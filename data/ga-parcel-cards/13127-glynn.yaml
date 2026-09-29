@@ -1,0 +1,470 @@
+state: GA
+jurisdiction: Glynn County
+fips: "13127"
+level: county
+markets: [Brunswick]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + parcel-attributed zoning (NO owner/tax/sale on REST)
+  - role: parcels
+    name: Parcels/Parcels — Glynn County GIS FeatureServer
+    restUrl: https://gis-web.glynncounty-ga.gov/gis-server/rest/services/Parcels/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Shape__Area
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      PARCELID: parcelIdCompact
+      PIN: parcelPin
+      PRCLKEY: parcelKey
+      SUBDNAME: subdivision
+      LEGAL_DESC: legalDescription
+      LOT_NUM: lotNumber
+      BLOCK_NUM: blockNumber
+      ZONE_1: zoning
+      ZONE_2: zoningAlt
+      ZONE_3: zoningAlt2
+      ZONE_4: zoningAlt3
+      DIST_CITY: taxDistrict
+      COMM_DISTRICT: commissionDistrict
+      Shape__Area: acreageGisSqFt
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Glynn County GIS — gis-web.glynncounty-ga.gov
+      Parcels/Parcels FeatureServer/0). Live count 46503 (2026-09-24). SR NAD 1983
+      StatePlane Georgia East FIPS 1001 Feet (wkid 102666 / 2239). maxRecordCount 2000 —
+      page via resultOffset / spatial envelopes. PARCEL_ID filled 46205; PIN filled 46493;
+      ZONE_1 filled 46017. Schema is THIN on CAMA: NO ownerName / mailing / CURR_VAL /
+      SALE_VAL / deed acres — tax/owner/sale via qPublic App=GlynnCountyGA / AppID=964
+      LayerID=19142 HTML (KeyValue={PIN} or {PARCEL_ID}; bot/CDN may 403 automated).
+      Acreage: Shape__Area is StatePlane sq ft — convert acres = Shape__Area/43560 (no
+      Deed_Acres field). Soft DIST_CITY (geo-checked): 01≈Brunswick (~6918; ~-81.49,31.16),
+      02≈west mainland / Everett-Thalman (~1092; ~-81.64–81.69,31.16–31.39), 03≈mainland
+      unincorporated majority (~26077), 04≈St Simons Island (~10733; ~-81.39,31.15),
+      05≈Sea Island (~797; ~-81.33,31.20), 06≈Jekyll Island (~876; ~-81.41,31.07) — prefer
+      spatial Boundaries/1 City of Brunswick + Addresses CITY for municipality. ZONE_1 top:
+      FA≈8880, R6≈6704, PDG≈6539, R12≈4250, R9≈4222, GR≈2732, PDR≈2439, R20≈1971,
+      MUCCH≈1040, HC≈956, PD≈913, G≈880, MR≈758, RR≈646. Companion Addresses/0 for situs
+      (FULL_ADDRESS/CITY/ZIP_POSTAL join on PARCEL_ID). REJECT paid Regrid/ATTOM. GEO-VERIFY
+      GEORGIA: WGS84 samples ~-81.495,31.162 (Brunswick New Town) / ~-81.395,31.154
+      (St Simons) — Census TIGERweb GEOID 13127 CENTLAT +31.2132793 CENTLON -081.4936324
+      (Brunswick MSA / Golden Isles). Boundaries/0 Glynn Boundary STCOFIPS context.
+      Schema EDITOR_NAME — DO NOT collect as PII; skip utilities/JWSC/AADT per tranche-3.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/FMV on public REST; qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Parcels/Parcels REST has no market/assessed/taxable value fields. Tax/CAMA via
+      qPublic App=GlynnCountyGA / AppID=964 LayerID=19142 HTML only. Deep-link
+      KeyValue={PIN} (or PARCEL_ID): Application.aspx?AppID=964&LayerID=19142&PageTypeID=4
+      &KeyValue={PIN}. Search PageTypeID=2&PageID=8446; Maps PageTypeID=1&PageID=8445.
+      Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_VAL/SALEDATE on Parcels/Parcels FeatureServer. Prefer qPublic Sales Search /
+      Sales List HTML App=GlynnCountyGA / AppID=964. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Zoning/Zoning Euclidean polygons + parcel ZONE_1
+    restUrl: https://gis-web.glynncounty-ga.gov/gis-server/rest/services/Zoning/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONE_: zoning
+      COMBINED_ZONE: zoningClass
+      ZONE_TYPE: zoningType
+      OVERLAYS: zoningOverlay
+      ZN_APP_NO_: zoningAppNumber
+    notes: >
+      Preferred Euclidean zoning polygons (count 4688). ZONE_ / COMBINED_ZONE / ZONE_TYPE
+      (RESIDENTIAL/COMMERCIAL/…). Parcel-attributed ZONE_1 on Parcels/Parcels/0 is usable
+      secondary (filled 46017) — join spatial or use parcel attribute for quick filters.
+      Companion Zoning/Preliminary_Proposed also on same server — draft only.
+    status: usable
+
+  - role: flu
+    name: Glynn_County_2018_Character_Areas (SEGRASS AGOL)
+    restUrl: https://services1.arcgis.com/PITZGI6S0DUdRaq5/arcgis/rest/services/Glynn_County_2018_Character_Areas/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Area
+    coverage: county-wide
+    fieldMap:
+      NAME: flu
+      Character_: fluAlt
+      PermittedZ: zoningPermitted
+      Area: acreage
+    notes: >
+      2018 Comp Plan character areas (count 18) — Coastal Marshlands / Community Gateway /
+      etc. with PermittedZ allowed zoning lists. Geo samples ~-81.53,31.07 / ~-81.47,31.30
+      — Glynn GA. Viewer: segrass.maps.arcgis.com webappviewer id=8ff5cbe331e44fa68900b8e7383883cc.
+      Not a substitute for Euclidean Zoning/Zoning/0.
+    status: usable
+
+  - role: other
+    name: Addresses/Addresses (situs points — join to parcels)
+    restUrl: https://gis-web.glynncounty-ga.gov/gis-server/rest/services/Addresses/Addresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      PARCELID: parcelIdCompact
+      PIN: parcelPin
+      FULL_ADDRESS: situsAddress
+      PADDR_NUMB: situsNumber
+      PRE_DIR: situsStreetDir
+      STREET: situsStreet
+      STREET_TYP: situsStreetType
+      UNIT_NUM: situsUnit
+      CITY: situsCity
+      ZIP_POSTAL: situsZip
+      LAT: latitude
+      LON: longitude
+    notes: >
+      Live count 69056. Join to Parcels on PARCEL_ID / PIN for situs. CITY top:
+      BRUNSWICK≈48893, ST SIMONS ISLAND≈17201, JEKYLL ISLAND≈1538, SEA ISLAND≈1224 —
+      situs city (usable for place filter alongside DIST_CITY / Boundaries). Sample
+      PARCEL_ID 01-03384 → FULL_ADDRESS '2319 WOLFE ST' CITY BRUNSWICK ZIP 31520
+      (~-81.495,31.162). Multi-address parcels possible — do not assume 1:1.
+    status: usable
+
+  - role: other
+    name: Boundaries/Boundaries — Glynn + City of Brunswick
+    restUrl: https://gis-web.glynncounty-ga.gov/gis-server/rest/services/Boundaries/Boundaries/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: cityName
+      MUNITYP: municipalityType
+      MUNIAREA: municipalityAreaSqMi
+    notes: >
+      Layer 1 "City of Brunswick Boundary" (count=1; NAME=City of Brunswick; centroid
+      ~-81.471,31.175). Preferred spatial municipality filter for Brunswick. Layer 0
+      "Glynn Boundary" = county outline (NAME=Glynn County COUNTYAREA=541.6). Soft
+      DIST_CITY='01' as attribute fallback only (~6918). Do NOT filter by owner mailing.
+    status: usable
+
+municipalities:
+  - name: Brunswick
+    level: city
+    parentFips: "13127"
+    joinToCountyParcels: >
+      Spatial Boundaries/Boundaries/1 City of Brunswick (~-81.47,31.17) OR soft
+      DIST_CITY='01' (~6918) OR Addresses CITY='BRUNSWICK'.
+    layers:
+      - role: zoning
+        name: Zoning/Zoning + parcel ZONE_1 Brunswick extract
+        restUrl: https://gis-web.glynncounty-ga.gov/gis-server/rest/services/Zoning/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE_: zoning
+          COMBINED_ZONE: zoningClass
+        notes: >
+          Prefer spatial Brunswick boundary ∩ Zoning/0; parcel ZONE_1 (e.g. GR in New Town)
+          as attribute aid. No separate City-of-Brunswick zoning FeatureServer — county
+          Zoning service covers city.
+        status: usable
+      - role: flu
+        name: Glynn_County_2018_Character_Areas city extract
+        restUrl: https://services1.arcgis.com/PITZGI6S0DUdRaq5/arcgis/rest/services/Glynn_County_2018_Character_Areas/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Area
+        coverage: city-only
+        fieldMap:
+          NAME: flu
+        notes: County character-area polygons clipped to Brunswick boundary — no city-owned FLU REST.
+        status: partial
+      - role: parcels
+        name: null — use county Parcels filtered to Brunswick
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Brunswick-only CAMA FeatureServer — county Parcels/Parcels/0 + spatial
+          Boundaries/1 / DIST_CITY=01. Owner/tax/sale still qPublic AppID=964 HTML.
+        status: gap
+    gaps:
+      - "No City-of-Brunswick separate parcel/CAMA REST — county layers + spatial Brunswick."
+      - "Owner/tax/sale HTML-only (qPublic) even inside city."
+    status: usable
+
+  - name: St. Simons Island
+    level: city
+    parentFips: "13127"
+    joinToCountyParcels: >
+      Soft DIST_CITY='04' (~10733; ~-81.39,31.15) OR Addresses CITY='ST SIMONS ISLAND'
+      (~17201). Unincorporated CDP / island community — no separate city-limits REST on
+      Boundaries (only Brunswick polygon published).
+    layers:
+      - role: zoning
+        name: Zoning/Zoning + parcel ZONE_1 SSI extract
+        restUrl: https://gis-web.glynncounty-ga.gov/gis-server/rest/services/Zoning/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE_: zoning
+        notes: County Zoning + DIST_CITY=04 / Addresses CITY filter. No SSI-owned GIS.
+        status: partial
+      - role: flu
+        name: Character Areas SSI extract
+        restUrl: https://services1.arcgis.com/PITZGI6S0DUdRaq5/arcgis/rest/services/Glynn_County_2018_Character_Areas/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Area
+        coverage: city-only
+        fieldMap:
+          NAME: flu
+        notes: County character areas only.
+        status: partial
+      - role: parcels
+        name: null — county Parcels + DIST_CITY=04
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcels/Parcels/0 + DIST_CITY='04' / Addresses CITY.
+        status: gap
+    gaps:
+      - "St. Simons Island unincorporated — no city-owned parcel/zoning/FLU REST; use county + DIST_CITY=04."
+    status: partial
+
+  - name: Jekyll Island
+    level: city
+    parentFips: "13127"
+    joinToCountyParcels: >
+      Soft DIST_CITY='06' (~876; ~-81.41,31.07) OR Addresses CITY='JEKYLL ISLAND' (~1538).
+      Jekyll Island Authority / state park context — JekyllIsland/Jekyll_EnerGov MapServer
+      exists (skip utilities/EnerGov detail unless needed). No separate city-limits polygon
+      on Boundaries.
+    layers:
+      - role: zoning
+        name: Zoning/Zoning Jekyll extract
+        restUrl: https://gis-web.glynncounty-ga.gov/gis-server/rest/services/Zoning/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE_: zoning
+        notes: County Zoning + DIST_CITY=06 / Addresses CITY.
+        status: partial
+      - role: flu
+        name: Character Areas Jekyll extract
+        restUrl: https://services1.arcgis.com/PITZGI6S0DUdRaq5/arcgis/rest/services/Glynn_County_2018_Character_Areas/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Area
+        coverage: city-only
+        fieldMap:
+          NAME: flu
+        notes: County character areas only.
+        status: partial
+      - role: parcels
+        name: null — county Parcels + DIST_CITY=06
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcels/Parcels/0 + DIST_CITY='06'.
+        status: gap
+    gaps:
+      - "Jekyll Island — no municipal parcel REST; county + DIST_CITY=06; JIA/EnerGov not preferred CAMA."
+    status: partial
+
+  - name: Sea Island
+    level: city
+    parentFips: "13127"
+    joinToCountyParcels: >
+      Soft DIST_CITY='05' (~797; ~-81.33,31.20) OR Addresses CITY='SEA ISLAND' (~1224).
+      Private island / unincorporated — no city-limits REST.
+    layers:
+      - role: zoning
+        name: Zoning/Zoning Sea Island extract
+        restUrl: https://gis-web.glynncounty-ga.gov/gis-server/rest/services/Zoning/Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE_: zoning
+        notes: County Zoning + DIST_CITY=05.
+        status: partial
+      - role: flu
+        name: Character Areas Sea Island extract
+        restUrl: https://services1.arcgis.com/PITZGI6S0DUdRaq5/arcgis/rest/services/Glynn_County_2018_Character_Areas/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Area
+        coverage: city-only
+        fieldMap:
+          NAME: flu
+        notes: County character areas only.
+        status: partial
+      - role: parcels
+        name: null — county Parcels + DIST_CITY=05
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcels/Parcels/0 + DIST_CITY='05'.
+        status: gap
+    gaps:
+      - "Sea Island unincorporated — county layers + DIST_CITY=05 only."
+    status: partial
+
+gaps:
+  - "No ownerName / mailing / CURR_VAL / assessed / SALE_* on Parcels/Parcels REST — tax/owner/sale via qPublic App=GlynnCountyGA / AppID=964 LayerID=19142 HTML only."
+  - "No Deed_Acres — derive GIS acres from Shape__Area/43560 (StatePlane ft²)."
+  - "Parcels maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "AGOL Tax_Parcels_Zone_1..4 are tiny address-ish splits (≈300 each) — NOT preferred vs gis-web Parcels/0."
+  - "Only Brunswick has published city-limits polygon (Boundaries/1); SSI/Jekyll/Sea Island via DIST_CITY + Addresses CITY."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/glynn + AppID=964 public for humans."
+  - "Rejected paid Regrid/ATTOM; skipped JWSC/Utilities/Street_Lights/AADT per tranche-3; no emails/phones."
+
+license: >
+  Glynn County GIS gis-web.glynncounty-ga.gov — Parcels/Parcels, Zoning/Zoning,
+  Addresses/Addresses, Boundaries/Boundaries. Character areas SEGRASS AGOL
+  PITZGI6S0DUdRaq5 Glynn_County_2018_Character_Areas. Public GIS sidebar
+  glynn.maps.arcgis.com instant app e82fe78c023b43f885f7260e84363006. Assessor
+  qPublic App=GlynnCountyGA / AppID=964 LayerID=19142 (qpublic.net/ga/glynn;
+  glynncounty.org GIS / Assessors). Attribution Glynn County GIS / Tax Assessor.
+  Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=964&LayerID=19142&PageTypeID=2&PageID=8446
+jurisdictionGisUrl: https://glynn.maps.arcgis.com/apps/instant/sidebar/index.html?appid=e82fe78c023b43f885f7260e84363006
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://gis-web.glynncounty-ga.gov/gis-
+    server/rest/services/Parcels/Parcels/FeatureServer/0 count 46504; extent center [['13127', 'Glynn
+    County']]; sample [['13127', 'Glynn County']]. No change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Brunswick city"
+      level: city
+      parentFips: "13127"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Glynn' AND aadt>0
+    altFilter: name LIKE '127-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 127-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 247
+    maxAadt: 62500
+    geoCheck: 246/247 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=GlynnCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=964&LayerID=19142&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_ID
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 01-03384
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=GlynnCountyGA&Layer=Parcels&PageType=Report&KeyValue=01-03384
+    verification: 'pattern-tested: real sample ID from PARCEL_ID; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://glynn.maps.arcgis.com/apps/instant/sidebar/index.html?appid=e82fe78c023b43f885f7260e84363006
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Brunswick city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

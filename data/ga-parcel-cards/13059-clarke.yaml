@@ -1,0 +1,483 @@
+state: GA
+jurisdiction: Clarke County
+fips: "13059"
+level: county
+markets: [Athens]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons (owner/mailing/situs/acres; no FMV/sales on this layer)
+  - role: parcels
+    name: ACC_Parcels (Athens-Clarke County Unified Government GIS — enigma.accgov.com)
+    restUrl: https://enigma.accgov.com/server/rest/services/ACC_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      REALKEY: ownerKey
+      OWNER_NAME: ownerName
+      OWNER_ADD: mailingAddress
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      PAR_ADD: situsAddress
+      HOUSE: situsNumber
+      STNAM_TYP: situsStreet
+      unit: situsUnit
+      FLOOR: situsFloor
+      ACRES: acreage
+      Shape__Area: shapeAreaSqFt
+      LEGAL_DESC: legalDescription
+      EXEMPTION: homesteadExempt
+      Neighbhd: neighborhood
+      Parcel_Inf: appraiserInternalUrl
+      FTR_CODE: featureCode
+      ccy: changeYearSoft
+      last_edited_date: lastUpdate
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + ownership/mailing/situs/acreage landbase
+      for Clarke County / Athens-Clarke County Unified Government (ACC) — FIPS 13059,
+      Athens MSA. Live count 43632 (2026-09-23). Identical twin:
+      PlanningViewer2025/FeatureServer/3 (same count/schema). Hosted mirrors slightly
+      behind: Hosted/ACC_PLANNING_VIEWER_2025/FeatureServer/3 count 42865;
+      Hosted/ACC_PARCELS/FeatureServer/0 count 41987; AGOL org xSEULKvB31odt3XQ
+      Parcel/FeatureServer/0 count 41989 (same schema — prefer enigma ACC_Parcels).
+      Case_Map_ParcelsSEPT2026/MapServer/10 also 43632. Prefer ACC_Parcels FeatureServer
+      (supportsPagination=true, supportsStatistics=true, maxRecordCount 2000). SR NAD 1983
+      StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240). ACRES>0
+      ≈18551; ACRES 5–150 ≈2122 (preferred multifamily acreage band); Shape__Area
+      217800–6534000 (≈5–150 ac GIS) ≈2061; ACRES=0|null ≈25081 (many condos/zero-lot /
+      ROW — when ACRES=0 prefer Shape__Area/43560 for GIS acres). OWNER_NAME / PAR_ADD /
+      ZIP filled ≈42951–42962; PARCEL_NO filled ≈43531; REALKEY filled ≈42962.
+      Compose situs from PAR_ADD (or HOUSE + STNAM_TYP). CITY/STATE/ZIP are OWNER mailing
+      (nationwide — ATHENS≈27910, WINTERVILLE≈1817, BOGART≈1619, WATKINSVILLE≈1344,
+      ATLANTA≈1063, ALPHARETTA/LARGO/MARIETTA/MINNETONKA…) — never municipality filter.
+      EXEMPTION soft (S0≈26580, S1≈8625, SC≈7463, SD≈161…) — homestead/exempt codes; no
+      published REST legend. Parcel_Inf is INTERNAL shard URL
+      (http://shard/gis/.../info.asp?key={REALKEY}) — not a public deep-link; use qPublic
+      KeyValue={PARCEL_NO} instead. ccy sparsely filled (blank≈40583; years 2017–2026
+      sparse) — soft change-year only. last_edited_date max ≈2026-09-23 UTC (fresh).
+      Official viewers: Planning Experience
+      https://experience.arcgis.com/experience/4ff11e146bac4516afe4571d3162ba10 ;
+      athensclarke.maps.arcgis.com MapSeries
+      appid=8f5a00e09802482b8641f2c98b19a42 ; Open Data hub
+      data-athensclarke.opendata.arcgis.com. Assessor HTML: qPublic SchneiderCorp
+      App=ClarkeCountyGA (qpublic.net/ga/clarke → Application.aspx?App=ClarkeCountyGA
+      &Layer=Parcels&PageType=Search). Numeric AppID form also works:
+      AppID=630&LayerID=11199&PageTypeID=4&PageID=4601&KeyValue={PARCEL_NO}
+      (preserve internal spaces in PARCEL_NO, e.g. "172D  013A"). NOTE: Clarke County
+      Board of Tax Assessors appraises ALL property in the county including Winterville
+      and Bogart (not part of unified ACC government). Geo-verified WGS84 samples
+      ~-83.336,33.890 (Barnett Shoals), ~-83.298,33.892 (Millstone Cir),
+      ~-83.335,33.895 (Red Fox Run), ~-83.298,33.897 (Morton Rd), county centroid
+      ~-83.38,33.95 — Clarke County GA / Athens MSA (NOT Clarke County VA Berryville;
+      NOT Clarke County AL Grove Hill alabamagis.com/Clarke; NOT Athens OH/TX/AL
+      lookalikes; NOT Oconee County GA Watkinsville as county card). Rejected ARC
+      LandPro_2012 stale regional as cadastral; rejected Regrid/ATTOM/CoreLogic paid;
+      rejected AGOL xSEULKvB31odt3XQ Parcel as preferred (stale count). NO tax.marketValue /
+      assessedValue / lastSale on this layer — see tax/sales entries.
+    status: usable
+
+  - role: tax
+    name: null — no public CAMA market/assessed REST; qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No CURR_VAL / FMV* / MAV* / assessed / taxable fields on ACC_Parcels or any
+      recovered public FeatureServer (Clariti, PlanningViewer2025, Case_Map*, Hosted
+      ACC_PARCELS, AGOL Parcel mirror). Tax/CAMA market + assessed + exemptions via
+      qPublic SchneiderCorp App=ClarkeCountyGA / AppID=630 LayerID=11199 HTML only.
+      Deep-link: Application.aspx?App=ClarkeCountyGA&Layer=Parcels&PageType=Report
+      &KeyValue={PARCEL_NO} or AppID=630&LayerID=11199&PageTypeID=4&PageID=4601
+      &KeyValue={PARCEL_NO}. Schneider Application.aspx observed HTTP 403 to automated
+      clients; qpublic.net/ga/clarke landing 200. Tax Commissioner payment portal
+      separate from CAMA. Status gap on REST; usable via HTML for humans.
+    status: gap
+
+  - role: sales
+    name: Parcel_Sales_2018 (calendar-year 2018 sale polygons only)
+    restUrl: https://enigma.accgov.com/server/rest/services/Parcel_Sales_2018/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      NET_SP: lastSale.price
+      SALEDATE: lastSale.date
+      REASON: lastSale.qualified
+      DEEDPAGE: lastSale.deedPage
+      GRANTOR: lastSale.grantor
+      GRANTEE: lastSale.grantee
+      OWNER_NAME: ownerName
+      PAR_ADD: situsAddress
+      REALKEY: ownerKey
+    notes: >
+      Only recovered public REST sales layer. Live count 2770; NET_SP>0 =2770;
+      SALEDATE filled =2770. SALEDATE range epoch ≈2018-01-02 → 2018-12-31 UTC —
+      calendar year 2018 ONLY (stale as of 2026-09-23). REASON domain: FM≈2199,
+      LM≈311, MM≈216, BV≈23, BK≈21 (soft qualification — FM appears arms-length;
+      no published REST legend). NET_SP min≈2000 max≈82500000 avg≈341876. Join
+      PARCEL_NO→parcels.PARCEL_NO. Geo-verified sale samples ~-83.361,33.917 /
+      ~-83.298,33.923 / ~-83.364,33.954 — Clarke GA. GAP: no 2019–2026 year layers
+      on REST; post-2018 / multi-sale history via qPublic Sales Search HTML only
+      (bot 403). On-parcel lastSale fields do NOT exist on ACC_Parcels. Rejected
+      paid Regrid/ATTOM sales; rejected Clarke VA/AL sales services (wrong state).
+    status: partial
+
+  - role: zoning
+    name: PlanningViewer2025 Zoning (ACC Planning — parcel-keyed district polygons)
+    restUrl: https://enigma.accgov.com/server/rest/services/PlanningViewer2025/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PIN: parcelIdCompact
+      CurrentZn: zoning
+      CombinedZn: zoningCombined
+      RGProperty: zoningRgFlag
+      SplitZoned: zoningSplitFlag
+      Acres: acreage
+    notes: >
+      Preferred authoritative ACC zoning POLYGON layer (Official Zoning Map of
+      Athens-Clarke County per Municode §9-3-3, dated 2024-02-06). Live count 43161
+      (2026-09-23). Twin: Parcel_Zoning_Types/FeatureServer/0 (same count/schema);
+      Clariti/ClaritiMap/MapServer/54; Hosted/ACC_PLANNING_VIEWER_2025/FeatureServer/14.
+      Prefer PlanningViewer2025 FeatureServer/14 (supportsPagination=true,
+      maxRecordCount 2000). Attribute join PARCEL_NO→parcels.PARCEL_NO (filled=43161)
+      or compact PIN (spaces stripped); spatial intersect also OK. CurrentZn top:
+      RS-25≈9579, RS-8≈6902, RS-15≈6623, RM-1≈4589, AR≈3844, RS-5≈3442, C-G≈2169,
+      RM-2≈1796, C-O≈852, C-D≈756, C-N≈639, I≈556, G≈465, E-I≈448, E-O≈167, P≈112,
+      C-R≈105, RS-40≈95 (+ IN/RM-3/I (PD)/C-G* sparse). CombinedZn carries split /
+      overlay combos when set. Ordinance: library.municode.com/ga/athens-clarke_county
+      Title 9. Experience viewer embeds this layer:
+      experience.arcgis.com/experience/4ff11e146bac4516afe4571d3162ba10. Geo-check:
+      P ~-83.375,34.005; RS-15 ~-83.347,34.005; RS-25 ~-83.401,34.021 — Athens-Clarke
+      GA. IMPORTANT: ACC zoning covers unified ACC footprint; Winterville (~728 parcels
+      spatial, only ≈58 zoning polys intersecting — mostly AR/RS-25 fringe) and Bogart
+      (~119 parcels, ≈25 zoning polys) have independent city zoning (PDF/UDC) — do NOT
+      treat ACC CurrentZn as Winterville/Bogart local zoning (see municipalities).
+    status: usable
+
+  - role: flu
+    name: PlanningViewer2025 Future Land Use (ACC Comp Plan / 2045 FLU)
+    restUrl: https://enigma.accgov.com/server/rest/services/PlanningViewer2025/FeatureServer/41
+    layerId: 41
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      Updated_FL: flu
+      ACRES: acreage
+      PROJECT_NO: fluProjectNumber
+      DATE_CHANG: fluChangeDate
+      Split: fluSplitFlag
+      Change: fluChangeFlag
+    notes: >
+      Preferred public REST Future Land Use. Live count 42303; Updated_FL filled
+      ≈42302. Domain: Traditional Neighborhood≈18216, Single Family Residential≈10787,
+      Mixed Density Residential≈4411, Rural≈3725, General Business≈1422, Employment≈1334,
+      Main Street Business≈1086, Downtown≈872, Government≈449. Twins:
+      FutureLandUse/FeatureServer/0 (count 42303 same schema);
+      Future_Land_Use/FeatureServer/0 (FLU_New, count 40936 — older/smaller, prefer
+      PlanningViewer2025/41); Clariti/ClaritiMap/MapServer/55. Attribute join
+      PARCEL_NO→parcels.PARCEL_NO or spatial. Planning Dept documents 2045 Future Land
+      Use Map on athensclarkecounty.com/planning — certify critical sites against
+      adopted Comp Plan PDF / Planning staff. ACC_Future_Development is Planned
+      Development overlay (not FLU) — do not prefer as future land use.
+      Land_Base_Classification_Standards/FeatureServer/0 (LBCS count 43327;
+      Activity/Structure/Site/Ownership) is existing land-based classification — not FLU.
+      No separate Winterville/Bogart city FLU FeatureServer recovered.
+    status: usable
+
+  - role: other
+    name: ACC_Boundary / Clariti Municipality (county + Winterville + Bogart polys)
+    restUrl: https://enigma.accgov.com/server/rest/services/ACC_Boundary/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      FTR_CODE: featureCode
+    notes: >
+      ACC_Boundary live count 1 — NAME=Athens-Clarke, FTR_CODE=COUNTY, centroid
+      ~-83.341,33.950. Preferred municipality filter (count 3):
+      Clariti/ClaritiMap/MapServer/71 NAME in (Athens-Clarke, Winterville, Bogart) OR
+      dedicated Winterville_Boundary/FeatureServer/0 (NAME='WINTERVILLE CITY LIMIT',
+      ~-83.280,33.966) and Bogart_Boundary/FeatureServer/0 (NAME='BOGART CITY LIMIT',
+      ~-83.522,33.951); also PlanningViewer2025 layers 15/16/17. Join = spatial
+      intersect (default). Do NOT filter by parcel mailing CITY.
+    status: usable
+
+  - role: other
+    name: ACC_Address_Point (site address points)
+    restUrl: https://enigma.accgov.com/server/rest/services/ACC_Address_Point/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      FullAdd: situsAddress
+      HouseNum: situsNumber
+      PreDir: situsStreetDir
+      StreetName: situsStreetName
+      StreetType: situsStreetType
+      FullStreetName: situsStreet
+      Unit: situsUnit
+      City: situsCity
+      Zipcode: situsZip
+      POSTALCITY: situsPostalCity
+      State: situsState
+      AddClass: addressClass
+      Status: addressStatus
+    notes: >
+      Live count 78045 address points. ParcelID join key present (format matches
+      parcels.PARCEL_NO). City domain: Athens≈76860, Winterville≈810, ACC≈254,
+      Bogart≈109 — preferred situs-city / soft municipality filter (better than
+      mailing CITY). Twin: PlanningViewer2025/FeatureServer/0 Address Point.
+      Geo-verified Winterville samples ~-83.294,33.972 / ~-83.295,33.962.
+      Inc_Muni field present but empty (n=0) — do not rely on. Zip_Codes/FeatureServer/0
+      (8 polys: 30601/02/06/07/09/22/46/83) for spatial situs-zip fallback.
+    status: usable
+
+municipalities:
+  - name: Athens-Clarke County (unified government)
+    level: county
+    parentFips: "13059"
+    joinToCountyParcels: >
+      Vast majority of ACC_Parcels IS the unified Athens-Clarke County government
+      footprint (City of Athens + Clarke County consolidated 1991). Spatial:
+      Clariti Municipality NAME='Athens-Clarke' OR ACC_Boundary; exclude Winterville
+      and Bogart city-limit polys when needing unified-only. Soft: Addresses
+      City='Athens' (~76860). Do NOT filter by mailing CITY='ATHENS' (owner mailing
+      nationwide). Standing order city-over-county: ACC zoning/FLU ARE the local
+      zoning/FLU for the unified area.
+    layers:
+      - role: zoning
+        name: PlanningViewer2025 Zoning (unified ACC = local zoning)
+        restUrl: https://enigma.accgov.com/server/rest/services/PlanningViewer2025/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: county-wide
+        fieldMap:
+          CurrentZn: zoning
+          CombinedZn: zoningCombined
+          PARCEL_NO: parcelId
+        notes: >
+          Official ACC zoning for unified jurisdiction. Municode Title 9; Official
+          Zoning Map 2024-02-06. Experience 4ff11e146bac4516afe4571d3162ba10.
+        status: usable
+      - role: flu
+        name: PlanningViewer2025 Future Land Use
+        restUrl: https://enigma.accgov.com/server/rest/services/PlanningViewer2025/FeatureServer/41
+        layerId: 41
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: county-wide
+        fieldMap:
+          Updated_FL: flu
+          PARCEL_NO: parcelId
+        notes: >
+          ACC Comp Plan / 2045 FLU on public REST. Certify vs Planning Dept Comp Plan PDF.
+        status: usable
+      - role: parcels
+        name: ACC_Parcels (same as county preferred)
+        restUrl: https://enigma.accgov.com/server/rest/services/ACC_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: county-wide
+        fieldMap:
+          PARCEL_NO: parcelId
+          ACRES: acreage
+          OWNER_NAME: ownerName
+        notes: >
+          No separate city CAMA — county Assessor layer covers unified ACC + Winterville
+          + Bogart (Clarke portion).
+        status: usable
+    gaps:
+      - "Former City of Athens and Clarke County governments consolidated 1991 into Athens-Clarke County Unified Government — no separate City of Athens GIS card required for the unified footprint."
+      - "No tax.marketValue / assessedValue on REST for unified ACC — qPublic HTML only."
+    status: usable
+
+  - name: Winterville
+    level: city
+    parentFips: "13059"
+    joinToCountyParcels: >
+      Spatial Winterville_Boundary/FeatureServer/0 OR Clariti Municipality
+      NAME='Winterville' OR PlanningViewer2025/17 (~728 parcels intersecting) OR
+      Addresses City='Winterville' (~810). Centroid ~-83.280,33.966. Mailing
+      CITY='WINTERVILLE' is owner mailing — never sole filter. Tax Assessor still
+      appraises Winterville parcels on county ACC_Parcels / qPublic.
+    layers:
+      - role: zoning
+        name: null — Winterville Zoning Map PDF 2021 (no city FeatureServer)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Winterville is NOT part of unified ACC; has independent zoning ordinance
+          (Municode library.municode.com/ga/winterville) and official Zoning Map PDF
+          2021: https://www.cityofwinterville.com/_files/ugd/b3a714_78c59792d2eb4c79aaad1573f06e9942.pdf
+          (filename Winterville_Zoning_Map_2021_HighContrast with Zoning Designations;
+          districts cited elsewhere include C1/G/PLC/R12H/R15H/R18H/R20H/RR). No
+          Winterville-owned zoning FeatureServer recovered. ACC PlanningViewer Zoning
+          intersects only ≈58 of ≈728 Winterville parcels (AR≈40 / RS-25≈15) — fringe /
+          incomplete; do NOT prefer ACC CurrentZn as Winterville local zoning. Status gap
+          on REST; PDF usable for manual certify. cityofwinterville.com/planning-and-zoning.
+        status: gap
+      - role: flu
+        name: null — no Winterville city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Winterville city Future Land Use FeatureServer. ACC FLU may label some
+          Winterville-area parcels but is ACC Comp Plan — certify via Winterville Planning
+          & Zoning / Comp Plan if adopted. Status gap.
+        status: gap
+      - role: parcels
+        name: null — use county ACC_Parcels filtered to Winterville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Winterville-only CAMA — county ACC_Parcels + spatial Winterville boundary /
+          Addresses City='Winterville'. Assessor covers Winterville.
+        status: gap
+    gaps:
+      - "Winterville zoning is PDF-only (2021 map); no public zoning/FLU FeatureServer."
+      - "ACC Zoning intersects only ~58/~728 Winterville parcels — not authoritative city zoning."
+      - "Rejected Zoneomics / paid zoning extracts."
+    status: partial
+
+  - name: Bogart
+    level: city
+    parentFips: "13059"
+    joinToCountyParcels: >
+      Spatial Bogart_Boundary/FeatureServer/0 OR Clariti Municipality NAME='Bogart'
+      OR PlanningViewer2025/16 (~119 Clarke-portion parcels intersecting) OR
+      Addresses City='Bogart' (~109). Centroid ~-83.522,33.951 (west Clarke / east
+      Oconee fringe). NOTE: City of Bogart straddles Clarke County and Oconee County
+      — this card covers Clarke FIPS 13059 portion only; Oconee-side parcels are
+      outside this county card. Mailing CITY='BOGART' never sole filter.
+    layers:
+      - role: zoning
+        name: null — Bogart Unified Development Code / Clerk map (no city FeatureServer)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Bogart is NOT part of unified ACC. Zoning governed by City of Bogart Unified
+          Development Code (adopted 2024-08-12; cityofbogart.com/city/planning-development
+          + UDC PDFs). Official zoning map maintained by City Clerk / Planning — no
+          public FeatureServer recovered. ACC Zoning intersects only ≈25 of ≈119
+          Clarke-portion Bogart parcels (RS-25/AR/E-I/E-O/RS-8) — do NOT prefer as
+          Bogart local zoning. Status gap on REST; UDC + Clerk map for certify.
+        status: gap
+      - role: flu
+        name: null — no Bogart city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Bogart city FLU FeatureServer on ACC or city sites. Status gap.
+        status: gap
+      - role: parcels
+        name: null — use county ACC_Parcels filtered to Bogart (Clarke portion)
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Bogart-only CAMA on ACC — county ACC_Parcels + spatial Bogart boundary
+          (Clarke). Oconee County Assessor covers Oconee-side Bogart parcels (out of
+          scope for FIPS 13059).
+        status: gap
+    gaps:
+      - "Bogart UDC/zoning map PDF/Clerk only — no public zoning FeatureServer."
+      - "City straddles Clarke + Oconee; only Clarke portion in this card."
+      - "ACC Zoning coverage inside Bogart poly is thin (~25 polys) — not city zoning."
+    status: partial
+
+gaps:
+  - "No tax.marketValue / tax.assessedValue / taxableValue on any public ACC REST FeatureServer — CAMA values via qPublic HTML only (Schneider Application.aspx bot 403; qpublic.net/ga/clarke 200)."
+  - "Parcel_Sales_2018 is calendar-year 2018 only (2770 sales; SALEDATE max 2018-12-31) — 2019–2026 sales REST gap; use qPublic Sales Search HTML."
+  - "No lastSale fields on ACC_Parcels polygons themselves."
+  - "ACRES=0|null ≈25081 of 43632 — many condo/zero-acre records; use Shape__Area/43560 for GIS acres when ACRES blank/0."
+  - "Winterville and Bogart are independent municipalities (not unified ACC) — ACC Zoning/FLU do not authoritatively cover them; Winterville Zoning Map PDF 2021 + Bogart UDC Aug 2024 only (no city FeatureServers)."
+  - "Bogart straddles Clarke + Oconee — Oconee-side parcels out of FIPS 13059 scope."
+  - "Mailing CITY/STATE/ZIP nationwide — never municipality filter; prefer Clariti Municipality / Winterville_Boundary / Bogart_Boundary spatial or Addresses City."
+  - "Parcel_Inf internal shard URLs are not public deep-links — use qPublic KeyValue={PARCEL_NO}."
+  - "EXEMPTION / REASON / ccy codes lack published REST legends — soft only."
+  - "Hosted/ACC_PLANNING_VIEWER_2025 parcels (42865) and Hosted/ACC_PARCELS (41987) / AGOL xSEULKvB31odt3XQ Parcel (41989) trail preferred ACC_Parcels (43632) — prefer enigma ACC_Parcels."
+  - "Future_Land_Use FLU_New (40936) older/smaller than PlanningViewer2025 FLU (42303) — prefer PV2025/41."
+  - "ACC_Future_Development is Planned Development overlay — not FLU."
+  - "LBCS is existing land-base classification — not FLU."
+  - "Q_Public_CO MapServer/0 is 73-point CO sample — not countywide parcels."
+  - "Inc_Muni on Addresses empty (n=0) — use City field instead."
+  - "Rejected lookalikes / non-preferred: Clarke County VA (clarkecounty.gov Online Mapping / clarke.cama.concisesystems.com); Clarke County AL (alabamagis.com/Clarke); Athens OH / Athens TX / Athens AL lookalike GIS; Oconee County GA as Clarke substitute; ARC LandPro_2012 stale regional as cadastral; Regrid Nationwide Parcel Boundaries / app.regrid.com/store/.../clarke paid; ATTOM/CoreLogic/DynamoSpatial/Zoneomics paid; AGOL xSEULKvB31odt3XQ Parcel as preferred current."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Athens-Clarke County Unified Government GIS / Geographic Information Office /
+  Planning Department / Board of Tax Assessors (enigma.accgov.com ArcGIS Server —
+  ACC_Parcels, PlanningViewer2025, Parcel_Zoning_Types, FutureLandUse /
+  Future_Land_Use, Parcel_Sales_2018, ACC_Boundary, Winterville_Boundary,
+  Bogart_Boundary, ACC_Address_Point, Zip_Codes, Clariti/ClaritiMap,
+  Land_Base_Classification_Standards). Experience Planning Viewer
+  4ff11e146bac4516afe4571d3162ba10; athensclarke.maps.arcgis.com MapSeries
+  8f5a00e09802482b8641f2c98b19a42. Open Data hub data-athensclarke.opendata.arcgis.com.
+  Assessor HTML qPublic SchneiderCorp App=ClarkeCountyGA / AppID=630 LayerID=11199
+  (qpublic.net/ga/clarke). Municode Athens-Clarke Title 9 Zoning; Winterville
+  Municode + Zoning Map PDF 2021 cityofwinterville.com; Bogart Unified Development
+  Code cityofbogart.com (Aug 2024). Attribution to Athens-Clarke County / Tax
+  Assessor / Planning / Winterville / Bogart. Public fields only; no emails/phones;
+  no paid vendors (Regrid/ATTOM/CoreLogic/Zoneomics).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ClarkeCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

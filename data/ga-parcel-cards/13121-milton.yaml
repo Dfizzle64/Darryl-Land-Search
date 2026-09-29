@@ -1,0 +1,58 @@
+state: GA
+jurisdiction: "Milton, Fulton County"
+fips: "13121"
+level: city
+markets: [Atlanta]
+
+layers:
+  - role: zoning
+    name: Zoning
+    restUrl: https://gis.miltonga.gov/arcgis/rest/services/Zoning/FeatureServer/59
+    layerId: 59
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ClassAbbr: zoning
+      Class: zoningDescription
+      ParcelPIN: parcelId
+      CaseNumber: zoningCaseId
+      EffectiveDate: zoningEffectiveDate
+      Status: zoningStatus
+    notes: >
+      Official City of Milton GIS FeatureServer. Live count 2013 (2026-09-23). ParcelPIN is
+      nearly always null (only ~4 populated) — treat as spatial-join zoning, not attribute join.
+      Prefer this over older AGOL CityOfMiltonZoning (services.arcgis.com/Eg4L1xEv2R3abuQd/...;
+      506 features, ZONE_CODE) which appears stale/subset.
+    status: usable
+
+  - role: flu
+    name: FutureLandUse2040
+    restUrl: https://gis.miltonga.gov/arcgis/rest/services/FutureLandUse2040/FeatureServer/68
+    layerId: 68
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: city-only
+    fieldMap:
+      Label: flu
+      LUClass: fluDescription
+      Acres: acreage
+    notes: >
+      Preferred FLU horizon. Live count 2204. Spatial join only. Older FutureLandUse2035/67 and
+      ExistingLandUse2010/85 also public if historical needed. MiltonCharacterAreas also exists.
+    status: usable
+
+gaps:
+  - "ParcelPIN on zoning is almost always null — do not rely on attribute join."
+  - "No city-owned tax/CAMA parcel service; use Fulton PMV/11."
+
+license: "City of Milton GIS; public FeatureServer."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+notes: >
+  JOIN TO COUNTY PARCELS: Spatial intersect Milton zoning/FLU polygons with Fulton PMV
+  MapServer/11 parcel polygons. Shared ParcelPIN field exists on zoning schema but is not
+  reliably populated (~4/2013); do not use as primary join key.

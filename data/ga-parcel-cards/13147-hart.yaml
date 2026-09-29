@@ -1,0 +1,423 @@
+state: GA
+jurisdiction: Hart County
+fips: "13147"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Hart County Parcels (GMRC Lavonia sewer webmap)"
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/LavoniaSewerWebMap04282023_WFL1/FeatureServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    parcelIdField: "Parcel_No"
+    liveCount: 18340
+    liveCount5to150ac: null
+    geoCheck: "extent center [['13147', 'Hart County']]; sample [['13147', 'Hart County']]; extent WGS84 [-83.1158, 34.2097, -82.7739, 34.4937]"
+    fieldMap:
+      Parcel_No: "parcelId"
+      Real_Key: "ownerKey"
+      Shape__Area: "shapeArea (acres = /4046.86 in WebMercator-scaled units; prefer geodesic calc)"
+    notes: >
+      pass1 2026-09-28: County-wide Hart GA parcels (18340) on shared RC org Ug5xGQbHsD8zuZzM
+      (LavoniaSewerWebMap04282023_WFL1 layer 15; 2023 vintage). Parcel_No + Real_Key only - acres from
+      geometry. Hartwell city parcels: services3 7ScJ8q0HhcQyXcHe Hartwell_Parcels/0 (2745).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  # PRIMARY INTENT — no county-wide public parcel REST; Archway commercial/industrial partial only
+  - role: parcels
+    name: null — no county-wide public parcel FeatureServer/MapServer confirmed
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No COUNTY-WIDE public cadastral FeatureServer/MapServer for Hart County GA found
+      (2026-09-24). Assessor/GIS for humans = qPublic/Beacon App=HartCountyGA /
+      AppID=751 LayerID=11787 (qpublic.net/ga/hart → qpublic.schneidercorp.com;
+      Cloudflare/bot 403 automated). Deep-link KeyValue={Parcel_No}: Application.aspx?
+      AppID=751&LayerID=11787&PageTypeID=4&KeyValue={Parcel_No}; Search PageTypeID=2&
+      PageID=5894 (also App=HartCountyGA&Layer=Parcels&PageType=Search). County site
+      hartcountyga.gov/taxassess.html + static mapcounty.html — no interactive county GIS
+      hub. UGA ITOS Archway/HartCounty MapServer publishes Industrial Parcels (27; count
+      18) + Commercial Parcels (28; count 728) ONLY — NOT full county inventory (see
+      partial layers below). City of Hartwell Parcels (zion.greer AGOL; count 2745) is
+      city-only. GM_ELA "Hart County" web map is a 3-polygon boundary sketch (FID/Id
+      only) — not parcels. OpenAddresses us/ga/hart.json 404. Commercial mirrors claim
+      ~15–16k parcels — do NOT wire paid Regrid/ATTOM/USLandGrid. GEO target Hart County
+      GA NE Georgia / Lake Hartwell — TIGER GEOID 13147 CENTLAT +34.352 CENTLON -082.965
+      (Hartwell ~-82.93,34.35). REJECT Hart County MI / Hart MI city; REJECT Hart County
+      KY BRADD school apps; REJECT Lake Hartwell Project Oconee SC (oconeesc) lookalikes.
+      Until a county-wide REST restores, land-search polygons = HTML-only gap (honest).
+    status: gap
+
+  - role: parcels
+    name: Archway/HartCounty Commercial Parcels (partial — NOT county-wide)
+    restUrl: https://maps.itos.uga.edu/arcgis/rest/services/Archway/HartCounty/MapServer/28
+    layerId: 28
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      Parcel_No: parcelId
+      Real_Key: realKey
+      OWNKEY: ownerKey
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STTYPE: situsStreetType
+      STREET_NAM: situsStreet
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: digestStrat
+      CityZoning: zoning
+      Longitude: longitude
+      Latitude: latitude
+    notes: >
+      UGA Archway Partnership / Hart County 2016 MapServer — Commercial Parcels ONLY
+      (live count 728). Schema has Parcel_No / situs parts / TAXDISTRIC / DIGCLASS /
+      CityZoning — NO ownerName / mailing / market Value / sale / acres on this layer.
+      GEO-VERIFY GEORGIA: samples ~-82.939,34.345 (Gibson St Hartwell) — Hart GA.
+      maxRecordCount 1000. Companion Industrial Parcels layer 27 (count 18; adds Acres /
+      Site_Name / County='Hart' — e.g. Hart County Industrial Park Parcel_No 'C44 104'
+      ~-82.972,34.338). Useful for commercial/industrial subset + schema hint for
+      qPublic KeyValue={Parcel_No}; NOT a substitute for county-wide CAMA polygons.
+      Skip Utilities layer 19 per tranche-3.
+    status: partial
+
+  - role: parcels
+    name: Archway/HartCounty Industrial Parcels (partial)
+    restUrl: https://maps.itos.uga.edu/arcgis/rest/services/Archway/HartCounty/MapServer/27
+    layerId: 27
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: sample
+    fieldMap:
+      Parcel_No: parcelId
+      Real_Key: realKey
+      Acres: acreage
+      Site_Name: siteName
+      County: countyName
+      CityZoning: zoning
+      Longitude: longitude
+      Latitude: latitude
+    notes: >
+      Industrial subset only (count 18). County='Hart' filled; Acres present. Same Archway
+      2016 vintage as Commercial/28. Not county-wide.
+    status: partial
+
+  - role: tax
+    name: null — no public REST CAMA values county-wide
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer with market/assessed/taxable for Hart County GA
+      county-wide (2026-09-24). Archway commercial/industrial lack Value fields. Tax/CAMA
+      via qPublic AppID=751 LayerID=11787 HTML only (Estimate Taxes / Report pages). Tax
+      Commissioner pay portal hartcountypay.com — no open REST. Rejected paid vendor tax.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No Hart GA multi-sale FeatureServer/MapServer found. Prefer qPublic Sales Search /
+      Sales List HTML App=HartCountyGA / AppID=751. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Archway Commercial/Industrial CityZoning attribute only (partial)
+    restUrl: https://maps.itos.uga.edu/arcgis/rest/services/Archway/HartCounty/MapServer/28
+    layerId: 28
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      CityZoning: zoning
+      Parcel_No: parcelId
+    notes: >
+      Soft zoning attribute on Archway commercial (e.g. O-I) + industrial CityZoning —
+      NOT Euclidean county zoning polygons. No county Zoning FeatureServer confirmed.
+      City of Hartwell may have local zoning offline — not on public REST. Honest partial.
+    status: partial
+
+  - role: flu
+    name: null — no public FLU REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Future Land Use FeatureServer confirmed for Hart County GA (2026-09-24).
+    status: gap
+
+  - role: other
+    name: Archway/HartCounty County_Boundary
+    restUrl: https://maps.itos.uga.edu/arcgis/rest/services/Archway/HartCounty/MapServer/29
+    layerId: 29
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID10: fips
+      NAME10: countyName
+      STATEFP10: stateFips
+      COUNTYFP10: countyFips3
+    notes: >
+      Census 2010 county outline (GEOID10 context). Useful geo check — extent ~Hart GA
+      Web Mercator. Not parcels.
+    status: usable
+
+municipalities:
+  - name: Hartwell
+    level: city
+    parentFips: "13147"
+    joinToCountyParcels: >
+      Spatial Hartwell_Parcels / Hartwell_GA_City_Limits (~-82.93,34.35) OR soft situs near
+      Hartwell GA. No county-wide parcel REST to join — city FS is standalone geometry.
+    layers:
+      - role: parcels
+        name: Hartwell_Parcels (City of Hartwell — zion.greer AGOL)
+        restUrl: https://services3.arcgis.com/7ScJ8q0HhcQyXcHe/arcgis/rest/services/Hartwell_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: GIS_Acres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          Real_Key: realKey
+          GIS_Acres: acreage
+        notes: >
+          City of Hartwell parcel polygons (live count 2745). Schema THIN — Parcel_No /
+          Real_Key / GIS_Acres only; NO owner/tax/sale. GEO-VERIFY Hartwell GA samples
+          ~-82.927,34.346 / ~-82.945,34.346. KeyValue for qPublic AppID=751 likely
+          Parcel_No (spaced format e.g. 'I57H 162'). Companion Hartwell_GA_City_Limits
+          (count 3 multiparts; geometry-only). Skip Hartwell Cleanouts/Hydrants/Water
+          Mains utilities per tranche-3. Not a county-wide substitute.
+        status: usable
+      - role: zoning
+        name: null — no Hartwell Euclidean zoning REST confirmed
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Soft CityZoning on Archway commercial subset only; no city zoning FS.
+        status: gap
+      - role: tax
+        name: null — qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Owner/tax/sale via qPublic AppID=751 HTML even inside Hartwell.
+        status: gap
+    gaps:
+      - "Hartwell_Parcels thin (no owner/tax/sale) — CAMA still qPublic HTML."
+      - "No city Euclidean zoning FeatureServer confirmed."
+    status: partial
+
+  - name: Bowersville
+    level: city
+    parentFips: "13147"
+    joinToCountyParcels: >
+      Soft situs near Bowersville GA (~-83.08,34.37) when county parcels REST exists; no
+      dedicated city limits/parcel FeatureServer confirmed (2026-09-24).
+    layers:
+      - role: parcels
+        name: null — no Bowersville parcel REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bowersville-owned GIS; county qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Bowersville city limits/parcel/zoning REST — qPublic county HTML only."
+    status: gap
+
+  - name: Canon
+    level: city
+    parentFips: "13147"
+    joinToCountyParcels: >
+      Soft near Canon GA (~-83.11,34.34); city also touches Franklin County — Hart portion
+      only. No Canon parcel REST confirmed.
+    layers:
+      - role: parcels
+        name: null — no Canon parcel REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Canon-owned GIS on public REST.
+        status: gap
+    gaps:
+      - "No Canon city GIS REST — qPublic HTML; city spans Franklin+Hart."
+    status: gap
+
+  - name: Royston
+    level: city
+    parentFips: "13147"
+    joinToCountyParcels: >
+      Soft near Royston GA (~-83.11,34.29); city spans Hart/Franklin/Madison — Hart portion
+      only. No Royston parcel REST confirmed on Hart dig.
+    layers:
+      - role: parcels
+        name: null — no Royston parcel REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Royston-owned public parcel FS found for Hart portion.
+        status: gap
+    gaps:
+      - "No Royston city parcel REST confirmed — multi-county city; qPublic HTML."
+    status: gap
+
+gaps:
+  - "No county-wide public parcel geometry REST — owner/tax/sale via qPublic AppID=751 LayerID=11787 HTML only."
+  - "Archway Commercial (728) + Industrial (18) are 2016 partial subsets — not full CAMA inventory."
+  - "Hartwell_Parcels (2745) city-only thin schema (Parcel_No/Real_Key/GIS_Acres)."
+  - "No county Euclidean zoning / FLU FeatureServer confirmed."
+  - "No OpenAddresses us/ga/hart source (404)."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/hart)."
+  - "REJECT Hart MI/KY lookalikes; REJECT paid Regrid/ATTOM; skip Archway Utilities(19)+AADT; no emails/phones."
+
+license: >
+  Hart County Assessor qPublic AppID=751 LayerID=11787 / App=HartCountyGA
+  (qpublic.net/ga/hart; hartcountyga.gov/taxassess.html). UGA ITOS Archway/HartCounty
+  MapServer (Industrial/Commercial parcels + County_Boundary) — University of Georgia
+  Archway Partnership / Carl Vinson Institute ITOS with Hart County. City of Hartwell
+  Parcels AGOL org 7ScJ8q0HhcQyXcHe (zion.greer). Attribution Hart County Tax Assessors /
+  UGA Archway / City of Hartwell. Public fields only; no emails/phones; no paid vendors;
+  skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=751&LayerID=11787&PageTypeID=2&PageID=5894
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HartCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    Hart County Parcels (GMRC Lavonia sewer webmap): https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgi
+    s/rest/services/LavoniaSewerWebMap04282023_WFL1/FeatureServer/15 - live count 18340 (5-150 ac:
+    None), parcel ID field Parcel_No. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Bowersville town"
+      level: city
+      parentFips: "13147"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Hartwell city"
+      level: city
+      parentFips: "13147"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Hart' AND aadt>0
+    altFilter: name LIKE '147-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 147-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 137
+    maxAadt: 47500
+    geoCheck: 137/137 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=HartCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=751&LayerID=11787&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: I57H   162
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HartCountyGA&Layer=Parcels&PageType=Report&KeyValue=I57H%20%20%20162
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=HartCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Bowersville town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Hartwell city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

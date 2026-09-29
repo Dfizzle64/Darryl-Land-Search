@@ -1,0 +1,378 @@
+state: GA
+jurisdiction: Terrell County
+fips: "13273"
+level: county
+markets: [Albany]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer; qPublic HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no PUBLICLY queryable Terrell County GA parcel
+      FeatureServer/MapServer with cadastral polygons + CAMA recovered. No Terrell_*
+      parcels on RVRC_ELA (Ug5xGQbHsD8zuZzM — CityLimits_* exist for Randolph/Clay/etc.
+      but NOT Terrell). No SWGRC / county AGOL parcel org found. Assessor CAMA + maps =
+      qPublic/Beacon App=TerrellCountyGA / AppID=770 LayerID=11806 PageID=5629
+      (qpublic.net/ga/terrell → qpublicaux confirms AppID; Dawson GA 39842).
+      Cloudflare/bot 403 blocks automated Application.aspx; public for humans.
+      Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=770&LayerID=11806&PageTypeID=4&PageID=5628&KeyValue={parcelId}
+      (Search PageTypeID=2 PageID=5629; also App=TerrellCountyGA&Layer=Parcels&PageType=Report
+      &KeyValue=). GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13273 CENTLAT +31.7768345
+      CENTLON -084.4368933 — Terrell / Dawson SWGA (~31.77,-84.44). REJECT Terrell County
+      TX CAD TerrellCADWebService (~-102.39,+30.14 Pecos/Sanderson TX); REJECT City of
+      Terrell TX AGOL (k1eQaOGZAVVR0bMw / City_of_Terrell_Parcels_zip); REJECT Dawson
+      County GA FIPS 13085 (north GA — dawsoncountyga.gov GIS Hub); REJECT paid
+      Regrid/ATTOM/USLandGrid. Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Tax/CAMA via qPublic AppID=770 LayerID=11806 /
+      App=TerrellCountyGA HTML only. Deep-link KeyValue={parcelId} on Report page.
+      Tax Commissioner pages on terrellcountyga.gov — not CAMA REST.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      AppID=770 / App=TerrellCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Terrell County GA Euclidean zoning FeatureServer recovered (2026-09-24).
+      City ordinances/PDF only if any — no Dawson/Bronwood/Parrott/Sasser zoning FS.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Terrell County GA Future Land Use FeatureServer found — Comp Plan / SWGRC staff gap.
+    status: gap
+
+  - role: other
+    name: TIGER Places — Dawson / Bronwood / Parrott / Sasser (GA)
+    restUrl: https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipalityName
+      GEOID: placeGeoid
+      BASENAME: placeBasename
+      CENTLAT: centroidLat
+      CENTLON: centroidLon
+    notes: >
+      Preferred PUBLIC spatial municipality filters when county parcels restore (auth none).
+      Live Incorporated Places (STATE=13): Dawson city GEOID 1321912 (~-84.44,+31.77) /
+      Bronwood town 1310860 (~-84.36,+31.83) / Parrott town 1359416 (~-84.51,+31.89) /
+      Sasser town 1368796 (~-84.35,+31.72). Filter BASENAME in (Dawson,Bronwood,Parrott,Sasser)
+      — do NOT use ST/NAME alone (Dawson MN/TX lookalikes). Companion Esri
+      USA_Census_Populated_Places (ST=GA PLACEFIPS) usable aid. RVRC CityLimits2024 did not
+      return these places under queried NAME/STATEFP. No county parcel REST to join yet.
+    status: usable
+
+municipalities:
+  - name: Dawson
+    level: city
+    parentFips: "13273"
+    joinToCountyParcels: >
+      County seat. Spatial TIGER Places NAME='Dawson city' / BASENAME='Dawson' GEOID 1321912
+      (~-84.44,31.77) when county parcels restore. Soft mailing city never sole filter.
+      No city-owned CAMA.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Dawson GA zoning FeatureServer — ordinance/PDF only if any.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Dawson FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Dawson-only CAMA — county qPublic AppID=770; TIGER place polygon usable.
+        status: gap
+    gaps:
+      - "Dawson TIGER place polygon usable; parcel/tax/sale still qPublic HTML."
+    status: partial
+
+  - name: Bronwood
+    level: city
+    parentFips: "13273"
+    joinToCountyParcels: >
+      Spatial TIGER BASENAME='Bronwood' GEOID 1310860 (~-84.36,31.83) ∩ county parcels when
+      available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bronwood zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bronwood-only CAMA REST.
+        status: gap
+    gaps:
+      - "Bronwood TIGER place usable; parcels still county qPublic."
+    status: partial
+
+  - name: Parrott
+    level: city
+    parentFips: "13273"
+    joinToCountyParcels: >
+      Spatial TIGER BASENAME='Parrott' GEOID 1359416 (~-84.51,31.89) ∩ county parcels when
+      available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Parrott zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Parrott-only CAMA REST.
+        status: gap
+    gaps:
+      - "Parrott TIGER place usable; parcels still county qPublic."
+    status: partial
+
+  - name: Sasser
+    level: city
+    parentFips: "13273"
+    joinToCountyParcels: >
+      Spatial TIGER BASENAME='Sasser' GEOID 1368796 (~-84.35,31.72) ∩ county parcels when
+      available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sasser zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sasser-only CAMA REST.
+        status: gap
+    gaps:
+      - "Sasser TIGER place usable; parcels still county qPublic."
+    status: partial
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU — qPublic App=TerrellCountyGA / AppID=770 LayerID=11806 HTML only."
+  - "No RVRC/SWGRC Terrell parcel or CityLimits_* FeatureServer recovered (unlike Randolph CityLimits_Randolph)."
+  - "TIGER Places Dawson/Bronwood/Parrott/Sasser are PUBLIC usable municipality aids — not CAMA."
+  - "REJECT Terrell County TX CAD (~-102.4,+30.1) / City of Terrell TX AGOL / Dawson County GA FIPS 13085 hub."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/terrell + AppID=770 Search/Maps public for humans."
+  - "Rejected paid Regrid/ATTOM/USLandGrid; skip utilities+AADT; no emails/phones."
+
+license: >
+  Terrell County Tax Assessor qPublic/Beacon App=TerrellCountyGA / AppID=770
+  LayerID=11806 PageID=5629 (qpublic.net/ga/terrell; terrellcountyga.gov; Dawson GA 39842).
+  Census TIGERweb Places for municipality polygons. No public county parcel FeatureServer
+  recovered. Attribution Terrell County Tax Assessor / US Census. Public fields only; no
+  emails/phones; no paid vendors; skip utilities+AADT. REJECT Terrell TX / Dawson County GA
+  lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=770&LayerID=11806&PageTypeID=2&PageID=5629
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=TerrellCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Bronwood town"
+      level: city
+      parentFips: "13273"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Dawson city"
+      level: city
+      parentFips: "13273"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Parrott town"
+      level: city
+      parentFips: "13273"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sasser town"
+      level: city
+      parentFips: "13273"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Terrell' AND aadt>0
+    altFilter: name LIKE '273-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 273-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 91
+    maxAadt: 15400
+    geoCheck: 90/91 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=TerrellCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=770&LayerID=11806&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=TerrellCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Bronwood town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Dawson city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Parrott town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sasser town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,447 @@
+state: GA
+jurisdiction: Upson County
+fips: "13293"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY INTENT — county-wide parcel polygons (zoning attribute layer doubles as landbase)
+  - role: parcels
+    name: Upson_County_Zoning_Map_WFL1 / Upson Zoning Data (parcel polygons + zoning)
+    restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      parcelnumb: parcelId
+      address: situsAddress
+      Zoning_1: zoning
+      Zoning_Abb: zoningCode
+      Zoning_URL: zoningOrdinanceUrl
+      Overlay_Di: zoningOverlay
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + Euclidean zoning (AGOL org
+      Mm1BAVEiAXrYE9vn owner jrowellgis — Upson_County_Zoning_Map_WFL1 FeatureServer
+      layer 2 titled Upson Zoning Data; companion experience
+      experience.arcgis.com/experience/81c901d54d2440e381265a871d3666b1 Upson County
+      Zoning Viewer). Live count 16209 (2026-09-24). WGS84 samples ~-84.135,+32.918
+      (Johnson St) — Thomaston / Yatesville ring. SR Web Mercator 102100; maxRecordCount
+      default — page via resultOffset / envelopes. Schema: parcelnumb (e.g. '111 044' /
+      'Y04 001') + address + Zoning_1 / Zoning_Abb (A-R / A-R-C / A-R-SPX / C-1 / C-2 /
+      M-1 / M-2 / O-1 / P-M / P-R / R-1 / R-2 / R-4 / R-5 / Thomaston / Yatesville) +
+      Zoning_URL (municode) + Overlay_Di. NO ownerName / mailing / tax / sale / acreage
+      fields on this layer — compute GIS acres from polygon; CAMA via qPublic HTML or
+      city Thomaston_CharacterArea/3. Official county WinGAP
+      services9.arcgis.com/1zCta9fCSdX45Yaq Parcel_Regions_w_WinGAP (owner upsonboc;
+      item 9b78d2df9b41405a8cc0e4e333502abe titled Upson County Georgia Parcels; extent
+      GA-correct) is listed public but LIVE returns Token Required 499 (2026-09-24) —
+      blocked; do not prefer until public view restores. Twin vector tiles
+      Upson_County_Parcels VectorTileServer (same org) — display only, not queryable
+      CAMA. Assessor qPublic AppID=562 LayerID=8423 (qpublic.net/ga/upson nav Search
+      Records / Maps PageTypeID=1; upsoncountyga.org/201/Tax-Assessor). Cloudflare/bot
+      403 automated Application.aspx; public for humans. Deep-link KeyValue={parcelnumb}:
+      Application.aspx?AppID=562&LayerID=8423&PageTypeID=4&KeyValue={parcelnumb}
+      (Search PageTypeID=2; Maps PageTypeID=1). GEO-VERIFY GEORGIA Upson FIPS 13293
+      Thomaston seat: Census TIGERweb GEOID 13293 CENTLAT +32.8812607 CENTLON
+      -084.2993038; REJECT paid Regrid/ATTOM/USLandGrid/Boundary Solutions 2019
+      restricted shapefile; skip utilities+AADT; no emails/phones. ~15k+ real parcels
+      per assessor office — L2 ≈16209 aligns.
+    status: usable   # pass1 2026-09-28: was partial; upgraded for Pass 1 (polygon + parcel ID). See pass1_2026-09-28 block.
+
+  - role: parcels
+    name: Parcel_Regions_w_WinGAP (upsonboc) — TOKEN REQUIRED
+    restUrl: https://services9.arcgis.com/1zCta9fCSdX45Yaq/arcgis/rest/services/Parcel_Regions_w_WinGAP/FeatureServer
+    layerId: null
+    geometry: polygon
+    auth: token
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Official Upson BOC AGOL WinGAP parcel service (title Upson County Georgia Parcels;
+      extent [[-84.53,32.68],[-84.12,33.00]] — correct GA). Live 2026-09-24: FeatureServer
+      and Road Centerlines sibling return Token Required 499 despite access=public listing.
+      Document discovered but unusable; re-check if org publishes anonymous view. Prefer
+      Zoning_Map_WFL1/2 for geometry + qPublic AppID=562 for CAMA until unlocked.
+    status: blocked
+
+  - role: tax
+    name: null — county-wide REST CAMA blocked; qPublic HTML + city Thomaston L3
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public county-wide FeatureServer with CURR_VAL/FMV/assessed (WinGAP token-
+      blocked). Assessor HTML: qPublic AppID=562 LayerID=8423 / qpublic.net/ga/upson
+      (Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={parcelId}
+      on Report page. City-of-Thomaston WinGAP attributes usable on Zoning_Map_WFL1/3
+      (curr_val>0 ≈4372) — city-only, not county-wide. Tax Commissioner / billing — bills
+      only, not CAMA REST. Honest county-wide REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer for Upson County GA (2026-09-24). Prefer
+      qPublic Sales Search / Sales List HTML AppID=562. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Upson_County_Zoning_Map_WFL1 / Upson Zoning Data
+    restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      parcelnumb: parcelId
+      Zoning_1: zoning
+      Zoning_Abb: zoningCode
+      Zoning_URL: zoningOrdinanceUrl
+      Overlay_Di: zoningOverlay
+    notes: >
+      Preferred Euclidean zoning on parcel polygons (same FS/2 as parcels landbase).
+      Domain Zoning_Abb: A-R / A-R-C / A-R-SPX / C-1 / C-1-C / C-2 / C-2-C / M-1 /
+      M-1-C / M-2 / M-2-C / O-1 / P-M / P-R / P-R-C / R-1 / R-2 / R-2-C / R-4 / R-5 /
+      Thomaston / Yatesville (municode Appendix A). Soft municipality filter via
+      Zoning_Abb in ('Thomaston','Yatesville') secondary to spatial character-area
+      layers. Human viewer: experience.arcgis.com/experience/81c901d54d2440e381265a871d3666b1.
+    status: usable
+
+  - role: flu
+    name: Upson_County_Zoning_Map_WFL1 / UpsonCounty_CharacterArea
+    restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      CA_Codes: flu
+      CA_Descrip: fluDescription
+      ZONECODE: zoningCode
+      ACRES: acreage
+      PIN: parcelId
+    notes: >
+      Character-area / future land use polygons count 15682 (2026-09-24). CA_Codes /
+      CA_Descrip domain includes AR Agricultural / Forestry, RC Rural Community, RR
+      Rural Residential, R Residential, C Commercial, I Industrial/Institutional, F
+      Forestry, PRC Parks/Recreation/Conservation, IND Industrial. PIN fill rate live
+      ≈0 — treat as area polygons, not parcel join key. Companion Yatesville Character
+      Areas/0 (329) + Thomaston_CharacterArea/3 (city WinGAP+CA).
+    status: usable
+
+municipalities:
+  - name: Thomaston
+    level: city
+    parentFips: "13293"
+    joinToCountyParcels: >
+      County seat Thomaston GA (~-84.327,+32.888; ZIP 30286). Prefer spatial
+      Thomaston_CharacterArea/3 ∩ county Zoning Data/2; soft Zoning_Abb='Thomaston'
+      (~city tag on L2) secondary. Full WinGAP CAMA on L3 (city-only).
+    layers:
+      - role: parcels
+        name: Upson_County_Zoning_Map_WFL1 / Thomaston_CharacterArea (WinGAP + CA)
+        restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          lastname: ownerLastName
+          firstname: ownerFirstName
+          middle: ownerMiddle
+          address1: mailingAddress
+          address2: mailingAddress2
+          address3: mailingAddress3
+          city: mailingCity
+          state: mailingState
+          zip_code: mailingZip
+          house_no: situsNumber
+          street_nam: situsStreet
+          sttype: situsStreetType
+          unit: situsUnit
+          zip: situsZip
+          totalacres: acreage
+          Draw_Acres: acreageGis
+          Deed_Acres: acreageDeed
+          curr_val: tax.marketValue
+          prev_val: tax.priorMarketValue
+          ovrideval: tax.overrideValue
+          flbaseval: tax.landBaseValue
+          fmvres: tax.marketValueResidential
+          zoningcode: zoning
+          digclass: dorCode
+          taxdistric: taxDistrict
+          neighbhood: neighborhood
+          legal_desc: legalDescription
+          CA_Code: flu
+          CA_Descrip: fluDescription
+        notes: >
+          Live count 4400; curr_val>0 ≈4372; totalacres 5–150 ≈210 (2026-09-24).
+          WinGAP schema (lastname often holds full owner string). WGS84 samples
+          ~-84.370,+32.878 (Woodland). Skip water/sewer/gas/electricty utilities +
+          apprname/alternate/land_appr/fuserid staff PII. qPublic AppID=562 for county
+          HTML companion. Prefer L3 inside city; county L2 for county-wide geometry.
+        status: usable
+      - role: tax
+        name: Thomaston_CharacterArea/3 curr_val / prev_val / flbaseval / fmv*
+        restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: city-only
+        fieldMap:
+          Parcel_No: parcelId
+          curr_val: tax.marketValue
+          prev_val: tax.priorMarketValue
+          flbaseval: tax.landBaseValue
+          totalacres: acreage
+        notes: City-only WinGAP tax values (curr_val as digest FMV). County-wide tax still qPublic HTML / blocked WinGAP.
+        status: usable
+      - role: zoning
+        name: Upson Zoning Data/2 spatial Thomaston + zoningcode on L3
+        restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          parcelnumb: parcelId
+          Zoning_Abb: zoningCode
+        notes: Prefer L2 Zoning_Abb / spatial city; L3 zoningcode often blank — use CA_Code as character-area FLU.
+        status: usable
+      - role: flu
+        name: Thomaston_CharacterArea/3 CA_Code / CA_Descrip
+        restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CA_Code: flu
+          CA_Descrip: fluDescription
+        notes: City character areas on same WinGAP polygons (e.g. RD Residential Development).
+        status: usable
+    gaps:
+      - "County-wide owner/tax REST still gap outside Thomaston L3 (WinGAP token-blocked)."
+      - "Sales via qPublic AppID=562 HTML even inside city."
+    status: usable
+
+  - name: Yatesville
+    level: city
+    parentFips: "13293"
+    joinToCountyParcels: >
+      Yatesville GA (~-84.15,+32.91). Soft Zoning_Abb='Yatesville' on L2 + spatial
+      Yatesville Character Areas/0 (329). No separate city CAMA REST.
+    layers:
+      - role: parcels
+        name: Upson Zoning Data/2 spatial Yatesville
+        restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          parcelnumb: parcelId
+          Zoning_Abb: zoningCode
+          address: situsAddress
+        notes: County L2 + Yatesville tag/character areas; CAMA via qPublic AppID=562.
+        status: partial
+      - role: flu
+        name: Yatesville Character Areas/0
+        restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CLUSTER_TY: flu
+          XLU: fluAlt
+          NEWPIN: parcelId
+          CNTYZONE: zoningCode
+        notes: Live count 329; NEWPIN join to county parcels when filled.
+        status: usable
+      - role: zoning
+        name: Upson Zoning Data/2 Zoning_Abb='Yatesville'
+        restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning_Abb: zoningCode
+        notes: Soft Zoning_Abb filter.
+        status: usable
+    gaps:
+      - "No Yatesville city-owned parcel/CAMA REST — county L2 + qPublic AppID=562."
+    status: partial
+
+  - name: The Rock
+    level: city
+    parentFips: "13293"
+    joinToCountyParcels: >
+      The Rock CDP/community GA (~-84.24,+32.97). Soft spatial when parcels available.
+      No separate municipal CAMA REST.
+    layers:
+      - role: parcels
+        name: Upson Zoning Data/2 spatial The Rock
+        restUrl: https://services5.arcgis.com/Mm1BAVEiAXrYE9vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          parcelnumb: parcelId
+          Zoning_Abb: zoningCode
+        notes: County L2 + soft spatial; qPublic AppID=562 for CAMA.
+        status: partial
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No The Rock separate zoning FS — use county L2.
+        status: gap
+    gaps:
+      - "No The Rock city-owned GIS REST."
+    status: partial
+
+gaps:
+  - "County-wide owner/tax/sale REST gap — official Parcel_Regions_w_WinGAP (upsonboc) Token Required 499; use qPublic AppID=562 HTML for CAMA/sales."
+  - "Preferred county parcels L2 expose zoning + situs address only — no Owner/CURR_VAL/Acres attributes (compute GIS acres from geometry)."
+  - "Thomaston_CharacterArea/3 provides WinGAP owner/tax/acres for city-only (~4400), not county-wide."
+  - "CharacterArea/1 PIN fill ≈0 — FLU area polygons, not parcel join."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/upson + AppID=562 Search/Maps public for humans."
+  - "REJECT paid Regrid/ATTOM/Boundary Solutions restricted 2019 parcels; skip utilities (water/sewer/gas/electricty on L3) + AADT; skip apprname/alternate/land_appr PII; no emails/phones."
+
+license: >
+  Upson County Zoning Map_WFL1 (AGOL org Mm1BAVEiAXrYE9vn / jrowellgis —
+  experience.arcgis.com/experience/81c901d54d2440e381265a871d3666b1). Official
+  WinGAP Parcel_Regions_w_WinGAP (upsonboc org 1zCta9fCSdX45Yaq) currently
+  token-blocked. Assessor qPublic AppID=562 LayerID=8423 (qpublic.net/ga/upson;
+  upsoncountyga.org/201/Tax-Assessor). Municode Appendix A Zoning. Attribution
+  Upson County Board of Assessors / GIS. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=562&LayerID=8423&PageTypeID=2
+jurisdictionGisUrl: https://experience.arcgis.com/experience/81c901d54d2440e381265a871d3666b1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    Upson Zoning_Map_WFL1/2 has county-wide polygons + parcelnumb (15925 non-null of 16209) - meets Pass
+    1 (acres from geometry). Upgraded partial->usable for Pass 1; official Parcel_Regions_w_WinGAP
+    (upsonboc) still Token Required 499 -> CAMA Pass 2. REST https://services5.arcgis.com/Mm1BAVEiAXrYE9
+    vn/arcgis/rest/services/Upson_County_Zoning_Map_WFL1/FeatureServer/2 live count 16209 (5-150 ac:
+    None); parcel ID field parcelnumb.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Thomaston city"
+      level: city
+      parentFips: "13293"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Yatesville town"
+      level: city
+      parentFips: "13293"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Upson' AND aadt>0
+    altFilter: name LIKE '293-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 293-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 150
+    maxAadt: 21600
+    geoCheck: 149/150 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=UpsonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=562&LayerID=8423&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: parcelnumb
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 111 044
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=UpsonCountyGA&Layer=Parcels&PageType=Report&KeyValue=111%20044
+    verification: 'pattern-tested: real sample ID from parcelnumb; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: inferred {County}CountyGA convention
+  jurisdictionGisUrl:
+    county: https://experience.arcgis.com/experience/81c901d54d2440e381265a871d3666b1
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Thomaston city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Yatesville town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

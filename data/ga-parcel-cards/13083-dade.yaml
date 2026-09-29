@@ -1,0 +1,256 @@
+state: GA
+jurisdiction: Dade County
+fips: "13083"
+level: county
+markets: [Chattanooga]
+
+layers:
+  - role: parcels
+    name: "Dade Parcels (EPL_Map, WinGAP join ~2022)"
+    restUrl: https://services2.arcgis.com/9rZSWj5rVGcJbHoU/arcgis/rest/services/EPL_Map/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: "TOTALACRES"
+    coverage: county-wide
+    parcelIdField: "PARCEL_NO"
+    liveCount: 10266
+    liveCount5to150ac: 2715
+    geoCheck: "extent center [['13083', 'Dade County']]; sample [['13083', 'Dade County']]; extent WGS84 [-85.6053, 34.6232, -85.3635, 34.9847]"
+    fieldMap:
+      PARCEL_NO: "parcelId"
+      PIN: "parcelPin"
+      REALKEY: "ownerKey"
+      LASTNAME: "ownerName"
+      ADDRESS1: "mailingAddress"
+      HOUSE_NO: "situsNumber"
+      STREET_NAM: "situsStreet"
+      SITUS: "situsAddress"
+      TOTALACRES: "acreage"
+      CURR_VAL: "tax.marketValue"
+      ZONINGCODE: "zoning"
+      DIGCLASS: "dorCode"
+      LEGAL_DESC: "legalDescription"
+    notes: >
+      pass1 2026-09-28: County-wide Dade GA WinGAP-joined parcels (10266) in AGOL org 9rZSWj5rVGcJbHoU
+      (EPL_Map FeatureServer layer 4, 'Parcels_22...' ~2022 vintage). Owner, mailing, situs, TOTALACRES,
+      CURR_VAL, zoning. Supersedes 2026-09-24 gap (LLLT AOI clip 7811 kept as alternate). Pass 2: confirm
+      currency vs qPublic.
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no county-wide public parcel REST (qPublic HTML + LLLT AOI clip only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No official Dade County GA ArcGIS FeatureServer/MapServer for county-wide
+      parcels found (2026-09-24). Assessor path is qPublic (qpublic.net/ga/dade;
+      App=DadeCountyGA on Beacon search). DNS dead / empty: gis.dadecountyga.com,
+      gis.dadega.com, maps.dadecountyga.gov. No Dade AGOL org content. Academic IGT
+      LLLT clip Dade_Parcels_2020LLLT (services.arcgis.com/UnTXoPXBYERF0OH6/…/
+      Dade_Parcels_2020LLLT/FeatureServer/5) is NOT county-wide — live count 7811
+      clipped to LLLT AOI (geo ~-85.56,34.79 Pudding Ridge — correct Dade GA /
+      Trenton area, but AOI sample; 2020 vintage). Fields: PARCEL_NO, TOTALACRES,
+      parcelAddress, OWNKEY + conservation scores — NO owner name on this layer.
+      Prefer as optional AOI enrichment only. Rejected Miami-Dade FL gisweb.miamidade.gov
+      and all FL Dade lookalikes; rejected DeKalb GA Tax_Parcels; rejected Hamilton TN
+      CHCRPA; rejected paid Regrid Dade GA extracts as primary.
+    status: gap
+
+  - role: parcels
+    name: Dade_Parcels_2020LLLT (IGT academic AOI clip — NOT county-wide)
+    restUrl: https://services.arcgis.com/UnTXoPXBYERF0OH6/arcgis/rest/services/Dade_Parcels_2020LLLT/FeatureServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: sample
+    fieldMap:
+      PARCEL_NO: parcelId
+      TOTALACRES: acreage
+      parcelAddress: situsAddress
+      OWNKEY: ownerKey
+    notes: >
+      Academic LLLT AOI clip only (7811; 2020). Geo-verified Dade GA ~-85.56,34.79.
+      No ownerName/mailing/FMV on layer — OWNKEY opaque. Use only when AOI coverage
+      acceptable; primary county-wide path remains qPublic HTML App=DadeCountyGA.
+    status: partial
+
+  - role: tax
+    name: null — no public REST CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Dade GA tax/marketValue FeatureServer. qPublic App=DadeCountyGA HTML reports.
+      dadecounty-ga.gov/150/Tax-Assessors points to assessor; dadecountypay.com is Tax
+      Commissioner (bills) — not cadastral REST.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Dade GA multi-sale FeatureServer found. qPublic Sales Search HTML only.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Dade County or City of Trenton zoning FeatureServer found (2026-09-24).
+      Zoning map/ordinance PDF / staff certification.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Dade Comp Plan FLU FeatureServer found. Rejected CHCRPA TPO land-use
+      (Hamilton-centric; northern Dade only in TPO footprint conceptually — not a
+      queryable Dade FLU layer).
+    status: gap
+
+municipalities:
+  - name: Trenton
+    level: city
+    parentFips: "13083"
+    joinToCountyParcels: >
+      No public county parcel REST — spatial against future landbase / qPublic map
+      near Trenton (~-85.51,34.87). LLLT AOI may include Trenton fringe parcels.
+    layers: []
+    notes: >
+      Sole incorporated city. No City of Trenton GA zoning/parcel FeatureServer
+      found. NOT Trenton NJ / Trenton OH / Trenton MI.
+    status: gap
+
+gaps:
+  - "PRIMARY GAP: no county-wide public parcel geometry/CAMA REST — assessor is qPublic App=DadeCountyGA HTML only (qpublic.net/ga/dade)."
+  - "LLLT Dade_Parcels_2020LLLT (7811, vintage 2020) is AOI academic clip — not county-wide; no owner name field."
+  - "No public REST zoning / FLU / sales / tax values."
+  - "No municipality boundary FeatureServer."
+  - "Rejected lookalikes: Miami-Dade FL (gisweb.miamidade.gov / gdsc.idsc.miami.edu); DeKalb GA Tax_Parcels; Hamilton TN CHCRPA LandUse_SF; Pike PA / Sumter / Glynn; paid Regrid/ATTOM Dade GA extracts as primary."
+  - "Enrichment vs thin in-app: optional LLLT AOI 7811 PARCEL_NO+TOTALACRES+parcelAddress; county-wide parcels/zoning/FLU/sales remain gap/HTML/PDF."
+
+license: >
+  Dade County Tax Assessors — qPublic SchneiderCorp App=DadeCountyGA
+  (qpublic.net/ga/dade; dadecounty-ga.gov/150/Tax-Assessors). Optional academic AOI:
+  IGT lab bgn313_igtlab Dade_Parcels_2020LLLT on org UnTXoPXBYERF0OH6 (not
+  county-official landbase). Attribution to Dade County Assessors / stated academic
+  source. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=DadeCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    https://services2.arcgis.com/9rZSWj5rVGcJbHoU/arcgis/rest/services/EPL_Map/FeatureServer/4 live
+    10266 (5-150 ac: 2715), parcel ID PARCEL_NO. County-wide Dade GA WinGAP-joined parcels (10266) in
+    AGOL org 9rZSWj5rVGcJbHoU (EPL_Map FeatureServer layer 4, 'Parcels_22...' ~2022 vintage). Owner,
+    mailing, situs, TOTALACRES, CURR_VAL, zoning. Supersedes 2026-09-24 gap (LLLT AOI clip 7811 kept as
+    alternate). Pass 2: confirm currency vs qPublic.
+  tried:
+    - "ArcGIS Online sharing search incl. county-seat (Trenton) queries with TIGER point-in-polygon filter"
+    - "Shared RC org Ug5xGQbHsD8zuZzM full scan; UTC org UnTXoPXBYERF0OH6 (LLLT clips)"
+    - "GMASS ISpzx3B5ZsVA6e1Z, GDITAdmin catalog"
+  cities:
+    - name: "Trenton city"
+      level: city
+      parentFips: "13083"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Dade' AND aadt>0
+    altFilter: name LIKE '083-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 083-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 101
+    maxAadt: 68800
+    geoCheck: 100/101 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 10226
+    restUrl: https://services2.arcgis.com/9rZSWj5rVGcJbHoU/arcgis/rest/services/EPL_Map/FeatureServer/4
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: Deed_Bk=93, Deed_Pg=91'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 10226
+    restUrl: https://services2.arcgis.com/9rZSWj5rVGcJbHoU/arcgis/rest/services/EPL_Map/FeatureServer/4
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=DadeCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001 00 001 00
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=DadeCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%2000%20001%2000
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=DadeCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Trenton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

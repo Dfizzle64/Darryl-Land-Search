@@ -1,0 +1,301 @@
+state: GA
+jurisdiction: Crawford County
+fips: "13079"
+level: county
+markets: [Macon]
+
+layers:
+  - role: parcels
+    name: CrawfordCountyParcels_Jan2026 (MGRC AGOL) — geometry + ZoningCode
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrawfordCountyParcels_Jan2026/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: DEEDACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELNO: parcelId
+      PID: parcelIdAlt
+      MAP: mapSheet
+      PARCEL: mapParcel
+      SUBID: mapSubParcel
+      DEEDACRES: acreage
+      CALCACRES: acreageGis
+      ZoningCode: zoning
+      DeedRef: deedReference
+      PLATREF: platReference
+      Notes: notes
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Middle Georgia Regional Commission MGRC AGOL
+      org Ug5xGQbHsD8zuZzM / owner jpaino_MGRC — FeatureServer layer 0 titled "Zoning" but
+      displayField PARCELNO; service item 396afd3493414572a47ab7f78468b3dc; snippet notes
+      CrawfordCountyParcels_Apr2026). Live count 8186 (2026-09-24). SR NAD 1983 StatePlane
+      Georgia West FIPS 1002 Feet (102667/2240). DEEDACRES 5–150 ≈2934; CALCACRES 5–150
+      ≈2921; ZoningCode filled ≈8176. NO owner / mailing / situs / CURR_VAL / SALE on this
+      public REST — tax/sale/owner are qPublic HTML-only (honest gap). ZoningCode domain:
+      R-AG≈4426, R1-AG≈2366, R-1≈667, R-CD≈361, R-2≈118, C-2≈98, I-G≈50, R-MH≈40, C-3≈27,
+      C-1≈18, PUD≈2, R-3≈2, R-4≈1. Official zoning public viewer Web Map
+      8b13e433ec07404097983789a00ef387 + Experience
+      56d0b053c26c4e8a8ebd50b001afa99f (owner mgrembowski) consume this FS + City_of_Roberta
+      Boundary. mgrcmaps.org/arcgis CrawfordCounty/ParcelViewer reported canceled /
+      non-authoritative in research box (AGOL item 7629a78d… SB_0006) — prefer this public
+      AGOL FS. Admin zoning FeatureService on mgrcmaps.org is staff-facing — do not prefer.
+      Geo-verified WGS84 samples ~-84.176,32.739 / ~-84.183,32.732 (W Crawford),
+      ~-84.015,32.820 (C050), Roberta ~-84.011,32.720 — Crawford County GA / Roberta–Knoxville
+      (Macon MSA ring; NOT Crawford County PA ccgis.crawfordcountypa.net; NOT Crawford IA
+      Parcel_CrawfordIA / experience 21eb1dc427c147f7abf59cadcba4c118 Magnasoft; NOT Crawford
+      OH). Rejected paid Regrid/ATTOM/Equator/DynamoSpatial. No emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: null — no public REST CAMA values; qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      CrawfordCountyParcels_Jan2026 has no CURR_VAL / MAV / FMV / assessed fields. Assessor
+      HTML: qpublic.net/ga/crawford → Application.aspx?App=CrawfordCountyGA&Layer=Parcels
+      (Cloudflare/bot 403 automated; public for humans). Deep-link pattern KeyValue={PARCELNO}
+      (PageType=Report). Tax Commissioner crawfordcountyga.org/tax-commissioner-2 (payments —
+      not CAMA). Honest REST tax gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history; qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALE_VAL / multi-sale FeatureServer on MGRC AGOL Crawford public items (2026-09-24).
+      qPublic Yearly Sales / Sales Search HTML App=CrawfordCountyGA. Rejected paid
+      Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: CrawfordCountyParcels_Jan2026 ZoningCode (on parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrawfordCountyParcels_Jan2026/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: DEEDACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELNO: parcelId
+      ZoningCode: zoning
+    notes: >
+      Parcel-attributed ZoningCode on preferred parcels (≈8176 filled). Same layer as
+      parcels — primary public zoning attribute. Official public zoning Web Map / Experience
+      (mgrembowski) for human viewer. Admin Euclidean zoning FS on mgrcmaps.org not preferred
+      for public consumers.
+    status: usable
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Crawford County future land use / character-area public FeatureServer recovered on
+      MGRC AGOL (2026-09-24). Comp Plan PDF / MGRC staff gap.
+    status: gap
+
+  - role: other
+    name: City of Roberta Boundary
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/City_of_Roberta_Boundary/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      LOCALFIPS: placeFips
+    notes: >
+      Preferred spatial municipality filter (count 1 Roberta ~-84.011,32.720; LOCALFIPS
+      65856). Also on Crawford_County_Commission_District_Map_WFL1 layer 1 Municipal
+      Boundaries. Knoxville is inactive municipality (charter lost 1995) — no separate poly.
+      Do NOT filter by mailing city from qPublic HTML.
+    status: usable
+
+  - role: other
+    name: Crawford County Commission District Map_WFL1
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Crawford_County_Commission_District_Map_WFL1/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      DISTRICT: commissionDistrict
+      DISTRICT_N: commissionDistrictNum
+      DISTRICT_L: commissionDistrictLabel
+      POPULATION: population
+    notes: >
+      Commission districts 001–005 (count 6 polys incl. multipart). Companion layers: /1
+      Municipal Boundaries (Roberta), /2 County Boundaries (NAME=Crawford STCOFIPS=13).
+      County site embeds district map (crawfordcountyga.org/crawford-county-district-map/).
+    status: usable
+
+municipalities:
+  - name: Roberta
+    level: city
+    parentFips: "13079"
+    joinToCountyParcels: >
+      Spatial City_of_Roberta_Boundary NAME='Roberta' (~-84.011,32.720) onto
+      CrawfordCountyParcels_Jan2026.
+    layers:
+      - role: zoning
+        name: CrawfordCountyParcels ZoningCode spatial Roberta
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrawfordCountyParcels_Jan2026/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: DEEDACRES
+        coverage: city-only
+        fieldMap:
+          ZoningCode: zoning
+          PARCELNO: parcelId
+        notes: Prefer parcel ZoningCode spatial to Roberta poly; certify vs city ordinance/PDF.
+        status: usable
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Roberta FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county parcels + spatial Roberta
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County CrawfordCountyParcels_Jan2026 + Roberta Boundary. No city CAMA REST.
+        status: gap
+    gaps:
+      - "No Roberta-owned separate parcel/CAMA FeatureServer; owner/tax/sale via county qPublic HTML."
+    status: partial
+
+gaps:
+  - "No public REST ownerName / mailing / situs / tax.marketValue / tax.assessedValue / lastSale.* — qPublic App=CrawfordCountyGA HTML only (Cloudflare/bot 403 automated)."
+  - "No public REST multi-sale history FeatureServer."
+  - "No county FLU / character-area FeatureServer on MGRC AGOL."
+  - "mgrcmaps.org CrawfordCounty/ParcelViewer AGOL item canceled (SB_0006) — prefer Ug5xGQbHsD8zuZzM CrawfordCountyParcels_Jan2026."
+  - "Admin zoning FeatureService on mgrcmaps.org staff-facing — not preferred for public REST consumers."
+  - "Knoxville inactive municipality — only Roberta city poly."
+  - "Rejected lookalikes: Crawford County PA (ccgis.crawfordcountypa.net / CivQuest); Crawford IA Parcel_CrawfordIA + experience 21eb1dc427c147f7abf59cadcba4c118; Crawford OH wells; paid Regrid/ATTOM/Equator/DynamoSpatial."
+  - "Skip utilities+AADT; no emails/phones collected."
+
+license: >
+  Middle Georgia Regional Commission (MGRC) AGOL org Ug5xGQbHsD8zuZzM —
+  CrawfordCountyParcels_Jan2026 (jpaino_MGRC / nwilliams_MGRC), City_of_Roberta_Boundary,
+  Crawford_County_Commission_District_Map_WFL1. Public zoning Web Map
+  8b13e433ec07404097983789a00ef387 + Experience
+  experience.arcgis.com/experience/56d0b053c26c4e8a8ebd50b001afa99f (mgrembowski).
+  Assessor HTML qpublic.net/ga/crawford App=CrawfordCountyGA. County site
+  crawfordcountyga.org. Attribution MGRC / Crawford County Tax Assessor. Public fields
+  only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=CrawfordCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://experience.arcgis.com/experience/56d0b053c26c4e8a8ebd50b001afa99f
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services1.arcgis.com/Ug5xGQbHsD8zu
+    ZzM/arcgis/rest/services/CrawfordCountyParcels_Jan2026/FeatureServer/0 count 8186; extent center
+    [['13079', 'Crawford County']]; sample [['13079', 'Crawford County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Roberta city"
+      level: city
+      parentFips: "13079"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Crawford' AND aadt>0
+    altFilter: name LIKE '079-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 079-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 62
+    maxAadt: 95400
+    geoCheck: 62/62 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST-partial
+    detail: DeedRef deed book/page on CrawfordCountyParcels_Jan2026/FeatureServer/0 (6804/8186 filled); no sale
+      date/price
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CrawfordCountyParcels_Jan2026/FeatureServer/0
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=CrawfordCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCELNO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: C001    002
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=CrawfordCountyGA&Layer=Parcels&PageType=Report&KeyValue=C001%20%20%20%20002
+    verification: 'pattern-tested: real sample ID from PARCELNO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://experience.arcgis.com/experience/56d0b053c26c4e8a8ebd50b001afa99f
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Roberta city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

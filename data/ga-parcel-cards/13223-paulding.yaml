@@ -1,0 +1,340 @@
+state: GA
+jurisdiction: Paulding County
+fips: "13223"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (geometry + deed acres + tax district; thin CAMA)
+  - role: parcels
+    name: Paulding Map Auto Updated_WFL3 Parcels
+    restUrl: https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/Paulding_Map_Auto_Updated_WFL3/FeatureServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: DeedAc
+    coverage: county-wide
+    fieldMap:
+      GPIN: parcelId
+      APIN: parcelIdAlt
+      HPIN: parcelIdAlt2
+      DeedAc: acreage
+      CalcAc: acreageCalc
+      TaxDist: taxDistrict
+      OWNKEY: ownerKey
+      SubdivID: subdivisionId
+      SubdivLotNum: subdivisionLot
+      DigestYear: tax.year
+    notes: >
+      Preferred county-wide parcel polygons for land-search geometry + acreage. Live count
+      75600 (2026-09-23); DeedAc 5–150 band = 5099 (CalcAc live >0 = 0 — do NOT use CalcAc
+      for acreage). SR Web Mercator (102100/3857); maxRecordCount 2000. Geo-verified WGS84
+      sample ~-84.876,33.829 (unincorporated south-central) and Dallas TaxDist=1100 samples
+      ~-84.84..-84.86, 33.91..33.93 — Paulding County GA, Atlanta MSA west (NOT Paulding
+      County OH ~-84.59,40.99). Thin CAMA on polygons: GPIN (stable id e.g. 220.3.2.020.0000),
+      DeedAc, TaxDist domain (1000=County/unincorporated ≈67620, 1100=Dallas ≈5178,
+      1200=Hiram ≈2562, 1300=Braswell ≈167), OWNKEY opaque int (NOT ownerName), Subdiv*.
+      NO ownerName, mailing*, situs*, tax.marketValue/assessedValue, zoning, or lastSale on
+      this REST — join Address Points (situs spatial), Zoning polygons / Dallas city zoning
+      (zoning), and qPublic AppID=689 HTML for owner/CAMA/sales. Mirror:
+      Paulding_County_GA_Zoning_Map_WFL1/FeatureServer/2 (count 75538, same schema). Prefer
+      this WFL3/25 as slightly fresher. Enrichment vs thin in-app (~5.1k in 5–150ac): full
+      county 75600 with TaxDist municipality proxy + GPIN join keys; owner/tax/sales remain
+      HTML/gap until ROK GoMaps4 starts.
+    status: usable
+
+  - role: parcels
+    name: Paulding County GA Zoning Map_WFL1 Parcels (mirror)
+    restUrl: https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/Paulding_County_GA_Zoning_Map_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: DeedAc
+    coverage: county-wide
+    fieldMap:
+      GPIN: parcelId
+      APIN: parcelIdAlt
+      DeedAc: acreage
+      TaxDist: taxDistrict
+      OWNKEY: ownerKey
+    notes: >
+      Live count 75538. Same thin schema as WFL3/25; published alongside county Zoning +
+      Municipalities in one FeatureServer — convenient when already querying that service.
+      Prefer WFL3/25 as primary when a single parcel URL is needed.
+    status: usable
+
+  - role: tax
+    name: null — no public REST CAMA values on parcels
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Official AGOL parcel layers expose OWNKEY + TaxDist only — no FMV/ASV/land/improvement
+      REST fields. Tax assessor HTML is qPublic AppID=689 (CDN/bot 403 from research box).
+      ROK GoMaps4 MapServer VW_Parcel_Owner layer 61 is referenced by
+      maps.roktech.net/PauldingGM4/js/config.js but
+      https://arcgis5.roktech.net/arcgis/rest/services/Paulding/GoMaps4/MapServer returns
+      "Service … not started" (500) on 2026-09-23 — cannot live-verify owner/tax attrs.
+      Honest gap vs Cobb taxassessorsdaily / DeKalb Tax_Parcels_Assessment_View.
+    status: gap
+
+  - role: zoning
+    name: Paulding County GA Zoning Map_WFL1 Zoning
+    restUrl: https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/Paulding_County_GA_Zoning_Map_WFL1/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: ZonedAcres
+    coverage: county-wide
+    fieldMap:
+      ZoningCode: zoning
+      ZoningClass: zoningDescription
+      Jurisdiction: municipality
+      Status: zoningStatus
+      ZonedAcres: acreage
+      CaseNum: zoningCase
+      ApprovDate: zoningApprovalDate
+    notes: >
+      Preferred county zoning POLYGON layer (Community Development). Live count 41973.
+      Spatial-join to parcels (no GPIN on this layer). ZoningCode domain includes A-1, R-2,
+      R-1/R-3/R-4/R-7, PRD, OSRD, B-1/B-2, I-1/I-2, NB, LRO, O & I, MPR, ER, MXD, MHP, R-55,
+      AML, B2CL, ECR, ECBP, …. Jurisdiction domain PAUC/DAL/HIR/BRWL but live fill is sparse
+      (PAUC≈2162, HIR≈2, DAL/BRWL≈0, null≈39809) — do not rely on Jurisdiction for city
+      filter; use TaxDist or Municipalities spatial join. Official for unincorporated; inside
+      City of Dallas prefer city Official Zoning Map (municipalities). Hiram/Braswell lack
+      city REST — county layer is best available. Geo samples ~-84.76..-84.79, 33.84..34.01
+      Paulding GA.
+    status: usable
+
+  - role: flu
+    name: null — no county-wide public FLU / character-area REST
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No county Future Land Use / character-area FeatureServer found on org
+      7YXQzPPGs9Uc4qKl (GISAdmin_GIS) or hub paulding-county-geospatial-hub-pcaud during live
+      pass 2026-09-23. Comp plan PDFs on paulding.gov only. City of Dallas has DallasFLU2017
+      (see municipalities). Honest county FLU gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sales table (ROK GoMaps4 not started)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No FeatureServer/MapServer sales-history table live on Paulding AGOL. GoMaps4 config
+      references VW_Parcel_SaleInfo layerId 62 on
+      https://arcgis5.roktech.net/arcgis/rest/services/Paulding/GoMaps4/MapServer — service
+      "not started" (500) from research box 2026-09-23. Sales appear in qPublic AppID=689
+      HTML only. Honest gap vs Cobb ParcelSales / Gwinnett Land Value Table. Do not scrape
+      emails/phones.
+    status: gap
+
+  - role: other
+    name: Address Points (situs enrichment)
+    restUrl: https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/Paulding_Map_Auto_Updated_WFL3/FeatureServer/2
+    layerId: 2
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Address: situsAddress
+      City: situsCity
+      ZipCode: situsZip
+      StreetName: situsStreetName
+      StreetType: situsStreetType
+      StructureNumber: situsNumber
+      LegalJurisdiction: municipality
+      AddressJurisdiction: addressJurisdiction
+      ConcatenatedStreetName: situsStreet
+    notes: >
+      Live count 85551 E911/site address points. NO GPIN — spatial-join (or nearest) to
+      parcel polygons for situsAddress. City/ZipCode are postal (e.g. Acworth 30101 on
+      north-Paulding samples) — NOT incorporated municipality. Municipality filter =
+      LegalJurisdiction (Paulding County ≈75120, City of Dallas ≈6525, City of Hiram ≈3468,
+      City of Braswell ≈139) or parcel TaxDist / Municipalities poly. Geo-verified
+      ~-84.74,34.01 (Wesley Heights / Acworth postal, still Paulding GA).
+    status: usable
+
+  - role: other
+    name: Municipalities / City Limits
+    restUrl: https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/Paulding_County_GA_Zoning_Map_WFL1/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Municipality: municipality
+      SqMi: areaSqMi
+      Website: municipalityWebsite
+      Notes: taxDistrictNote
+    notes: >
+      Live count 3 city polygons: DALLAS (8.146 sq mi, District 1100), HIRAM (4.148, 1200),
+      BRASWELL (3.087, 1300). Mirror: Map Auto Updated_WFL3/FeatureServer/12 City Limits
+      (same 3). Parcel↔city join = spatial intersect OR TaxDist decode OR Address Points
+      LegalJurisdiction. Braswell also spans Polk County — this card is Paulding-side only.
+    status: usable
+
+  - role: other
+    name: Corridor Overlay Buffer District Web
+    restUrl: https://services8.arcgis.com/7YXQzPPGs9Uc4qKl/arcgis/rest/services/Paulding_County_GA_Zoning_Map_WFL1/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Street_Nam: overlayStreet
+      Label: overlayLabel
+    notes: "Live count 458 corridor-overlay buffer polygons. Spatial-join only."
+    status: usable
+
+municipalities:
+  - name: Dallas
+    level: city
+    parentFips: "13223"
+    joinToCountyParcels: >
+      Attribute: city Official Zoning GPIN ≈ county GPIN (verified 137.3.4.019.0000).
+      Also TaxDist=1100 (≈5178 parcels); spatial Municipalities Municipality='DALLAS';
+      Address Points LegalJurisdiction='City of Dallas' (≈6525).
+    layers:
+      - role: zoning
+        name: City of Dallas Official Zoning Map_WFL1 (adopted 12.5.2025)
+        restUrl: https://services6.arcgis.com/eaXMnnhlTkGbwQYU/arcgis/rest/services/City_of_Dallas_Official_Zoning_Map_WFL1/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: DeedAc
+        coverage: city-only
+        fieldMap:
+          GPIN: parcelId
+          UDC: zoning
+          ZoningCode: zoningAlt
+          DeedAc: acreage
+          TaxDist: taxDistrict
+          APIN: parcelIdAlt
+          OWNKEY: ownerKey
+        notes: >
+          Preferred Dallas-local zoning (standing order: city over county stub inside city
+          limits). Live count 4588 parcel-tied polygons; UDC/ZoningCode e.g. R-2, R-3, R-1,
+          TH, CBD, C-1, I-1, C-2, MXU, MF-1. TaxDist=1100 on samples. Geo-verified
+          ~-84.844,33.910 — Dallas GA / Paulding (NOT Dallas TX ~-96.89,32.74; REJECT
+          egisdata-dallasgis / City_of_Dallas_Boundary services5 74bZbbuf05Ctvbzv). Org
+          eaXMnnhlTkGbwQYU (awhisner / City of Dallas GA). Prefer UDC ("Current Zoning")
+          over ZoningCode when they differ after rezoning. Near-duplicate
+          City_of_Dallas_Official_Zoning_Map09_02_2026_WFL1/2 count 4591 — same adopted
+          12.5.2025 content; wire this Official Zoning Map_WFL1 URL from the public web map.
+          County Zoning Jurisdiction rarely marks DAL — city REST required inside city limits.
+        status: usable
+      - role: flu
+        name: DallasFLU2017 (character areas)
+        restUrl: https://services6.arcgis.com/eaXMnnhlTkGbwQYU/arcgis/rest/services/DallasFLU2017/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Character_: flu
+          CA_Descrip: fluDescription
+        notes: >
+          Live count 608 character-area polygons (Commercial, Residential, Industrial,
+          Historic Commercial, Public/Institutional, Park/Recreation/Conservation, …).
+          Spatial-join (no GPIN). Geo ~-84.78..-84.81, 33.90..33.91 Dallas GA. 2017 vintage —
+          treat as FLU proxy; confirm against current comp plan if critical.
+        status: usable
+      - role: parcels
+        name: LandbaseEnergov Parcels (city extract — thin)
+        restUrl: https://services6.arcgis.com/eaXMnnhlTkGbwQYU/arcgis/rest/services/LandbaseEnergov/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: DeedAc
+        coverage: city-only
+        fieldMap:
+          GPIN: parcelId
+          APIN: parcelIdAlt
+          DeedAc: acreage
+          TaxDist: taxDistrict
+          OWNKEY: ownerKey
+        notes: >
+          City landbase parcel extract (same thin schema family as county). Prefer county
+          WFL3/25 for county-wide search + CAMA join keys; use city Official Zoning for
+          zoning-on-parcel enrichment via GPIN.
+        status: partial
+    gaps:
+      - "No Dallas REST owner/tax/sales — county qPublic AppID=689 HTML only."
+      - "DallasFLU2017 is 2017 character areas — not a parcel-tied current FLUM."
+    status: usable
+
+  - name: Hiram
+    level: city
+    parentFips: "13223"
+    joinToCountyParcels: >
+      TaxDist=1200 (≈2562); spatial Municipalities Municipality='HIRAM'; Address Points
+      LegalJurisdiction='City of Hiram' (≈3468).
+    layers: []
+    notes: >
+      No public City of Hiram ArcGIS FeatureServer/MapServer for zoning/FLU found
+      (2026-09-23). cityofhiramga.gov posts zoning as PDF / department page; links county
+      GeoExplorer. County Zoning Jurisdiction HIR live count ≈2 only — effectively no
+      city-coded zoning attrs. Use county parcels + Municipalities poly + county Zoning
+      spatial join as best available; city zoning certification remains a gap vs Dallas.
+    status: gap
+
+  - name: Braswell
+    level: city
+    parentFips: "13223"
+    joinToCountyParcels: >
+      TaxDist=1300 (≈167); spatial Municipality='BRASWELL'; Address Points
+      LegalJurisdiction='City of Braswell' (≈139). Multi-county (Paulding+Polk) — this card
+      is Paulding-side only.
+    layers: []
+    notes: >
+      Tiny city (~3.1 sq mi); no public city-owned zoning/FLU REST found. County Zoning
+      Jurisdiction BRWL live ≈0. Geography-only via Municipalities / TaxDist.
+    status: gap
+
+gaps:
+  - "County AGOL parcels are thin: geometry + GPIN + DeedAc + TaxDist + OWNKEY only — NO ownerName, mailing*, situs*, tax.marketValue/assessedValue/taxableValue, or lastSale on REST."
+  - "CalcAc field exists but live >0 count = 0 — always use DeedAc for acreage."
+  - "Sales gap: no live public sales FeatureServer; ROK GoMaps4 VW_Parcel_SaleInfo/62 not started; qPublic AppID=689 HTML only."
+  - "Tax/owner gap: ROK GoMaps4 VW_Parcel_Owner/61 not started; OWNKEY is opaque; qPublic HTML for humans (research-box CDN/bot 403)."
+  - "County FLU gap: no public county future-land-use REST; Dallas has DallasFLU2017 only."
+  - "County Zoning Jurisdiction sparsely populated — use TaxDist or Municipalities spatial join for city filter; prefer City of Dallas Official Zoning inside Dallas."
+  - "Hiram and Braswell lack public city zoning/FLU REST — gap (Dallas usable)."
+  - "Address Points City is postal/CDP (Acworth etc.); municipality = LegalJurisdiction or TaxDist/Municipalities."
+  - "Braswell spans Paulding+Polk — Paulding card covers Paulding-side only."
+  - "pcsvr-gis.pauldingco.net:6443 on-prem Contours listed in AGOL item metadata but host unreachable from research box."
+  - "Rejected lookalikes: Paulding_County_OH_Parcels (services5 9Z9r3rLUCq0SjsRb, centroid ~-84.59,40.99); City of Dallas TX boundary/hubs (egisdata-dallasgis, services5 74bZbbuf05Ctvbzv ~-96.89,32.74); UofMD/Regrid-style ga_paulding_shp (services1 qTQ6qYkHpxlu0G82, count 68018 incomplete third-party — do not prefer over official county AGOL); Equator/paid parcel downloads."
+  - "Do not collect emails/phones. No paid vendors. Official hosts: services8 7YXQzPPGs9Uc4qKl (county), services6 eaXMnnhlTkGbwQYU (Dallas GA), maps.roktech.net viewers, qpublic.schneidercorp.com AppID=689."
+  - "Enrichment vs thin in-app (~5.1k DeedAc 5–150): full county 75600 geometry+DeedAc+TaxDist, county zoning polygons, Dallas city zoning+FLU joins, Address Points situs spatial join; owner/tax/sales still HTML/gap."
+
+license: >
+  Paulding County GIS public ArcGIS Online (org 7YXQzPPGs9Uc4qKl / GISAdmin_GIS) —
+  Paulding_Map_Auto_Updated_WFL3, Paulding_County_GA_Zoning_Map_WFL1 (Parcels, Zoning,
+  Municipalities, Corridor Overlay). Hub: paulding-county-geospatial-hub-pcaud.hub.arcgis.com.
+  Viewers: maps.roktech.net/PauldingGM4 + PauldingTM4 (ROK GoMaps4/TaxMap4 backends currently
+  not started). City of Dallas GA AGOL (eaXMnnhlTkGbwQYU / awhisner) — Official Zoning Map_WFL1,
+  DallasFLU2017, LandbaseEnergov. Assessor HTML: qPublic SchneiderCorp AppID=689
+  LayerID=11378. Attribution to Paulding County GIS / City of Dallas GA. Public fields only;
+  no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=689&LayerID=11378&PageTypeID=2
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

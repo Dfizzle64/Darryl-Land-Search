@@ -1,0 +1,256 @@
+state: GA
+jurisdiction: Lincoln County
+fips: "13181"
+level: county
+markets: [Augusta]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Lincoln County GA public parcel FeatureServer/MapServer with
+      cadastral polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon
+      App=LincolnCountyGA Layer=Parcels (qpublic.net/ga/lincoln; lincolncountyga.com Tax
+      Assessor; seat Lincolnton GA 30817). Cloudflare/bot 403 blocks automated
+      Application.aspx; public for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=LincolnCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}.
+      AGOL item Parcel_Regions_w_WinGAP_CivicPlus_view (owner lincolnpw org
+      nmiAsMcP1CEqOOth) is PUBLIC-listed but query returns Token Required (SB_0005) —
+      blocked; do NOT wire as open REST. CSRA RC (csrarc.ga.gov/mapping-gis) publishes
+      no open county parcel REST — contact planning@csrarc.ga.gov only. CSRARC_Counties
+      boundary usable for geo-clip (NAME=LINCOLN FIPS=181). GEO-VERIFY GEORGIA: Census
+      TIGERweb GEOID 13181 CENTLAT +33.7936268 CENTLON -082.4511098; CSRARC_Counties
+      sample vertex ~-82.646,33.985 — east-central GA CSRA / Lake Thurmond / Augusta MSA
+      fringe. REJECT Lincoln County NE (~-100.7,41.0), Lincoln County NC
+      (lincolncounty.org→lincolncountync.gov; services8…/TaX0xkzgvxdv4n56 Lincolnton ETJ),
+      Lincoln County WY hub lincogis-lcwygis, Lincoln WI, arcgisserver.lincolncounty.org
+      SSL mismatch. Rejected paid Regrid/ATTOM/DynamoSpatial/USLandGrid; no emails/phones;
+      skip utilities+AADT.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=LincolnCountyGA
+      HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=LincolnCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}.
+      Search: PageType=Search. Numeric AppID/LayerID not recovered from public HTML
+      (Cloudflare); named App=LincolnCountyGA works for humans.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      App=LincolnCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Lincoln County GA Euclidean zoning REST found (2026-09-24). Planning/zoning PDF
+      path via lincolncountyga.com Community Development / CSRA RC Comp Plan PDFs only.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Lincoln County GA future land use FeatureServer recovered — Comp Plan PDF /
+      CSRA RC planning gap (lincoln_county_joint_comprehensive_plan drafts on csrarc.ga.gov).
+    status: gap
+
+  - role: other
+    name: CSRARC_Counties Lincoln boundary (context — NOT parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CSRARC_Counties/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      FIPS: countyFips3
+    notes: >
+      Filter NAME='LINCOLN' / FIPS='181' for Lincoln County GA outline (count=1;
+      sample ~-82.65,33.98). Geo-verify / clip only — zero parcel/owner/tax/sale fields.
+      Same shared org Ug5xGQbHsD8zuZzM as other GA RC layers.
+    status: partial
+
+municipalities:
+  - name: Lincolnton
+    level: city
+    parentFips: "13181"
+    joinToCountyParcels: >
+      No county parcel REST to join — city filter blocked until geometry source exists.
+      County seat Lincolnton GA (~-82.48,33.79 soft; FIPS place ~1347800 soft).
+      REJECT Lincolnton NC ETJ parcels (lincolncountync TaX0xkzgvxdv4n56).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Lincolnton GA zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lincolnton GA FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lincolnton-only CAMA — county qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Lincolnton GA city-owned parcel/zoning/FLU REST; county qPublic HTML only; reject Lincolnton NC lookalikes."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Lincoln County GA — qPublic App=LincolnCountyGA HTML only."
+  - "lincolnpw Parcel_Regions_w_WinGAP_CivicPlus_view Token Required (SB_0005) — blocked; not open REST."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/lincoln + App=LincolnCountyGA Search/Maps public for humans."
+  - "CSRARC_Counties boundary only — not parcels; CSRA RC mapping page has no public county FS."
+  - "REJECT Lincoln NE / Lincoln NC / Lincoln WY lincogis-lcwygis / Lincoln WI / arcgisserver.lincolncounty.org."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/USLandGrid; no emails/phones; skip utilities+AADT."
+
+license: >
+  Lincoln County Tax Assessor qPublic/Beacon App=LincolnCountyGA (qpublic.net/ga/lincoln;
+  lincolncountyga.com Tax Assessor; Lincolnton GA 30817). CSRA RC CSRARC_Counties
+  boundary on Ug5xGQbHsD8zuZzM. No public ArcGIS parcel service discovered 2026-09-24.
+  Attribution Lincoln County Tax Assessors. Public HTML only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LincolnCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=LincolnCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Lincolnton city"
+      level: city
+      parentFips: "13181"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Lincoln' AND aadt>0
+    altFilter: name LIKE '181-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 181-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 49
+    maxAadt: 5490
+    geoCheck: 49/49 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=LincolnCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=LincolnCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Lincolnton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

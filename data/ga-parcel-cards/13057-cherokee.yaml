@@ -1,0 +1,423 @@
+state: GA
+jurisdiction: Cherokee County
+fips: "13057"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide parcels with owner, mailing, situs, acreage, zoning attr (no sale price / limited tax)
+  - role: parcels
+    name: MainLayersPRO Parcels
+    restUrl: https://gis.cherokeecountyga.gov/arcgis/rest/services/MainLayersPRO/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      TIN: parcelId
+      TINNoSpace: parcelIdAlt
+      PIN: parcelIdAlt2
+      Acreage: acreage
+      OWNER: ownerName
+      Mailing_Address: mailingAddress
+      Mailing_Suite: mailingSuite
+      Mailing_City: mailingCity
+      Mailing_State: mailingState
+      Mailing_Zip: mailingZip
+      Property_Address: situsAddress
+      Property_City: situsCity
+      Property_Zip: situsZip
+      Zoning: zoning
+      TaxDistrict: taxDistrict
+      DEEDBOOK: lastSale.deedBook
+      DEEDPAGE: lastSale.deedPage
+      Subdivision: subdivision
+    notes: >
+      Preferred county-wide parcel source. Live count 116022 (2026-09-23).
+      Spatial reference NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240).
+      maxRecordCount 2000. Rich polygon CAMA: TIN (tax id, e.g. "23N08   048  D"), TINNoSpace, PIN
+      (e.g. "23-0305-0001"), legal Acreage, OWNER, mailing street/city/state/zip, situs address/city/zip,
+      county Zoning coded domain (AG/GC/R20/… plus CITY for municipal parcels — ~37196 Zoning=CITY).
+      DEEDBOOK/DEEDPAGE present but NO lastSale.price / lastSale.date / lastSale.qualified on this layer.
+      NO tax.marketValue / assessedValue / taxableValue on MainLayersPRO — see AGOL Parcels_Backup CURR_VAL
+      (role=tax) or Spatialest appraiser site. Equivalent mirrors: MainLayersOnline/1 and opLayersPro/34
+      (same ~116022 count). Prefer TIN or TINNoSpace as stable parcelId; PIN is land-lot based.
+      gis.cherokeega.com SSL cert mismatch — use gis.cherokeecountyga.gov.
+    status: usable
+
+  # AGOL hosted backup — same geometry family + CURR_VAL tax market proxy; slightly older count
+  - role: parcels
+    name: Cherokee_County_Parcels_2025 Parcels_Backup (AGOL)
+    restUrl: https://services9.arcgis.com/CAVmSZdRT9pdZgEk/arcgis/rest/services/Cherokee_County_Parcels_2025/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      TIN: parcelId
+      TINNoSpace: parcelIdAlt
+      PIN: parcelIdAlt2
+      Acreage: acreage
+      Owner: ownerName
+      Mailing_Address: mailingAddress
+      Mailing_City: mailingCity
+      Mailing_State: mailingState
+      Mailing_Zip: mailingZip
+      Property_Address: situsAddress
+      Property_City: situsCity
+      Property_Zip: situsZip
+      Zoning: zoning
+      CURR_VAL: tax.marketValue
+      DEEDBOOK: lastSale.deedBook
+      DEEDPAGE: lastSale.deedPage
+      TaxDistric: taxDistrict
+    notes: >
+      Hosted AGOL backup (county description: backup layer). Live count 115005 (2026-09-23) — slightly
+      behind MainLayersPRO/1. Same core CAMA fields PLUS CURR_VAL (~113533 with CURR_VAL>0) usable as
+      tax.marketValue proxy. Prefer MainLayersPRO/1 for geometry freshness; join CURR_VAL on TIN/TINNoSpace
+      when market value needed from public REST. No assessed/taxable split; no sale price/date.
+    status: partial
+
+  - role: tax
+    name: Cherokee_County_Parcels_2025 CURR_VAL (AGOL)
+    restUrl: https://services9.arcgis.com/CAVmSZdRT9pdZgEk/arcgis/rest/services/Cherokee_County_Parcels_2025/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      TIN: parcelId
+      TINNoSpace: parcelIdAlt
+      PIN: parcelIdAlt2
+      CURR_VAL: tax.marketValue
+    notes: >
+      Only county-wide public REST tax value found. CURR_VAL appears to be a current/market value integer.
+      No tax.assessedValue / tax.taxableValue / land vs improvement split on county layers (Canton city
+      Existing_Land_Use has richer MarketValue/LandValue/BuildingValue but city-only). GA assessed often
+      40% of FMV — not exposed here. Prefer Spatialest for full CAMA values.
+    status: partial
+
+  # Unincorporated county zoning polygons (excludes Zoning=CITY stubs)
+  - role: zoning
+    name: ZoningOnlinePortal Cherokee County Zoning (unincorporated)
+    restUrl: https://gis.cherokeecountyga.gov/arcgis/rest/services/ZoningOnlinePortal/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: Acreage__Legal_
+    coverage: county-wide
+    fieldMap:
+      Zoning: zoning
+      Tax_Identification_Number__TIN_: parcelId
+      TIN__No_Spaces_: parcelIdAlt
+      Parcel_Identification_Number__PIN_: parcelIdAlt2
+      Acreage__Legal_: acreage
+      Owner: ownerName
+      Property_Address: situsAddress
+      Property_City: situsCity
+      Property_Zip: situsZip
+    notes: >
+      Preferred county zoning POLYGON layer for unincorporated codes. Live count 79573 (2026-09-23) —
+      equals MainLayersPRO zoning total minus Zoning=CITY (~37256). Field names are alias-expanded
+      (Tax_Identification_Number__TIN_ ≈ TIN). Attribute-join to parcels on TIN/TINNoSpace/PIN.
+      For municipal zoning use city layers (Canton, Woodstock, Ball Ground) or spatial-join city polys;
+      county Zoning="CITY" on parcels is only a jurisdiction flag, not a city district code.
+      Equivalent full (incl. CITY) layer: MainLayersPRO/MapServer/2 count 116829.
+    status: usable
+
+  - role: zoning
+    name: MainLayersPRO Cherokee County Zoning (incl. CITY placeholders)
+    restUrl: https://gis.cherokeecountyga.gov/arcgis/rest/services/MainLayersPRO/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: Acreage__Legal_
+    coverage: county-wide
+    fieldMap:
+      Zoning: zoning
+      Tax_Identification_Number__TIN_: parcelId
+      TIN__No_Spaces_: parcelIdAlt
+      Parcel_Identification_Number__PIN_: parcelIdAlt2
+    notes: >
+      Parcel-based zoning polygons county-wide. Live count 116829. Includes Zoning=CITY for municipal
+      parcels (~37256) — not a usable city district. Prefer ZoningOnlinePortal/3 for unincorporated
+      codes, or filter Zoning<>'CITY'. Same expanded field naming as Portal/3.
+    status: partial
+
+  - role: zoning
+    name: MainLayersPRO Overlay Districts
+    restUrl: https://gis.cherokeecountyga.gov/arcgis/rest/services/MainLayersPRO/MapServer/43
+    layerId: 43
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zon_Ovrl: zoningOverlay
+    notes: >
+      Sparse overlay polys only. Live count 2 (sample Zon_Ovrl=BFO). Spatial-join supplement; not
+      primary zoning.
+    status: partial
+
+  - role: flu
+    name: MainLayersPRO Future Development
+    restUrl: https://gis.cherokeecountyga.gov/arcgis/rest/services/MainLayersPRO/MapServer/42
+    layerId: 42
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      AreaType: flu
+    notes: >
+      County Future Development character/plan polygons. Live count 205 (2026-09-23). AreaType coded
+      domain WS3_FutureDevelopment: 1 Utilities, 2 Workplace Center, 3 Regional Center, 4 Urban Core,
+      5 Neighborhood Living, 6 Suburban Living, 7 Suburban Growth, 8 Country Estates, 9 Rural Places,
+      10 Natural Preserve, 11 Bells Ferry LCI, 12 SW Cherokee, 13 Wild Cat, 14 Scenic Corridor,
+      15 Corridor and Nodes, 16 Community Village. Decode AreaType→name for flu label. Spatial-join
+      only (no parcel id). Same layer on ZoningOnlinePortal/5. Coarse plan geography — not parcel-level.
+    status: usable
+
+  - role: sales
+    name: n/a — no public county sale-history FeatureServer/MapServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No county-wide sale price/date REST layer located (2026-09-23). Parcels expose DEEDBOOK/DEEDPAGE
+      only. Use Spatialest property search for sale history (HTML; not a GIS join). Permit Data
+      (MainLayersPRO/22) is permits, not deeds.
+    status: gap
+
+municipalities:
+  - name: Canton
+    level: city
+    parentFips: "13057"
+    joinToCountyParcels: "TIN / TINNoSpace / PIN attribute join on Canton_Zoning_Parcels and Existing_Land_Use; Character Area FLU is spatial-join only"
+    layers:
+      - role: zoning
+        name: Canton Zoning Parcels
+        restUrl: https://services6.arcgis.com/dpaY3zboICQILFY5/arcgis/rest/services/Canton_Zoning_Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CantonZoning: zoning
+          Code: zoningCode
+          TIN: parcelId
+          TINNoSpace: parcelIdAlt
+          PIN: parcelIdAlt2
+        notes: >
+          Live count 12032 (2026-09-23). Parcel-tied city zoning. Prefer CantonZoning (domain e.g.
+          R-40, GC, CBD, PD-Mixed Use, RM-15, L-I). PIN/TIN match county MainLayersPRO/1 for attribute
+          join. Open data: map-cantonga.opendata.arcgis.com. SR 102667/2240.
+        status: usable
+      - role: flu
+        name: Canton Character Area Future Land Use
+        restUrl: https://services6.arcgis.com/dpaY3zboICQILFY5/arcgis/rest/services/Character_Area_Future_Land_Use/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Character_Area: flu
+          Sub_Area: fluSubArea
+        notes: >
+          Live count 35 character-area polygons. Domain codes: DUC Downtown/Urban Center, MHC Major
+          Highway Corridor, HTNS Historic/Traditional Neighborhood-Stable, SDA Suburban Development,
+          CLMURC Community Level Mixed Use/Retail Center, TNRA Traditional Neighborhood Redevelopment,
+          NL Neighborhood Living, SE Suburban Estates, NA Natural Area, EC Employment Center,
+          AI Area of Influence. Spatial-join to county parcels (no parcel id on layer).
+        status: usable
+      - role: parcels
+        name: Canton Existing Land Use (city extract + CAMA)
+        restUrl: https://services6.arcgis.com/dpaY3zboICQILFY5/arcgis/rest/services/Existing_Land_Use/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          TIN: parcelId
+          TINNoSpace: parcelIdAlt
+          PIN: parcelIdAlt2
+          Acreage: acreage
+          Owner: ownerName
+          Mailing_Address: mailingAddress
+          Mailing_City: mailingCity
+          Mailing_State: mailingState
+          Mailing_Zip: mailingZip
+          Property_Address: situsAddress
+          Property_City: situsCity
+          Property_Zip: situsZip
+          CantonZoning: zoning
+          Zoning: zoningCountyCama
+          CantonLanduse: fluExisting
+          MarketValue: tax.marketValue
+          LandValue: tax.landMarketValue
+          BuildingValue: tax.improvementMarketValue
+          CURR_VAL: tax.marketValueAlt
+          PropertyReal_ID: spatialestPropertyId
+        notes: >
+          Live count 11215 city parcels with richer tax fields than county REST (MarketValue, LandValue,
+          BuildingValue, CURR_VAL) plus CantonZoning and CantonLanduse. Real_ID_Link pattern
+          https://property.spatialest.com/ga/cherokee/#/property/{PropertyReal_ID}. Prefer county
+          MainLayersPRO/1 for county-wide search; use this for Canton-scoped apps / tax enrichment.
+        status: partial
+    gaps:
+      - "No city sale-history REST; use Spatialest filtered by city / TIN."
+    status: usable
+
+  - name: Woodstock
+    level: city
+    parentFips: "13057"
+    joinToCountyParcels: "Spatial join city zoning/FLU polygons to county parcels (no shared parcel id on CD_ZoningCodes); optional filter parcels by Property_City/Cities layer"
+    layers:
+      - role: zoning
+        name: Woodstock CD_ZoningCodes ZONING CODES
+        restUrl: https://gis.woodstockga.gov/arcgis/rest/services/OpsLayers/CD_ZoningCodes/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          Description: zoningDescription
+        notes: >
+          Live count 34 zoning-district polygons (2026-09-23). maxRecordCount 1000. Codes include R-1..R-5,
+          GC, NC, LI, HI, PUD, DT-* downtown districts, TRANS (T4/T4-O), overlays coded ZONING=OVER with
+          Description Gateway/Historic/Parkway/Ridgewalk Corridor/Technology Park. Spatial-join to county
+          parcels. Related layers: TRANSECTS/0 (count 2), OVERLAY DISTRICTS/1 (count 6). City GIS also at
+          data-WoodstockGA.opendata.arcgis.com (mostly PDF zoning maps + this REST).
+        status: usable
+      - role: flu
+        name: Woodstock CD_FutureDevelopment CharacterAreas
+        restUrl: https://gis.woodstockga.gov/arcgis/rest/services/OpsLayers/CD_FutureDevelopment/MapServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CharacterA: flu
+        notes: >
+          Live count 10 character-area polygons (e.g. Regional Activity Center, Neighborhood Living,
+          Urban Core, Natural Preserve, Workplace Center). Spatial-join to parcels. GrowthBoundary/0
+          is a single boundary poly; CharacterAreas_GrowthBoundary/2 count 8.
+        status: usable
+    gaps:
+      - "No Woodstock sale-history REST; no city parcel CAMA FeatureServer preferred over county."
+    status: usable
+
+  - name: Ball Ground
+    level: city
+    parentFips: "13057"
+    joinToCountyParcels: "TIN / TINNoSpace / PIN attribute join on city Zoning_August_2024; county MainLayersPRO/41 Ball Ground Zoning is spatial-join only (no PIN)"
+    layers:
+      - role: zoning
+        name: Ball Ground Zoning_August_2024
+        restUrl: https://services9.arcgis.com/CAVmSZdRT9pdZgEk/arcgis/rest/services/Zoning_August_2024/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: Acreage
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Zoning_Description: zoningDescription
+          TIN: parcelId
+          TINNoSpace: parcelIdAlt
+          PIN: parcelIdAlt2
+          Acreage: acreage
+        notes: >
+          Preferred Ball Ground city zoning. Live count 1793 parcel-tied polygons (2026-09-23). Codes
+          include CC-R/CC-C/CC-T, GC, LI, R-15/R-20/R-30/R-40/R-80, RM-4, RZL, TND, BGH, plus *-County
+          legacy labels. PIN/TIN join to county parcels. Same org as Cherokee AGOL parcels
+          (CAVmSZdRT9pdZgEk). View layer Zoning_August_2024_(View) lacks Zoning_Description.
+        status: usable
+      - role: zoning
+        name: MainLayersPRO Ball Ground Zoning (county-hosted)
+        restUrl: https://gis.cherokeecountyga.gov/arcgis/rest/services/MainLayersPRO/MapServer/41
+        layerId: 41
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: >
+          Coarse city zoning polys on county server. Live count 105. Zoning is SmallInteger subtype
+          (0=AG, 1=GC, 4=LI, 9=R15, 10=R20, 14=R80, 20=RZL, 21=TND, 24=CBD, 2=HO, 6=OIT, 15=RE, 25=RM4,
+          26=UNK, 12=R40, 5=LRO, 11=R30, 27=BOL). No PIN — spatial-join only. Prefer city
+          Zoning_August_2024 FeatureServer when available.
+        status: partial
+    gaps:
+      - "No Ball Ground FLU/character-area public REST found; use county Future Development spatial clip."
+      - "No city sale-history REST."
+    status: usable
+
+  - name: Holly Springs
+    level: city
+    parentFips: "13057"
+    joinToCountyParcels: "No city zoning REST; spatial-join county parcels to Cities layer (Jurisidiction=Holly Springs) or filter Property_City; city zoning is PDF-only"
+    layers: []
+    notes: >
+      No public city ArcGIS FeatureServer/MapServer for zoning/FLU found (2026-09-23). City Planning &
+      Zoning page posts Official Zoning Map as PDF only (hollyspringsga.us / civicplus DocumentCenter).
+      data-tohs.opendata.arcgis.com is Holly Springs NC (wrong geography) — do not wire. County parcel
+      Zoning=CITY inside Holly Springs limits; use PDF/manual for district codes.
+    status: gap
+
+  - name: Waleska
+    level: city
+    parentFips: "13057"
+    joinToCountyParcels: "Spatial join / Property_City='Waleska' / Cities layer; no city zoning REST"
+    layers: []
+    notes: >
+      No independent public Waleska zoning/FLU FeatureServer found (2026-09-23). Small municipality;
+      parcels show Zoning=CITY on county layer. No city open-data hub located.
+    status: gap
+
+  - name: Nelson
+    level: city
+    parentFips: "13057"
+    joinToCountyParcels: "Spatial join / Cities layer Jurisidiction=Nelson; note Nelson spans Cherokee+Pickens"
+    layers: []
+    notes: >
+      No City of Nelson (GA) public zoning/FLU REST found (2026-09-23). Municipality crosses into
+      Pickens County — Cherokee layers only cover the Cherokee footprint. County Zoning=CITY inside
+      limits.
+    status: gap
+
+gaps:
+  - "No county-wide lastSale.price / lastSale.date / lastSale.qualified on any public FeatureServer/MapServer — only DEEDBOOK/DEEDPAGE on parcels. Use Spatialest HTML for sales."
+  - "MainLayersPRO parcels lack tax.marketValue/assessedValue/taxableValue; AGOL Parcels_Backup CURR_VAL is the only county-wide REST market-value proxy (partial)."
+  - "County Zoning=CITY (~37k parcels) is a jurisdiction flag — not municipal district codes. Wire Canton/Woodstock/Ball Ground city layers; Holly Springs/Waleska/Nelson are PDF or gap."
+  - "Future Development (205 AreaType polys) is coarse plan context, not parcel-level FLU."
+  - "Holly Springs GA, Waleska, and Nelson have no independent public zoning/FLU REST; Holly Springs posts PDF zoning map only."
+  - "Nelson spans Cherokee+Pickens — Cherokee GIS covers Cherokee side only."
+  - "gis.cherokeega.com presents SSL hostname mismatch; use https://gis.cherokeecountyga.gov/ instead."
+  - "PropertyReal_ID deep-link to Spatialest exists on Canton Existing_Land_Use only — not on county MainLayersPRO parcels."
+  - "No emails/phones collected; no paid vendor (Regrid/Zoneomics/etc.) wired."
+
+license: >
+  Cherokee County GIS public MapServer endpoints (gis.cherokeecountyga.gov); Cherokee County AGOL
+  org CAVmSZdRT9pdZgEk backup parcels / Ball Ground zoning; City of Canton open data
+  (map-cantonga.opendata.arcgis.com / org dpaY3zboICQILFY5); City of Woodstock GIS
+  (gis.woodstockga.gov / data-WoodstockGA.opendata.arcgis.com); City of Ball Ground AGOL
+  (CityOfBallGround). Attribution to Cherokee County GIS / respective cities. Public CAMA fields
+  only; do not scrape emails/phones. No paid vendors.
+appraiserSearchUrl: https://property.spatialest.com/ga/cherokee/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

@@ -1,0 +1,391 @@
+state: GA
+jurisdiction: McDuffie County
+fips: "13189"
+level: county
+markets: [Augusta]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/mailing/situs/zoning/deed acres (NO curr_val/sale on REST)
+  - role: parcels
+    name: Public/MapServer Tax Parcels (Thomson-McDuffie Enterprise portal proxy)
+    restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/e75fa80580074db48b7b3e468993d96b/rest/services/Public/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acres
+    coverage: county-wide
+    fieldMap:
+      ParcelNo: parcelId
+      Realkey: ownerKey
+      Name: ownerName
+      Mail_Addre: mailingAddressAlt
+      Mail_Add_1: mailingAddress
+      Mail_Add_2: mailingAddress2
+      Mail_City: mailingCity
+      Mail_State: mailingState
+      House_No: situsNumber
+      Street_Nam: situsStreet
+      Street_Typ: situsStreetType
+      Legal: legalDescription
+      Tax_Distri: taxDistrict
+      Zoning: zoning
+      Homestead: homesteadExempt
+      Land_Type: landType
+      Dig_Class: dorCode
+      Dig_Strat: dorStrata
+      Deed_Acres: acreage
+      Subdivisio: subdivision
+      Neighborho: neighborhood
+      Shape.area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA-lite (Thomson-McDuffie ArcGIS Enterprise
+      portal proxy Public/MapServer/10 Tax Parcels; webmap Public item
+      3777fae25e414b29a8fdfbffc02855d7; PublicGIS WAB app
+      1391fae3272443b7a5e69d6a63b8b403). Live count 12579 (2026-09-24). maxRecordCount 1000 —
+      page via resultOffset / spatial envelopes. Direct
+      gis.thomson-mcduffie.net/arcgis/rest/services/Public/MapServer returns Token Required
+      (499) — use portal/sharing/servers/... proxy (auth none for public). Name filled ≈12515;
+      Mail_Add_1 usable ≈11446 (coalesce: prefer Mail_Add_1 over Mail_Addre; treat literal
+      'NULL' string as blank); House_No>0 ≈9275; Deed_Acres 5–150 = 2641. NO Mail_Zip /
+      curr_val / mav* / sale_* / SALE_DATE on this layer — tax/sale via qPublic AppID=712
+      LayerID=11417 HTML. Compose situs from House_No+Street_Nam+Street_Typ when House_No>0.
+      Prefer Deed_Acres for acreage band; Shape.area is StatePlane sq ft (wkid 102666 / 2239
+      Georgia East) — GIS acres ≈ Shape.area/43560. Parcel-attributed Zoning top: R2≈5461 /
+      R1≈3484 / 1R≈923 / 2R≈335 / R-1B≈298 / R-1A≈260 / B2≈226 / B1≈226 / C2≈195 / T1≈106 —
+      prefer Euclidean Planning/MapServer County Zoning ZONE_ when available. Dig_Class:
+      R≈9858, V≈1094, C≈646, E≈427, A≈329, J≈73, I≈57. Tax_Distri soft geo-checked:
+      1≈8745 unincorp majority (~-82.61,33.61 Vic Moore NW), 2≈3009 Thomson (~-82.49,33.46;
+      ParcelNo often 0T…), 3≈316 Dearing (~-82.39,33.42; ParcelNo often 0D…) — prefer spatial
+      BaseMap Thomson City Limits / Dearing City Limits. Schema Appraiser / created_user /
+      last_edited_user — DO NOT collect as PII. Skip Planning Water/Sewer Service Area +
+      utilities/AADT per tranche-3. Companion layer 9 Tax Parcels Numbers = same schema
+      (labels) — prefer /10. Official assessor: qPublic App=McDuffieCountyGA / AppID=712
+      LayerID=11417 (qpublic.net/ga/mcduffie; thomson-mcduffie.gov Tax Assessor Search Records
+      → PageTypeID=2&PageID=4888). KeyValue={ParcelNo} e.g. '00010002' / '0T310014'. GEO-VERIFY
+      GEORGIA: WGS84 samples ~-82.611,33.614 / ~-82.494,33.461 (Thomson) / ~-82.387,33.419
+      (Dearing) — Census TIGERweb GEOID 13189 CENTLAT +33.4827626 CENTLON -082.4813128
+      (Augusta MSA / CSRA). REJECT paid Regrid/ATTOM/USLandGrid; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL/FMV/assessed on public REST; qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Public/MapServer/10 has no market/assessed/taxable value fields. Tax/CAMA values via
+      qPublic App=McDuffieCountyGA / AppID=712 LayerID=11417 HTML only. Deep-link
+      KeyValue={ParcelNo}: Application.aspx?AppID=712&LayerID=11417&PageTypeID=4&KeyValue={ParcelNo}.
+      Search PageTypeID=2&PageID=4888. Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_VAL/SALEDATE on Public Tax Parcels. Prefer qPublic Sales Search / Sales List
+      HTML App=McDuffieCountyGA / AppID=712. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Planning/MapServer County Zoning (Euclidean) + parcel Zoning
+    restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/1ad128cbaa1f4537bc4ce0cefc41ffe0/rest/services/Planning/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONE_: zoning
+    notes: >
+      Preferred Euclidean county zoning polygons (count 9189). ZONE_ top: R-2≈5423, R-1≈3372,
+      C-2≈171, T-1≈106, I-2≈91, I-1≈13, C-1≈8, R-3≈5. Parcel-attributed Zoning on Tax Parcels/10
+      is usable secondary (mixed R2/R-2/1R spellings). Companion Thomson Zoning/2 (CITY_ZON)
+      and Dearing Zoning/4 (ZoneCode) for city extracts. Skip Sewer/Water Service Area layers
+      0–1 per tranche-3.
+    status: usable
+
+  - role: flu
+    name: Planning/MapServer CharacterAreasMcDuffie
+    restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/1ad128cbaa1f4537bc4ce0cefc41ffe0/rest/services/Planning/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: flu
+    notes: >
+      Comp-plan character areas (count 26) — Lakeshore / Production / Suburban Reserve /
+      Usry Pond Preserve / Fort Gordon Buffer / Countryside / Traditional Kaolin Mining /
+      Urban Reserve / Medical District / Wrightsboro Village / Three Points Interchange /
+      McDuffie County Tourism Gateway. Companion CharacterAreasThomson/11 (Downtown Thomson /
+      Traditional Neighborhood / Commercial Corridor / Regional Commercial / Suburban
+      Residential…) and CharacterAreasDearing/10. Planning character only — not Euclidean
+      zoning substitute.
+    status: usable
+
+  - role: other
+    name: Public/MapServer E911 Addresses (situs points)
+    restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/e75fa80580074db48b7b3e468993d96b/rest/services/Public/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GISAddress: situsAddress
+      City: situsCity
+      Zip: situsZip
+      GIS_ST_Nam: situsStreet
+      Customer: addressCustomerLabel
+    notes: >
+      E911 address points — join spatially to Tax Parcels (no ParcelNo on this layer). City /
+      Zip usable for place filter alongside Tax_Distri / city limits. Schema Customer may hold
+      occupant labels — treat carefully; do not harvest phones/emails. Prefer parcel House_No+
+      Street_* when present.
+    status: partial
+
+  - role: other
+    name: BaseMap Thomson + Dearing City Limits
+    restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/4415670611184522938f298b9e23c1fb/rest/services/BaseMap/MapServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      CITY: cityName
+      ACRES: acreage
+      SQMILES: municipalityAreaSqMi
+    notes: >
+      Layer 8 Thomson City Limits (CITY='City of Thomson'; centroid ~-82.494,33.471). Layer 9
+      Dearing City Limits (~-82.384,33.414). Preferred spatial municipality filters. Soft
+      Tax_Distri='2' Thomson / '3' Dearing as attribute fallback only. Layer 10 County Boundary.
+      Skip WATER/SEWER attribute flags as utilities context.
+    status: usable
+
+municipalities:
+  - name: Thomson
+    level: city
+    parentFips: "13189"
+    joinToCountyParcels: >
+      Spatial BaseMap/8 Thomson City Limits (~-82.49,33.47) OR soft Tax_Distri='2' (~3009;
+      ParcelNo often 0T…; ~-82.49,33.46). Mailing Mail_City='THOMSON' is NOT authoritative
+      (~7742 includes countywide mail-to-Thomson).
+    layers:
+      - role: zoning
+        name: Planning/MapServer Thomson Zoning
+        restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/1ad128cbaa1f4537bc4ce0cefc41ffe0/rest/services/Planning/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CITY_ZON: zoning
+        notes: >
+          City Euclidean zoning (count 3051). CITY_ZON top: R-1≈1051, R-1A≈555, R-1B≈471,
+          R-2≈380, B-1≈281, B-2≈198, I-1≈69, S≈34, P≈12. Prefer spatial Thomson limits ∩
+          Thomson Zoning; county ZONE_ / parcel Zoning as secondary.
+        status: usable
+      - role: flu
+        name: Planning CharacterAreasThomson
+        restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/1ad128cbaa1f4537bc4ce0cefc41ffe0/rest/services/Planning/MapServer/11
+        layerId: 11
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: flu
+        notes: >
+          Thomson character areas (count 20) — Downtown Thomson / Traditional Neighborhood
+          Stable|Declining / Medical District / Commercial Corridor / Regional Commercial /
+          Suburban Residential.
+        status: usable
+      - role: parcels
+        name: null — use county Tax Parcels filtered to Thomson
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Thomson-only CAMA FeatureServer — county Public/10 + spatial BaseMap/8 /
+          Tax_Distri=2. Owner on REST; tax/sale still qPublic AppID=712 HTML.
+        status: gap
+    gaps:
+      - "No City-of-Thomson separate parcel/CAMA REST — county Tax Parcels + spatial Thomson limits."
+      - "Tax/sale HTML-only (qPublic) even inside city; no Mail_Zip on county REST."
+    status: usable
+
+  - name: Dearing
+    level: city
+    parentFips: "13189"
+    joinToCountyParcels: >
+      Spatial BaseMap/9 Dearing City Limits (~-82.38,33.41) OR soft Tax_Distri='3' (~316;
+      ParcelNo often 0D…). Mail_City='DEARING' alone insufficient.
+    layers:
+      - role: zoning
+        name: Planning/MapServer Dearing Zoning
+        restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/1ad128cbaa1f4537bc4ce0cefc41ffe0/rest/services/Planning/MapServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoneCode: zoning
+        notes: Dearing city Euclidean ZoneCode polygons + spatial city limits.
+        status: usable
+      - role: flu
+        name: Planning CharacterAreasDearing
+        restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/1ad128cbaa1f4537bc4ce0cefc41ffe0/rest/services/Planning/MapServer/10
+        layerId: 10
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Name: flu
+        notes: Dearing character-area polygons when published.
+        status: partial
+      - role: parcels
+        name: null — county Tax Parcels + Tax_Distri=3 / spatial Dearing
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Public/10 + soft Tax_Distri=3 / BaseMap/9.
+        status: gap
+    gaps:
+      - "No Dearing-owned parcel CAMA REST — county layers + Tax_Distri=3 / spatial limits."
+    status: partial
+
+gaps:
+  - "No curr_val / mav* / assessed / SALE_* on Public Tax Parcels REST — tax/owner detail beyond Name+mail + sale via qPublic AppID=712 LayerID=11417 HTML only."
+  - "No Mail_Zip field on Tax Parcels — mailing zip gap on REST."
+  - "Public/MapServer maxRecordCount 1000 — page via resultOffset / envelopes; direct /arcgis/rest Token Required (499) — use portal proxy URL."
+  - "Parcel Zoning spellings inconsistent (R2 vs R-2 vs 1R) — prefer Planning County Zoning ZONE_ Euclidean."
+  - "Tax_Distri soft only — prefer spatial Thomson/Dearing city limits; mailing CITY never sole municipality filter."
+  - "Schema Appraiser / created_user / last_edited_user — DO NOT collect as PII."
+  - "Skip Planning Sewer/Water Service Area + utilities+AADT per tranche-3."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/mcduffie + AppID=712 public for humans."
+  - "Rejected paid Regrid/ATTOM/USLandGrid; no emails/phones."
+
+license: >
+  Thomson-McDuffie County GIS (gis.thomson-mcduffie.net ArcGIS Enterprise) — Public/MapServer
+  Tax Parcels/10, E911/0; Planning/MapServer County Zoning/3, Thomson Zoning/2, Dearing
+  Zoning/4, CharacterAreas*; BaseMap city limits. Assessor qPublic App=McDuffieCountyGA /
+  AppID=712 LayerID=11417 (qpublic.net/ga/mcduffie; thomson-mcduffie.gov Tax Assessor).
+  Attribution Thomson-McDuffie GIS / Tax Assessor. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=712&LayerID=11417&PageTypeID=2&PageID=4888
+jurisdictionGisUrl: https://gis.thomson-mcduffie.net/portal/apps/webappviewer/index.html?id=1391fae3272443b7a5e69d6a63b8b403
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable (unverified 2026-09-28 - host unreachable from box)
+  summary: >
+    Existing usable layer https://gis.thomson-mcduffie.net/portal/sharing/servers/e75fa80580074db48b7b3e
+    468993d96b/rest/services/Public/MapServer/10 could not be reached from the research box on
+    2026-09-28 (TLS handshake dropped: URLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF
+    occurred in violation of ). Status left usable per 2026-09-24 verification; needs re-check from
+    another network.
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Dearing town"
+      level: city
+      parentFips: "13189"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Thomson city"
+      level: city
+      parentFips: "13189"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='McDuffie' AND aadt>0
+    altFilter: name LIKE '189-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 189-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 124
+    maxAadt: 38700
+    geoCheck: 123/124 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: Name
+    filledCount: null
+    restUrl: https://gis.thomson-mcduffie.net/portal/sharing/servers/e75fa80580074db48b7b3e468993d96b/rest/services/Public/MapServer/10
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner field on another REST layer already on this card
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=McDuffieCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=712&LayerID=11417&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://gis.thomson-mcduffie.net/portal/apps/webappviewer/index.html?id=1391fae3272443b7a5e69d6a63b8b403
+    note: existing card viewer (HTTP 000 from box)
+    cities:
+    - name: Dearing town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Thomson city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'
+  note: McDuffie county GIS host gis.thomson-mcduffie.net unreachable from box (TLS drop); REST fields not re-read
+    in pass2

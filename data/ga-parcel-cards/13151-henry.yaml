@@ -1,0 +1,542 @@
+state: GA
+jurisdiction: Henry County
+fips: "13151"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide parcels: situs + acreage; NO owner/mailing/tax/sale on REST
+  - role: parcels
+    name: Parcels (county MapServer)
+    restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Parcels/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE_1
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ACREAGE_1: acreage
+      FULLADDRES: situsAddress
+      HOUSE_NUMB: situsStreetNo
+      STREETNAME: situsStreetName
+      POST_TYPE: situsStreetType
+      POST_DIR: situsStreetDir
+      UNIT: situsUnit
+      POSTALCITY: situsCity
+      ZIP: situsZip
+      ST: situsState
+      ZONING: zoning
+      FUTURE_LAN: flu
+      INCORPORAT: incorporatedFlag
+      JURISDICTI: taxDistrict
+      SUBDIVISIO: subdivision
+      Venue: venue
+      QPublic: appraiserDeepLink
+    notes: >
+      Preferred county-wide parcel geometry. Live count 103537 (2026-09-23).
+      Spatial reference NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 /
+      latestWkid 2240). maxRecordCount 2000. Geo-verified WGS84 sample lon/lat ~-84.32,
+      33.40 (Henry County GA — not a lookalike). Rich situs: FULLADDRES and
+      HOUSE_NUMB/STREETNAME/POST_TYPE/POST_DIR/UNIT + POSTALCITY/ZIP/ST. ACREAGE_1 is
+      double. INCORPORAT is Yes/No only (~32521 Yes) — NOT city name; for municipality use
+      Planning/Future_Land_Use MUNICIPAL or spatial intersect Layers/Cities (McDonough,
+      Stockbridge, Hampton, Locust Grove). ZONING and FUTURE_LAN on THIS layer are often
+      null — prefer Current_Zoning_and_Future_Land_Use/0 (ZONING + CityZoning) and
+      Planning/Future_Land_Use FLU2023. NO ownerName, mailing*, tax.*, or lastSale.* on any
+      public county REST verified — CAMA is qPublic HTML; QPublic field embeds deep link
+      AppID=1035&LayerID=22139&PageTypeID=4&PageID=15803&KeyValue={PARCEL_NO}. Equivalent
+      mirror: SAGES/Sages/FeatureServer/6 (same count 103537 / same schema). Prefer this
+      MapServer/12 or SAGES FS/6 for geometry; join zoning/FLU/owner separately.
+    status: usable
+
+  - role: parcels
+    name: SAGES Parcels (FeatureServer mirror)
+    restUrl: https://arcgis.co.henry.ga.us/server/rest/services/SAGES/Sages/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE_1
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ACREAGE_1: acreage
+      FULLADDRES: situsAddress
+      POSTALCITY: situsCity
+      ZIP: situsZip
+      ST: situsState
+      INCORPORAT: incorporatedFlag
+      JURISDICTI: taxDistrict
+      QPublic: appraiserDeepLink
+    notes: >
+      Live count 103537 — same universe as Parcels/MapServer/12. FeatureServer supports
+      advanced queries/statistics. Prefer either; no CAMA owner/tax/sale here either.
+    status: usable
+
+  - role: zoning
+    name: Current Zoning (parcel polygons + CityZoning)
+    restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Current_Zoning_and_Future_Land_Use/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONING: zoning
+      CityZoning: zoningCity
+      Spl_Zoning: zoningOverlay
+    notes: >
+      Preferred county-wide zoning POLYGON layer (parcel-tied). Live count 102390
+      (2026-09-23). Join to parcels on PARCEL_NO. Unincorporated codes on ZONING (~70344
+      non-CITY): RA, R2, R3, PD, R1, RX, RM, R4, MHD, MU, C1–C3, I1/I2, OI, R5, RTF, …
+      When ZONING='CITY' (~32044) use CityZoning for municipal district (~30374 non-blank):
+      PD, R2, R3, R50, RM, R75, R100, RA, C2, R75/R85, RTD, RM75, C3, PUD, R85, RMH, M1,
+      OI, … CityZoning is a county-side stub — prefer city-local REST when available
+      (McDonough GMC Zoning Classifications polygons; county McDonough/Stockbridge/
+      Locust_Grove city parcel ZONING). Mirrors: Planning/Zoning/MapServer/0 and
+      SAGES/Sages/FeatureServer/12 (same 102390).
+    status: usable
+
+  - role: zoning
+    name: Planning Zoning MapServer (mirror)
+    restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Planning/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONING: zoning
+      CityZoning: zoningCity
+    notes: >
+      Live count 102390 — same schema as Current_Zoning_and_Future_Land_Use/0. Prefer the
+      Current_Zoning_and_Future_Land_Use service name for clarity.
+    status: usable
+
+  - role: flu
+    name: Planning Future Land Use 2023
+    restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Planning/Future_Land_Use/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE_1
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      FLU2023: flu
+      FUTURE_LAN: fluAlt
+      MUNICIPAL: municipality
+      ZONING: zoning
+      ACREAGE_1: acreage
+      CITY: cityFlag
+    notes: >
+      Preferred FLU. Live count 98977 (2026-09-23). FLU2023 domain: CITY (~31691), LDS, MDS,
+      HDS, RR, UR, HDMU, LDMU, INDUS, VC, GREEN, COM, PI, UTI. MUNICIPAL live group-by:
+      Henry County ~65037, McDonough ~10059, Stockbridge ~8825, Locust Grove ~4725,
+      Hampton ~3072 (+ blanks). Join on PARCEL_NO. CITY field mostly blank — use MUNICIPAL.
+      Mirrors: Current_Zoning_and_Future_Land_Use/MapServer/2 and SAGES/Sages/FeatureServer/13.
+      Municipal FLU often coded CITY — city-specific FLU is PDF/comp-plan, not REST.
+    status: usable
+
+  - role: sales
+    name: lastSale via qPublic HTML only (no REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No lastSale.price / lastSale.date / lastSale.qualified on any public Henry county
+      MapServer/FeatureServer verified 2026-09-23 (Parcels, SAGES, Zoning, FLU, city clips,
+      Socrata_Data/Tyler_Socrata; EnerGov folders empty). Sale history is qPublic Schneider
+      HTML only — not a GIS join.
+    status: gap
+
+  - role: tax
+    name: tax values via qPublic HTML only (no REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No tax.marketValue / assessedValue / taxableValue on public county REST. Assessment
+      cards on qPublic (AppID=1035). McDonough GMC city parcels carry OWNER_NAME only
+      (no values). County-wide tax REST = gap.
+    status: gap
+
+municipalities:
+  # Discovered from Layers/Cities + SAGES Cities (4 polys, WGS84 Henry GA) + FLU MUNICIPAL
+  # + Comp Plan / New Georgia Encyclopedia. Flippen is unincorporated (see entry).
+  - name: McDonough
+    level: city
+    parentFips: "13151"
+    joinToCountyParcels: >
+      PARCEL_NO attribute join. Prefer MUNICIPAL='McDonough' on Planning/Future_Land_Use
+      (~10059) or spatial intersect Layers/Cities NAME='McDonough' / McDonough/FeatureServer/2
+      city limit. County Parcels INCORPORAT='Yes' alone is insufficient (all four cities).
+      GMC mcd_Planning_view/0 PARCEL_ID = county PARCEL_NO (verified spatial match
+      057D01200000 @ ~-84.198, 33.406). County McDonough/FeatureServer/3 is city parcel clip
+      with city ZONING codes.
+    layers:
+      - role: zoning
+        name: GMC McDonough Zoning Classifications (city district polygons)
+        restUrl: https://services3.arcgis.com/7ScJ8q0HhcQyXcHe/arcgis/rest/services/mcd_Planning_view/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CODE: zoning
+          Display: zoningLabel
+          Descri: zoningDescription
+        notes: >
+          Preferred McDonough-local zoning POLYGONS. Live count 813 (2026-09-23). Extent
+          WGS84 ~-84.20..-84.10, 33.40..33.48 — McDonough GA verified. Codes include
+          R-50/R-75/R-85/R-100, RA-200, RTD, RM-75, C-1..C-4, M-1/M-2, O-I, MCDZ, RGP, …
+          Spatial-join to county Parcels/12 or attribute-join via GMC parcels PARCEL_ID.
+          Powers Community View (gmc-gis.maps.arcgis.com). Prefer over county CityZoning
+          stub when parcel is in McDonough limits.
+        status: usable
+      - role: parcels
+        name: GMC McDonough Planning Parcels (owner + situs; acres weak)
+        restUrl: https://services3.arcgis.com/7ScJ8q0HhcQyXcHe/arcgis/rest/services/mcd_Planning_view/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_ID: parcelId
+          OWNER_NAME: ownerName
+          STREET_ADDRESS: situsAddress
+          STREET_NUM: situsStreetNo
+          STREET_NAME: situsStreetName
+          STREET_TYPE: situsStreetType
+          ACRES: acreage
+          LAND_USE: dorCodeDescription
+          LAND_USE_CODE: dorCode
+          SUBDIVISION_NAME: subdivision
+        notes: >
+          Live count 16048 (larger than county McDonough clip 10274 — may include planning
+          buffer / older annexation set). OWNER_NAME populated (~15871). ACRES often 0 —
+          prefer county ACREAGE_1. Join PARCEL_ID=PARCEL_NO. No mailing/tax/sale. Prefer
+          county Parcels for geometry/acreage; use this for ownerName inside McDonough.
+        status: partial
+      - role: parcels
+        name: County McDonough Parcels clip (city ZONING attribute)
+        restUrl: https://arcgis.co.henry.ga.us/server/rest/services/McDonough/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: ACREAGE_1
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ACREAGE_1: acreage
+          MUNICIPAL: municipality
+          ZONING: zoning
+          FUTURE_LAN: flu
+        notes: >
+          Live count 10274. City ZONING codes (R50, R75, R100, RA200, RM75, RTD, C1–C3, M1,
+          OI, PD, RGP, MCDZ, …). FUTURE_LAN mostly CITY/LD. Prefer GMC Zoning Classifications
+          for formal district polygons; this clip for quick PARCEL_NO→city zoning attribute.
+        status: usable
+      - role: zoning
+        name: County Current Zoning CityZoning (McDonough extract)
+        restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Current_Zoning_and_Future_Land_Use/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ZONING: zoningCountyFlag
+          CityZoning: zoning
+        notes: >
+          Filter via FLU MUNICIPAL='McDonough' join on PARCEL_NO or ZONING='CITY' + spatial
+          Cities. County-side CityZoning stub — prefer GMC / McDonough FS/3 for city work.
+        status: partial
+    gaps:
+      - "No McDonough-specific FLU FeatureServer with city future-land-use classes; county FLU2023 marks city parcels CITY."
+      - "GMC parcel ACRES often 0; count 16048 ≠ county city clip 10274 — treat GMC as planning overlay, not authoritative acreage."
+      - "No lastSale/tax on city REST; use qPublic."
+    status: usable
+
+  - name: Stockbridge
+    level: city
+    parentFips: "13151"
+    joinToCountyParcels: >
+      PARCEL_NO; FLU MUNICIPAL='Stockbridge' (~8825); or spatial intersect Layers/Cities
+      NAME='Stockbridge'. stockbridgega.maps.arcgis.com webapp item inaccessible (CONT_0001)
+      at verify time — use county-hosted Stockbridge FeatureServer.
+    layers:
+      - role: zoning
+        name: County Stockbridge Parcels ZONING (city clip)
+        restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Stockbridge/FeatureServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: ACREAGE_1
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ACREAGE_1: acreage
+          ZONING: zoning
+          SUBDIVISIO: subdivision
+        notes: >
+          Preferred Stockbridge-local public REST for city zoning attributes. Live count
+          11081 (2026-09-23). ZONING codes: R1–R4, RA, RM, RM2, PD, MU, C1–C3, M1 — city
+          district set (not county RA/R2 schema). No independent Stockbridge zoning
+          FeatureServer with district polygons found publicly (city AGOL item inaccessible).
+          Prefer this over county CityZoning when parcel is in Stockbridge.
+        status: usable
+      - role: zoning
+        name: County Current Zoning CityZoning (Stockbridge extract)
+        restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Current_Zoning_and_Future_Land_Use/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          CityZoning: zoning
+        notes: >
+          Filter MUNICIPAL='Stockbridge' via FLU join. Backup if city clip unavailable.
+        status: partial
+    gaps:
+      - "No public Stockbridge-owned zoning/FLU district FeatureServer verified (AGOL webapp item inaccessible 2026-09-23)."
+      - "No city FLU classes on REST; county FLU2023=CITY for municipal parcels."
+      - "No owner/tax/sale on Stockbridge REST."
+    status: usable
+
+  - name: Hampton
+    level: city
+    parentFips: "13151"
+    joinToCountyParcels: >
+      PARCEL_NO; FLU MUNICIPAL='Hampton' (~3072); spatial intersect Layers/Cities
+      NAME='Hampton'. No Hampton-GA city REST found — reject
+      services8.arcgis.com/gbzZfTaSTnfRdQPt (CITYNAME=Mustang, ST_FIPS=40 Oklahoma —
+      wrong-state lookalike).
+    layers:
+      - role: zoning
+        name: County Current Zoning CityZoning (Hampton extract)
+        restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Current_Zoning_and_Future_Land_Use/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ZONING: zoningCountyFlag
+          CityZoning: zoning
+        notes: >
+          Only public Hampton zoning attribute source found. Sample CityZoning for
+          MUNICIPAL=Hampton includes R2, R3, RD, RA, C1–C3, M1/M2, RMH. Filter
+          ZONING='CITY' and join FLU MUNICIPAL='Hampton' on PARCEL_NO (or spatial Cities).
+          hamptonga.gov Planning/Zoning is HTML/PDF-oriented; GIS page 404; no public
+          FeatureServer. Treat REST as county stub, not city-authoritative polygons.
+        status: partial
+    gaps:
+      - "No Hampton GA city-owned zoning/FLU FeatureServer; Mustang OK AGOL org explicitly rejected (wrong state)."
+      - "CityZoning is county-maintained stub; confirm with Hampton Planning for permit work."
+      - "No city FLU REST; county FLU2023=CITY for Hampton parcels."
+      - "No owner/tax/sale on REST for Hampton."
+    status: partial
+
+  - name: Locust Grove
+    level: city
+    parentFips: "13151"
+    joinToCountyParcels: >
+      PARCEL_NO; FLU MUNICIPAL='Locust Grove' (~4725); spatial intersect Layers/Cities
+      NAME='Locust Grove'; county Locust_Grove/Locust_Grove/FeatureServer/1 city parcel clip.
+    layers:
+      - role: zoning
+        name: County Locust Grove Parcels ZONING (city clip)
+        restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Locust_Grove/Locust_Grove/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: ACREAGE_1
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ACREAGE_1: acreage
+          ZONING: zoning
+          FUTURE_LAN: flu
+          FULLADDRES: situsAddress
+          POSTALCITY: situsCity
+          ZIP: situsZip
+          Venue: municipality
+        notes: >
+          Preferred Locust Grove-local public REST. Live count 4772 (2026-09-23). ZONING:
+          R2, R3, PD, RM, RMH, City, RA, C1–C3, M1/M2, OI, R1, AAR, RD. Includes situs
+          FULLADDRES. FUTURE_LAN mostly CITY/LD/RR/TCU — not a full city FLUM. No
+          independent Locust Grove zoning FeatureServer found. Prefer this clip over county
+          CityZoning.
+        status: usable
+      - role: zoning
+        name: County Current Zoning CityZoning (Locust Grove extract)
+        restUrl: https://arcgis.co.henry.ga.us/server/rest/services/Current_Zoning_and_Future_Land_Use/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          CityZoning: zoning
+        notes: >
+          Backup; filter MUNICIPAL='Locust Grove' via FLU join.
+        status: partial
+    gaps:
+      - "No Locust Grove-owned independent zoning/FLU FeatureServer verified."
+      - "City FLU not detailed on REST (FUTURE_LAN/FLU2023 often CITY)."
+      - "No owner/tax/sale on Locust Grove REST."
+    status: usable
+
+  - name: Flippen
+    level: city
+    parentFips: "13151"
+    joinToCountyParcels: >
+      Flippen is unincorporated — no Cities NAME=Flippen; no FLU MUNICIPAL=Flippen;
+      POSTALCITY Flippen count 0 (mailing typically McDonough). Use county layers; do not
+      expect a municipal tax district.
+    layers: []
+    notes: >
+      Flippen is an unincorporated community in Henry County (not one of the four
+      incorporated cities). No municipal boundary on Layers/Cities; no city zoning/FLU REST.
+      Wire county Parcels + Current Zoning + FLU (MUNICIPAL='Henry County'). Status gap as
+      municipality.
+    status: gap
+
+gaps:
+  - "No ownerName / mailingAddress / tax.marketValue / tax.assessedValue / lastSale.* on any public county-wide REST (Parcels, SAGES, Zoning, FLU, city clips, Tyler_Socrata, empty EnerGov). CAMA is qPublic HTML only."
+  - "Parcel-layer ZONING/FUTURE_LAN attributes often null — always join Current_Zoning (ZONING+CityZoning) and Planning/Future_Land_Use (FLU2023+MUNICIPAL)."
+  - "Municipal FLU detail missing: FLU2023='CITY' for ~32k city parcels; city comprehensive-plan FLU is PDF (DCA / city sites), not REST."
+  - "Hampton has no city GIS REST; county CityZoning stub only. Rejected Mustang OK AGOL (ST_FIPS=40) as wrong-state lookalike."
+  - "Stockbridge city AGOL webapp item inaccessible at verify time; use county Stockbridge/FeatureServer/2."
+  - "Flippen is unincorporated — no city REST / boundary."
+  - "Postal places Ellenwood/Rex/Jonesboro/Jackson/Jenkinsburg appear in POSTALCITY but are not Henry incorporated municipalities (only McDonough, Stockbridge, Hampton, Locust Grove)."
+  - "GMC McDonough parcel count 16048 ≠ county city clip 10274; ACRES often 0 — partial for acreage."
+  - "No lastSale.qualified anywhere; no emails/phones collected; no paid vendors."
+  - "INCORPORAT is Yes/No only — use MUNICIPAL or Cities polygon for city name."
+
+license: >
+  Henry County GIS public ArcGIS Server (arcgis.co.henry.ga.us); city overlays hosted on
+  same server (McDonough, Stockbridge, Locust_Grove). McDonough Community View / GMC GIS
+  AGOL org 7ScJ8q0HhcQyXcHe (mcd_Planning_view). qPublic SchneiderCorp for CAMA HTML.
+  Attribution to Henry County GIS / respective cities. Public fields only; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HenryCountyGA&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://arcgis.co.henry.ga.us/server/rest/services/Parcels/MapServer/12 count 103617; extent center
+    [['13151', 'Henry County']]; sample [['13151', 'Henry County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Hampton city"
+      level: city
+      parentFips: "13151"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Locust Grove city"
+      level: city
+      parentFips: "13151"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "McDonough city"
+      level: city
+      parentFips: "13151"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Stockbridge city"
+      level: city
+      parentFips: "13151"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Henry' AND aadt>0
+    altFilter: name LIKE '151-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 151-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 290
+    maxAadt: 186000
+    geoCheck: 289/290 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=HenryCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=1035&LayerID=22139&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '? 045'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=HenryCountyGA&Layer=Parcels&PageType=Report&KeyValue=%3F%20045
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=HenryCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Hampton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Locust Grove city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: McDonough city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Stockbridge city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

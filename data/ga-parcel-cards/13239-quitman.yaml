@@ -1,0 +1,163 @@
+state: GA
+jurisdiction: Quitman County
+fips: "13239"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer recovered
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Quitman County GA public parcel FeatureServer/MapServer
+      recovered (2026-09-24). RVRC_ELA org Ug5xGQbHsD8zuZzM has Quitman_Blocks /
+      Quitman_Tracts / Quitman_Roads / Quitman County webmap only — NO parcel CAMA
+      (unlike Clay ParcelsChattCo / Parcels12_2018 neighbors). Official human
+      CAMA/GIS = Beacon/qPublic AppID=726 LayerID=11767 (qpublic.net/ga/quitman;
+      Georgetown GA seat; topmenu → beacon.schneidercorp.com). Cloudflare/bot 403
+      automated Application.aspx; public for humans. QuitmanCountyGA_WFS 404.
+      Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=726&LayerID=11767&PageTypeID=4&KeyValue={parcelId}
+      (Search PageID=5434; Estimate Taxes PageID=5877).
+      GEO-VERIFY GEORGIA FIPS 13239: Quitman_Blocks STATEFP20='13' COUNTYFP20='239'
+      samples ~-84.974,31.816 / ~-85.104,31.815; Census TIGERweb GEOID 13239
+      CENTLAT +31.8673135 CENTLON -085.0187878 (Georgetown / Lake Walter F. George
+      / Chattahoochee). REJECT arcsrv.mfc.ms.gov BrianMitchell/Parcels/50 "Quitman
+      Parcels" (Quitman County MISSISSIPPI — Township/Range PLSS). REJECT City of
+      Quitman (Brooks County GA FIPS 13027 — different county; city named Quitman
+      ≠ Quitman County). REJECT paid Regrid/ATTOM/DynamoSpatial/Equator (~2.8k
+      commercial parcel ads). Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — Beacon/qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via Beacon AppID=726
+      LayerID=11767 HTML. Rejected paid vendor tax extracts.
+    status: gap
+
+  - role: sales
+    name: null — Beacon/qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer Beacon/qPublic Sales Search HTML
+      AppID=726. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Quitman County GA zoning REST found (2026-09-24). RVRC Quitman layers are
+      census blocks/tracts/roads only — not Euclidean zoning.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Quitman County GA future land use REST found — Comp Plan/PDF gap.
+    status: gap
+
+  - role: other
+    name: Quitman_Blocks (census — geo scaffold only)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Quitman_Blocks/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID20: blockGeoid
+      COUNTYFP20: countyFp
+    notes: >
+      2020 census blocks (STATEFP20=13 COUNTYFP20=239 = FIPS 13239). NOT parcels —
+      use only for county extent / geo-verify. Twin Quitman_Tracts /
+      Quitman_Roads. Webmap 8cb01198b5d549c2848622607bbc3806.
+    status: usable
+
+municipalities:
+  - name: Georgetown
+    level: city
+    parentFips: "13239"
+    joinToCountyParcels: >
+      County seat and only incorporated municipality (Quitman County). No public
+      CityLimits_Quitman / Georgetown boundary FeatureServer recovered — soft
+      filter via situs/community Georgetown GA 39854 when parcel HTML/REST exists.
+      Do NOT use City of Quitman (Brooks County) as this municipality.
+    layers:
+      - role: parcels
+        name: null — no city parcel CAMA FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Georgetown-owned parcel FS — county Beacon/qPublic HTML only.
+        status: gap
+      - role: zoning
+        name: null — no Georgetown zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Georgetown city zoning REST found.
+        status: gap
+    gaps:
+      - "No Georgetown city limits or parcel/zoning FeatureServer — Beacon AppID=726 county HTML."
+      - "City of Quitman (Brooks County) is NOT this municipality."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Quitman County GA — Beacon AppID=726 LayerID=11767 HTML only."
+  - "QuitmanCountyGA_WFS 404; Application.aspx Cloudflare/bot 403 automated."
+  - "RVRC has Quitman census blocks/tracts/roads only — no parcel CAMA FS (gap vs Clay/Chattahoochee neighbors)."
+  - "No Georgetown city-limits FeatureServer recovered."
+  - "REJECT Quitman County MS arcsrv.mfc.ms.gov Parcels/50; REJECT City of Quitman Brooks County GA (13027); REJECT paid Regrid/ATTOM/DynamoSpatial/Equator."
+  - "Skip utilities+AADT; no emails/phones."
+
+license: >
+  Quitman County Tax Assessor Beacon/qPublic AppID=726 LayerID=11767
+  (qpublic.net/ga/quitman; Georgetown GA). River Valley RC / GARC —
+  Quitman_Blocks / Quitman_Tracts / Quitman_Roads (Ug5xGQbHsD8zuZzM; census/roads
+  only). Attribution Quitman County Tax Assessor / RVRC GIS. Public HTML + census
+  scaffold only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=726&LayerID=11767&PageTypeID=2&PageID=5434
+jurisdictionGisUrl: https://beacon.schneidercorp.com/Application.aspx?AppID=726&LayerID=11767&PageTypeID=1
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

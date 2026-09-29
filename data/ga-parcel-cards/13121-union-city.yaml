@@ -1,0 +1,58 @@
+state: GA
+jurisdiction: "Union City, Fulton County"
+fips: "13121"
+level: city
+markets: [Atlanta]
+
+layers:
+  - role: zoning
+    name: UC_Zoning_2025cw
+    restUrl: https://services.arcgis.com/MewUCwyCByL0k7La/arcgis/rest/services/Union_City_Data_WFL1/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: LandAcres
+    coverage: city-only
+    fieldMap:
+      ParcelID: parcelId
+      Zoning: zoning
+      ZonDesc: zoningDescription
+      Address: situsAddress
+      LandAcres: acreage
+      TaxYear: taxYear
+      TaxDist: taxDistrict
+    notes: >
+      Public Union City Data FeatureServer (publisher Square1GIS). Live count 9214; TaxYear 2025.
+      Parcel-attributed. ParcelID matches Fulton PMV/11. Duplicate layer id 22 has same schema/count.
+      Overlays (RooseveltHwyCorridor, UrbanDesign, DowntownDevelopmentArea) also on this service.
+      No separate city-operated ArcGIS Server found.
+    status: usable
+
+  - role: flu
+    name: CHARACTER_AREAS
+    restUrl: https://services.arcgis.com/MewUCwyCByL0k7La/arcgis/rest/services/Union_City_Data_WFL1/FeatureServer/21
+    layerId: 21
+    geometry: polygon
+    auth: none
+    acreageField: GIS_acre
+    coverage: city-only
+    fieldMap:
+      NAME: flu
+      GIS_acre: acreage
+    notes: >
+      Character-area polygons used as FLU proxy (no dedicated FLU layer found). Live count 8897.
+      Spatial join (NAME codes like NOS); no ParcelID on this layer.
+    status: partial
+
+gaps:
+  - "Hosted by consultant org Square1GIS (not city AGOL org) — public but monitor for URL drift."
+  - "No dedicated Future Land Use layer; CHARACTER_AREAS is FLU proxy only."
+  - "UC_Tax_Parcels_2026 on same service is a city clip of Fulton parcels — prefer county PMV/11 for CAMA."
+
+license: "Union City GIS data via Square1GIS public FeatureServer; verify attribution with city."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+notes: >
+  JOIN TO COUNTY PARCELS: Zoning — attribute join ParcelID = Fulton PMV MapServer/11 ParcelID,
+  else spatial intersect. CHARACTER_AREAS — spatial intersect with PMV/11 only.

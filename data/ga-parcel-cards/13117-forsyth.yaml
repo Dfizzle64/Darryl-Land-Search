@@ -1,0 +1,302 @@
+state: GA
+jurisdiction: Forsyth County
+fips: "13117"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide parcels with situs, mailing, acreage, zoning attr, tax values; NO owner (join EnerGov)
+  - role: parcels
+    name: Public Tax Parcel (FeatureServer)
+    restUrl: https://geo.forsythco.com/gis/rest/services/Public/Tax_Parcel/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: STATEDAREA
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      STATEDAREA: acreage
+      SITEADDRESS: situsAddress
+      PSTLADDRESS: mailingAddress
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      PSTLZIP5: mailingZip
+      PSTLZIP4: mailingZip4
+      ZONING: zoning
+      LNDVALUE: tax.landMarketValue
+      CNTASSDVAL: tax.marketValue
+      CNTTXBLVAL: tax.taxableValue
+      PRVASSDVAL: tax.previousMarketValue
+      USECD: dorCode
+      USEDSCRP: dorCodeDescription
+      CLASSCD: propertyClass
+      CLASSDSCRP: propertyClassDescription
+      CNVYNAME: subdivision
+      TAXYEAR: taxYear
+      Link: appraiserDeepLink
+      TaxBillLink: taxBillSearchUrl
+    notes: >
+      Preferred county-wide parcel source. Live count 105480 (2026-09-23). Spatial reference
+      NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240).
+      maxRecordCount 15000. Geo-verified WGS84 samples ~-84.13, 34.05 (south Forsyth / Suwanee
+      postal) and ~-84.24, 34.26 (north Forsyth) — Forsyth County GA, not NC lookalike.
+      STATEDAREA is acres (double); ~102635 with STATEDAREA>0; ~4009 in app 5–150 acre band.
+      Rich tax on polygons: LNDVALUE, CNTASSDVAL, CNTTXBLVAL (~104801 with CNTASSDVAL>0).
+      Alias quirk: CNTASSDVAL labeled "Current Assessed Value" but values behave as fair-market /
+      digest total — for most parcels CNTTXBLVAL ≈ 0.4×CNTASSDVAL (GA 40% assessment); ~731
+      parcels have lower CNTTXBLVAL (exemptions / CUVA). Map CNTASSDVAL→tax.marketValue and
+      CNTTXBLVAL→tax.taxableValue; no separate always-40% assessed field. ZONING on ~105349
+      parcels (R2R, RES3, CR1, A1, PUD, …). NO ownerName on this layer — join EnerGov
+      TaxParcels OWNERNME1 on PARCELID. Link embeds qPublic AppID=1027 deep link
+      KeyValue={PARCELID with spaces as +}. TaxBillLink → forsythproperty.assurancegov.com.
+      Equivalent MapServer: Public/Tax_Parcel/MapServer/0 (same count 105480). Prefer
+      FeatureServer for queries. Pictometry Tax Parcel /3 is a thin geometry+ZONING stub
+      (same count, no CAMA) — do not prefer.
+    status: usable
+
+  - role: parcels
+    name: EnerGov TaxParcels (owner + mailing mirror)
+    restUrl: https://geo.forsythco.com/gis/rest/services/EnerGov/EnerGovParcelAddressMapService/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      OWNERNME1: ownerName
+      OWNERNME2: ownerName2
+      SITEADDRESS: situsAddress
+      PSTLADDRESS: mailingAddress
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      Link: appraiserDeepLink
+      TaxBillLink: taxBillSearchUrl
+    notes: >
+      Live count 105480 — same universe as Public Tax_Parcel/0. OWNERNME1 populated on
+      ~105349. Prefer Public Tax_Parcel for acreage/tax/zoning; join this layer on PARCELID
+      for ownerName (only public county REST owner source verified). No STATEDAREA /
+      CNTASSDVAL / ZONING here.
+    status: usable
+
+  - role: parcels
+    name: Pictometry Tax Parcel (thin mirror)
+    restUrl: https://geo.forsythco.com/gisworkflow/rest/services/Pictometry/Web_Service_Property_Services/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      SITEADDRESS: situsAddress
+      CNVYNAME: subdivision
+      ZONING: zoning
+      TAXYEAR: taxYear
+    notes: >
+      Live count 105480. Geometry + PARCELID/SITEADDRESS/ZONING/TAXYEAR only — NO owner,
+      mailing zip split, acreage, or tax values. Prefer Public/Tax_Parcel/FeatureServer/0.
+    status: partial
+
+  - role: tax
+    name: Public Tax Parcel (CAMA values on polygons)
+    restUrl: https://geo.forsythco.com/gis/rest/services/Public/Tax_Parcel/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: STATEDAREA
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      LNDVALUE: tax.landMarketValue
+      CNTASSDVAL: tax.marketValue
+      CNTTXBLVAL: tax.taxableValue
+      PRVASSDVAL: tax.previousMarketValue
+      TAXYEAR: taxYear
+    notes: >
+      Tax/CAMA values live on the preferred parcel polygons (not a separate service).
+      See parcels notes for CNTASSDVAL vs CNTTXBLVAL alias/40% behavior. No distinct
+      tax.assessedValue field; when no exemption CNTTXBLVAL≈0.4×CNTASSDVAL (GA assessed).
+      TAXYEAR sample 2026. Tax bill HTML: forsythproperty.assurancegov.com/Property/Search.
+    status: usable
+
+  - role: zoning
+    name: Public Zoning Districts
+    restUrl: https://geo.forsythco.com/gisworkflow/rest/services/Public/Zoning_Districts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningDescription
+    notes: >
+      Preferred county-wide zoning POLYGON layer. Live count 4612 (2026-09-23). maxRecordCount
+      2000. SR 102667/2240. Spatial-join to parcels (no parcel id on this layer). Codes include
+      A1, AG-RES, RES1–RES6, R1/R1R/R2/R2R/R3, CR1/CR2, OSR, LR, NS, UV, HB, CBD, HC, BP, O&I,
+      OR, OCMS, M1/M2, MINE, PUD, MPD, MCD, MRD, plus ZONECLASS=CUMMING (~138 polys) as a
+      city-area stub (ZONEDESC City / City of Cumming) — NOT Cumming city district codes.
+      Parcel attribute ZONING on Public Tax_Parcel/0 is an alternate CAMA string (join-free)
+      and carries real district codes inside Cumming limits (R1/R1A/R2/R3/MU/OP/HB/CBD/…).
+      Prefer parcel ZONING when inside MunicipalBoundary; prefer this polygon layer for
+      unincorporated district boundaries. Mirrors: Zoning_Districts/MapServer/0 and
+      Pictometry Web_Service_Property_Services/FeatureServer/4 (both count 4612); EnerGov
+      MapServer/5 ZoningDistrict (same schema/count).
+    status: usable
+
+  - role: zoning
+    name: EnerGov Overlay Districts
+    restUrl: https://geo.forsythco.com/gis/rest/services/EnerGov/EnerGovParcelAddressMapService/MapServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      District: zoningOverlay
+      Label: zoningOverlayLabel
+      PIN: parcelIdAlt
+      UDC_Link: zoningOrdinanceLink
+    notes: >
+      Live count 1133 overlay polygons (Wetland Protection, Peachtree Parkway, groundwater
+      recharge, corridor overlays, Coal Mountain nodes, Etowah River corridor, etc.). Spatial-
+      join or PIN where present. Supplemental to base Zoning_Districts — not a substitute.
+    status: usable
+
+  - role: flu
+    name: EnerGov CharacterArea (comp-plan character areas)
+    restUrl: https://geo.forsythco.com/gis/rest/services/EnerGov/EnerGovParcelAddressMapService/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      CharacterArea: flu
+      ACRES: acreage
+      AdoptionYear: fluAdoptionYear
+    notes: >
+      County Comprehensive Plan character areas (AdoptionYear 2022). Live count only 11 coarse
+      polygons: North/South Georgia 400, Campground, Haw Creek and Daves Creek,
+      Chestatee/Jot Em Down, Lanier, Etowah, Sawnee Mountain, Big Creek, Vickery Creek,
+      McFarland. Spatial-join only as broad plan context — NOT parcel-level FLU. No finer
+      Future Land Use FeatureServer found on public geo.forsythco.com. City of Cumming FLU
+      is comprehensive-plan PDF, not REST.
+    status: partial
+
+  - role: sales
+    name: lastSale via qPublic HTML only (no REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No lastSale.price / lastSale.date / lastSale.qualified on any public Forsyth GA REST
+      verified 2026-09-23 (Public Tax_Parcel, EnerGov TaxParcels, Pictometry property,
+      Zoning, overlays, CharacterArea, ParcelIASService). Sale history is qPublic Schneider
+      HTML (AppID=1027) only — not a GIS join. ParcelIASService/0 is geometry+PARCELID+TAXYEAR
+      only (count 105146, older tax year).
+    status: gap
+
+municipalities:
+  # Only incorporated municipality in Forsyth County GA is Cumming (county seat).
+  # Unincorporated places (Big Creek, Chestatee, Coal Mountain, Drew, Ducktown, etc.) —
+  # no Cities poly / no municipal tax district; use county layers.
+  - name: Cumming
+    level: city
+    parentFips: "13117"
+    joinToCountyParcels: >
+      Spatial intersect EnerGov MunicipalBoundary (MapServer/3) NAME='Cumming' (1 poly,
+      LOCALFIPS=20932, MUNIAREA≈7.59 sq mi; WGS84 vertex ~-84.14, 34.18 — Cumming GA verified).
+      Live parcel intersect count ~4892 (2026-09-23). PARCELID C-prefix is a strong city
+      signal (~3986 of 4748 C-prefix parcels fall inside the city poly) but not exclusive
+      (~906 non-C also inside; some C outside — annexation lag); prefer spatial join over
+      C-prefix alone. SiteAddress MUNICIPALITY='Cumming' is POSTAL city for most of the
+      county (~86407 addresses) — do NOT use as incorporated-city filter.
+    layers:
+      - role: zoning
+        name: County parcel ZONING attribute (Cumming extract)
+        restUrl: https://geo.forsythco.com/gis/rest/services/Public/Tax_Parcel/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: STATEDAREA
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          STATEDAREA: acreage
+          ZONING: zoning
+          SITEADDRESS: situsAddress
+        notes: >
+          Preferred Cumming-local zoning source on public REST. Filter parcels by spatial
+          intersect MunicipalBoundary NAME=Cumming. Sampled district codes inside city limits
+          include R1/R1A/R2/R3, PUD, MU, OP, HB, CBD, INST, M1, PSC, NS, A1, O&I — actual city
+          district strings on the CAMA attribute, not the county ZONECLASS=CUMMING stub.
+          Prefer over Zoning_Districts CUMMING polygons when parcel is in city limits.
+        status: usable
+      - role: zoning
+        name: County Zoning_Districts CUMMING stub
+        restUrl: https://geo.forsythco.com/gisworkflow/rest/services/Public/Zoning_Districts/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoningCountyFlag
+          ZONEDESC: zoningDescription
+        notes: >
+          Filter ZONECLASS='CUMMING' (~138 polys). County-maintained city-area stub only —
+          does not expose Cumming district codes. Prefer parcel ZONING extract above.
+        status: partial
+      - role: other
+        name: EnerGov MunicipalBoundary (Cumming city poly)
+        restUrl: https://geo.forsythco.com/gis/rest/services/EnerGov/EnerGovParcelAddressMapService/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          NAME: municipality
+          MUNITYP: municipalityType
+          MUNIAREA: municipalityAreaSqMi
+          LOCALFIPS: placeFips
+        notes: >
+          Live count 1 (NAME=Cumming). City-poly↔county-parcel join key = spatial intersect
+          on this polygon (no shared parcel id). Place FIPS 20932.
+        status: usable
+    gaps:
+      - "No Cumming-owned public zoning/FLU FeatureServer verified (cityofcumming.net Zoning Map page has no ArcGIS embed; Cumming Utilities GIS is water/sewer/storm only)."
+      - "County Zoning_Districts ZONECLASS=CUMMING is a stub (~138), not city district polygons."
+      - "City FLU/character areas are comprehensive-plan PDF only; county CharacterArea does not isolate Cumming classes."
+      - "No city lastSale/tax REST beyond county layers; use qPublic / assurancegov."
+    status: usable
+
+gaps:
+  - "No lastSale.price / lastSale.date / lastSale.qualified on any public county REST — sale history is qPublic HTML (AppID=1027) only."
+  - "ownerName is NOT on Public Tax_Parcel — must join EnerGov TaxParcels/1 OWNERNME1 on PARCELID (or scrape qPublic)."
+  - "CNTASSDVAL alias says Assessed but behaves as FMV; CNTTXBLVAL is taxable (≈40% FMV without exemptions). No dedicated tax.assessedValue field."
+  - "FLU is only 11 coarse CharacterArea polygons — not parcel-level; Cumming city FLU is PDF."
+  - "Only one incorporated municipality (Cumming). SiteAddress MUNICIPALITY postal values (Alpharetta, Suwanee, Gainesville, Dawsonville, Ball Ground, Duluth) are NOT Forsyth incorporated cities."
+  - "Internal / PlanningEditing folders return Token Required (499) — ignored; public folders used instead."
+  - "ParcelIASService/0 is thin geometry (TAXYEAR 2025) — prefer Public Tax_Parcel."
+  - "qPublic AppID deep-link URLs often return CDN/bot 403 to automated clients; www.qpublic.net/ga/forsyth/search.html is public for humans."
+  - "Rejected lookalikes: forsyth.cc Tax Parcel Viewer / propertylookup (Forsyth County NC — 336 area code, Register of Deeds); Athens-Clarke PlanningViewer2025 (wrong county); open-data hub API sometimes surfaces unrelated global datasets — wire only geo.forsythco.com verified endpoints."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Forsyth County Georgia GIS public ArcGIS Server (geo.forsythco.com) — Public Tax_Parcel,
+  Public Zoning_Districts, EnerGov EnerGovParcelAddressMapService, Pictometry property
+  services. Open data portal geo-forsythcoga.opendata.arcgis.com. qPublic SchneiderCorp
+  (AppID=1027) for CAMA HTML; forsythproperty.assurancegov.com for tax bills. Attribution
+  to Forsyth County GIS / Tax Assessment / Planning & Development. Public fields only;
+  no paid vendors.
+appraiserSearchUrl: https://www.qpublic.net/ga/forsyth/search.html
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

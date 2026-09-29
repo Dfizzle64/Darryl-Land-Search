@@ -1,0 +1,311 @@
+state: GA
+jurisdiction: Screven County
+fips: "13251"
+level: county
+markets: [Savannah]
+
+layers:
+  - role: parcels
+    name: "Screven Parcels with WinGAP CAMA (CRC portal.segrass.org)"
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/Screven/Property_Data/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: "totalacres"
+    coverage: county-wide
+    parcelIdField: "Parcel_No"
+    liveCount: 10943
+    liveCount5to150ac: 3680
+    geoCheck: "extent center [['13251', 'Screven County']]; sample [['13251', 'Screven County']]; extent WGS84 [-81.8693, 32.4904, -81.3858, 33.0469]"
+    fieldMap:
+      Parcel_No: "parcelId"
+      Realkey: "ownerKey"
+      lastname: "ownerName"
+      address1: "mailingAddress"
+      house_no: "situsNumber"
+      street_nam: "situsStreet"
+      totalacres: "acreage"
+      Draw_Acres: "acreageGis"
+      Deed_Acres: "acreageDeed"
+      curr_val: "tax.marketValue"
+      sale_val: "lastSale.price"
+      zoningcode: "zoning"
+      qPub_Link: "appraiserDeepLink"
+    notes: >
+      pass1 2026-09-28: Coastal RC portal.segrass.org Screven/Property_Data MapServer layer 2 - WinGAP-
+      joined parcels with owner, mailing, situs, values, sale_val, zoning, qPub_Link. Better than the
+      2016-vintage maps.crc.ga.gov ScrevenWebsite/1 (kept below as alternate). MapServer - page with
+      resultOffset (maxRecordCount likely 1000/2000).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: ScrevenWebsite Parcels (CRC — Tax Assessor parcels regularly updated by CRC GIS)
+    restUrl: https://maps.crc.ga.gov/crcarcgis/rest/services/Screven/ScrevenWebsite/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: GEO_ACRES
+    coverage: county-wide
+    fieldMap:
+      parcel_no: parcelId
+      Geopin: parcelGeopin
+      realkey: ownerKey
+      GEO_ACRES: acreage
+      MAP_NUM: mapNumber
+      PropNUM: propertyNumber
+      X_COORD: xCoord
+      Y_COORD: yCoord
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Coastal Regional Commission ScrevenWebsite
+      MapServer layer 1 "Parcels"; description: Screven County Parcels from Tax Assessor's
+      Office regularly updated by CRC GIS staff; Dec 2016 vintage noted on layer; service
+      description Last updated 21 August 2018). Live count 10979 (2026-09-24). SR wkid
+      103027 / latestWkid 6445. maxRecordCount 1000. Thin attributes: parcel_no + Geopin +
+      realkey + GEO_ACRES — NO owner/mailing/situs/CURR_VAL/zoning/sale on REST. Twin
+      Screven/ScrevenParcels/MapServer/0 same count 10979 / same thin schema — interchangeable.
+      Geo-verified WGS84 samples ~-81.575,32.548 / ~-81.573,32.542 — Screven County GA
+      (~-81.6,32.7) NW of Savannah / Sylvania seat. Prefer qPublic AppID=673 HTML for CAMA
+      owner/values/sales. Rejected paid Regrid/ATTOM/DynamoSpatial; rejected wrong-state
+      lookalikes.
+    status: partial
+
+  - role: tax
+    name: null — no public REST values; qPublic AppID=673 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      CRC parcels expose no CURR_VAL/FMV/assessed. Assessor HTML: qpublic.net/ga/screven →
+      qpublic.schneidercorp.com AppID=673 (Cloudflare/bot 403 automated; public for humans).
+      Deep-link KeyValue={parcel_no}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No SALEPRICE/SALEDATE on CRC layers; qPublic Sales Search HTML AppID=673 only.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Screven Euclidean zoning REST on CRC or AGOL (2026-09-24). Planning PDF / Municode gap.
+    status: gap
+
+  - role: flu
+    name: null — no public county FLU FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Screven Future Land Use FeatureServer recovered — Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Sylvania_CityLimits (AGOL — city poly only)
+    restUrl: https://services5.arcgis.com/6IiydNrBLAAfmCgg/arcgis/rest/services/Sylvania_CityLimits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      City of Sylvania limits FeatureServer (owner hlarisey_ISE). Use spatial join onto CRC
+      parcels for Sylvania filter. Geo-check extent covers Screven/Sylvania GA corridor —
+      verify before sole reliance. No other municipal polys published.
+    status: partial
+
+municipalities:
+  - name: Sylvania
+    level: city
+    parentFips: "13251"
+    joinToCountyParcels: >
+      Spatial intersect Sylvania_CityLimits FeatureServer/0 (preferred when live) onto CRC
+      ScrevenWebsite/1 parcels. County seat.
+    layers:
+      - role: zoning
+        name: null — no city zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sylvania zoning FeatureServer — PDF/Municode gap.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sylvania FLU REST.
+        status: gap
+      - role: parcels
+        name: null — CRC county parcels spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Sylvania-only CAMA — CRC parcels + city limits spatial.
+        status: gap
+    gaps:
+      - "No Sylvania-owned zoning/FLU/parcel REST; thin CRC geometry only."
+    status: partial
+
+gaps:
+  - "CRC ScrevenWebsite/1 and ScrevenParcels/0 are geometry+parcel_no+GEO_ACRES only (Dec 2016 / service note Aug 2018) — no owner/mailing/situs/values/zoning/sales on REST."
+  - "No public REST tax.marketValue / assessedValue / lastSale — qPublic AppID=673 HTML only."
+  - "No county zoning or FLU FeatureServer."
+  - "Sylvania city limits AGOL only municipal poly; no other city REST."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial Screven extracts."
+  - "No emails/phones; no paid vendors."
+
+license: >
+  Coastal Regional Commission (maps.crc.ga.gov — Screven/ScrevenWebsite MapServer/1 Parcels,
+  Screven/ScrevenParcels). Assessor HTML qpublic.net/ga/screven AppID=673 SchneiderCorp.
+  Sylvania_CityLimits AGOL. Attribution to Screven County Tax Assessor / CRC / City of
+  Sylvania. Public fields only; no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=673&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    Screven Parcels with WinGAP CAMA (CRC portal.segrass.org):
+    https://portal.segrass.org/crcarcgis/rest/services/Screven/Property_Data/MapServer/2 - live count
+    10943 (5-150 ac: 3680), parcel ID field Parcel_No. Geography verified against TIGER county polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Hiltonia town"
+      level: city
+      parentFips: "13251"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Newington town"
+      level: city
+      parentFips: "13251"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Oliver city"
+      level: city
+      parentFips: "13251"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rocky Ford town"
+      level: city
+      parentFips: "13251"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Sylvania city"
+      level: city
+      parentFips: "13251"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Screven' AND aadt>0
+    altFilter: name LIKE '251-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 251-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 98
+    maxAadt: 7750
+    geoCheck: 98/98 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 10870
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/Screven/Property_Data/MapServer/2
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 10877
+    restUrl: https://portal.segrass.org/crcarcgis/rest/services/Screven/Property_Data/MapServer/2
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=screvenCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001 001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=screvenCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=screvenCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Hiltonia town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Newington town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Oliver city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rocky Ford town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Sylvania city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

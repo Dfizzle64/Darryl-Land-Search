@@ -1,0 +1,445 @@
+state: GA
+jurisdiction: Colquitt County
+fips: "13071"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Colquitt County GA public cadastral parcel FeatureServer/MapServer
+      recovered (2026-09-24). Official human viewer = qPublic App=ColquittCountyGA /
+      AppID=631 LayerID=11201 (qpublic.net/ga/colquitt → qpublic.schneidercorp.com;
+      county seat Moultrie GA 31776). Cloudflare/bot 403 blocks automated Application.aspx
+      from research box; public for humans (qpublicaux confirms AppID=631 LayerID=11201
+      PageID=4602 search / PageTypeID=4 PageID=4604 KeyValue={parcelId} report).
+      SWGRC (Southwest Georgia RC) has no public Colquitt parcel folder; SGRC alma folders
+      exclude Colquitt (south-central GA / SWGRC territory). REJECTED: GDITAdmin AGOL item
+      "Parcels - GA - Colquitt County" (services.arcgis.com/ISpzx3B5ZsVA6e1Z/.../Colquitt_Parcels)
+      — catalog URL returns Invalid URL / item data SB_0006 subscription canceled.
+      REJECTED: AECOM Bridge_PTIP/qpublic_parcel1 MapServer/30 "colquitt (qpublic)" — service
+      not started (500). Rejected paid Regrid/DynamoSpatial/Equator Colquitt extracts.
+      Geo-context: Moultrie ~-83.79,31.18; Colquitt GA (NOT Colquitt AR city; NOT lookalike
+      counties). Parcel/owner/tax/sale via qPublic HTML only until a live county/RC REST appears.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic App=ColquittCountyGA
+      HTML. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=631&LayerID=11201&PageTypeID=4&PageID=4604&KeyValue={parcelId}
+      (also App=ColquittCountyGA&Layer=Parcels&PageType=Report&KeyValue=). Tax estimator
+      companion AppID=665 LayerID=11347 PageID=5831 (not parcel CAMA). Tax Commissioner
+      colquittcountytax.com (payments — not CAMA).
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. qPublic Sales Search / Yearly Sales HTML AppID=631.
+      Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — PDF zoning map only (no FeatureServer)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Colquitt County Euclidean zoning FeatureServer found. County Zoning dept publishes
+      PDF only: document_center/Zoning/ZoningMap01132016.pdf (Current Zoning Map) and
+      document_center/Departments/landuse.pdf (Generalized Existing Land Use) on
+      colquittcountyga.gov/departments/zoning — not machine-readable REST.
+    status: gap
+
+  - role: flu
+    name: null — PDF land-use only (no FLU FeatureServer)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No future land use / character-area FeatureServer. Generalized Existing Land Use PDF
+      only (see zoning notes). Comp Plan PDF gap for machine FLU.
+    status: gap
+
+municipalities:
+  - name: Moultrie
+    level: city
+    parentFips: "13071"
+    joinToCountyParcels: >
+      No county parcel REST to join. Soft: Moultrie city limits when parcels become
+      available; postal CITY='MOULTRIE' is never sole municipality filter.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Moultrie-owned public zoning FeatureServer found — county PDF map gap.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Moultrie FLU REST.
+        status: gap
+      - role: parcels
+        name: null — use county qPublic when REST appears
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city-only CAMA FeatureServer.
+        status: gap
+    gaps:
+      - "No Moultrie city-owned parcel/zoning/FLU FeatureServer."
+    status: gap
+
+  - name: Doerun
+    level: city
+    parentFips: "13071"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Doerun limits when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Doerun-owned zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Doerun FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic only.
+        status: gap
+    gaps:
+      - "No Doerun city-owned GIS REST."
+    status: gap
+
+  - name: Norman Park
+    level: city
+    parentFips: "13071"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Norman Park limits when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Norman Park zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Norman Park FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic only.
+        status: gap
+    gaps:
+      - "No Norman Park city-owned GIS REST."
+    status: gap
+
+  - name: Funston
+    level: city
+    parentFips: "13071"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Funston limits when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Funston zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Funston FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic only.
+        status: gap
+    gaps:
+      - "No Funston city-owned GIS REST."
+    status: gap
+
+  - name: Berlin
+    level: city
+    parentFips: "13071"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Berlin limits when parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Berlin zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Berlin FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic only.
+        status: gap
+    gaps:
+      - "No Berlin city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No public county parcel geometry REST — qPublic AppID=631 HTML/map only; GDITAdmin Colquitt_Parcels subscription canceled; AECOM qpublic_parcel1 not started."
+  - "No REST tax.marketValue / assessedValue / owner / situs — qPublic digest HTML AppID=631."
+  - "No REST lastSale.price/date — qPublic Sales Search HTML only."
+  - "No zoning/FLU FeatureServer — ZoningMap01132016.pdf + landuse.pdf only on county site."
+  - "SWGRC / SGRC have no public Colquitt parcel MapServer folder."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/colquitt topmenu 200; qpublicaux confirms KeyValue deep-link."
+  - "Rejected paid Regrid/DynamoSpatial/Equator; rejected canceled GDITAdmin AGOL; rejected AECOM static layer."
+  - "Skip utilities+AADT; no emails/phones collected."
+
+license: >
+  Colquitt County Tax Assessors qPublic (qpublic.net/ga/colquitt) App=ColquittCountyGA /
+  AppID=631 LayerID=11201. County site colquittcountyga.gov (Zoning PDFs). Tax Commissioner
+  colquittcountytax.com. Attribution Colquitt County Tax Assessor. Public fields only; no
+  emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=631&LayerID=11201&PageTypeID=4&PageID=4604&KeyValue=
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ColquittCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Berlin city"
+      level: city
+      parentFips: "13071"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Doerun city"
+      level: city
+      parentFips: "13071"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Ellenton town"
+      level: city
+      parentFips: "13071"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Funston city"
+      level: city
+      parentFips: "13071"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Moultrie city"
+      level: city
+      parentFips: "13071"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Norman Park city"
+      level: city
+      parentFips: "13071"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Colquitt' AND aadt>0
+    altFilter: name LIKE '071-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 071-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 227
+    maxAadt: 23500
+    geoCheck: 227/227 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=ColquittCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=631&LayerID=11201&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=ColquittCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Berlin city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Doerun city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Ellenton town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Funston city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Moultrie city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Norman Park city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,547 @@
+state: GA
+jurisdiction: Brooks County
+fips: "13027"
+level: county
+markets: [Valdosta]
+
+layers:
+  - role: parcels
+    name: Brooks Boundaries Parcel Info (SGRC)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCEL_NO2: parcelIdAlt
+      SKEY: parcelKey
+      MAP: mapSheet
+      BLOCK: mapBlock
+      PARCEL: mapParcel
+      SUBPAR: mapSubParcel
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      LASTNAME: ownerName
+      FIRSTNAME: ownerFirstName
+      MIDDLE: ownerMiddleName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP_1: mailingZip
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      TOTALACRES: acreage
+      ACRES: acreageGis
+      WOODACRES: acreageWoodland
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      SALE_VAL: lastSale.price
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LAND_TYPE: landType
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      HOMEEXEMPT: homesteadExempt
+      LANDGMD: georgiaMilitiaDistrict
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      NEIGHBHOOD: neighborhood
+      Shape.STArea(): shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Southern Georgia Regional Commission
+      GIS; sgrcmaps.com/alma Brooks/Boundaries MapServer layer 0 "Parcel Info"). Live count
+      10037 (2026-09-24). SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (102667/2240).
+      maxRecordCount 1000 — page via resultOffset / spatial envelopes. TOTALACRES 5–150 =
+      3057; CURR_VAL>0 = 10027; LASTNAME filled = 10027; HOUSE_NO>0 = 6903; ZONINGCODE
+      non-blank = 6735 (AG≈6123, DR-20-M≈268, R-1≈199, RR≈44, R-20≈43…); MAVCURR>0 = 0
+      (assessed REST gap); SALE_VAL>0 = 0 (sales REST gap). DIGCLASS: R≈6622, V≈1888,
+      A≈497, C≈413, E≈388, J≈156 (+ I/U/P/blank). Compose situsAddress from HOUSE_NO +
+      STDIRECT + STREET_NAM + STTYPE when HOUSE_NO>0. CITY/STATE/ZIP_1 are OWNER mailing
+      (QUITMAN / VALDOSTA / KEY BISCAYNE / MOULTRIE / …) — never municipality filter.
+      TAXDISTRIC soft (geo-checked, no published REST legend): 01≈Quitman (~2273;
+      ~-83.56,30.79), 02≈unincorporated (~5772), 03≈Barwick (~113; ~-83.73,30.89),
+      04≈Pavo (~169; ~-83.74,30.96), 05≈Morven (~341; ~-83.50,30.93), 99≈special /
+      eastern fringe (~1359; ~-83.44,30.89) — prefer spatial Boundaries/1 Cities for
+      municipality. Prefer BrooksZoning_(View_Only) TYPE polygons for authoritative
+      zoning over parcel ZONINGCODE. No Brooks/PropertyInformation service; Boundaries/0
+      is the cadastral+CAMA layer. Rejected paid Regrid/GetParcelData; BrooksCountyGA_WFS
+      404; VALOR TaxOffice is Lowndes-only (do not use for Brooks). Geo-verified WGS84
+      samples ~-83.515,30.851 (Quitman N / Adel Rd), ~-83.502,31.000 (N Brooks Yates),
+      ~-83.558,30.798 (Quitman) — Brooks County GA / Quitman (Valdosta MSA ring; NOT
+      Brooks County TX; NOT Brooks County KS). Schema exposes WATER/SEWER/GAS/ELECTRICTY
+      — DO NOT collect (skip utilities). No emails/phones collected.
+    status: usable
+
+  - role: tax
+    name: Parcel Info CURR_VAL / FMV* / MAV* (on polygons)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. CURR_VAL>0 = 10027; MAVCURR>0 = 0
+      (assessed REST gap — use qPublic HTML). Assessor HTML: qpublic.net/ga/brooks →
+      Application.aspx?AppID=638&LayerID=12107 (Cloudflare/bot 403 on Application.aspx
+      from research box; public for humans). Deep-link KeyValue={PARCEL_NO}:
+      Application.aspx?AppID=638&LayerID=12107&PageTypeID=4&PageID=5972&KeyValue={PARCEL_NO}
+      (also App=BrooksCountyGA&Layer=Parcels&PageType=Report&KeyValue= form). Proven on
+      BrooksZoning HTML field. Tax Commissioner brookscountyga.governmentwindow.com/tax.html
+      (payments — not CAMA).
+    status: usable
+
+  - role: sales
+    name: null — SALE_VAL zero-filled; qPublic Sales Search HTML only
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      SALE_VAL / SALELAND1 / SALEIMP1 / SALEIMP2 fields exist but SALE_VAL>0 = 0 live
+      (2026-09-24). No public REST multi-sale / property_sales year layers for Brooks (VALOR
+      property_sales is Lowndes-only). qPublic Yearly Sales / Sales Search HTML AppID=638.
+      Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: BrooksZoning (View Only) — SGRC AGOL parcel-level zoning
+    restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/BrooksZoning_(View_Only)/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      TYPE: zoning
+      PARCEL_NO: parcelId
+      ACRES: acreage
+      CASE_NUM: zoningCase
+      CHANGE: zoningChangeDate
+      HTML: appraiserReportUrl
+      REALKEY: ownerKey
+      SKEY: parcelKey
+    notes: >
+      Preferred public REST zoning polygons (SGRC AGOL owner jttreadon_sgrc / org
+      HA2thkMWRBDb77XN; view-only). Live count 10465. TYPE domain: AG≈6579, SFQuitman City
+      Zoning≈1029, R1≈735, DR22M≈578, MRQuitman City Zoning≈431, R22≈228, RPQuitman City
+      Zoning≈224, GBQuitman City Zoning≈122, LIQuitman City Zoning≈96, MHP≈88, CH≈87,
+      CBDQuitman City Zoning≈72, PIQuitman City Zoning≈62, BR≈51 (+ SF/RR/HI/WLI/…). Mix of
+      county codes + Quitman city LDR labels on one field — spatial Boundaries/1 Cities
+      Name='Quitman' to separate city vs unincorporated when needed. HTML carries qPublic
+      deep-link AppID=638. Join PARCEL_NO→parcels.PARCEL_NO or spatial intersect. Official
+      viewer: experience.arcgis.com/experience/103ff60c071346efbad9790545e27207 (Brooks Co
+      Zoning). Companion Web Map dae8b8009a0343579d5399b31dbcd970. Parcel-attributed
+      ZONINGCODE on Boundaries/0 is fallback/screen — prefer this TYPE layer for
+      district polygons. Geo-verified ~-83.516,30.854 / ~-83.551,30.727 — Brooks GA.
+    status: usable
+
+  - role: zoning
+    name: Parcel Info ZONINGCODE (parcel-attributed fallback)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+    notes: >
+      Parcel-attributed zoning on preferred parcels (ZONINGCODE non-blank ≈6735; AG dominant).
+      Fast attribute filter; for authoritative boundaries prefer BrooksZoning TYPE polygons.
+    status: partial
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Brooks County future land use / character-area FeatureServer on SGRC alma Brooks
+      folder or jttreadon_sgrc AGOL (2026-09-24). Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Brooks Boundaries Cities (incorporated)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: municipality
+    notes: >
+      Preferred spatial municipality filter. Live count 6 polys: Pavo, Morven, Barwick,
+      Quitman (×3 parts). Name is the city. Companion layer/2 County boundary. Join =
+      spatial intersect (default). Do NOT filter by parcel mailing CITY. Soft TAXDISTRIC
+      as attribute fallback only.
+    status: usable
+
+  - role: other
+    name: Brooks RoadAddresses Addresses
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Brooks/RoadAddresses/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDRESS: situsAddress
+      STNUM: situsNumber
+      NAME: situsStreetName
+      TYPE: situsStreetType
+      PREDIR: situsStreetDir
+      CITY: postalCity
+      ZIP: situsZip
+      COUNTY: countyName
+      STATE: situsState
+      GISLINK: parcelGisLink
+      LAT: latitude
+      LON: longitude
+    notes: >
+      Live count 11114 address points. ZIP filled (situs zip gap-fill). CITY is postal —
+      NOT municipality filter; prefer Boundaries/1 Cities spatial. GISLINK may join to
+      parcels when populated. Skip any phone/PII if present. Geo Brooks GA.
+    status: usable
+
+municipalities:
+  - name: Quitman
+    level: city
+    parentFips: "13027"
+    joinToCountyParcels: >
+      Spatial Boundaries/1 Cities Name='Quitman' (multipart ~-83.56,30.80) OR soft
+      TAXDISTRIC='01' (~2273). mailing CITY='QUITMAN' is postal — never sole filter.
+    layers:
+      - role: zoning
+        name: BrooksZoning Quitman extract (TYPE *Quitman City Zoning*)
+        restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/BrooksZoning_(View_Only)/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          TYPE: zoning
+          PARCEL_NO: parcelId
+        notes: >
+          Preferred Quitman zoning = BrooksZoning TYPE spatial to Quitman poly (sample
+          SFQuitman / MRQuitman / RPQuitman / GBQuitman / LIQuitman / CBDQuitman /
+          PIQuitman City Zoning labels). No separate City-of-Quitman FeatureServer.
+          Parcel ZONINGCODE city-filter fallback.
+        status: usable
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Quitman city FLU FeatureServer — Comp Plan PDF gap.
+        status: gap
+      - role: parcels
+        name: null — use county Parcel Info filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Quitman-only CAMA — county Boundaries/0 + spatial Quitman / TAXDISTRIC=01.
+        status: gap
+    gaps:
+      - "No Quitman-owned separate zoning/FLU/parcel FeatureServer — SGRC BrooksZoning + Boundaries."
+    status: usable
+
+  - name: Morven
+    level: city
+    parentFips: "13027"
+    joinToCountyParcels: >
+      Spatial Boundaries/1 Name='Morven' (~-83.49,30.94) OR soft TAXDISTRIC='05' (~341).
+    layers:
+      - role: zoning
+        name: BrooksZoning Morven extract
+        restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/BrooksZoning_(View_Only)/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          TYPE: zoning
+        notes: Prefer BrooksZoning spatial to Morven poly + parcel ZONINGCODE. No Morven-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Morven FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcel Info + spatial Morven
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Boundaries/0 + spatial Morven / TAXDISTRIC=05.
+        status: gap
+    gaps:
+      - "No Morven city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Pavo
+    level: city
+    parentFips: "13027"
+    joinToCountyParcels: >
+      Spatial Boundaries/1 Name='Pavo' (~-83.74,30.95) OR soft TAXDISTRIC='04' (~169).
+      Note: Pavo straddles Brooks/Thomas — certify county with spatial.
+    layers:
+      - role: zoning
+        name: BrooksZoning Pavo extract
+        restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/BrooksZoning_(View_Only)/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          TYPE: zoning
+        notes: Prefer BrooksZoning spatial + parcel ZONINGCODE. No Pavo-owned GIS folder.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pavo FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcel Info + spatial Pavo
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Boundaries/0 + spatial Pavo / TAXDISTRIC=04.
+        status: gap
+    gaps:
+      - "No Pavo city-owned zoning/FLU/parcel REST; city straddles Brooks/Thomas."
+    status: partial
+
+  - name: Barwick
+    level: city
+    parentFips: "13027"
+    joinToCountyParcels: >
+      Spatial Boundaries/1 Name='Barwick' (~-83.74,30.90) OR soft TAXDISTRIC='03' (~113).
+      Barwick also borders Thomas County — certify with spatial.
+    layers:
+      - role: zoning
+        name: BrooksZoning Barwick extract
+        restUrl: https://services5.arcgis.com/HA2thkMWRBDb77XN/arcgis/rest/services/BrooksZoning_(View_Only)/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          TYPE: zoning
+        notes: Prefer BrooksZoning spatial + parcel ZONINGCODE. No Barwick-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Barwick FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcel Info + spatial Barwick
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Boundaries/0 + spatial Barwick / TAXDISTRIC=03.
+        status: gap
+    gaps:
+      - "No Barwick city-owned zoning/FLU/parcel REST; city borders Thomas County."
+    status: partial
+
+gaps:
+  - "SALE_VAL>0 = 0 on Parcel Info — no REST lastSale.price/date; qPublic AppID=638 Sales Search HTML only; VALOR property_sales is Lowndes-only."
+  - "MAVCURR>0 = 0 — no usable assessedValue on REST; prefer CURR_VAL market + qPublic HTML for assessed/taxable."
+  - "No public FLU / character-area FeatureServer on SGRC Brooks folder or jttreadon_sgrc AGOL."
+  - "Boundaries/0 maxRecordCount 1000 — page via resultOffset / spatial envelopes."
+  - "TAXDISTRIC codes lack published REST name legend — soft map 01=Quitman / 02=unincorp / 03=Barwick / 04=Pavo / 05=Morven / 99=special; prefer Cities spatial."
+  - "Parcel mailing CITY/STATE/ZIP_1 nationwide/postal — never municipality filter."
+  - "No city-only CAMA FeatureServers — always county Boundaries/0 + spatial Cities poly."
+  - "Pavo and Barwick straddle / border Thomas County — always certify with spatial Brooks polys."
+  - "BrooksCountyGA_WFS 404; qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/brooks HTML 200."
+  - "Rejected lookalikes / non-preferred: Brooks County TX GIS; Brooks County KS GIS; VALOR TaxOffice/TaxParcels (Lowndes-only); paid Regrid/ATTOM/GetParcelData."
+  - "Schema WATER/SEWER/GAS/ELECTRICTY — DO NOT collect (skip utilities+AADT); no emails/phones."
+
+license: >
+  Southern Georgia Regional Commission GIS sgrcmaps.com — Brooks/Boundaries (Parcel Info/0,
+  Cities/1, County/2), Brooks/RoadAddresses, LocalDistricts, VoterPrecincts, hydrology,
+  CautionAreas (skip utilities). SGRC AGOL BrooksZoning_(View_Only) + Brooks County Web Map
+  63c4a5f4cc3341dab729b216e5009cca + Zoning Experience 103ff60c071346efbad9790545e27207
+  (owner jttreadon_sgrc). Assessor qpublic.net/ga/brooks AppID=638 LayerID=12107. Tax
+  Commissioner brookscountyga.governmentwindow.com. Attribution SGRC / Brooks County Tax
+  Assessor. Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=638&LayerID=12107&PageTypeID=2
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?webmap=63c4a5f4cc3341dab729b216e5009cca
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0 count 10037; extent center
+    [['13027', 'Brooks County']]; sample [['13027', 'Brooks County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Barwick city"
+      level: city
+      parentFips: "13027"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Morven city"
+      level: city
+      parentFips: "13027"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Quitman city"
+      level: city
+      parentFips: "13027"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Brooks' AND aadt>0
+    altFilter: name LIKE '027-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 027-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 91
+    maxAadt: 15700
+    geoCheck: 91/91 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 10027
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 10027
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BrooksCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=638&LayerID=12107&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 092    00104
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BrooksCountyGA&Layer=Parcels&PageType=Report&KeyValue=092%20%20%20%2000104
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?webmap=63c4a5f4cc3341dab729b216e5009cca
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Barwick city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Morven city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Quitman city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

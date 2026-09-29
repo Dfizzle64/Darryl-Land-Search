@@ -1,0 +1,354 @@
+state: GA
+jurisdiction: Richmond County
+fips: "13245"
+level: county
+markets: [Augusta]
+
+layers:
+  - role: parcels
+    name: AGOL/AGSGeneralFeatures MapServer Parcels_ParcelWeb (Augusta-Richmond CAMA)
+    restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/32
+    layerId: 32
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      pin: parcelId
+      parcel_no: parcelIdAlt
+      own1: ownerName
+      owner_address1: mailingAddress
+      owner_address2: mailingAddress2
+      owner_address3: mailingAddress3
+      owner_city: mailingCity
+      owner_state: mailingState
+      owner_zip: mailingZip
+      owner_citystatezip: mailingCityStateZip
+      siteaddress: situsAddress
+      site_citystzip: situsCityStateZip
+      parcel_zip: situsZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      totalacres: acreage
+      lotsize: lotSize
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      ovrideval: tax.overrideValue
+      zoningcode: zoning
+      proptype: dorCode
+      propdesc: propertyType
+      digclass: digestClass
+      taxdistric: taxDistrict
+      TAXDIST_DESC: taxDistrictName
+      neighbhood: neighborhood
+      neighbhood_desc: neighborhoodName
+      subd_name: subdivision
+      legal_desc: legalDescription
+      deedpage: deedBookPage
+      platpage: platBookPage
+      lat: situsLat
+      lon: situsLon
+      vacant: vacant
+      homeexempt: homesteadExempt
+      yr_built: yearBuilt
+    notes: >
+      Preferred CONSOLIDATED Augusta–Richmond parcel GEOMETRY + CAMA (Augusta GA /
+      Richmond County FIPS 13245; gismap.augustaga.gov). Live count ≈84855 (2026-09-24).
+      maxRecordCount 100000. SR NAD 1983 StatePlane Georgia East FIPS 1001 Feet (wkid
+      102666 / latestWkid 2239). pin is dashed PIN (e.g. '011-0-208-00-0'); parcel_no is
+      compact alternate ('0110208000') — prefer pin for qPublic KeyValue. own1 filled
+      ≈84523; curr_val>0 ≈84523; totalacres 5–150 ≈3126. Map_LayersTS/316 labels curr_val
+      as "100% Assessed Value (Money)" — treat as tax.marketValue (digest FMV), not 40%
+      assessed. zoningcode on parcel is usable secondary to Euclidean Zoning/11 (trim
+      trailing spaces: R-1A≈20764 / R-1C≈12913 / R-1≈10464 / R-1B≈8547 / A≈6589 / B-2≈4208
+      / R-3B≈2784 / B-1≈2655 / CITY≈2321 / R-MH≈2114). Companion thin AGOL Parcels/9
+      (STATUS='Current' ≈84543; PIN+GIS_Acreage+StatedArea — filter STATUS<>'Retired').
+      Official viewers: Augusta Maps gismap.augustaga.gov/augustats/ ; Open Augusta
+      GeoHub geohub-augustagis.opendata.arcgis.com ; augustaga.gov/815/GIS. Assessor
+      qPublic AppID=678 LayerID=11365 PageID=4758 (qpublic.net/ga/richmond →
+      augustarichmondtaxassessor.com). Deep-link KeyValue={pin}:
+      Application.aspx?AppID=678&LayerID=11365&PageTypeID=4&KeyValue={pin} (also
+      App=RichmondCountyGA&Layer=Parcels&PageType=Report&KeyValue={pin}). GEO-VERIFY
+      GEORGIA: parcel lat/lon samples ~-82.050,33.512 / ~-82.019,33.513 / ~-82.059,33.509
+      (Augusta); Census TIGERweb GEOID 13245 CENTLAT +33.3596223 CENTLON -082.0735510.
+      REJECT Richmond County VA GEOID 51159 (~-76.73,37.94) and Richmond city VA 51760
+      (~-77.48,37.53); REJECT paid Regrid/ATTOM/USLandGrid; skip Utilities folder + AADT;
+      skip LASTEDITOR/CreatedByRecord schema editor names as PII; no emails/phones.
+    status: usable
+
+  - role: tax
+    name: Parcels_ParcelWeb curr_val / prev_val (digest FMV on REST)
+    restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/32
+    layerId: 32
+    geometry: polygon
+    auth: none
+    acreageField: totalacres
+    coverage: county-wide
+    fieldMap:
+      pin: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      ovrideval: tax.overrideValue
+      own1: ownerName
+    notes: >
+      Public REST carries digest curr_val / prev_val (≈84855 rows; curr_val>0 ≈84523).
+      No separate 40% assessed / taxable millage fields on this layer — millrate present
+      but tax bill via Tax Commissioner. Companion HTML qPublic AppID=678 for appeal /
+      history detail. Rejected paid vendor tax extracts.
+    status: usable
+
+  - role: sales
+    name: Map_LayersTS Sales 2025 (+ Sales 2024 / Sales 2023 / All Sales)
+    restUrl: https://gismap.augustaga.gov/arcgis/rest/services/Map_LayersTS/MapServer/465
+    layerId: 465
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      siteaddress: situsAddress
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      SALECLASS: lastSale.qualified
+      GRANTEE: saleBuyer
+      GRANTOR: saleSeller
+      MKTVAL: tax.marketValue
+      REASON: saleReason
+      REASONCODE: saleReasonCode
+      CLASS: saleClass
+      DEEDPAGE: deedBookPage
+      PT61_NUM: pt61Number
+    notes: >
+      Preferred current-year digest sales polygons (Sales 2025/465 count ≈8488). Companions
+      Sales 2024/461 ≈7454; Sales 2023/457; All Sales/404 ≈111337 historical. Join on PIN≈pin.
+      GRANTEE is buyer at sale (not necessarily current own1). Prefer /465 for rolling current
+      year; use /404 for multi-year history. Also qPublic Sales Search AppID=678. Rejected
+      paid Regrid/ATTOM sales.
+    status: usable
+
+  - role: zoning
+    name: AGOL/AGSGeneralFeatures Zoning (Euclidean) + parcel zoningcode
+    restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      DESCRIPTION: zoningName
+      ZONING_CAS: zoningCase
+      PIN: parcelIdSoft
+    notes: >
+      Preferred Euclidean zoning polygons (count ≈2991). Distinct ZONING codes include
+      R-1 / R-1A–E / R-2 / R-3A–C / R-MH / A / B-1 / B-2 / LI / HI / P-1 / PUD / POPD /
+      CITY / FORT. Twin Map_LayersTS Zoning/333 same schema (maxRecordCount 2000). Parcel
+      zoningcode on Parcels_ParcelWeb/32 is usable secondary (join pin). Skip utilities.
+    status: usable
+
+  - role: flu
+    name: null — no public Future Land Use FeatureServer recovered
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Augusta/Richmond Future Land Use / Character Areas public REST found (2026-09-24).
+      PlanningComm_Map is case points only (not FLU polygons). Honest gap.
+    status: gap
+
+  - role: other
+    name: AGOL Parcels (thin cadastral; filter STATUS='Current')
+    restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acreage
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      GIS_Acreage: acreage
+      StatedArea: acreageStated
+      STATUS: parcelStatus
+      TaxYear: taxYear
+      Par_ZIP: situsZip
+    notes: >
+      Thin geometry fabric (STATUS='Current' ≈84543). Prefer Parcels_ParcelWeb/32 when
+      owner/tax/zoning needed. Always filter STATUS<>'Retired' (retired retained in FC).
+    status: usable
+
+  - role: other
+    name: Incorporated Areas / Municipal Boundaries (Hephzibah, Blythe, Fort Gordon)
+    restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      CITY_NAME: cityName
+      COUNTY_NAME: countyName
+      State: state
+      SQMILE: sqMiles
+      ACREAGE: acreage
+      MILIT_RES: militaryReservation
+    notes: >
+      Live count 3 — HEPHZIBAH, BLYTHE, FORT GORDON (State='Georgia'; COUNTY_NAME=
+      RICHMOND). Twin Map_LayersTS Municipal Boundaries/456. Augusta consolidated body
+      is NOT a separate CITY_NAME row — entire ParcelWeb ≈ countywide consolidated city-
+      county. Preferred spatial municipality filter for Hephzibah/Blythe; Fort Gordon is
+      military reservation (not an incorporated city for soft mailing filters).
+    status: usable
+
+municipalities:
+  - name: Augusta (consolidated Augusta–Richmond)
+    level: city
+    parentFips: "13245"
+    joinToCountyParcels: >
+      Augusta–Richmond County consolidated government. Entire Parcels_ParcelWeb/32 IS the
+      consolidated jurisdiction (no separate city CAMA). Soft site_citystzip / owner_city
+      alone insufficient — prefer countywide REST. Do NOT treat HEPHZIBAH/BLYTHE mailing
+      labels as Augusta-only.
+    layers:
+      - role: parcels
+        name: Same as county Parcels_ParcelWeb/32
+        restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/32
+        layerId: 32
+        geometry: polygon
+        auth: none
+        acreageField: totalacres
+        coverage: city-only
+        fieldMap:
+          pin: parcelId
+          own1: ownerName
+          curr_val: tax.marketValue
+          totalacres: acreage
+          zoningcode: zoning
+        notes: No separate city CAMA — consolidated county layer is the parcel source.
+        status: usable
+      - role: zoning
+        name: County Euclidean Zoning (consolidated)
+        restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/11
+        layerId: 11
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          DESCRIPTION: zoningName
+        notes: Consolidated Euclidean zoning IS local zoning for Augusta proper.
+        status: usable
+      - role: flu
+        name: null — no FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Augusta FLU FeatureServer.
+        status: gap
+    gaps:
+      - "No separate city parcel/CAMA — use county Parcels_ParcelWeb/32."
+      - "No public FLU REST."
+    status: usable
+
+  - name: Hephzibah
+    level: city
+    parentFips: "13245"
+    joinToCountyParcels: >
+      Spatial Incorporated Areas/10 CITY_NAME='HEPHZIBAH' (≈19.5 sq mi) onto pin. Soft
+      site_citystzip alone insufficient.
+    layers:
+      - role: parcels
+        name: null — county ParcelWeb spatial Hephzibah
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Hephzibah-owned CAMA FS — county /32 + spatial city limits; qPublic AppID=678.
+        status: gap
+      - role: zoning
+        name: County Zoning spatial Hephzibah
+        restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/11
+        layerId: 11
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+          DESCRIPTION: zoningName
+        notes: Prefer spatial city limits ∩ county Euclidean Zoning/11.
+        status: usable
+    gaps:
+      - "No City-of-Hephzibah separate parcel/CAMA REST — county fabric + spatial limits."
+    status: partial
+
+  - name: Blythe
+    level: city
+    parentFips: "13245"
+    joinToCountyParcels: >
+      Spatial Incorporated Areas/10 CITY_NAME='BLYTHE' (≈2.56 sq mi) onto pin.
+    layers:
+      - role: parcels
+        name: null — county ParcelWeb spatial Blythe
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Blythe-owned CAMA FS — county /32 + spatial limits; qPublic AppID=678.
+        status: gap
+      - role: zoning
+        name: County Zoning spatial Blythe
+        restUrl: https://gismap.augustaga.gov/arcgis/rest/services/AGOL/AGSGeneralFeatures/MapServer/11
+        layerId: 11
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: Prefer spatial city limits ∩ Zoning/11.
+        status: usable
+    gaps:
+      - "No City-of-Blythe separate parcel/CAMA REST."
+    status: partial
+
+gaps:
+  - "No public Future Land Use / Character Areas REST — PlanningComm_Map is case points only."
+  - "curr_val is digest 100% FMV — no separate 40% assessed/taxable on ParcelWeb; tax bill via Tax Commissioner."
+  - "Sales 2025/465 is year-sliced; use All Sales/404 for multi-year; GRANTEE≠current owner."
+  - "AGOL Parcels/9 retains Retired polygons — always filter STATUS='Current'."
+  - "qPublic Application.aspx / augustarichmondtaxassessor.com Cloudflare/bot 403 automated; public for humans (AppID=678)."
+  - "REJECT Richmond VA GEOID 51159 / city 51760 lookalikes; reject paid Regrid/ATTOM/USLandGrid; skip Utilities+AADT; no emails/phones; skip LASTEDITOR PII."
+
+license: >
+  Augusta–Richmond County consolidated GIS (gismap.augustaga.gov) — AGOL/
+  AGSGeneralFeatures Parcels_ParcelWeb/32 + Parcels/9 + Zoning/11 + Incorporated Areas/10;
+  Map_LayersTS Sales 2025/465 (+ /461 /457 /404) + Zoning/333 + Municipal Boundaries/456.
+  Augusta Maps gismap.augustaga.gov/augustats/ ; Open Augusta GeoHub
+  geohub-augustagis.opendata.arcgis.com ; augustaga.gov/815/GIS. Assessor qPublic
+  AppID=678 LayerID=11365 PageID=4758 (qpublic.net/ga/richmond;
+  augustarichmondtaxassessor.com). Attribution Augusta GA Government IT-GIS / Richmond
+  County Board of Assessors. Public fields only; no emails/phones; no paid vendors; skip
+  utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=678&LayerID=11365&PageTypeID=2&PageID=4758
+jurisdictionGisUrl: https://gismap.augustaga.gov/augustats/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"

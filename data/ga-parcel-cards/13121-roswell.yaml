@@ -1,0 +1,61 @@
+state: GA
+jurisdiction: "Roswell, Fulton County"
+fips: "13121"
+level: city
+markets: [Atlanta]
+
+layers:
+  - role: zoning
+    name: UDC Zoning
+    restUrl: https://gisweb.ci.roswell.ga.us/arcgis/rest/services/PublicViewer/CommunityDevelopmentPublic/MapServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: STATEDAREA
+    coverage: city-only
+    fieldMap:
+      PARCELID: parcelId
+      LOWPARCELI: parcelId
+      ATRPIN_: parcelIdAlt
+      USECD: zoning
+      USEDSCRP: zoningDescription
+      SITEADDRES: situsAddress
+      OWNERNME1: ownerName
+      STATEDAREA: acreage
+      CHAR_AREA_: flu
+      LUCode_: dorCode
+      LivUnits_: livableUnits
+    notes: >
+      Official Roswell Community Development public MapServer. Live count 36286 (2026-09-23).
+      Parcel-attributed UDC zoning. PARCELID matches Fulton PMV/11 ParcelID format. Also mirrored
+      on WebApps/UDCParcels/MapServer/0 and LGIM_ParcelPublishing/TaxParcels. maxRecordCount 250000.
+      CHAR_AREA_ is character-area label on the parcel, not the FLU polygon layer.
+    status: usable
+
+  - role: flu
+    name: Proposed Land Use (FLU)
+    restUrl: https://gisweb.ci.roswell.ga.us/arcgis/rest/services/LGIM_LandUsePlanning/FLU/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LANDUSECODE: flu
+      LANDUSEDESC: fluDescription
+    notes: >
+      Coarse FLU / proposed land-use polygons. Live count 56. Same schema as Character Areas
+      (CommunityDevelopmentPublic/MapServer/21, also 56 features). Spatial join only — no parcel id.
+    status: usable
+
+gaps:
+  - "FLU is coarse (56 polygons); parcel-level character area is on zoning layer CHAR_AREA_."
+  - "Prefer Fulton PMV/11 for county CAMA values; Roswell parcel layers are zoning-oriented mirrors."
+
+license: "City of Roswell GIS; public Community Development viewer services."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+notes: >
+  JOIN TO COUNTY PARCELS: Attribute join zoning.PARCELID (or LOWPARCELI) = Fulton PMV MapServer/11
+  ParcelID. FLU polygons: spatial intersect with PMV/11. No conflicting city-only parcel id.

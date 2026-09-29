@@ -1,0 +1,356 @@
+state: GA
+jurisdiction: Irwin County
+fips: "13155"
+level: county
+markets: [Albany]
+
+layers:
+  - role: parcels
+    name: Irwin/ParcelInformation Tax Parcels — SGRC alma MapServer
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Irwin/ParcelInformation/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      REAL_KEY: ownerKey
+      LASTNAME: ownerName
+      FIRSTNAME: ownerNameFirst
+      MIDDLE: ownerMiddleName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP_1: mailingZip
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      TOTALACRES: acreage
+      DRWN_ACR: acreageGis
+      WOODACRES: acreageWoodland
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      A_VALUE: tax.landValue
+      P_VALUE: tax.improvementValue
+      SALE_VAL: lastSale.price
+      SALELAND1: lastSale.landPrice1
+      SALEIMP1: lastSale.impPrice1
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      DIGSTRAT: dorStrata
+      LAND_TYPE: landType
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      HOMEEXEMPT: homesteadExempt
+      LANDGMD: georgiaMilitiaDistrict
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      NEIGHBHOOD: neighborhood
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+      LAT: latitude
+      LON: longitude
+      ZIP: situsZip
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP/REALPROP CAMA (Southern Georgia
+      Regional Commission SGRC alma ArcGIS Server — Irwin/ParcelInformation MapServer
+      layer 5 "Tax Parcels"). Live count 7066 (2026-09-24). Twin label layers 2/3/4
+      (address/owner/parcel-number labels) — prefer layer 5 for polygons + full CAMA.
+      SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / 2240).
+      maxRecordCount 1000 — page via resultOffset / orderByFields=OBJECTID. CURR_VAL>0
+      ≈6915; LASTNAME ≈6904; TOTALACRES 5–150 ≈2430; HOUSE_NO>0 ≈4296; ADDRESS2 ≈6806;
+      ZONINGCODE ≈6856; FMVRES>0 ≈3338; MAVCURR>0 =0 (MAV* present but unused — do NOT
+      rely on MAVCURR as assessed; prefer CURR_VAL market; assessed via qPublic HTML).
+      SALE_VAL>0 =0; SALELAND1>0 =0 (sale REST gap). TAXDISTRIC soft geo-checked:
+      01≈5354 (county/rural majority), 02≈1562 (Ocilla-leaning), null≈150 — prefer
+      spatial Boundaries/1 Ocilla City Limits. DIGCLASS distinct: R/V/A/C/E/J/I/P/U.
+      ZONINGCODE top on sample: AU/RR/R14/R8M/R8/GB/WLI… — prefer Euclidean
+      Irwin/Zoning/MapServer/0 ZONE_CODE. Compose situs HOUSE_NO+STDIRECT+STREET_NAM+
+      STTYPE when HOUSE_NO>0. CITY/STATE/ADDRESS2 are OWNER mailing (nationwide —
+      Inlet Beach FL etc.) — never municipality filter. WATER/SEWER/GAS/ELECTRICTY/
+      ROADSTREET present — SKIP per tranche-3. Schema may expose APPRAISER/APPRNAME —
+      DO NOT collect as PII. Official assessor HTML: qPublic App=IrwinCountyGA
+      (qpublic.net/ga/irwin). Deep-link KeyValue={PARCEL_NO}: Application.aspx?
+      App=IrwinCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}
+      (preserve spaces e.g. '0030   0001'). GEO-VERIFY GEORGIA: WGS84 samples
+      ~-83.365,31.763 / ~-83.363,31.766 (Ford Rd / Lower Rebecca Rd north county);
+      Ocilla city ~-83.25,31.59–31.61 — FIPS 13155 seat Ocilla / SGA (NOT IRWIN
+      wildfire services; NOT Regrid paid). Rejected paid Regrid/ATTOM.
+    status: usable
+
+  - role: tax
+    name: Irwin/ParcelInformation Tax Parcels CURR_VAL (on polygons)
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Irwin/ParcelInformation/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      A_VALUE: tax.landValue
+      P_VALUE: tax.improvementValue
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. CURR_VAL>0 ≈6915;
+      MAVCURR>0 =0 — no usable assessedValue on REST; use CURR_VAL market +
+      qPublic App=IrwinCountyGA HTML for assessed/taxable. HISTYR*/HISTVAL* are
+      assessment value-year history — NOT sales.
+    status: usable
+
+  - role: sales
+    name: Irwin Tax Parcels SALE_* zero-filled — qPublic HTML
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Irwin/ParcelInformation/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      SALE_VAL: lastSale.price
+      SALELAND1: lastSale.landPrice1
+      SALELAND2: lastSale.landPrice2
+      SALEIMP1: lastSale.impPrice1
+      SALEIMP2: lastSale.impPrice2
+    notes: >
+      SALE_VAL>0 =0; SALELAND1>0 =0 live (no usable REST sale components / no
+      lastSale.date). Prefer qPublic Sales Search / Sales List HTML
+      App=IrwinCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Irwin/Zoning ZONE_CODE Euclidean + parcel ZONINGCODE
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Irwin/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONE_CODE: zoning
+      LOCATION: zoningJurisdiction
+      CASE_NUM: zoningCaseNumber
+    notes: >
+      Preferred Euclidean zoning polygons (count 925). LOCATION CITY≈382 /
+      COUNTY≈525. ZONE_CODE top: AU≈341, R14≈129, RR≈112, GB≈68, R8M≈55, R8≈54,
+      R20≈33, RP≈32, WLI≈26, HI≈21, CBD≈7, RC≈7, MR≈9…. Parcel-attributed
+      ZONINGCODE on Tax Parcels/5 is usable secondary (AU/RR/R14…). Numeric
+      parcel ZONING 001/004… opaque — prefer ZONE_CODE / ZONINGCODE text.
+    status: usable
+
+  - role: flu
+    name: null — no public FLU/CharacterAreas FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No Irwin FutureLandUse / CharacterAreas / Landuse MapServer on SGRC alma
+      (2026-09-24). Comp-plan PDF gap. Zoning Euclidean is not FLU.
+    status: gap
+
+  - role: other
+    name: Irwin/Boundaries — Ocilla City Limits + County Boundary
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Irwin/Boundaries/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LAYER: boundaryClass
+    notes: >
+      Layer 1 "Ocilla City Limits" (multi-part; CITY LAYER polygons centroid
+      ~-83.24–83.25,31.59–31.61). Layer 2 County Boundary; layer 0 Historic
+      District. Preferred spatial municipality filter for Ocilla. Soft
+      TAXDISTRIC='02' (~1562) Ocilla-leaning aid only — do not equate to city.
+      Companion Addresses/0 for situs points join.
+    status: usable
+
+municipalities:
+  - name: Ocilla
+    level: city
+    parentFips: "13155"
+    joinToCountyParcels: >
+      Spatial Irwin/Boundaries/1 Ocilla City Limits (~-83.25,31.60) OR soft
+      TAXDISTRIC='02' (~1562) as attribute aid; mailing CITY never sole filter.
+    layers:
+      - role: zoning
+        name: Irwin/Zoning Ocilla extract (LOCATION='CITY')
+        restUrl: https://www.sgrcmaps.com/alma/rest/services/Irwin/Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE_CODE: zoning
+          LOCATION: zoningJurisdiction
+        notes: >
+          Filter LOCATION='CITY' (~382) or spatial Ocilla limits ∩ Zoning/0.
+          City codes include R14/R8M/R8/RP/GB/CBD….
+        status: usable
+      - role: flu
+        name: null — no Ocilla FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county FLU FeatureServer recovered.
+        status: gap
+      - role: parcels
+        name: null — county Tax Parcels + spatial Ocilla
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ocilla-only CAMA — county ParcelInformation/5 + Boundaries/1.
+        status: gap
+    gaps:
+      - "No Ocilla city-owned parcel/FLU REST — county layers + spatial Ocilla City Limits."
+      - "Owner/tax on county REST; sale via qPublic HTML."
+    status: usable
+
+gaps:
+  - "MAVCURR>0 =0 — no usable assessedValue on REST; prefer CURR_VAL market + qPublic App=IrwinCountyGA HTML."
+  - "SALE_VAL/SALELAND1/SALEIMP1 zero-filled — no REST lastSale.price/date; qPublic Sales Search HTML."
+  - "No public FLU/CharacterAreas FeatureServer for Irwin County."
+  - "No dedicated sgrcmaps.com/Irwin/ interactive viewer (404) — use Map Viewer URL or SGRC alma REST; BenHill-style /Irwin/ path absent."
+  - "TAXDISTRIC soft only (01 rural / 02 Ocilla-leaning) — prefer spatial Ocilla City Limits."
+  - "Mailing CITY nationwide — never municipality filter; coalesce ADDRESS2||ADDRESS1 for mailing street."
+  - "maxRecordCount 1000 — page via resultOffset + orderByFields=OBJECTID."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/irwin)."
+  - "Schema WATER/SEWER/GAS/ELECTRICTY/ROAD* — DO NOT collect (skip utilities+AADT); skip APPRAISER/APPRNAME PII; no emails/phones."
+  - "Rejected paid Regrid/ATTOM; rejected IRWIN wildfire AGOL lookalikes."
+
+license: >
+  Southern Georgia Regional Commission GIS (sgrcmaps.com/alma) — Irwin/
+  ParcelInformation MapServer/5 Tax Parcels; Irwin/Zoning/0; Irwin/Boundaries;
+  Irwin/Addresses. Assessor qPublic App=IrwinCountyGA (qpublic.net/ga/irwin).
+  Attribution SGRC / Irwin County Tax Assessor. Public fields only; no
+  emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=IrwinCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://www.sgrcmaps.com/alma/rest/services/Irwin/ParcelInformation/MapServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.sgrcmaps.com/alma/rest/services/Irwin/ParcelInformation/MapServer/5 count 7073; extent
+    center [['13155', 'Irwin County']]; sample [['13155', 'Irwin County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Ocilla city"
+      level: city
+      parentFips: "13155"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Irwin' AND aadt>0
+    altFilter: name LIKE '155-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 155-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 77
+    maxAadt: 9780
+    geoCheck: 75/77 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 6921
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Irwin/ParcelInformation/MapServer/5
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 6921
+    restUrl: https://www.sgrcmaps.com/alma/rest/services/Irwin/ParcelInformation/MapServer/5
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=IrwinCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0030   0001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=IrwinCountyGA&Layer=Parcels&PageType=Report&KeyValue=0030%20%20%200001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://www.sgrcmaps.com/alma/rest/services/Irwin/ParcelInformation/MapServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Ocilla city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

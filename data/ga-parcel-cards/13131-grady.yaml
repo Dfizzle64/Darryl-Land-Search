@@ -1,0 +1,380 @@
+state: GA
+jurisdiction: Grady County
+fips: "13131"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcels + WinGAP CAMA via Schneider WFS (owner/situs/acres/CURR_VAL)
+  - role: parcels
+    name: GradyCountyGA_WFS Parcels (Schneider)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PIN: parcelIdAlt
+      QPID: parcelIdQpublic
+      _v_ON: ownerName
+      HOUSE_NO: situsNumber
+      STDIRECT: situsStreetDir
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      ACRES: acreageDeedAlt
+      TOTALACRES: acreage
+      CALC_ACRES: acreageGis
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      MAVCURR: tax.assessedValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      SALE_VAL: lastSale.price
+      SALELAND1: lastSale.landPrice
+      SALEIMP1: lastSale.improvementPrice
+      ZONINGCODE: zoning
+      ZONING: zoningAlt
+      TAXDISTRIC: taxDistrict
+      TAX_DISTRI: taxDistrictAlt
+      DIST_DESC: municipality
+      DIGCLASS: dorCode
+      DIG_CLASS: dorCodeAlt
+      DIGSTRAT: dorStrata
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      HOMEEXEMPT: homesteadExempt
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      LANDGMD: georgiaMilitiaDistrict
+      NEIGHBHOOD: neighborhood
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+      LAT: latitude
+      LON: longitude
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      WEB_ADD: appraiserSearchUrl
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP CAMA landbase (Schneider
+      GradyCountyGA_WFS MapServer layer 0 "Parcels"). Live count 14483 (2026-09-24).
+      SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (102667/2240). maxRecordCount
+      2000 — page via resultOffset / spatial envelopes. GEO-VERIFY GEORGIA: WGS84 samples
+      ~-84.371,31.056 (north county / Cumbie Rd) / TAX_DISTRI=01 extent ~-84.23,30.89
+      (Cairo) / 02 ~-84.33,30.89 (Whigham) / 03 county-wide — Grady County GA county seat
+      Cairo (~-84.20,30.88). REJECT Grady County OK (Chickasha ~-97.95,35.05); REJECT paid
+      Regrid/ATTOM/DynamoSpatial. _v_ON filled ≈14404 (virtual owner name; no lastname/
+      firstname/address1 mailing fields on this WFS — mailing via qPublic HTML). CURR_VAL>0
+      =14120; TOTALACRES>0 =13200; TOTALACRES 5–150 ≈4014; HOUSE_NO>0 =10001; SALE_VAL>0 =0;
+      SALELAND1>0 ≈17; MAVCURR>0 =0; ZONINGCODE usable ≈0; ZONING non-blank ≈3 — zoning
+      REST gap. DIST_DESC: COUNTY≈9150, CAIRO≈4916, WHIGHAM≈329. Soft TAX_DISTRI /
+      TAXDISTRIC: 01≈Cairo (~4922), 02≈Whigham (~327), 03≈unincorporated COUNTY (~9169) —
+      prefer DIST_DESC attribute or spatial city limits when available (no Grady city-limits
+      FeatureServer confirmed 2026-09-24). digclass: R≈10077, V≈2310, C≈671, E≈502, A≈481,
+      J≈60 (+ sparse). Compose situs HOUSE_NO+STDIRECT+STREET_NAM+STTYPE when HOUSE_NO>0.
+      LAT/LON / WEB_ADD essentially blank on REST — use geometry + qPublic deep-link.
+      Assessor qPublic AppID=742 LayerID=11779 / App=GradyCountyGA (qpublic.net/ga/grady;
+      Application.aspx Cloudflare/bot 403 automated; public for humans). KeyValue=
+      {PARCEL_NO}. Schema may expose APPRAISER/APPRNAME — DO NOT collect emails/phones.
+      WATER/SEWER/GAS/ELECTRICTY present — SKIP per tranche-3. No emails/phones.
+    status: usable
+
+  - role: tax
+    name: GradyCountyGA_WFS CURR_VAL / FMV* (same layer)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      PREV_VAL: tax.priorMarketValue
+      FMVRES: tax.marketValueResidential
+      FMVCOM: tax.marketValueCommercial
+      FMVACC: tax.marketValueAccessory
+      MAVCURR: tax.assessedValue
+      TAXDISTRIC: taxDistrict
+      DIGCLASS: dorCode
+      HOMEEXEMPT: homesteadExempt
+      HISTYR1: tax.histYear1
+      HISTVAL1: tax.histValue1
+      HISTYR2: tax.histYear2
+      HISTVAL2: tax.histValue2
+      HISTYR3: tax.histYear3
+      HISTVAL3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. CURR_VAL>0 =14120; MAVCURR>0=0 —
+      no usable assessedValue on REST; use CURR_VAL market + qPublic AppID=742 HTML for
+      assessed/taxable. Deep-link KeyValue={PARCEL_NO}:
+      Application.aspx?App=GradyCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}
+      (also AppID=742&LayerID=11779&PageTypeID=4&KeyValue=). histyr*/histval* are assessment
+      value-year history — NOT sales.
+    status: usable
+
+  - role: sales
+    name: null — SALE_VAL unused; SALELAND1 sparse (17)
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      SALE_VAL>0 =0 on GradyCountyGA_WFS/0 (2026-09-24); SALELAND1>0 ≈17 — too sparse for
+      county sales landbase. Prefer qPublic Sales Search HTML App=GradyCountyGA / AppID=742.
+      Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — parcel ZONINGCODE/ZONING unused on WFS
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      ZONINGCODE usable ≈0; ZONING non-blank ≈3 on GradyCountyGA_WFS/0 (2026-09-24). No
+      separate Euclidean zoning FeatureServer found for Grady GA. Zoning via qPublic map
+      layers / county PDFs if any — honest REST gap.
+    status: gap
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Grady County GA Future Land Use FeatureServer found (2026-09-24) — Comp Plan PDF /
+      SWGA RC staff gap.
+    status: gap
+
+  - role: other
+    name: null — no Grady city-limits FeatureServer confirmed
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No dedicated Grady_City_Limits / Cairo / Whigham boundary FeatureServer confirmed
+      (2026-09-24). Soft municipality via DIST_DESC (CAIRO/WHIGHAM/COUNTY) or TAX_DISTRI
+      01/02/03. Do NOT filter by owner mailing city (mailing not on WFS).
+    status: gap
+
+municipalities:
+  - name: Cairo
+    level: city
+    parentFips: "13131"
+    joinToCountyParcels: >
+      Soft DIST_DESC='CAIRO' (~4916) OR TAX_DISTRI/TAXDISTRIC='01' (~4922; extent ~-84.23,
+      30.89). No Cairo city-limits FeatureServer confirmed — prefer DIST_DESC over mailing.
+    layers:
+      - role: zoning
+        name: null — county zoning REST gap
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cairo-only or county Euclidean zoning REST — qPublic/PDF gap.
+        status: gap
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cairo city FLU FeatureServer.
+        status: gap
+      - role: parcels
+        name: null — use county WFS filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Cairo-only CAMA — county GradyCountyGA_WFS/0 + DIST_DESC='CAIRO' / TAX_DISTRI=01.
+        status: gap
+    gaps:
+      - "No Cairo-owned separate zoning/FLU/parcel FeatureServer — county WFS + DIST_DESC/TAX_DISTRI soft filter."
+    status: partial
+
+  - name: Whigham
+    level: city
+    parentFips: "13131"
+    joinToCountyParcels: >
+      Soft DIST_DESC='WHIGHAM' (~329) OR TAX_DISTRI/TAXDISTRIC='02' (~327; extent ~-84.33,
+      30.89). No Whigham city-limits FeatureServer confirmed.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Whigham-only zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Whigham FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county WFS + DIST_DESC Whigham
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County GradyCountyGA_WFS/0 + DIST_DESC='WHIGHAM' / TAX_DISTRI=02.
+        status: gap
+    gaps:
+      - "No Whigham city-owned zoning/FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "SALE_VAL unused (0); SALELAND1 sparse (~17) — no public REST multi-sale history; qPublic App=GradyCountyGA / AppID=742 HTML only."
+  - "MAVCURR assessed unused (MAVCURR>0=0) — assessed/taxable via qPublic HTML."
+  - "No Euclidean zoning FeatureServer — parcel ZONINGCODE/ZONING essentially blank."
+  - "No county FLU REST; no city-limits FeatureServer — soft DIST_DESC / TAX_DISTRI only."
+  - "No mailing address fields on WFS (no address1/city/state/zip) — owner via _v_ON; mailing via qPublic HTML."
+  - "qpublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/grady)."
+  - "Rejected Grady OK lookalikes; rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones collected."
+  - "WATER/SEWER/GAS/ELECTRICTY skipped (no utilities/AADT per tranche-3)."
+  - "GradyCountyGA_WFS maxRecordCount 2000 — page via resultOffset / envelopes."
+
+license: >
+  Schneider Geospatial GradyCountyGA_WFS MapServer/0 (Parcel WinGAP CAMA + geometry).
+  Assessor HTML qPublic SchneiderCorp App=GradyCountyGA / AppID=742 LayerID=11779
+  PageID=5886 (qpublic.net/ga/grady; KeyValue={PARCEL_NO} Report deep-links). Attribution
+  Grady County Tax Assessors / Schneider. Public fields only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=742&LayerID=11779&PageTypeID=2&PageID=5886
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer/0 count 14483; extent
+    center [['13131', 'Grady County']]; sample [['13131', 'Grady County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Cairo city"
+      level: city
+      parentFips: "13131"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Whigham city"
+      level: city
+      parentFips: "13131"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Grady' AND aadt>0
+    altFilter: name LIKE '131-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 131-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 172
+    maxAadt: 18100
+    geoCheck: 172/172 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    - A_VALUE
+    - FMVRES
+    filledCount: 14120
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: _v_ON
+    filledCount: null
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner field on another REST layer already on this card
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=GradyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=742&LayerID=11779&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '00010021001'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=GradyCountyGA&Layer=Parcels&PageType=Report&KeyValue=00010021001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://wfs.schneidercorp.com/arcgis/rest/services/GradyCountyGA_WFS/MapServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Cairo city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Whigham city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

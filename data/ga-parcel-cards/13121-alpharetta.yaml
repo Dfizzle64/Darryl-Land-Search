@@ -1,0 +1,54 @@
+state: GA
+jurisdiction: "Alpharetta, Fulton County"
+fips: "13121"
+level: city
+markets: [Atlanta]
+
+layers:
+  - role: zoning
+    name: Zoning Districts
+    restUrl: https://alphagis.alpharetta.ga.us/arcgis/rest/services/ZoningDistricts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoningDistrict: zoning
+      ZoningRuleID: zoningRuleId
+    notes: >
+      Dedicated AlphaGIS ZoningDistricts FeatureServer. Live count 369 (2026-09-23). District
+      codes include AG, RE, R-*, C-1/C-2, O-I, MU, DT-*, L-I, etc. Also on EconDev/FeatureServer/13
+      (same ZoningDistrict field). No parcel id — spatial join required. maxRecordCount 1000.
+    status: usable
+
+  - role: flu
+    name: Future Land Use
+    restUrl: https://alphagis.alpharetta.ga.us/arcgis/rest/services/FutureLandUse/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      character_: flu
+      CA_Descrip: fluDescription
+      FDM_PLU: fluPattern
+      FDM_Plan_D: fluPlanHorizon
+    notes: >
+      Official FutureLandUse FeatureServer. Live count 732. Spatial join only. Overlays
+      (DowntownOverlay, NorthPointOverlay, LandUse/* Overlay) are not citywide FLU.
+    status: usable
+
+gaps:
+  - "No parcel id on zoning/FLU — spatial intersect with Fulton PMV/11 only."
+  - "City TaxParcels/ParcelsWM are Fulton-maintained clips; do not replace county PMV/11 for CAMA."
+
+license: "City of Alpharetta AlphaGIS; public FeatureServer."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+notes: >
+  JOIN TO COUNTY PARCELS: Spatial intersect zoning/FLU polygons with Fulton PMV MapServer/11
+  parcel polygons. No shared parcel id field on these district layers. City parcel services
+  (ParcelsWM) carry Fulton ParcelID where present but are not required for zoning join.

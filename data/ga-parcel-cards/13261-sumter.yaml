@@ -1,0 +1,530 @@
+state: GA
+jurisdiction: Sumter County
+fips: "13261"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + owner/situs/tax/sale/zoning (KCS / Americus–Sumter)
+  - role: parcels
+    name: Sumter_Parcels TaxParcel_Fabric_FC (KCS / Americus–Sumter)
+    restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Sumter_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PARCELIDAPNS: parcelIdNs
+      PARCELIDAP: parcelIdQuery
+      WinGapPID: wingapParcelId
+      LOWPARCELID: parcelIdLow
+      FULLOWNERNAMES: ownerName
+      OWNERNME1: ownerFirstName
+      OWNERNME2: ownerMiddleName
+      OWNERNME3: ownerLastName
+      OWNERNME4: ownerOtherName
+      PSTLADDRESS: mailingAddress
+      PSTLADDRESS2: mailingAddress2
+      PSTLCITY: mailingCity
+      PSTLSTATE: mailingState
+      PSTLZIP5: mailingZip
+      SITEADDRESS: situsAddress
+      ADDRESS: situsStreet
+      CITY: situsCity
+      ZIP: situsZip
+      HOUSE_NO_1: situsNumber
+      STREET_N_1: situsStreetCard
+      STTYPE: situsStreetType
+      TOTALACRES: acreage
+      ACRES: acreageGis
+      LNDVALUE: tax.landValue
+      CNTASSDVAL: tax.assessedValue
+      PRVASSDVAL: tax.priorAssessedValue
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      GRANTOR: lastSale.grantor
+      GRANTEE: lastSale.grantee
+      ZONING: zoning
+      CLASSCD: dorCode
+      CLASSDSCRP: dorCodeDesc
+      CVTTXCD: taxDistrict
+      CVTTXDSCRP: taxDistrictDesc
+      LANDDIST: landDistrict
+      SUBDIV: subdivision
+      PRPRTYDSCRP: legalDescription
+      EXEMPT: homesteadExempt
+      REALKEY: ownerKey
+      OWNKEY: ownerKeyAlt
+      SALEKEY: saleKey
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (City of Americus / Sumter County
+      GIS hosted by KCS on ga31portal.kcsgis.com; Public/Sumter_Parcels FeatureServer/1
+      "sdeadmin.TaxParcel_Fabric_FC"; twin Public/Public MapServer/10 Tax Parcels same
+      schema/count). Official public viewer maps.kcsgis.com/ga.americus_sumter_public/
+      (americusga.gov GIS). Live count 16369 (2026-09-24). SR NAD83 UTM 16N 26916.
+      maxRecordCount 2000 — page via resultOffset / envelopes. TOTALACRES 5–150 = 2937;
+      CNTASSDVAL>0 = 16296; LNDVALUE>0 = 15300; SALEPRICE>0 = 8445; FULLOWNERNAMES
+      filled ≈16298; ZONING filled ≈16368; CITY='AMERICUS' = 6562;
+      CVTTXDSCRP AMERICUS≈6532 / UNINCORPORATED COUNTY / PLAINS / LESLIE / DESOTO /
+      ANDERSONVILLE / DOWNTOWN AMERICUS. Prefer PARCELIDAPNS (no-space) or PARCELID
+      for KeyValue; WinGapPID mirrors PARCELID. Compose situs from HOUSE_NO_1 +
+      STREET_N_1 + STTYPE when HOUSE_NO_1>0; SITEADDRESS often filled. PSTLCITY/
+      CITY mailing vs situs — prefer spatial Municipal Boundaries/13 for city filter
+      (never soft-mail alone). Schema exposes SEPTIC/SEWERSERV — DO NOT collect
+      utilities per tranche-3. No separate total market/CURR_VAL field — LNDVALUE +
+      CNTASSDVAL only. GEO-VERIFY GEORGIA Sumter FIPS 13261 Americus seat
+      (~-84.23,32.07): WGS84 samples ~-84.072,31.953 (De Soto) / ~-84.088,31.954
+      (Leslie) / ~-84.227,32.063 (Americus); FS iteminfo extent
+      ~[-84.45,31.86]–[-83.92,32.23]. REJECT Sumter County SC (~-80.34,33.92
+      Sumter/Columbia); REJECT Sumter County FL qPublic AppID=1207 LayerID=36374
+      (~-82.0,28.7 The Villages/Bushnell); REJECT paid Regrid/ATTOM. Assessor HTML:
+      qpublic.net/ga/sumter → sumterassessors.com (Cloudflare); App=SumterCountyGA
+      Application.aspx also Cloudflare/bot 403 automated; public for humans.
+      Deep-link KeyValue={PARCELIDAPNS}: Application.aspx?App=SumterCountyGA&Layer=
+      Parcels&PageType=Report&KeyValue={PARCELIDAPNS}. Skip utilities+AADT; no
+      emails/phones.
+    status: usable
+
+  - role: tax
+    name: Sumter_Parcels CNTASSDVAL / LNDVALUE (on polygons)
+    restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Sumter_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PARCELIDAPNS: parcelIdNs
+      CNTASSDVAL: tax.assessedValue
+      PRVASSDVAL: tax.priorAssessedValue
+      LNDVALUE: tax.landValue
+      CVTTXCD: taxDistrict
+      CVTTXDSCRP: taxDistrictDesc
+      CLASSCD: dorCode
+      EXEMPT: homesteadExempt
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons (CNTASSDVAL>0 = 16296;
+      LNDVALUE>0 = 15300). No separate total market/CURR_VAL/FMV* REST field —
+      assessed + land only. Assessor HTML sumterassessors.com / App=SumterCountyGA
+      when full digest card needed.
+    status: usable
+
+  - role: sales
+    name: Sumter_Parcels SALEPRICE / SALEDATE (on polygons)
+    restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Sumter_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PARCELIDAPNS: parcelIdNs
+      SALEPRICE: lastSale.price
+      SALEDATE: lastSale.date
+      GRANTOR: lastSale.grantor
+      GRANTEE: lastSale.grantee
+      SALEKEY: saleKey
+    notes: >
+      Last-sale REST on preferred polygons (SALEPRICE>0 = 8445 of 16369; SALEDATE
+      string e.g. '3/27/2023' / '11/30/2000'). Prefer qPublic/sumterassessors Sales
+      Search for multi-sale history. Rejected paid Regrid/ATTOM sales. REJECT
+      Sumter FL/SC sale layers (wrong geography).
+    status: usable
+
+  - role: zoning
+    name: Sumter Zoning District + Americus Zoning District (Public MS) + parcel ZONING
+    restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Public/MapServer/26
+    layerId: 26
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningDesc
+      ZONETYPE: zoningType
+      PARCELID: parcelId
+    notes: >
+      Euclidean Sumter Zoning District Public/Public MapServer/26 (count 8962;
+      ZONECLASS R1/R-1L/C1/R2/AG/R3/C3/C2/MHP/I-1/R-R/MUNICIPALITY/I-2). Twin
+      Americus Zoning District /25 (count 6601; ZONECLASS IN/R-1/C-1/R-2/AG/R-3/
+      R-3A/R4MH/C-3/C-2/N-S/RR/PMUD/I). Parcel-attributed ZONING also on
+      Sumter_Parcels/1 (richer labels e.g. 'R-2 (1 & 2 Family Dwelling)' /
+      'AG (Agricultural)' / 'Municipal Area' / split-zoning strings). Prefer
+      Euclidean /26+/25 for map outlines; parcel ZONING for join. No separate
+      FeatureServer for zoning — MapServer queryable (auth none).
+    status: usable
+
+  - role: flu
+    name: null — no separate FLU/CharacterAreas FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Sumter County GA FutureLandUse / CharacterAreas FeatureServer on
+      ga31portal Public folder (2026-09-24). Zoning layers are Euclidean, not
+      long-range FLU. Comp-plan PDF gap if any.
+    status: gap
+
+  - role: other
+    name: Municipal Boundaries + County Boundaries (Public MS)
+    restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Public/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipalityName
+      MUNITYP: municipalityType
+      LOCALFIPS: localFips
+      POPULATION: population
+    notes: >
+      Municipal Boundaries NAME=Americus / Plains / Leslie / Desoto / Andersonville
+      (LOCALFIPS=13261). Twin County Boundaries/14. Preferred spatial municipality
+      filters. Companion RVRC CityLimits_Sumter (Ug5xGQbHsD8zuZzM) census places
+      Americus/Andersonville/De Soto/Leslie/Plains — same geography. Site Address
+      Point/0 aids situs. Skip Garbage/Stormwater/Impervious (utilities-adjacent)
+      per tranche-3.
+    status: usable
+
+municipalities:
+  - name: Americus
+    level: city
+    parentFips: "13261"
+    joinToCountyParcels: >
+      Spatial Public/Public MapServer/13 NAME='Americus' (~-84.224,32.077) ∩
+      Sumter_Parcels/1; soft CVTTXDSCRP LIKE '%AMERICUS%' / CITY='AMERICUS'
+      (ZIP 31709) aid only — prefer spatial. County seat; first-class city GIS
+      partner (americusga.gov).
+    layers:
+      - role: zoning
+        name: Americus Zoning District (Public MS/25)
+        restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Public/MapServer/25
+        layerId: 25
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+          ZONEDESC: zoningDesc
+          PARCELID: parcelId
+        notes: >
+          City Euclidean zoning (6601 polys). Prefer over county /26 inside
+          Americus limits. Domain IN/R-1/C-1/R-2/AG/R-3/R-3A/R4MH/C-3/C-2/N-S/
+          RR/PMUD/I.
+        status: usable
+      - role: parcels
+        name: Sumter_Parcels spatial Americus extract
+        restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Sumter_Parcels/FeatureServer/1
+        layerId: 1
+        geometry: polygon
+        auth: none
+        acreageField: TOTALACRES
+        coverage: city-only
+        fieldMap:
+          PARCELID: parcelId
+          FULLOWNERNAMES: ownerName
+          TOTALACRES: acreage
+          CNTASSDVAL: tax.assessedValue
+          SALEPRICE: lastSale.price
+        notes: >
+          No separate Americus-only CAMA — county Sumter_Parcels + Municipal
+          Boundaries NAME='Americus' (CITY soft ≈6562). Tax/sale/owner on county REST.
+        status: usable
+      - role: flu
+        name: null — no Americus FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city FLU FeatureServer recovered.
+        status: gap
+    gaps:
+      - "No Americus-only parcel CAMA FS — county Sumter_Parcels + spatial city limits."
+      - "FLU gap; Euclidean Americus Zoning District/25 usable."
+      - "Skip Americus Garbage & Trash / Stormwater Accounts per tranche-3."
+    status: usable
+
+  - name: Plains
+    level: city
+    parentFips: "13261"
+    joinToCountyParcels: >
+      Spatial Municipal Boundaries NAME='Plains' (~-84.396,32.034) ∩ county
+      parcels; soft CVTTXDSCRP='PLAINS'.
+    layers:
+      - role: zoning
+        name: Sumter Zoning District Plains spatial extract
+        restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Public/MapServer/26
+        layerId: 26
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+        notes: County Euclidean zoning ∩ Plains limits — no Plains-only zoning FS.
+        status: partial
+      - role: parcels
+        name: null — county Sumter_Parcels + spatial Plains
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Plains-only CAMA — county Tax Parcels + city limits.
+        status: gap
+    gaps:
+      - "Plains city limits usable; parcel/FLU still county layers + assessor HTML."
+    status: partial
+
+  - name: Leslie
+    level: city
+    parentFips: "13261"
+    joinToCountyParcels: >
+      Spatial Municipal Boundaries NAME='Leslie' (~-84.086,31.955) ∩ county
+      parcels; soft CVTTXDSCRP='LESLIE'.
+    layers:
+      - role: zoning
+        name: Sumter Zoning District Leslie spatial extract
+        restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Public/MapServer/26
+        layerId: 26
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+        notes: County zoning ∩ Leslie limits.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Leslie
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Leslie-only CAMA REST.
+        status: gap
+    gaps:
+      - "Leslie city limits usable; parcel/FLU still county layers."
+    status: partial
+
+  - name: De Soto
+    level: city
+    parentFips: "13261"
+    joinToCountyParcels: >
+      Spatial Municipal Boundaries NAME='Desoto' (~-84.064,31.955) ∩ county
+      parcels; soft CVTTXDSCRP='DESOTO' / CITY='DESOTO'.
+    layers:
+      - role: zoning
+        name: Sumter Zoning District De Soto spatial extract
+        restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Public/MapServer/26
+        layerId: 26
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+        notes: County zoning ∩ Desoto limits.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Desoto
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No De Soto-only CAMA REST.
+        status: gap
+    gaps:
+      - "De Soto / Desoto city limits usable; parcel/FLU still county layers."
+    status: partial
+
+  - name: Andersonville
+    level: city
+    parentFips: "13261"
+    joinToCountyParcels: >
+      Spatial Municipal Boundaries NAME='Andersonville' (~-84.145,32.197) ∩
+      county parcels; soft CVTTXDSCRP='ANDERSONVILLE'.
+    layers:
+      - role: zoning
+        name: Sumter Zoning District Andersonville spatial extract
+        restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Public/MapServer/26
+        layerId: 26
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+        notes: County zoning ∩ Andersonville limits.
+        status: partial
+      - role: parcels
+        name: null — county parcels + spatial Andersonville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Andersonville-only CAMA REST.
+        status: gap
+    gaps:
+      - "Andersonville city limits usable; parcel/FLU still county layers."
+    status: partial
+
+gaps:
+  - "No separate total market/CURR_VAL/FMV* REST — LNDVALUE + CNTASSDVAL only; full digest via sumterassessors.com / App=SumterCountyGA HTML when needed."
+  - "No separate FLU/CharacterAreas FeatureServer — Euclidean zoning only."
+  - "Zoning Euclidean lives on Public MapServer/25–26 (not FeatureServer) — queryable; parcel ZONING attributed on Sumter_Parcels/1."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic/sumterassessors Application.aspx Cloudflare/bot 403 automated; maps.kcsgis.com may geoblock non-US egress; public for humans (americusga.gov GIS)."
+  - "REJECT Sumter County SC (~-80.34,33.92); REJECT Sumter County FL AppID=1207 LayerID=36374 (~-82.0,28.7); REJECT paid Regrid/ATTOM; skip SEPTIC/SEWERSERV + Garbage/Stormwater + AADT; no emails/phones."
+
+license: >
+  City of Americus / Sumter County GIS hosted by KCS (ga31portal.kcsgis.com Public
+  folder; AmericusSumter geodatabase) — Sumter_Parcels FeatureServer/1 TaxParcel_Fabric;
+  Public MapServer Tax Parcels/10, Municipal Boundaries/13, Americus Zoning/25,
+  Sumter Zoning/26. Official public viewer maps.kcsgis.com/ga.americus_sumter_public/
+  (americusga.gov departments/gis_mapping). Assessor qpublic.net/ga/sumter →
+  sumterassessors.com / App=SumterCountyGA. Companion RVRC CityLimits_Sumter
+  (Ug5xGQbHsD8zuZzM). Attribution City of Americus / Sumter County / KCS.
+  Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+  REJECT Sumter SC/FL lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=SumterCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://maps.kcsgis.com/ga.americus_sumter_public/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Sumter_Parcels/FeatureServer/1 count
+    16368; extent center [['13261', 'Sumter County']]; sample [['13261', 'Sumter County']]. No change to
+    field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Americus city"
+      level: city
+      parentFips: "13261"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Andersonville city"
+      level: city
+      parentFips: "13261"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "De Soto city"
+      level: city
+      parentFips: "13261"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Leslie city"
+      level: city
+      parentFips: "13261"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Plains city"
+      level: city
+      parentFips: "13261"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Sumter' AND aadt>0
+    altFilter: name LIKE '261-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 261-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 163
+    maxAadt: 17800
+    geoCheck: 163/163 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CNTASSDVAL
+    - LNDVALUE
+    - PRVASSDVAL
+    filledCount: null
+    restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Sumter_Parcels/FeatureServer/1
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: REST
+    detail: Sumter_Parcels/FeatureServer/1 SALEPRICE (8443>0), SALEDATE (15880 filled), GRANTOR, GRANTEE on polygons;
+      no deed book/page field
+    restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Sumter_Parcels/FeatureServer/1
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OWNERNME1
+    filledCount: 12748
+    restUrl: https://ga31portal.kcsgis.com/ga31server/rest/services/Public/Sumter_Parcels/FeatureServer/1
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=SumterCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCELID
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 1530    13   7
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=SumterCountyGA&Layer=Parcels&PageType=Report&KeyValue=1530%20%20%20%2013%20%20%207
+    verification: 'pattern-tested: real sample ID from PARCELID; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://maps.kcsgis.com/ga.americus_sumter_public/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Americus city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Andersonville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: De Soto city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Leslie city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Plains city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

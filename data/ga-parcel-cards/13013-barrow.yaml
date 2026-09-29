@@ -1,0 +1,738 @@
+state: GA
+jurisdiction: Barrow County
+fips: "13013"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide cadastral polygons + WinGAP-style owner/mailing (NO tax/sale/situs on polygon)
+  - role: parcels
+    name: BarrowParcelswOwner_Project BarrowParcels (AGOL hosted — owner + mailing)
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/BarrowParcelswOwner_Project/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_no: parcelId
+      PARCEL_NO_1: parcelIdAlt
+      Map_no: mapSheet
+      REALKEY: ownerKey
+      LASTNAME: ownerName
+      ADDRESS1: mailingAddressLine1OrCoOwner
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/mailing landbase (Barrow County
+      AGOL org OVFGXfRTCVcPwl55 / barrow-county.maps.arcgis.com / BarrowCountyCTO).
+      Live count 44221 (2026-09-23); Parcel_no filled ≈41515; LASTNAME filled ≈40656;
+      REALKEY>0 ≈40656; ADDRESS1 filled ≈23236 (often co-owner name, NOT street);
+      ADDRESS2 filled ≈25544 (typical street); ADDRESS3 filled ≈19000 (alt street /
+      overflow). Compose mailing street from ADDRESS2 then ADDRESS3 when ADDRESS1
+      looks like a person name. SR Web Mercator 102100/3857; GIS acres ≈
+      Shape__Area/4046.8564224 (5–150 ac ≈4277). Geo-verified WGS84 samples
+      ~-83.762,33.898 (XX055… / Bethlehem fringe), ~-83.815,33.981 (AU13D… Auburn),
+      ~-83.804,34.088 (BR025… Braselton) — Barrow County GA, Atlanta MSA northeast
+      (NOT Norwalk CT org HfsHDBmkGwb1UtID ParcelViewer_Layers SR 102656; NOT any
+      non-GA Barrow). Parcel_no prefixes (live): XX≈25926 unincorporated, WN≈7858
+      Winder, AU≈4557 Auburn, ST≈1401 Statham, BR≈1212 Braselton, BE≈410 Bethlehem,
+      CA≈148 Carl — usable soft municipality filter alongside City_Limits spatial /
+      FLU Jurisdicti / Address Inc_Muni. No situs*, tax.*, lastSale.*, or Euclidean
+      zoning on this layer — join Address_Points on Parcel_ID=Parcel_no for situs;
+      CurrentZoningDistricts Zone on Parcel_no; FLU2023 on BCGIS_Zoning_Layers/137.
+      Same-org twin Barrow_Parcels_w_Owner/FeatureServer/0 (38071; StatePlane GA West
+      102667 feet — GIS acres = Shape__Area/43560; 5–150 ≈3344) has same CAMA attrs
+      at lower count; prefer this Project/1 for count+REALKEY. Thin geometry
+      landbases: BCGIS_Base_Layers/120 Parcel Boundaries (44669) and
+      Barrow_Parcels/FeatureServer/142 (44460) — PIN+geometry only. Official viewers:
+      experience.arcgis.com/experience/cbd734c0037e41e38fc08b186e1ee896 (Barrow County
+      GIS Viewer) and Future Development Map experience/4202c02ad056473ab6dac925cd998e7a.
+      Enrichment vs thin in-app: full-county outlines + Parcel_no + owner/mailing +
+      GIS acres; tax/sale/situs/Euclidean zoning via joins or HTML.
+    status: usable
+
+  - role: parcels
+    name: Barrow_Parcels_w_Owner (StatePlane twin — accurate GIS acres)
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/Barrow_Parcels_w_Owner/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_no: parcelId
+      PARCEL_NO_1: parcelIdAlt
+      Map_no: mapSheet
+      Realkey: ownerKey
+      lastname: ownerName
+      address1: mailingAddressLine1OrCoOwner
+      address2: mailingAddress
+      address3: mailingAddress2
+      city: mailingCity
+      state: mailingState
+      zip: mailingZip
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Live count 38071 — Energov/WinGAP owner join on StatePlane GA West FIPS 1002
+      Feet (102667/2240). GIS acres = Shape__Area/43560 (more accurate than Web
+      Mercator twin); 5–150 ≈3344; lastname filled ≈37063. Prefer Project/1 for
+      higher count; use this when deeded-acre substitute must be StatePlane feet.
+      Same mailing ADDRESS1=co-owner caveat.
+    status: partial
+
+  - role: parcels
+    name: BCGIS_Base_Layers Parcel Boundaries (thin geometry landbase)
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/BCGIS_Base_Layers/FeatureServer/120
+    layerId: 120
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_no: parcelId
+      Map_no: mapSheet
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Live count 44669 — highest-count PIN+geometry landbase (no owner/tax). Prefer
+      Project/1 for attributes; this if a geometry-only AGOL URL is needed. SR 102667.
+      Twin Barrow_Parcels/142 count 44460 same thin schema.
+    status: partial
+
+  - role: tax
+    name: null — no public REST tax/CAMA values
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public FeatureServer/MapServer exposes tax.marketValue / assessedValue /
+      taxableValue for Barrow (2026-09-23). Owner/mailing only on parcel layers.
+      Assessor HTML: qPublic SchneiderCorp AppID=635 LayerID=11218
+      (qpublic.schneidercorp.com / qpublic.net/ga/barrow / App=BarrowCountyGA).
+      CDN/bot 403 from research box on Application.aspx; public for humans.
+      Deep-link: Application.aspx?AppID=635&LayerID=11218&PageTypeID=4&PageID=…&KeyValue={Parcel_no}
+      or App=BarrowCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_no}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Barrow multi-sale FeatureServer/MapServer found (2026-09-23). Parcel layers
+      expose no saleamnt/saledate/qualified fields. qPublic AppID=635 Sales Search /
+      Sales List are HTML/Beacon-only. Rejected ARC LandPro_2012 (Ug5xGQbHsD8zuZzM)
+      and paid Regrid/USLandGrid as sales/CAMA substitutes.
+    status: gap
+
+  - role: zoning
+    name: CurrentZoningDistricts Zoning_Districts (county Euclidean + city stubs)
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/CurrentZoningDistricts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_no: parcelId
+      Zone: zoning
+      Zone_Descr: zoningOrdinanceUrl
+      Case_No: zoningCase
+      ReZone_Act: rezoningAction
+      ReZone_Dat: rezoningDate
+      Setbacks: zoningSetbacks
+      Principal_: zoningPrincipalUseTable
+      Link: zoningLink
+      Comments: zoningComments
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred county zoning district polygons (parcel-tied; PIN-join on Parcel_no
+      OR spatial). Live count 33577; Parcel_no filled 33577. SR 102667 feet. Domain
+      Zone: R1≈12600, Winder≈6957, AG≈2844, R2≈2798, Auburn≈2553, AR≈2300,
+      Statham≈1158, Braselton≈733, Bethlehem≈369, M1≈256, R3≈256, C3≈175, C2≈160,
+      Carl≈153, M2≈104, AC≈92, C1≈42, MH≈17, OI≈10. Zone values that are city names
+      (Winder/Auburn/Statham/Braselton/Bethlehem/Carl ≈11923) are CITY STUBS —
+      inside city limits prefer city zoning certification (Winder ZONECLASS;
+      Bethlehem_Zoning Zone; Carl_Zoning Zone). Unincorporated Euclidean codes
+      R1/R2/R3/AG/AR/AC/C1/C2/C3/M1/M2/MH/OI. Zone_Descr is municode ordinance URL
+      (not a text description). Twin BCGIS_Zoning_Layers/FeatureServer/110
+      Unincorporated Barrow Zoning (33570) same schema. Updated Oct 2022 per service
+      description. Geo-verified ~-83.76,33.90 Barrow GA.
+    status: usable
+
+  - role: flu
+    name: BCGIS_Zoning_Layers Future Development Area (FLU2023 parcel-tied)
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/BCGIS_Zoning_Layers/FeatureServer/137
+    layerId: 137
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_no: parcelId
+      FLU2023: flu
+      Jurisdicti: fluJurisdiction
+      Link: fluOrdinanceLink
+      Shape__Area: shapeAreaSqFt
+    notes: >
+      Preferred parcel-tied Future Land Use / character (Comp Plan 2023 era). Live
+      count 35929; Parcel_no filled 35929. Domain FLU2023: Suburban Residential≈9768,
+      City of Winder≈7138, Rural Residential≈4889, City of Auburn≈3453, Rural
+      Reserve≈3328, Traditional Residential≈3046, City of Statham≈1324, 316
+      Innovation≈1084, Town of Braselton≈751, Employment Industrial≈685, Destination
+      211≈151, Low Intensity Workplace≈122, Mixed Use Neighborhood≈118, Commercial
+      Corridor≈42, Community Crossroads≈30. Jurisdicti: Barrow County≈22703,
+      Winder≈7135, Auburn≈3450, Statham≈1324, Braselton≈738, Town of Bethlehem≈372,
+      Town of Carl≈148. City-named FLU2023 / Jurisdicti values are city stubs —
+      prefer city FLU inside Winder (2023 Future Land Use Character) and NEGRC city
+      FLU/CA layers. Twin BarrowParcelswOwner_Project/FeatureServer/13 same count/
+      schema (Web Mercator). Dissolved inventory Future_Development_Areas/93 (118
+      polygons; Function_ Employment/Industrial Center≈44 etc.) is spatial-only —
+      prefer this parcel-tied layer. Official experience Future Development Map
+      4202c02ad056473ab6dac925cd998e7a. Empty stubs Future_Development_Areas_2023/130
+      and Future_Land_Use_Character_Areas/12 (count 0) — do not use.
+    status: usable
+
+  - role: other
+    name: City_Limits (municipalities)
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/City_Limits/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: municipality
+      City_Town_: municipalityFull
+      LOCALFIPS: placeFips
+      MUNITYP: municipalityType
+      Acres: areaAcres
+      MUNIAREA: areaSqMi
+    notes: >
+      Live count 6 multipart municipality polygons: Bethlehem (~-83.73,33.93),
+      Statham (~-83.60,33.96), Auburn (~-83.84,34.04), Winder (~-83.70,33.97),
+      Carl (~-83.82,34.00), Braselton (~-83.81,34.11). Parcel↔city join = spatial
+      City_Limits OR Parcel_no prefix (WN/AU/ST/BR/BE/CA) OR FLU Jurisdicti OR
+      Address_Points Inc_Muni OR zoning Zone city-stub. Twin City_Limits_View and
+      BarrowParcelswOwner_Project/4 CityLimits. Braselton and Auburn also spill into
+      adjacent counties — this layer is Barrow-side only.
+    status: usable
+
+  - role: other
+    name: Address_Points (situs address points)
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/Address_Points/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_ID: parcelId
+      StrFullAdd: situsAddress
+      Add_Number: situsNumber
+      St_PreDir: situsStreetDir
+      St_Name: situsStreet
+      St_PosTyp: situsStreetType
+      Unit: situsUnit
+      Post_Comm: postalCommunity
+      Post_Code: situsZip
+      Inc_Muni: municipality
+      Uninc_Comm: unincorporatedCommunity
+    notes: >
+      Live count 45295; Parcel_ID filled ≈33428 (PIN-join to Parcel_no). Inc_Muni
+      domain: UNINCORPORATED≈26921, WINDER≈9746, AUBURN≈5144, BRASELTON≈1556,
+      STATHAM≈1434, BETHLEHEM≈366, CARL≈127. Post_Comm is postal (not municipality
+      filter). Geo-verified ~-83.731,33.987 Winder GA. Twin BCGIS_Base_Layers/112
+      Address Points count 46448 (broader schema). Prefer Parcel_ID attribute join
+      when filled; else spatial to parcels.
+    status: usable
+
+  - role: other
+    name: Highway Corridor Overlay Parcels
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/BCGIS_Zoning_Layers/FeatureServer/109
+    layerId: 109
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_no: parcelId
+      Map_no: mapSheet
+      Link: overlayLink
+      Comments: overlayComments
+    notes: >
+      Live count 3178 parcels inside Highway Corridor Overlay (HCO). PIN-join.
+      Overlay polygon twin Highway_Corridor_Overlay/FeatureServer/2. PDF HCO map
+      also on barrowga.org Planning. Destination_211_Overlay also present for NW
+      corridor near Braselton/211.
+    status: usable
+
+  - role: flu
+    name: NEGRC CA - Barrow County, Bethlehem, and Carl - 2025
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FDM_Short: fluCode
+      FDM_Long: flu
+      ID: fluFeatureId
+    notes: >
+      Live count 1121 dissolved character areas (e.g. 316 Innovation). Spatial-join
+      only. Prefer county parcel-tied FLU2023 for PIN search; this for regional
+      inventory. Org Ug5xGQbHsD8zuZzM (NEGRC) — same org hosts LandPro_2012 (reject
+      as cadastral). Geo-verified ~-83.77,33.95 Barrow GA.
+    status: partial
+
+municipalities:
+  - name: Winder
+    level: city
+    parentFips: "13013"
+    joinToCountyParcels: >
+      Attribute: Parcel_no LIKE 'WN%' (≈7858) OR FLU Jurisdicti='Winder' OR zoning
+      Zone='Winder' OR Address Inc_Muni='WINDER'. Spatial City_Limits Name='Winder'
+      (~-83.70,33.97) OR Winder Municipal Boundary Planning/ZoningMap/5.
+    layers:
+      - role: zoning
+        name: City of Winder Winder_Zoning (ZONECLASS)
+        restUrl: https://gis.cityofwinder.com/arcgis/rest/services/Jason/Winder_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+          ZONEDESC: zoningDescription
+          Parcel: parcelId
+          Legend: zoningLegend
+          Conditions: zoningConditions
+          Notes_Desc: zoningNotes
+          Shape__Area: shapeAreaSqFt
+        notes: >
+          Preferred Winder-local Euclidean zoning (standing order: city over county
+          Zone='Winder' stub). Live count 6790; Parcel sparsely filled ≈91 — join =
+          spatial default (not Parcel_no). Domain ZONECLASS: R-1≈2270, R-1B≈1616,
+          R-1A≈949, R-3≈425, B-1≈380, TNPD≈352, R-2≈282, B-2≈222, G≈92, DT≈66,
+          AG≈54, I≈54, PUD≈20, MH≈6. SR StatePlane GA West 102667. Geo-verified
+          ~-83.730,33.956 Winder GA. Twin Planning/ZoningMap/FeatureServer/0 Zoning
+          Districts (6790; same ZONECLASS) + Cond Use layer 1 + Downtown/Historic
+          overlays. Official viewer: gis.cityofwinder.com portal Public Zoning Map
+          webappviewer id=eb98448a14464fa4999d1b0e431325b3. Portal
+          gis.cityofwinder.com (owner jason.griffin@WINDER).
+        status: usable
+      - role: flu
+        name: 2023 Winder Future Land Use (Character)
+        restUrl: https://gis.cityofwinder.com/arcgis/rest/services/Jason/2023_Winder_Future_Land_Use/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Character: flu
+          Shape__Area: shapeAreaSqFt
+        notes: >
+          Preferred Winder-local FLU/character. Live count 7545. Domain Suburban
+          Residential≈4187, Old Winder≈1095, Glenwood≈732, Downtown Gateway≈663,
+          Mill Village≈492, Downtown≈197, Commerce Corridor≈169, Conservation≈10.
+          Spatial-join. Prefer over county FLU2023='City of Winder' stub and NEGRC
+          CA - Winder - 2023 (layer 6, 366 dissolved).
+        status: usable
+      - role: flu
+        name: NEGRC CA - Winder - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/6
+        layerId: 6
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 366 dissolved. Prefer city 2023 Future Land Use Character for
+          parcel-scale; this for regional inventory. Geo-verified ~-83.71,33.97.
+        status: partial
+      - role: parcels
+        name: Winder Jason/Parcels (county landbase mirror — thin)
+        restUrl: https://gis.cityofwinder.com/arcgis/rest/services/Jason/Parcels/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: county-wide
+        fieldMap:
+          parcel_no: parcelId
+          map_no: mapSheet
+        notes: >
+          Live count 36365 — Barrow county parcel mirror on Winder server (thin;
+          no owner). Prefer county Project/1 for CAMA; this only if Winder-hosted
+          geometry URL is required. NOT Winder-city-only.
+        status: partial
+      - role: other
+        name: Winder Municipal Boundary
+        restUrl: https://gis.cityofwinder.com/arcgis/rest/services/Planning/ZoningMap/FeatureServer/5
+        layerId: 5
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          NAME: municipality
+          Acres: areaAcres
+          MUNIAREA: areaSqMi
+        notes: >
+          Live count 1 Winder city-limit polygon. Prefer for Winder spatial join.
+        status: usable
+    gaps:
+      - "No Winder parcel CAMA REST (owner/tax/sale) on city server — use county Project/1 + qPublic HTML."
+      - "Winder_Zoning Parcel field mostly null (≈91/6790) — spatial intersect default."
+      - "County CurrentZoningDistricts Zone='Winder' is a stub — prefer ZONECLASS."
+    status: usable
+
+  - name: Auburn
+    level: city
+    parentFips: "13013"
+    joinToCountyParcels: >
+      Parcel_no LIKE 'AU%' (≈4557) OR FLU Jurisdicti='Auburn' OR Zone='Auburn' OR
+      Inc_Muni='AUBURN'. Spatial City_Limits Name='Auburn' (~-83.84,34.04). City
+      also spans Gwinnett — Gwinnett card for Gwinnett-side.
+    layers:
+      - role: flu
+        name: NEGRC FLU - Auburn - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 335. Many FDM_Long null on sample — treat as coarse inventory.
+          Spatial-join. Geo-verified ~-83.82,33.98 Auburn GA (Barrow/Gwinnett). No
+          official City of Auburn zoning FeatureServer found (2026-09-23); county
+          Zone='Auburn' stub only.
+        status: partial
+    gaps:
+      - "No City of Auburn Euclidean zoning REST — county Zone='Auburn' stub + NEGRC FLU only."
+      - "City straddles Barrow/Gwinnett — do not treat as Barrow-only."
+    status: partial
+
+  - name: Statham
+    level: city
+    parentFips: "13013"
+    joinToCountyParcels: >
+      Parcel_no LIKE 'ST%' (≈1401) OR FLU Jurisdicti='Statham' OR Zone='Statham' OR
+      Inc_Muni='STATHAM'. Spatial City_Limits Name='Statham' (~-83.60,33.96).
+    layers:
+      - role: flu
+        name: NEGRC FLU - Statham - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/5
+        layerId: 5
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 235 (e.g. Commercial Mixed Use). Spatial-join. Geo-verified
+          ~-83.62,33.96 Statham GA. No official City of Statham zoning FeatureServer
+          found (2026-09-23); county Zone='Statham' stub only.
+        status: usable
+    gaps:
+      - "No City of Statham Euclidean zoning REST — county Zone='Statham' stub + NEGRC FLU only."
+    status: partial
+
+  - name: Bethlehem
+    level: city
+    parentFips: "13013"
+    joinToCountyParcels: >
+      Parcel_no LIKE 'BE%' (≈410) OR FLU Jurisdicti='Town of Bethlehem' OR
+      Zone='Bethlehem' OR Inc_Muni='BETHLEHEM'. Spatial City_Limits Name='Bethlehem'
+      (~-83.73,33.93) OR Bethlehem_Zoning presence.
+    layers:
+      - role: zoning
+        name: Bethlehem Zoning (county-hosted city districts)
+        restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/Bethlehem_Zoning/FeatureServer/46
+        layerId: 46
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Parcel_no: parcelId
+          Zone: zoning
+          Zone_Description: zoningDescription
+          Case_No: zoningCase
+          Principal_Use_Table: zoningPrincipalUseTable
+          Setbacks: zoningSetbacks
+          Subdivision: subdivision
+          ReZone_Act: rezoningAction
+          ReZone_Dat: rezoningDate
+          Link: zoningLink
+        notes: >
+          Preferred Bethlehem-local zoning (county AGOL host). Live count 375.
+          Domain Zone: R1≈209, AR≈62, AG≈54, C1≈17, C2≈14, OI≈10, M1≈6, Bethlehem≈2
+          (stub remnant), AC≈1. PIN-join on Parcel_no or spatial. Twin
+          Bethlehem_Zoning_View. Prefer over county CurrentZoningDistricts
+          Zone='Bethlehem' stub. Geo-verified Bethlehem GA ~-83.71,33.93. NEGRC CA
+          Bethlehem Historic Area Overlay layer 801 (1 polygon) optional overlay.
+        status: usable
+      - role: other
+        name: NEGRC CA - Bethlehem Historic Area Overlay - 2025
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/801
+        layerId: 801
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Live count 1 historic overlay polygon. Spatial only. Geo-verified
+          ~-83.71,33.93.
+        status: partial
+    gaps:
+      - "No Bethlehem parcel CAMA REST beyond county Project/1; no city-hosted AGOL org found."
+    status: usable
+
+  - name: Carl
+    level: city
+    parentFips: "13013"
+    joinToCountyParcels: >
+      Parcel_no LIKE 'CA%' (≈148) OR FLU Jurisdicti='Town of Carl' OR Zone='Carl' OR
+      Inc_Muni='CARL'. Spatial City_Limits Name='Carl' (~-83.82,34.00) OR
+      Carl_Zoning presence.
+    layers:
+      - role: zoning
+        name: Carl_Zoning (county-hosted town districts)
+        restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/Carl_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Parcel_no: parcelId
+          Zone: zoning
+          Zone_Description: zoningDescription
+          Case_No: zoningCase
+          Principal_Use_Table: zoningPrincipalUseTable
+          Setbacks: zoningSetbacks
+          Subdivision: subdivision
+          ReZone_Act: rezoningAction
+          ReZone_Dat: rezoningDate
+          Link: zoningLink
+        notes: >
+          Preferred Carl-local zoning. Live count 151. Domain Zone: R1≈70, C1≈34,
+          C2≈20, AG≈14, AC≈4, AR≈3, M2≈3, M1≈2, R3≈1. PIN-join or spatial. Twin
+          Carl_Zoning_View. Prefer over county Zone='Carl' stub. Geo-verified
+          ~-83.82,34.00 Carl GA. NOT Carlisle / other Carl lookalikes.
+        status: usable
+    gaps:
+      - "No Carl parcel CAMA REST beyond county Project/1."
+    status: usable
+
+  - name: Braselton
+    level: city
+    parentFips: "13013"
+    joinToCountyParcels: >
+      Parcel_no LIKE 'BR%' (≈1212 on Barrow landbase) OR FLU Jurisdicti='Braselton'
+      OR Zone='Braselton' OR Inc_Muni='BRASELTON'. Spatial City_Limits Name='Braselton'
+      (~-83.81,34.11). Town spans Barrow + Jackson + Hall + Gwinnett — this card is
+      Barrow-side only.
+    layers:
+      - role: flu
+        name: NEGRC FLU - Braselton - 2025
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/417
+        layerId: 417
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: fluCode
+          FDM_Long: flu
+          ID: fluFeatureId
+        notes: >
+          Live count 95 (e.g. Commercial). Spatial-join. Geo-verified ~-83.83,34.12
+          Braselton GA. No official Town of Braselton zoning FeatureServer found in
+          Barrow org / AGOL search for Barrow-side (2026-09-23); county
+          Zone='Braselton' stub only. Destination 211 Overlay nearby on county org.
+        status: usable
+    gaps:
+      - "No Braselton Euclidean zoning REST on Barrow card — county Zone='Braselton' stub + NEGRC FLU."
+      - "Multi-county town (Barrow/Jackson/Hall/Gwinnett) — do not treat BR% as Braselton-only statewide."
+    status: partial
+
+gaps:
+  - "No public REST tax.marketValue/assessedValue/taxableValue — owner/mailing only on Project/1; qPublic AppID=635 LayerID=11218 HTML for humans (CDN/bot 403)."
+  - "No public REST lastSale.price/date/qualified — qPublic Sales Search HTML only."
+  - "No deeded acreage field — GIS acres via Shape__Area (Project/1 Web Mercator /4046.86 → 5–150 ≈4277; Barrow_Parcels_w_Owner StatePlane feet /43560 → 5–150 ≈3344)."
+  - "Situs not on parcel polygons — join Address_Points Parcel_ID≈33428/45295 or spatial; Post_Comm is postal not municipality."
+  - "Mailing ADDRESS1 often co-owner name; street typically ADDRESS2 or ADDRESS3 — do not map ADDRESS1 alone to mailingAddress."
+  - "County zoning Zone city-name stubs (Winder/Auburn/Statham/Braselton/Bethlehem/Carl ≈11923) — prefer city layers inside limits (Winder ZONECLASS; Bethlehem/Carl Zone REST; Auburn/Statham/Braselton zoning certification gap)."
+  - "City zoning REST usable for Winder / Bethlehem / Carl; Auburn / Statham / Braselton FLU-only (NEGRC) + county stubs."
+  - "Empty FLU stubs Future_Development_Areas_2023/130 and Future_Land_Use_Character_Areas/12 (count 0) — use BCGIS_Zoning_Layers/137."
+  - "Barrow_Parcels_(View)/0 count 0 — dead view; do not use."
+  - "qPublic AppID=635 may CDN/bot-403 automated clients; public for humans. Deep-link AppID=635 LayerID=11218 KeyValue={Parcel_no}."
+  - "Rejected lookalikes: City of Norwalk CT org HfsHDBmkGwb1UtID ParcelViewer_Layers (SR 102656 Connecticut; service description 'Norwalk Operational Layers'; extent CT StatePlane) mis-hit from 'Barrow' web search; ARC LandPro_2012 + related Ug5xGQbHsD8zuZzM stale regional land-cover (not cadastral); Regrid/USLandGrid/MappingSolutionsGIS paid parcel extracts; any Barrow FL or non-GA Barrow."
+  - "Enrichment vs thin in-app: county 44221 geometry+Parcel_no+owner/mailing+GIS acres; county Zone+FLU2023 PIN-tied; Address_Points situs; City_Limits + prefix municipality; Winder full zoning+FLU; Bethlehem/Carl zoning; NEGRC city/county FLU/CA; sales/tax/Auburn-Statham-Braselton-Euclidean-zoning remain gap/HTML/PDF."
+
+license: >
+  Barrow County Government AGOL org OVFGXfRTCVcPwl55 (barrow-county.maps.arcgis.com
+  / BarrowCountyCTO / gis@barrowga.org Planning-GIS) — BarrowParcelswOwner_Project,
+  Barrow_Parcels_w_Owner, Barrow_Parcels, Parcels, BCGIS_Base_Layers,
+  BCGIS_Zoning_Layers, CurrentZoningDistricts, Future_Development_Areas*,
+  City_Limits, Address_Points, Bethlehem_Zoning, Carl_Zoning,
+  Highway_Corridor_Overlay, Destination_211_Overlay, BC_Owned_Parcels, and related
+  BCGIS_* group layers. Viewers: experience cbd734c0037e41e38fc08b186e1ee896
+  (GIS Viewer); experience 4202c02ad056473ab6dac925cd998e7a (Future Development
+  Map). City of Winder GIS (gis.cityofwinder.com / jason.griffin@WINDER) —
+  Jason/Winder_Zoning, Jason/2023_Winder_Future_Land_Use, Planning/ZoningMap,
+  Public Zoning Map webappviewer eb98448a14464fa4999d1b0e431325b3. Northeast
+  Georgia Regional Commission (NEGRC / Ug5xGQbHsD8zuZzM / NEGARC_ELA) —
+  NEGRC_Future_Development_Map_Inventory_WFL1 layers 4–7, 417, 801. Assessor HTML:
+  qPublic SchneiderCorp AppID=635 LayerID=11218 (qpublic.net/ga/barrow). County
+  site barrowga.org/526/GIS. Attribution to Barrow County / City of Winder / NEGRC.
+  Public fields only; no emails/phones; no paid vendors (Regrid/ATTOM/CoreLogic/
+  USLandGrid/MappingSolutionsGIS).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=635&LayerID=11218&PageTypeID=2&PageID=0
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/OVFGXfRTCVcPw
+    l55/arcgis/rest/services/BarrowParcelswOwner_Project/FeatureServer/1 count 44221; extent center
+    [['13013', 'Barrow County']]; sample [['13013', 'Barrow County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Auburn city"
+      level: city
+      parentFips: "13013"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Bethlehem town"
+      level: city
+      parentFips: "13013"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Braselton town"
+      level: city
+      parentFips: "13013"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Carl town"
+      level: city
+      parentFips: "13013"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Statham city"
+      level: city
+      parentFips: "13013"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Winder city"
+      level: city
+      parentFips: "13013"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Barrow' AND aadt>0
+    altFilter: name LIKE '013-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 013-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 176
+    maxAadt: 78000
+    geoCheck: 176/176 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 40656
+    restUrl: https://services5.arcgis.com/OVFGXfRTCVcPwl55/arcgis/rest/services/BarrowParcelswOwner_Project/FeatureServer/1
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BarrowCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=635&LayerID=11218&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_no
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: XX055A 010
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BarrowCountyGA&Layer=Parcels&PageType=Report&KeyValue=XX055A%20010
+    verification: 'pattern-tested: real sample ID from Parcel_no; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=BarrowCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Auburn city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Bethlehem town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Braselton town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Carl town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Statham city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Winder city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

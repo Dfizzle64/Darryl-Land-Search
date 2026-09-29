@@ -1,0 +1,323 @@
+state: GA
+jurisdiction: Fulton County
+fips: "13121"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — wire this first for county-wide site search (TaxYear 2026 digest, full CAMA)
+  - role: parcels
+    name: Property Map Viewer Tax Parcel
+    restUrl: https://gismaps.fultoncountyga.gov/arcgispub2/rest/services/PropertyMapViewer/PropertyMapViewer/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: LandAcres
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      LandAcres: acreage
+      Owner: ownerName
+      OwnerAddr1: mailingAddress
+      OwnerAddr2: mailingAddress
+      Address: situsAddress
+      TotAppr: tax.marketValue
+      TotAssess: tax.assessedValue
+      LUCode: dorCode
+      LivUnits: livableUnits
+      TaxYear: taxYear
+      ClassCode: classCode
+      TaxDist: taxDistrict
+      LandAppr: tax.landMarketValue
+      ImprAppr: tax.improvementMarketValue
+      LandAssess: tax.landAssessedValue
+      ImprAssess: tax.improvementAssessedValue
+    notes: >
+      Preferred county-wide parcel source. Live count 373306 (2026-09-23).
+      Spatial reference NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240).
+      maxRecordCount 2000. No situsCity/situsZip fields; OwnerAddr2 often holds "CITY ST ZIP" for mailing.
+      No zoning or sale fields on this layer. TaxYear sample = 2026. TotAppr is appraised/fair market;
+      TotAssess is assessed (typically 40% in GA). Concatenate OwnerAddr1 + OwnerAddr2 for mailingAddress.
+    status: usable
+
+  # Hosted FeatureServer lead — convenient WGS84 but NOT county-wide
+  - role: parcels
+    name: CurrentParcels (hosted FeatureServer)
+    restUrl: https://services5.arcgis.com/buITjRsK0rZsAXbQ/arcgis/rest/services/CurrentParcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: LandAcres
+    coverage: sample
+    fieldMap:
+      ParcelID: parcelId
+      LandAcres: acreage
+      Owner: ownerName
+      OwnerAddr1: mailingAddress
+      OwnerAddr2: mailingAddress
+      Address: situsAddress
+      ZipCode: situsZip
+      TotAppr: tax.marketValue
+      TotAssess: tax.assessedValue
+      LUCode: dorCode
+      LivUnits: livableUnits
+      TaxYear: taxYear
+      ClassCode: classCode
+      FultonUpdateDate: sourceUpdatedAt
+    notes: >
+      Hosted ArcGIS Online FeatureServer (WGS84 / 4326), maxRecordCount 2000, Query+Extract.
+      Live count only 29784 vs ~373k county-wide — extent is a north-Fulton subset (roughly Sandy Springs /
+      Buckhead corridor), NOT full Fulton. Same CAMA field family as PMV/11 plus ZipCode + FultonUpdateDate.
+      FultonUpdateNotes sample: "Fulton tax parcels for 2026." Do not use as sole county parcel source.
+      Useful as a WGS84 convenience mirror where coverage overlaps.
+    status: partial
+
+  - role: parcels
+    name: OpenData Tax Parcels
+    restUrl: https://gismaps.fultoncountyga.gov/arcgispub/rest/services/OpenData/Tax_Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: LandAcres
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      LandAcres: acreage
+      Owner: ownerName
+      OwnerAddr1: mailingAddress
+      OwnerAddr2: mailingAddress
+      Address: situsAddress
+      LUCode: dorCode
+      LivUnits: livableUnits
+      TaxYear: taxYear
+      ClassCode: classCode
+    notes: >
+      Official OpenData MapServer; live count 373306; SR 102667/2240. Geometry + owner/address/LU/acres
+      present, but assessment/appraised value fields (TotAppr/TotAssess/etc.) are ABSENT vs PMV/11.
+      Prefer PMV/11 when values are needed.
+    status: partial
+
+  - role: parcels
+    name: Imagery ParcelRoads Parcels
+    restUrl: https://gismaps.fultoncountyga.gov/arcgispub/rest/services/Imagery/ParcelRoads/MapServer/53
+    layerId: 53
+    geometry: polygon
+    auth: none
+    acreageField: LandAcres
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      LandAcres: acreage
+      Owner: ownerName
+      Address: situsAddress
+      TotAppr: tax.marketValue
+      TotAssess: tax.assessedValue
+      LUCode: dorCode
+      TaxYear: taxYear
+    notes: >
+      Same ~373306 parcels and CAMA fields as PMV/11. Scale-dependent parent mosaic (effective scales
+      ~1:1200–1:600); some filtered queries return 400. Prefer PMV/11 for app queries.
+    status: partial
+
+  - role: tax
+    name: Property Map Viewer Tax Parcel (CAMA values)
+    restUrl: https://gismaps.fultoncountyga.gov/arcgispub2/rest/services/PropertyMapViewer/PropertyMapViewer/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: LandAcres
+    coverage: county-wide
+    fieldMap:
+      ParcelID: parcelId
+      TotAppr: tax.marketValue
+      TotAssess: tax.assessedValue
+      LandAppr: tax.landMarketValue
+      ImprAppr: tax.improvementMarketValue
+      LandAssess: tax.landAssessedValue
+      ImprAssess: tax.improvementAssessedValue
+      TaxYear: taxYear
+      TaxDist: taxDistrict
+      ExCode: exemptionCode
+    notes: >
+      Tax/CAMA values live on the same parcel polygons as role=parcels PMV/11 (not a separate service).
+      No taxableValue field distinct from TotAssess observed. GA assessed is typically 40% of appraised.
+    status: usable
+
+  - role: zoning
+    name: City of Atlanta Zoning District (OpenData FeatureServer)
+    restUrl: https://gis.atlantaga.gov/dpcd/rest/services/OpenDataService1/FeatureServer/22
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      ZONECLASS: zoning
+      ZONINGCODE: zoningCategory
+      ZONEDESC: zoningDescription
+      STATUS: zoningStatus
+    notes: >
+      CITY OF ATLANTA ONLY — not county-wide. Live count 2982. Prefer FeatureServer/22 over MapServer.
+      Equivalent MapServer: https://gis.atlantaga.gov/dpcd/rest/services/LandUsePlanning/LandUsePlanning/MapServer/0
+      (same fields; SR Web Mercator 102100/3857). Spatial-join to Fulton parcels by geometry; many Fulton
+      parcels fall outside Atlanta city limits (Sandy Springs, Roswell, Alpharetta, unincorporated, etc.).
+    status: usable
+
+  - role: zoning
+    name: Fulton Industrial District Zoning
+    restUrl: https://gismaps.fultoncountyga.gov/arcgispub2/rest/services/PropertyMapViewer/PropertyMapViewer/MapServer/34
+    layerId: 34
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      ZClass: zoning
+      ZClassDesc: zoningDescription
+      CaseID: zoningCaseId
+      EffDate: zoningEffectiveDate
+    notes: >
+      Parent group is "Fulton Industrial District" — NOT county-wide. Live count only 37 polygons.
+      Tiny FID/west-industrial footprint. Do not treat as Fulton County zoning.
+    status: partial
+
+  - role: flu
+    name: City of Atlanta Development Patterns - Future Land Use
+    restUrl: https://gis.atlantaga.gov/dpcd/rest/services/LandUsePlanning/LandUsePlanning/MapServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      LANDUSECOD: flu
+      LANDUSEDES: fluDescription
+      NDP: fluPattern
+      DP_NAME: fluName
+      DENSITY: fluDensity
+      FAR: fluFar
+    notes: >
+      CITY OF ATLANTA ONLY. Live count 21573. Also on OpenDataService1/FeatureServer/19.
+      FID 2035 FLU on PMV/33 exists but only 8 features — ignore for county coverage.
+    status: usable
+
+  - role: sales
+    name: Tyler Yearly Sales (2022 layer)
+    restUrl: https://gismaps.fultoncountyga.gov/arcgispub2/rest/services/Tax/Tyler_YearlySales/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ParID: parcelId
+      Price: lastSale.price
+      TaxYear: lastSale.date
+    notes: >
+      Separate year layers 2=2018 … 6=2022 only (no 2023–2026 layers found). Fields: ParID, TaxYear,
+      Price, Cur — NO calendar sale date, NO qualified/validity flag. Many Price=0. TaxYear is year
+      bucket not a date; map to lastSale.date only as year string with caution. Live 2022 count 12875.
+      Join to parcels on ParID ≈ ParcelID. Partial / stale for multifamily underwriting.
+    status: partial
+
+gaps:
+  - "CurrentParcels FeatureServer (services5…/CurrentParcels) is NOT county-wide — only ~29.8k of ~373k parcels; north-Fulton subset. Do not wire as sole parcel source."
+  - "No county-wide zoning REST layer found. Atlanta zoning (OpenDataService1/FeatureServer/22) is city-only; PMV/34 zoning is Fulton Industrial District only (~37 polys). Municipal zoning/FLU backfilled in municipalities: section / city cards (2026-09-23); unincorporated Fulton and gap cities (Hapeville, Palmetto, Chattahoochee Hills, Mountain Park) still lack public zoning REST."
+  - "No usable public sale-history with sale date + qualified flag. Tyler_YearlySales stops at 2022 and has Price+year only; many zero prices."
+  - "Parcel layers lack situsCity; PMV/OpenData lack situsZip (hosted CurrentParcels has ZipCode where it covers)."
+  - "No distinct tax.taxableValue field on public layers (TotAssess is assessed; exemptions via ExCode)."
+  - "Tax/Tax_ParcelCurrentDigest_GCS_WGS_1984 is WGS84 county-ish (~355k) but STALE (sample TaxYear 2018) — reject for current digest."
+  - "Assessor HTML property search (fultonassessor.org / qpublic) returns bot/CDN 403 to automated clients; site is public for humans."
+  - "OpenData/Tax_Parcels omits assessment value fields — geometry/owner only."
+
+license: "Fulton County GIS Open Data portal (gisdata.fultoncountyga.gov) lists CC-BY-SA; City of Atlanta DPCD Open Data for Atlanta zoning/FLU. Attribution to Fulton County GIS / City of Atlanta as applicable. Public CAMA fields; do not scrape emails/phones."
+appraiserSearchUrl: https://fultonassessor.org/
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+municipalities:
+  # City cards under cards/GA/13121-{slug}.yaml. Atlanta zoning/FLU already on this county card.
+  - slug: atlanta
+    card: null
+    status: on-county-card
+    zoningUrl: https://gis.atlantaga.gov/dpcd/rest/services/OpenDataService1/FeatureServer/22
+    note: "Zoning + FLU layers already documented above (city-only)."
+  - slug: sandy-springs
+    card: cards/GA/13121-sandy-springs.yaml
+    status: usable
+    zoningUrl: https://gis2.sandyspringsga.gov/arcgis/rest/services/OpenData/General_Reference/FeatureServer/127
+  - slug: roswell
+    card: cards/GA/13121-roswell.yaml
+    status: usable
+    zoningUrl: https://gisweb.ci.roswell.ga.us/arcgis/rest/services/PublicViewer/CommunityDevelopmentPublic/MapServer/8
+  - slug: alpharetta
+    card: cards/GA/13121-alpharetta.yaml
+    status: usable
+    zoningUrl: https://alphagis.alpharetta.ga.us/arcgis/rest/services/ZoningDistricts/FeatureServer/0
+  - slug: johns-creek
+    card: cards/GA/13121-johns-creek.yaml
+    status: usable
+    zoningUrl: https://services1.arcgis.com/bqfNVPUK3HOnCFmA/arcgis/rest/services/Zoning_Current/FeatureServer/0
+  - slug: milton
+    card: cards/GA/13121-milton.yaml
+    status: usable
+    zoningUrl: https://gis.miltonga.gov/arcgis/rest/services/Zoning/FeatureServer/59
+  - slug: east-point
+    card: cards/GA/13121-east-point.yaml
+    status: usable
+    zoningUrl: https://services7.arcgis.com/CPLm4MuWYjfnA2R9/arcgis/rest/services/Current_Zoning/FeatureServer/0
+  - slug: college-park
+    card: cards/GA/13121-college-park.yaml
+    status: usable
+    zoningUrl: https://services7.arcgis.com/snkPZPJHBqHjJ0On/arcgis/rest/services/Zoning_20241226/FeatureServer/0
+  - slug: south-fulton
+    card: cards/GA/13121-south-fulton.yaml
+    status: usable
+    zoningUrl: https://services3.arcgis.com/y2BJK2GUfoTwH7py/arcgis/rest/services/CurrentZoning/FeatureServer/0
+  - slug: fairburn
+    card: cards/GA/13121-fairburn.yaml
+    status: usable
+    zoningUrl: https://services8.arcgis.com/ZvMgtqecACHwgXJb/arcgis/rest/services/Current_Zoning_FLU/FeatureServer/0
+  - slug: union-city
+    card: cards/GA/13121-union-city.yaml
+    status: usable
+    zoningUrl: https://services.arcgis.com/MewUCwyCByL0k7La/arcgis/rest/services/Union_City_Data_WFL1/FeatureServer/14
+  - slug: hapeville
+    card: null
+    status: gap
+    zoningUrl: null
+    note: "No public zoning/FLU FeatureServer or MapServer found (PDF/map page only)."
+  - slug: palmetto
+    card: null
+    status: gap
+    zoningUrl: null
+    note: "No public zoning/FLU REST found for Palmetto GA (AGOL hits are Palmetto FL)."
+  - slug: chattahoochee-hills
+    card: null
+    status: gap
+    zoningUrl: null
+    note: "No public zoning/FLU FeatureServer found."
+  - slug: mountain-park
+    card: null
+    status: gap
+    zoningUrl: null
+    note: "Tiny city; no public zoning/FLU REST found."
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "GDOT / UGA ITOS (OMAT PMED Traffic Data)"
+    restUrl: "https://maps.itos.uga.edu/arcgis/rest/services/GDOT/GDOT_FunctionalClass/MapServer/21"
+    layerId: 21
+    field: "AADT"
+    geography: "state HPMS / traffic segments (polyline)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "Public GDOT FunctionalClass MapServer layer 21 OMAT PMED Traffic Data with AADT; GDOT TADA (drakewell) is interactive/CSV alternative without a simple statewide FeatureServer."

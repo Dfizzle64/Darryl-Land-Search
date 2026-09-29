@@ -1,0 +1,334 @@
+state: GA
+jurisdiction: Wheeler County
+fips: "13309"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide parcel polygons (THIN schema: Parcel_No + REALKEY/OWNKEY only)
+  - role: parcels
+    name: Wheeler_County_View TaxParcels18 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wheeler_County_View/FeatureServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      REALKEY: realKey
+      OWNKEY: ownerKey
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR — Wheeler_County_View item 0abc8ab6e7cd4463a12cd54b173b9168
+      FeatureServer/15 TaxParcels18). Live count 4063 (2026-09-24). Schema THIN —
+      Parcel_No + REALKEY + OWNKEY + Shape__Area/Length + polygon only (NO owner name /
+      mailing / situs / CURR_VAL / sale / Draw_Acres). Shape__Area is AGOL metric area
+      (Web Mercator), NOT deed/GIS acres — do not treat as acreageField. Parcel_No format
+      e.g. '0001  001' / '0001  001A' (preserve spaces for KeyValue). maxRecordCount 2000 —
+      page via resultOffset / spatial envelopes. Envelope WGS84 samples ~-82.93,32.13 —
+      Wheeler County GA / Alamo seat. CountyBoundary/9 CNTYIDFP=13309 NAME=Wheeler
+      STATEFP=13 COUNTYFP=309 RDC=Heart of Georgia-Altamaha geo-verified. Census TIGERweb
+      GEOID 13309 CENTLAT +32.1170030 CENTLON -082.7245432. Join CAMA via qPublic
+      App=WheelerCountyGA / AppID=777 LayerID=11813 HTML (KeyValue={Parcel_No}).
+      REJECT Wheeler County TX (~-102.4,35.4) lookalike parcel FeatureServers — wrong
+      state. Rejected paid Regrid/ATTOM/DynamoSpatial/USLandGrid; no emails/phones;
+      skip utilities+AADT.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels18; qPublic AppID=777 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels18 (OWNKEY/REALKEY are opaque keys,
+      not owner names or values). Assessor HTML qpublic.net/ga/wheeler →
+      App=WheelerCountyGA / AppID=777 LayerID=11813 (Cloudflare/bot 403 automated on
+      Application.aspx; qpublic.net public for humans). Deep-link KeyValue={Parcel_No}:
+      Application.aspx?AppID=777&LayerID=11813&PageTypeID=4&KeyValue={Parcel_No}
+      (Search App=WheelerCountyGA&Layer=Parcels&PageType=Search; Estimate Taxes
+      PageTypeID=2 PageID=5919). Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No SALE_*/lastSale on TaxParcels18. Prefer qPublic Sales Search / Sales List HTML
+      App=WheelerCountyGA / AppID=777. Rejected paid Regrid/ATTOM sales. (Wheeler TX
+      sale layers are WRONG geography — do not use.)
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean; city AlamoZoning only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Wheeler County-wide Euclidean zoning FeatureServer on Wheeler_County_View
+      (2026-09-24). Prefer city Euclidean: AlamoZoning (see municipalities). Glenwood
+      lacks zoning layer. Comp-plan SpecialAreas/8 (count 11) — planning character only,
+      not Euclidean zoning.
+    status: gap
+
+  - role: flu
+    name: Wheeler_County_View Landuse (FLULU / EXTLU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wheeler_County_View/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Acres: acreage
+    notes: >
+      Comp-plan / existing+future land-use polygons (count 4517). FLULU sample top
+      (first 2000): Agriculture≈859 / Forestry≈687 / Residential≈372 / Commercial≈54 /
+      Industrial≈16 / Park/Recreation/Conservation≈5 / Public/Institutional≈4 /
+      Transportation/Communication/Utilities≈3. Companion SpecialAreas/8 for named
+      corridors. Not a substitute for Euclidean zoning. LandUseOld/4 legacy — prefer /14.
+    status: usable
+
+  - role: other
+    name: Wheeler_County_View CountyBoundary (GA FIPS 13309)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wheeler_County_View/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      CNTYIDFP: countyFips
+      STATEFP: stateFips
+      COUNTYFP: countyFp
+      RDC: regionalCommission
+    notes: >
+      Preferred spatial county mask — NAME=Wheeler CNTYIDFP=13309 STATEFP=13 COUNTYFP=309
+      RDC=Heart of Georgia-Altamaha (count=1; centroid ~-82.70,32.07). Companion
+      FireDistricts/5 / Roads/10 — not parcels. Skip FloodZones/Soils/Wetlands as non-CAMA.
+      Confirms Georgia (reject Wheeler TX).
+    status: usable
+
+municipalities:
+  - name: Alamo
+    level: city
+    parentFips: "13309"
+    joinToCountyParcels: >
+      County seat. Spatial City_of_Alamo_View/1 AlamoCityLimits (Name='Alamo' FIPS='309';
+      ~-82.78,32.15; ACRES≈1240) ∩ TaxParcels18. Mailing city never sole filter.
+    layers:
+      - role: zoning
+        name: City_of_Alamo_View AlamoZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Alamo_View/FeatureServer/5
+        layerId: 5
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: >
+          City Euclidean Zoning codes (live count 27; 2026-09-24). Codes: R-40≈5 /
+          RM-15≈5 / R-20≈4 / R-15≈3 / I≈3 / AG/F≈3 / B-1≈3 / B-3≈1. ZoneDescription
+          field present but live fill = null — use Zoning code only. Skip
+          AlamoSewerLines / AlamoUtilityLineCollection / Alamo5MileBuffer per tranche-3.
+        status: usable
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Alamo FLU FeatureServer — county Landuse/14 + AlamoSpecialAreas/2 planning character only.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels18 + spatial Alamo
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Alamo-only CAMA — county /15 + AlamoCityLimits/1. Tax/sale qPublic HTML.
+        status: gap
+    gaps:
+      - "No Alamo city-owned parcel/FLU REST — county TaxParcels18 + spatial limits."
+      - "Owner/tax/sale via qPublic AppID=777 HTML even inside city."
+    status: usable
+
+  - name: Glenwood
+    level: city
+    parentFips: "13309"
+    joinToCountyParcels: >
+      Spatial City_of_Glenwood_View/0 GlenwoodCityLimits (Name='Glenwood' FIPS='309';
+      ~-82.67,32.18) ∩ TaxParcels18.
+    layers:
+      - role: zoning
+        name: null — no GlenwoodZoning layer published
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City_of_Glenwood_View has limits/special areas/low-income/minority/water/sewer
+          only — no zoning FS. Skip GlenwoodWaterLines / GlenwoodSewerLines /
+          GlenwoodValves / GlenwoodManHoles / Glenwood5MileBuffer per tranche-3.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels18 + spatial Glenwood
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Glenwood-only CAMA REST.
+        status: gap
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Glenwood FLU — county Landuse/14 + GlenwoodSpecialAreas/5 only.
+        status: gap
+    gaps:
+      - "No Glenwood zoning/parcel/FLU REST — city limits only + county parcels."
+    status: partial
+
+gaps:
+  - "TaxParcels18 REST is thin — Parcel_No/REALKEY/OWNKEY only; no owner name/mailing/situs/CURR_VAL/sale/Draw_Acres; tax/owner/sale via qPublic AppID=777 LayerID=11813 HTML only."
+  - "No county-wide Euclidean zoning — AlamoZoning only; Glenwood no zoning FS; SpecialAreas planning character."
+  - "maxRecordCount 2000 — page via resultOffset / envelopes."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/wheeler + App=WheelerCountyGA Search/Maps public for humans; WheelerCountyGA_WFS 404."
+  - "Skip city Water/Sewer/Valves/ManHoles/Utility + AADT per tranche-3; no emails/phones."
+  - "REJECT Wheeler TX parcel FeatureServers (wrong-state); REJECT paid Regrid/ATTOM/USLandGrid."
+
+license: >
+  Heart of Georgia Altamaha RC GIS (hogagis / services5.arcgis.com/HHvUPZ2XuLOAJxjR) —
+  Wheeler_County_View TaxParcels18/15, Landuse/14, CountyBoundary/9, SpecialAreas/8;
+  City_of_Alamo_View, City_of_Glenwood_View. Assessor qPublic App=WheelerCountyGA /
+  AppID=777 LayerID=11813 (qpublic.net/ga/wheeler; Alamo GA 30411). Attribution
+  HOGARC / Wheeler County Tax Assessor. Public fields only; no emails/phones; no paid
+  vendors; skip utilities+AADT. REJECT non-Georgia Wheeler County lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WheelerCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wheeler_County_View/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Wheeler_County_View/FeatureServer/15 count 4063; extent center [['13309',
+    'Wheeler County']]; sample [['13309', 'Wheeler County']]. No change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Alamo town"
+      level: city
+      parentFips: "13309"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Glenwood city"
+      level: city
+      parentFips: "13309"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Wheeler' AND aadt>0
+    altFilter: name LIKE '309-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 309-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 51
+    maxAadt: 3460
+    geoCheck: 51/51 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=WheelerCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=777&LayerID=11813&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 0001  001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=WheelerCountyGA&Layer=Parcels&PageType=Report&KeyValue=0001%20%20001
+    verification: 'pattern-tested: real sample ID from Parcel_No; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Wheeler_County_View/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Alamo town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Glenwood city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

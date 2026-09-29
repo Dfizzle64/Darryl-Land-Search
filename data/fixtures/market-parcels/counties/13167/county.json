@@ -1,0 +1,33 @@
+{
+  "name": "Johnson",
+  "fips": "13167",
+  "state": "Georgia",
+  "markets": [
+    "Macon"
+  ],
+  "featureCount": 2193,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-johnson-parcels-13167",
+  "queryUrl": "https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Johnson_CountyWide_GeoData_View/FeatureServer/12/query",
+  "gaps": [
+    "Parcels are Johnson TaxParcels_25 (HOGARC) (https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Johnson_CountyWide_GeoData_View/FeatureServer/12). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Pass 2 tax is HTML-only, sale is HTML-only, and owner is HTML-only. HTML-only values were not scraped.",
+    "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Pass 2 owner name is HTML-only and was not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13167/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13167/lookup.json",
+  "sourceCount": 2193,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=johnsonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=JohnsonCountyGA&Layer=Parcels&PageType=Maps",
+  "pulledOn": "2026-09-29"
+}

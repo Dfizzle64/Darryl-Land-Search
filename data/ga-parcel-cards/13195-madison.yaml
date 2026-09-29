@@ -1,0 +1,516 @@
+state: GA
+jurisdiction: Madison County
+fips: "13195"
+level: county
+markets: [Athens]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Madison County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=MadisonCountyGA (qpublic.net/ga/madison →
+      qpublic.schneidercorp.com Application.aspx?App=MadisonCountyGA&Layer=Parcels; county
+      seat Danielsville GA 30633, 91 Albany Avenue). Numeric AppID/LayerID not recovered
+      automated (search.html Cloudflare/bot; MadisonCountyGA_WFS on wfs.schneidercorp.com
+      → 404). Deep-link KeyValue={parcelId}:
+      Application.aspx?App=MadisonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}.
+      No NEGRC / GARC / county AGOL Madison GA parcel FS (AGOL title/tag searches 0 for
+      Madison+Georgia+parcels; NEGRC hosts FLU/character only). GEO-VERIFY GEORGIA: Census
+      TIGER GEOID 13195 CENTLAT +34.1277691 CENTLON -083.2090142 — Madison County GA /
+      Danielsville (~-83.22,34.12) Athens MSA ring. REJECT Madison County AL
+      (madmaps1.madisonal.gov; Parcels_North_Alabama Madison layer); REJECT Madison FL
+      (carded separately); REJECT Madison WI / OH Engineer hub
+      madison-county-gis-data-download-madcoengineer.hub.arcgis.com (Ohio copyright);
+      REJECT Madison IN WFS; REJECT City of Madison / Morgan County GA NEGRC CA layers
+      442–444 (~-83.47,33.59 Morgan seat — wrong county). Rejected paid
+      Regrid/ATTOM/DynamoSpatial. No emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=MadisonCountyGA
+      (qpublic.net/ga/madison; madisoncountyga.us Board of Assessors). Honest REST
+      tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. qPublic Sales Search / Sales List HTML
+      App=MadisonCountyGA only (bot 403 automated). Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Madison County GA Euclidean zoning FeatureServer on AGOL/NEGRC (2026-09-24).
+      Planning & Zoning madisoncountyga.us — plats/rezones staff process + PDF gap, not
+      public REST. City zoning FS not recovered for Danielsville/Comer/Colbert/etc.
+    status: gap
+
+  - role: flu
+    name: NEGRC CA — Madison County, Carlton, Colbert, Danielsville, and Ila - 2023
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/436
+    layerId: 436
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FDM_Short: flu
+      FDM_Long: fluName
+      Parcel_ID: parcelId
+      ID: fluId
+    notes: >
+      Preferred county+small-city character areas (count 41; NEGRC / GARC org
+      Ug5xGQbHsD8zuZzM). FDM_Short domain sample: CARD Carlton Downtown, CCC Comer-Carlton
+      Corridor, COLD Colbert Downtown, DAND Danielsville Downtown, HCC Hull-Colbert
+      Corridor, ID Ila Downtown, RC Rural Conservation, RTRES Rural Town Residential,
+      SMC South Madison County, I Industrial, INST Institutional, LI Little Ila, etc.
+      Geo-verified ~-83.290,34.178 (Madison Co GA — NOT Morgan City of Madison). Companion
+      city FLU: Comer/434 (count 203; A/C/G/I/PI/PRC/R/TCU); Hull/435 (count 18). REJECT
+      NEGRC/442–444 "Madison" overlays (~-83.47,33.59 = City of Madison / Morgan County).
+      Not a substitute for Euclidean zoning or parcel geometry.
+    status: usable
+
+municipalities:
+  - name: Danielsville
+    level: city
+    parentFips: "13195"
+    joinToCountyParcels: >
+      No county parcel REST to join. Soft spatial Danielsville (~-83.22,34.12; county seat)
+      / NEGRC/436 FDM_Short='DAND' when parcels become available.
+    layers:
+      - role: flu
+        name: NEGRC/436 Danielsville Downtown extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/436
+        layerId: 436
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: flu
+          FDM_Long: fluName
+        notes: Filter FDM_Short='DAND' (Danielsville Downtown) on county CA layer.
+        status: partial
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Danielsville zoning FeatureServer found.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No city or county parcel REST — qPublic HTML county-wide.
+        status: gap
+    gaps:
+      - "No Danielsville-owned parcel/zoning REST; county qPublic HTML + NEGRC CA only."
+    status: partial
+
+  - name: Comer
+    level: city
+    parentFips: "13195"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Comer (~-83.13,34.06) / NEGRC FLU-Comer-2023.
+    layers:
+      - role: flu
+        name: NEGRC FLU - Comer - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/434
+        layerId: 434
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: flu
+          FDM_Long: fluName
+        notes: >
+          City Comp Plan FLU (count 203). Domain A Agriculture/Forestry, C Commercial, G
+          Government, I Industrial, PI Public/Institutional, PRC Public Recreation/
+          Conservation, R Residential, TCU Transportation/Communication/Utility. Geo
+          ~-83.143,34.064 Comer GA.
+        status: usable
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Comer Euclidean zoning FS.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "Comer FLU usable on NEGRC/434; no parcel/zoning REST."
+    status: partial
+
+  - name: Hull
+    level: city
+    parentFips: "13195"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Hull (~-83.29,34.01) / NEGRC CA-Hull-2023.
+    layers:
+      - role: flu
+        name: NEGRC CA - Hull - 2023
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/435
+        layerId: 435
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: flu
+          FDM_Long: fluName
+        notes: City character areas (count 18). Geo ~-83.292,34.013 Hull GA.
+        status: usable
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Hull zoning FS.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "Hull CA usable on NEGRC/435; no parcel/zoning REST."
+    status: partial
+
+  - name: Colbert
+    level: city
+    parentFips: "13195"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Colbert (~-83.21,34.04) / NEGRC/436
+      FDM_Short='COLD'.
+    layers:
+      - role: flu
+        name: NEGRC/436 Colbert Downtown extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/436
+        layerId: 436
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: flu
+        notes: Filter FDM_Short='COLD' on county CA layer.
+        status: partial
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Colbert zoning FS.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Colbert-owned parcel/zoning REST."
+    status: partial
+
+  - name: Carlton
+    level: city
+    parentFips: "13195"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Carlton (~-83.03,34.04) / NEGRC/436
+      FDM_Short='CARD'.
+    layers:
+      - role: flu
+        name: NEGRC/436 Carlton Downtown extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/436
+        layerId: 436
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: flu
+        notes: Filter FDM_Short='CARD'.
+        status: partial
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Carlton zoning FS.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Carlton-owned parcel/zoning REST."
+    status: partial
+
+  - name: Ila
+    level: city
+    parentFips: "13195"
+    joinToCountyParcels: >
+      No county parcel REST. Soft spatial Ila (~-83.29,34.24) / NEGRC/436 FDM_Short='ID'.
+    layers:
+      - role: flu
+        name: NEGRC/436 Ila Downtown extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/NEGRC_Future_Development_Map_Inventory_WFL1/FeatureServer/436
+        layerId: 436
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          FDM_Short: flu
+        notes: Filter FDM_Short='ID' (Ila Downtown).
+        status: partial
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ila zoning FS.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Ila-owned parcel/zoning REST."
+    status: partial
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning for Madison County GA — qPublic App=MadisonCountyGA HTML only (numeric AppID/LayerID not recovered automated)."
+  - "MadisonCountyGA_WFS 404; no NEGRC/GARC/county AGOL Madison GA parcel FeatureServer."
+  - "NEGRC FLU/CA usable (436 county+small cities; 434 Comer; 435 Hull) — not parcel geometry."
+  - "REJECT NEGRC/442–444 City of Madison / Morgan County overlays (~-83.47,33.59)."
+  - "REJECT Madison AL / FL / WI / OH Engineer hub / IN WFS lookalikes."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial Madison GA extracts."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/madison + App=MadisonCountyGA Search/Maps public for humans."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Madison County Tax Assessor qPublic/Beacon App=MadisonCountyGA (qpublic.net/ga/madison;
+  Danielsville GA; madisoncountyga.us). NEGRC / GARC AGOL org Ug5xGQbHsD8zuZzM
+  NEGRC_Future_Development_Map_Inventory_WFL1 layers 434/435/436 (Comer FLU, Hull CA,
+  Madison County CA). No public ArcGIS parcel service discovered 2026-09-24. Attribution
+  Madison County Tax Assessor / NEGRC. Public HTML + FLU only; no emails/phones; no paid
+  vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=MadisonCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=MadisonCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Carlton city"
+      level: city
+      parentFips: "13195"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Colbert city"
+      level: city
+      parentFips: "13195"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Comer city"
+      level: city
+      parentFips: "13195"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Danielsville city"
+      level: city
+      parentFips: "13195"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Hull city"
+      level: city
+      parentFips: "13195"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Ila city"
+      level: city
+      parentFips: "13195"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Madison' AND aadt>0
+    altFilter: name LIKE '195-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 195-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 110
+    maxAadt: 19700
+    geoCheck: 110/110 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=MadisonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=MadisonCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Carlton city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Colbert city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Comer city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Danielsville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Hull city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Ila city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

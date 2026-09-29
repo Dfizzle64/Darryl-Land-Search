@@ -1,0 +1,604 @@
+state: GA
+jurisdiction: Dooly County
+fips: "13093"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + WinGAP CAMA (owner/mailing/situs/acres/FMV)
+  - role: parcels
+    name: Dooly_County_Parcels — RVRC/SGRC FeatureServer
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      lastname: ownerName
+      firstname: ownerFirstName
+      address1: mailingAddress
+      address2: mailingAddress2
+      address3: mailingAddress3
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      stdirect: situsStreetDir
+      street_nam: situsStreet
+      sttype: situsStreetType
+      unit: situsUnit
+      Deed_Acres: acreage
+      Draw_Acres: acreageGis
+      totalacres: acreageTotal
+      woodacres: acreageWoodland
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      mavcurr: tax.assessedValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice
+      saleimp1: lastSale.improvementPrice
+      zoningcode: zoning
+      zoning: zoningAlt
+      taxdistric: taxDistrict
+      digclass: dorCode
+      digstrat: dorStrata
+      land_type: landType
+      legal_desc: legalDescription
+      subd_name: subdivision
+      homeexempt: homesteadExempt
+      landgmd: georgiaMilitiaDistrict
+      landlot: landLot
+      landdist: landDistrict
+      neighbhood: neighborhood
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+      lat: latitude
+      lon: longitude
+      qPub_Link: appraiserSearchUrl
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP CAMA landbase (AGOL org
+      Ug5xGQbHsD8zuZzM — owner SGRC_GIS / River Valley RC shared org; FeatureServer
+      layer 14 "Dooly County Parcels"). Live count 7277 (2026-09-24). SR Web Mercator
+      (wkid 102100/3857). GEO-VERIFY GEORGIA: WGS84 samples ~-84.003,32.144 /
+      ~-84.027,32.172 (west Dooly / Flint River) / taxdistric means ~-83.80,32.08
+      (Vienna) — Dooly County GA county seat Vienna (~-83.80,32.09). REJECT Dooly
+      lookalikes outside GA; REJECT paid Regrid/ATTOM/DynamoSpatial. lastname filled
+      7277; curr_val>0 =7223; Deed_Acres>0 =5675; house_no>0 =4838; qPub_Link filled
+      7277; zoningcode filled 7277. sale_val>0 =0; saleland1>0 ≈51 — sales essentially
+      unused on REST (prefer qPublic Sales HTML). mavcurr>0 =0 — assessed unused;
+      prefer curr_val as market; assessed/taxable via qPublic HTML. city/state/zip_code
+      are OWNER mailing — never municipality filter. Compose situs
+      house_no+stdirect+street_nam+sttype when house_no>0. zoningcode top: AG≈2903,
+      R-1≈1670, R-2≈842, blank≈769, C-1≈246, R-1MH≈204, C-2≈169, A-F≈120, WLD≈108,
+      AR≈68, I-1≈59 (+ sparse combos). Soft TAXDISTRIC (geo-checked means):
+      01≈unincorporated west (~4238; ~-84.01,32.18), 02≈Vienna (~1423; ~-83.80,32.08),
+      03≈Pinehurst (~217; ~-83.77,32.19), 04≈Unadilla (~930; ~-83.74,32.24),
+      05≈Byromville (~227; ~-83.91,32.20), 06≈Lilly (~117; ~-83.87,32.15),
+      07≈Dooling (~104; ~-83.93,32.23) — prefer spatial Dooly_City_Limits/0 for
+      municipality. digclass distinct J/E/A/P/U/R/C/I/V. Assessor qPublic
+      App=doolyCountyGA / App=DoolyCountyGA / AppID=780 LayerID=11816 (qPub_Link
+      KeyValue deep-link; qpublic.net/ga/dooly; search.html 404; bot 403
+      Application.aspx). DoolyCountyGA_WFS 403. WATER/SEWER/gas/electricty present —
+      SKIP per tranche-3. Schema may expose appraiser name fields — DO NOT collect
+      emails/phones. GDITAdmin Parcel_Regions_w_WinGAP also responds — prefer this
+      Ug5xGQbHsD8zuZzM layer 14 as primary.
+    status: usable
+
+  - role: tax
+    name: Dooly_County_Parcels curr_val / fmv* (on preferred parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      taxdistric: taxDistrict
+      digclass: dorCode
+      homeexempt: homesteadExempt
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. curr_val>0 =7223; mavcurr>0=0 —
+      no usable assessedValue on REST; use curr_val market + qPublic AppID=780 HTML for
+      assessed/taxable. Deep-link KeyValue={Parcel_No}:
+      Application.aspx?App=doolyCountyGA&Layer=Parcels&PageType=Report&KeyValue={Parcel_No}
+      (also AppID=780&LayerID=11816&PageTypeID=4&KeyValue=). histyr*/histval* are
+      assessment value-year history — NOT sales.
+    status: usable
+
+  - role: sales
+    name: null — sale_val unused; saleland1 sparse (51)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      sale_val>0 =0 on Dooly_County_Parcels/14 (2026-09-24); saleland1>0 ≈51 —
+      too sparse for county sales landbase. Prefer qPublic Sales Search HTML
+      App=doolyCountyGA / AppID=780. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Dooly_County_Parcels zoningcode (parcel-attributed)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      zoningcode: zoning
+      zoning: zoningAlt
+    notes: >
+      Parcel-attributed zoning (zoningcode filled 7277). Top: AG≈2903, R-1≈1670,
+      R-2≈842, blank≈769, C-1≈246, R-1MH≈204, C-2≈169, A-F≈120, WLD≈108, AR≈68,
+      I-1≈59. No separate Euclidean zoning FeatureServer on RVRC/SGRC Dooly folder
+      (2026-09-24). County/city zoning PDFs on doolycountyga.com/dooly-county-maps/
+      (County Zoning; Vienna Zoning with Parcels; Unadilla Zoning with Parcels) — not REST.
+    status: usable
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Dooly County GA Future Land Use FeatureServer found on Ug5xGQbHsD8zuZzM
+      (2026-09-24) — Comp Plan PDF / RVRC staff gap. Dooly County Impact Planning is PDF.
+    status: gap
+
+  - role: other
+    name: Dooly_City_Limits (incorporated)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_City_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Preferred spatial municipality filter. Live count 6 (no name attribute — identify
+      by centroid): Vienna (~-83.787,32.091), Lilly (~-83.878,32.147), Pinehurst
+      (~-83.760,32.196), Byromville (~-83.907,32.201), Dooling (~-83.929,32.230),
+      Unadilla (~-83.736,32.258). Join = spatial intersect (default). Soft TAXDISTRIC
+      as attribute fallback only. Companion Dooly_CityLimits / CityLimits_Dooly also on
+      same org. Do NOT filter by owner mailing city.
+    status: usable
+
+municipalities:
+  - name: Vienna
+    level: city
+    parentFips: "13093"
+    joinToCountyParcels: >
+      Spatial Dooly_City_Limits/0 centroid ~-83.79,32.09 OR soft TAXDISTRIC='02' (~1423).
+    layers:
+      - role: zoning
+        name: Parcel zoningcode Vienna extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Deed_Acres
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+          Parcel_No: parcelId
+        notes: >
+          Prefer spatial Vienna poly + zoningcode R-1/R-2/C-*/I-* inside city. PDF
+          "Vienna Zoning with Parcels" on doolycountyga.com — not REST. No separate
+          City-of-Vienna FeatureServer.
+        status: usable
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Vienna city FLU FeatureServer — Comp Plan PDF gap.
+        status: gap
+      - role: parcels
+        name: null — use county Parcels filtered to city
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Vienna-only CAMA — county Dooly_County_Parcels/14 + spatial Vienna / TAXDISTRIC=02.
+        status: gap
+    gaps:
+      - "No Vienna-owned separate zoning/FLU/parcel FeatureServer — county layers + spatial."
+    status: usable
+
+  - name: Unadilla
+    level: city
+    parentFips: "13093"
+    joinToCountyParcels: >
+      Spatial Dooly_City_Limits/0 centroid ~-83.74,32.26 OR soft TAXDISTRIC='04' (~930).
+    layers:
+      - role: zoning
+        name: Parcel zoningcode Unadilla extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Deed_Acres
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Prefer spatial Unadilla + parcel zoningcode. PDF "Unadilla Zoning with Parcels" on county site — not REST.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Unadilla FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels + spatial Unadilla
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Dooly_County_Parcels/14 + spatial Unadilla / TAXDISTRIC=04.
+        status: gap
+    gaps:
+      - "No Unadilla city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Byromville
+    level: city
+    parentFips: "13093"
+    joinToCountyParcels: >
+      Spatial Dooly_City_Limits/0 centroid ~-83.91,32.20 OR soft TAXDISTRIC='05' (~227).
+    layers:
+      - role: zoning
+        name: Parcel zoningcode Byromville extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Deed_Acres
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Prefer spatial Byromville + parcel zoningcode. No Byromville-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Byromville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels + spatial Byromville
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Dooly_County_Parcels/14 + spatial Byromville / TAXDISTRIC=05.
+        status: gap
+    gaps:
+      - "No Byromville city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Pinehurst
+    level: city
+    parentFips: "13093"
+    joinToCountyParcels: >
+      Spatial Dooly_City_Limits/0 centroid ~-83.76,32.20 OR soft TAXDISTRIC='03' (~217).
+    layers:
+      - role: zoning
+        name: Parcel zoningcode Pinehurst extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Deed_Acres
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Prefer spatial Pinehurst + parcel zoningcode. No Pinehurst-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pinehurst FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels + spatial Pinehurst
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Dooly_County_Parcels/14 + spatial Pinehurst / TAXDISTRIC=03.
+        status: gap
+    gaps:
+      - "No Pinehurst city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Lilly
+    level: city
+    parentFips: "13093"
+    joinToCountyParcels: >
+      Spatial Dooly_City_Limits/0 centroid ~-83.88,32.15 OR soft TAXDISTRIC='06' (~117).
+    layers:
+      - role: zoning
+        name: Parcel zoningcode Lilly extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Deed_Acres
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Prefer spatial Lilly + parcel zoningcode. No Lilly-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lilly FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels + spatial Lilly
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Dooly_County_Parcels/14 + spatial Lilly / TAXDISTRIC=06.
+        status: gap
+    gaps:
+      - "No Lilly city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Dooling
+    level: city
+    parentFips: "13093"
+    joinToCountyParcels: >
+      Spatial Dooly_City_Limits/0 centroid ~-83.93,32.23 OR soft TAXDISTRIC='07' (~104).
+    layers:
+      - role: zoning
+        name: Parcel zoningcode Dooling extract
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+        layerId: 14
+        geometry: polygon
+        auth: none
+        acreageField: Deed_Acres
+        coverage: city-only
+        fieldMap:
+          zoningcode: zoning
+        notes: Prefer spatial Dooling + parcel zoningcode. No Dooling-owned GIS.
+        status: partial
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Dooling FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Parcels + spatial Dooling
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Dooly_County_Parcels/14 + spatial Dooling / TAXDISTRIC=07.
+        status: gap
+    gaps:
+      - "No Dooling city-owned zoning/FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "sale_val unused (0); saleland1 sparse (~51) — no public REST multi-sale history; qPublic App=doolyCountyGA / AppID=780 HTML only."
+  - "mavcurr assessed unused (mavcurr>0=0) — assessed/taxable via qPublic HTML."
+  - "No Euclidean zoning FeatureServer — parcel zoningcode only; county/city zoning PDFs on doolycountyga.com."
+  - "No county FLU REST."
+  - "Dooly_City_Limits/0 has no name attribute — identify cities by centroid; soft TAXDISTRIC map."
+  - "DoolyCountyGA_WFS 403; qpublic.net/ga/dooly/search.html 404 (home + App=doolyCountyGA still live); Application.aspx Cloudflare/bot 403 automated."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones collected."
+  - "WATER/SEWER/gas/electricty skipped (no utilities/AADT per tranche-3)."
+
+license: >
+  River Valley / SGRC shared AGOL org Ug5xGQbHsD8zuZzM — Dooly_County_Parcels
+  FeatureServer/14 (Parcel WinGAP CAMA), Dooly_City_Limits/0. RVRC_ELA companion
+  Dooly Roads / Dooly_County_Lines / Dooly County webmap
+  36b7011c58014fa099e4f7ac3992d368. Assessor HTML qPublic SchneiderCorp
+  App=doolyCountyGA / App=DoolyCountyGA / AppID=780 LayerID=11816 (qpublic.net/ga/dooly;
+  qPub_Link KeyValue deep-links). County maps PDFs doolycountyga.com/dooly-county-maps/.
+  Attribution Dooly County Tax Assessors / RVRC. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=780&LayerID=11816&PageTypeID=2&PageID=5922
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services1.arcgis.com/Ug5xGQbHsD8zu
+    ZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14 count 7277; extent center [['13093',
+    'Dooly County']]; sample [['13093', 'Dooly County']]. No change to field map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Byromville town"
+      level: city
+      parentFips: "13093"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Dooling town"
+      level: city
+      parentFips: "13093"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Lilly city"
+      level: city
+      parentFips: "13093"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Pinehurst city"
+      level: city
+      parentFips: "13093"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Unadilla city"
+      level: city
+      parentFips: "13093"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Vienna city"
+      level: city
+      parentFips: "13093"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Dooly' AND aadt>0
+    altFilter: name LIKE '093-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 093-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 108
+    maxAadt: 56800
+    geoCheck: 107/108 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 7223
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 7256
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer/14
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=doolyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=780&LayerID=11816&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '  1      1'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=doolyCountyGA&Layer=Parcels&PageType=Report&KeyValue=%20%201%20%20%20%20%20%201
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Dooly_County_Parcels/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Byromville town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Dooling town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Lilly city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Pinehurst city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Unadilla city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Vienna city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,396 @@
+state: GA
+jurisdiction: Franklin County
+fips: "13119"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: "Franklin County Parcels (Schneider WFS)"
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/FranklinCountyGA_WFS/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: "Acreage"
+    coverage: county-wide
+    parcelIdField: "ParcelNo"
+    liveCount: 17122
+    liveCount5to150ac: null
+    geoCheck: "extent center [['13119', 'Franklin County']]; sample [['13119', 'Franklin County']]; extent WGS84 [-83.3995, 34.2233, -83.0516, 34.5319]"
+    fieldMap:
+      ParcelNo: "parcelId"
+      JJGPin: "parcelPin"
+      RKEY: "ownerKey"
+      OwnerName: "ownerName"
+      OwnerAddr1: "mailingAddress"
+      OwnerCSZ: "mailingCityStateZip"
+      SiteAddr: "situsAddress"
+      Acreage: "acreageText"
+    notes: >
+      pass1 2026-09-28: Schneider-hosted FranklinCountyGA_WFS MapServer layer 0 (17122) - owner, mailing,
+      situs, acreage text. Acreage is text (e.g. '.37 AC.') - compute GIS acres from geometry for the
+      5-150 filter. Alternate: NEGRC/GMRC copies on Ug5 org (CarnesvilleWaterSewerWebMapFinal_WFL1/16,
+      16396).
+    status: usable
+    verifiedAt: 2026-09-28
+
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no Franklin County GA public parcel FeatureServer/MapServer
+      with cadastral polygons + CAMA recovered. Official human cadastral + CAMA path =
+      qPublic/Beacon App=FranklinCountyGA (qpublic.net/ga/franklin →
+      qpublic.schneidercorp.com Application.aspx; county seat Carnesville GA 30521).
+      Cloudflare/bot 403 blocks automated Application.aspx from research box; public for
+      humans. Numeric AppID/LayerID not recovered automated (assessorsearch + county pages
+      expose App=FranklinCountyGA name form only). Deep-link KeyValue={parcelId}:
+      Application.aspx?App=FranklinCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (also PageType=Search). FranklinCountyGA_WFS on wfs.schneidercorp.com → 404;
+      qpublic.schneidercorp.com FranklinCountyGA_WFS → 403. No NEGRC / GMRC / county AGOL
+      Franklin GA parcel FS (AGOL title searches 0 for Franklin+Georgia+parcels; NEGRC GIS
+      is fee/request assistance only). Commercial vendors advertise Franklin GA parcel
+      extracts (DynamoSpatial/Regrid/ParcelVision/USLandGrid/GetParcelData) — rejected
+      (paid). GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13119 CENTLAT +34.3754000
+      CENTLON -083.2292148 — Franklin County GA / Carnesville–Lavonia–Royston (NEGA /
+      SC border; I-85 corridor). REJECT franklin-search.gsacorp.io (live autocomplete
+      returns Apalachicola/Carrabelle FL — Franklin County FLORIDA, wrong state). REJECT
+      Franklin County NC franklincountymaps.net / cards/NC/37069-franklin.yaml (~Louisburg
+      NC). REJECT Franklin OH gis.franklincountyohio.gov; Franklin VA
+      data-franklincova.opendata.arcgis.com; Franklin ID experience.arcgis.com parcel
+      viewer; Franklin TN lookalikes; City of Franklin (Warren OH) Franklin_Parcels FS.
+      REJECT paid Regrid/ATTOM/DynamoSpatial/ParcelVision. No emails/phones collected.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=FranklinCountyGA
+      (qpublic.net/ga/franklin; Cloudflare/bot 403 automated; public for humans). Deep-link
+      KeyValue={parcelId} on Report page. Tax Commissioner taxes.franklincountyga.com
+      Search & Pay — bills/pay only, not CAMA REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. qPublic Sales Search / Sales List / Yearly
+      Sales HTML App=FranklinCountyGA only (bot 403 automated). Rejected paid
+      Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Franklin County GA Euclidean zoning FeatureServer on AGOL/NEGRC (2026-09-24).
+      Official UDC & Zoning Map page franklincountyga.gov/1373/UDC-Zoning-Map (UDC adopted
+      8-1-22; map approved 9/19; amended 3-3-2025) — PDF / staff documents, not public
+      REST. City zoning (Lavonia/Royston/Carnesville/Canon/Franklin Springs/Martin) not
+      recovered as public FS.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Franklin County GA future land use FeatureServer found (2026-09-24). Comp Plan /
+      UDC character via county PDF path — not REST.
+    status: gap
+
+municipalities:
+  - name: Carnesville
+    level: city
+    parentFips: "13119"
+    joinToCountyParcels: >
+      County seat. Soft spatial ~-83.23,34.37 (Census place) when parcels become available.
+      No separate city parcel REST.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No City of Carnesville zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Carnesville FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic App=FranklinCountyGA HTML only.
+        status: gap
+    gaps:
+      - "No Carnesville city-owned GIS REST."
+    status: gap
+
+  - name: Lavonia
+    level: city
+    parentFips: "13119"
+    joinToCountyParcels: Soft spatial Lavonia GA (~-83.11,34.44) when county parcels available.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lavonia zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Lavonia FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Lavonia city-owned GIS REST."
+    status: gap
+
+  - name: Royston
+    level: city
+    parentFips: "13119"
+    joinToCountyParcels: >
+      Soft spatial Royston GA (~-83.11,34.29). Royston may touch adjacent counties —
+      prefer county qPublic Franklin when parcel REST restores; do not assume
+      Royston-only geometry is Franklin-only.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Royston zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Royston FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Royston city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Franklin County GA — qPublic App=FranklinCountyGA HTML only (numeric AppID/LayerID not recovered automated)."
+  - "FranklinCountyGA_WFS 404/403; no NEGRC/GMRC/county AGOL Franklin GA parcel FeatureServer."
+  - "REJECT franklin-search.gsacorp.io (Franklin County FL — Apalachicola/Carrabelle autocomplete)."
+  - "REJECT Franklin County NC franklincountymaps.net (FIPS 37069); REJECT Franklin OH/VA/ID/TN and City of Franklin OH Warren County Franklin_Parcels."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial/ParcelVision/USLandGrid/GetParcelData Franklin GA extracts."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/franklin + App=FranklinCountyGA Search/Maps public for humans."
+  - "UDC & Zoning Map franklincountyga.gov/1373 — PDF only, not FeatureServer."
+  - "Tax Commissioner taxes.franklincountyga.com — bills/pay only, not CAMA REST."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Franklin County Tax Assessor qPublic/Beacon App=FranklinCountyGA (qpublic.net/ga/franklin;
+  Carnesville GA). Tax Commissioner taxes.franklincountyga.com. County government
+  franklincountyga.gov (UDC/Zoning Map PDF). No public ArcGIS parcel service discovered
+  2026-09-24. Attribution Franklin County Tax Assessor. Public HTML only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=FranklinCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=FranklinCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: usable
+  summary: >
+    Franklin County Parcels (Schneider WFS):
+    https://wfs.schneidercorp.com/arcgis/rest/services/FranklinCountyGA_WFS/MapServer/0 - live count
+    17122 (5-150 ac: {'code': 400, 'extendedCode': -2147220985, 'message': 'Unable to complete
+    operation.', 'details': []}), parcel ID field ParcelNo. Geography verified against TIGER county
+    polygon.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Canon city"
+      level: city
+      parentFips: "13119"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Carnesville city"
+      level: city
+      parentFips: "13119"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Franklin Springs city"
+      level: city
+      parentFips: "13119"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Lavonia city"
+      level: city
+      parentFips: "13119"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Royston city"
+      level: city
+      parentFips: "13119"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Franklin' AND aadt>0
+    altFilter: name LIKE '119-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 119-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 171
+    maxAadt: 48600
+    geoCheck: 171/171 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OwnerName
+    filledCount: 16897
+    restUrl: https://wfs.schneidercorp.com/arcgis/rest/services/FranklinCountyGA_WFS/MapServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=FranklinCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: ParcelNo
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 025 A
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=FranklinCountyGA&Layer=Parcels&PageType=Report&KeyValue=025%20A
+    verification: 'pattern-tested: real sample ID from ParcelNo; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=FranklinCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Canon city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Carnesville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Franklin Springs city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Lavonia city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Royston city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

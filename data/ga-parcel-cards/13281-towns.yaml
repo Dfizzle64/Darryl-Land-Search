@@ -1,0 +1,313 @@
+state: GA
+jurisdiction: Towns County
+fips: "13281"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no live public parcel FeatureServer; qPublic HTML + human ROKMAPS viewer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap (2026-09-24): no live Towns County GA public parcel FeatureServer/
+      MapServer with cadastral polygons + CAMA recovered. Official human GIS =
+      ROKMAPS™ https://maps.roktech.net/ROKMAPS_Towns/ (also ROKMAPS_TownsCounty/
+      and TownsSearch shell maps.roktech.net/TownsSearch/ — SPA; no public ArcGIS
+      query API recovered). Folder towns absent from arcgis4/5.roktech.net root
+      (404 Folder not found — same pattern as Habersham/Stephens/Rabun historical
+      MapServer removals). Assessor CAMA + maps = qPublic App=TownsCountyGA
+      (qpublic.net/ga/towns/ → Search Records; also qpublic.net/ga/towns/search.html).
+      Cloudflare/bot 403 blocks automated Application.aspx from research box; public
+      for humans. Deep-link KeyValue={parcelId}:
+      Application.aspx?App=TownsCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+      (Search PageType=Search). TownsCountyGA_WFS on wfs.schneidercorp.com → 404;
+      qpublic.schneidercorp.com → 403. No GMRC / GDIT / county AGOL Towns GA parcel
+      FS (title searches 0 usable; GDIT org ISpzx3B5ZsVA6e1Z lists Union sibling
+      webmaps but no Towns). Commercial extracts (Equator/Regrid/ATTOM/USLandGrid) —
+      rejected (paid). GEO-VERIFY GEORGIA: Census TIGERweb GEOID 13281 CENTLAT
+      +34.9167042 CENTLON -083.7372719 — NE Georgia mountains Hiawassee / Young Harris
+      / Lake Chatuge / Brasstown Bald ring (NOT any out-of-state "Towns" lookalike —
+      Towns County exists only in GA). Seat Hiawassee (~-83.76,34.95). Skip utilities
+      (Hiawassee water/sewer pages exist — do not collect) + AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST CURR_VAL/FMV/assessed. Assessor HTML: qPublic App=TownsCountyGA
+      (qpublic.net/ga/towns; Cloudflare/bot 403 automated; public for humans).
+      Deep-link KeyValue={parcelId} on Report page. Tax Commissioner / billing —
+      bills/pay only, not CAMA REST. Honest REST tax/owner gap.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST SALEPRICE/SALEDATE layer. Prefer qPublic Sales Search / Sales List
+      HTML App=TownsCountyGA. Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no live public zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Towns County GA Euclidean zoning FeatureServer recovered (2026-09-24). City of
+      Hiawassee / Young Harris planning referenced in county hazard-mitigation /
+      economic-dev PDFs (hiawasseega.gov) — no public zoning FeatureServer found.
+      ROKMAPS human TOC may show zoning for humans; no queryable REST.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Towns County GA Future Land Use FeatureServer found. Joint Comp Plan /
+      Economic Development Strategy PDFs on hiawasseega.gov — not REST.
+    status: gap
+
+  - role: other
+    name: null — ROKMAPS human viewer only (no live REST boundary FS)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Prefer Census TIGERweb county poly GEOID 13281 for spatial mask until a live
+      county boundary FeatureServer is published. ROKMAPS_Towns human viewer for
+      interactive boundary/context.
+    status: gap
+
+municipalities:
+  - name: Hiawassee
+    level: city
+    parentFips: "13281"
+    joinToCountyParcels: >
+      County seat Hiawassee GA (~-83.76,34.95; ZIP 30546; Lake Chatuge). No county
+      parcel REST to join — city filter blocked until geometry source exists. Tax maps
+      via county qPublic App=TownsCountyGA.
+    layers:
+      - role: zoning
+        name: null — no city FeatureServer recovered
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          City of Hiawassee (hiawasseega.gov) — water/sewer pages present (skip per
+          tranche-3); no public zoning FeatureServer recovered (2026-09-24).
+        status: gap
+      - role: flu
+        name: null — Comp Plan / EconDev PDF
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Towns County Econ Dev Strategy / hazard mitigation PDFs on hiawasseega.gov — not REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Hiawassee city-owned parcel REST — county App=TownsCountyGA / ROKMAPS human viewer.
+        status: gap
+    gaps:
+      - "No Hiawassee city-owned parcel/zoning/FLU REST — county qPublic App=TownsCountyGA + ROKMAPS human viewer."
+      - "Skip Hiawassee water/sewer utility pages per tranche-3."
+    status: gap
+
+  - name: Young Harris
+    level: city
+    parentFips: "13281"
+    joinToCountyParcels: >
+      Soft spatial Young Harris GA (~-83.85,34.93; Young Harris College / Brasstown
+      Valley) when parcels available. No county parcel REST.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Young Harris zoning FeatureServer found (2026-09-24).
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Young Harris FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML only
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County qPublic HTML only.
+        status: gap
+    gaps:
+      - "No Young Harris city-owned GIS REST."
+    status: gap
+
+gaps:
+  - "No live public REST parcels/owner/tax/sales/zoning/FLU for Towns County GA — qPublic App=TownsCountyGA HTML + ROKMAPS human viewer only."
+  - "arcgis4/5.roktech.net folder towns 404; no live towns_rokmaps MapServer recovered (2026-09-24)."
+  - "TownsCountyGA_WFS 404/403; no GMRC/GDIT/county AGOL Towns GA parcel FeatureServer."
+  - "Numeric AppID/LayerID not recovered (Cloudflare) — use App=TownsCountyGA&Layer=Parcels&KeyValue={parcelId}."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; qpublic.net/ga/towns + App=TownsCountyGA Search/Maps + maps.roktech.net/ROKMAPS_Towns/ public for humans."
+  - "Rejected paid Equator/Regrid/ATTOM/USLandGrid; skip utilities+AADT; no emails/phones."
+  - "GEO-VERIFY: Towns County exists only in Georgia (FIPS 13281) — reject any out-of-state lookalike."
+
+license: >
+  Towns County GIS ROKMAPS (maps.roktech.net/ROKMAPS_Towns/; companion
+  ROKMAPS_TownsCounty/ / TownsSearch). Tax Assessor qPublic App=TownsCountyGA
+  (qpublic.net/ga/towns; qpublic.net/ga/towns/search.html; Hiawassee GA). City of
+  Hiawassee (hiawasseega.gov) — Comp Plan / EconDev PDF context; tax maps via county
+  assessor. Attribution Towns County GIS / Tax Assessors. Public HTML + human viewer;
+  no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=TownsCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://maps.roktech.net/ROKMAPS_Towns/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Hiawassee city"
+      level: city
+      parentFips: "13281"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Young Harris city"
+      level: city
+      parentFips: "13281"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Towns' AND aadt>0
+    altFilter: name LIKE '281-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 281-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 48
+    maxAadt: 15500
+    geoCheck: 48/48 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=TownsCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://maps.roktech.net/ROKMAPS_Towns/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Hiawassee city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Young Harris city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

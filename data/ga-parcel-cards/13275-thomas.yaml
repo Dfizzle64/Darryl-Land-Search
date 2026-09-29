@@ -1,0 +1,575 @@
+state: GA
+jurisdiction: Thomas County
+fips: "13275"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + CAMA (owner/mailing/situs/acres/CURR_VAL)
+  - role: parcels
+    name: parcels_addresses Parcels (Thomas County Maps / CMAP)
+    restUrl: https://www.thomascountymaps.org/arcgis/rest/services/parcels_addresses/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      LASTNAME: ownerName
+      ADDRESS1: mailingAddress
+      ADDRESS2: mailingAddress2
+      ADDRESS3: mailingAddress3
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP_1: mailingZip
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      TOTALACRES: acreage
+      CURR_VAL: tax.marketValue
+      SALE_VAL: lastSale.price
+      TAXDISTRIC: taxDistrict
+      LEGAL_DESC: legalDescription
+      SUBD_NAME: subdivision
+      LANDLOT: landLot
+      LANDDIST: landDistrict
+      REVIEWDATE: lastReviewDate
+      Shape: geometry
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + CAMA (Thomas County GIS CMAP host
+      thomascountymaps.org ArcGIS Server; parcels_addresses MapServer/4 "Parcels";
+      twin labels layer /3 same schema/count). Live count 24832 (2026-09-24).
+      SR NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid
+      2240). maxRecordCount 1000 — page via resultOffset / envelopes. No public
+      FeatureServer twin (FS 500). CURR_VAL>0 = 24723; TOTALACRES>0 = 24614;
+      TOTALACRES 5–150 = 3863; LASTNAME filled = 24636; HOUSE_NO>0 = 21637;
+      SALE_VAL>0 = 0 (sale REST gap — use qPublic Sales Search HTML). Compose
+      situsAddress from HOUSE_NO + STREET_NAM + STTYPE when HOUSE_NO>0; CITY/STATE/
+      ZIP_1 are owner mailing (nationwide — e.g. Moultrie/Atlanta/Tallahassee mail
+      appear) — never municipality filter. Soft TAXDISTRIC (geo-checked samples,
+      no published REST legend): 01≈Thomasville city (~9883, ~-83.99,30.84),
+      02≈Thomasville fringe (~2271, ~-83.96,30.81), 03≈east Thomasville area
+      (~2763, ~-83.89,30.87), 04≈unincorporated north (~7245, ~-83.74,31.03),
+      05≈Boston (~879, ~-83.78,30.80), 06≈Barwick (~178, ~-83.74,30.90),
+      07≈Coolidge (~412, ~-83.86,31.02), 08≈Meigs (~444, ~-84.09,31.08),
+      09≈Ochlocknee (~373, ~-84.04,30.98), 10≈Pavo (~278, ~-83.75,30.97) —
+      prefer spatial city limits / situs when available over TAXDISTRIC alone.
+      Official public viewer: thomascountymaps.org/cmap/ (CMAP; linked from
+      thomascountyboc.org/gis-mapping). Assessor HTML: qpublic.net/ga/thomas →
+      qpublic.schneidercorp.com App=ThomasCountyGA / AppID=682 LayerID=11372
+      PageTypeID=2 PageID=4775 Search; Report PageTypeID=4 PageID=4777
+      KeyValue={PARCEL_NO}. Cloudflare/bot 403 automated Application.aspx; public
+      for humans. GEO-VERIFY GEORGIA Thomas FIPS 13275 seat Thomasville
+      (~-83.98,30.84): WGS84 samples ~-83.736,31.034 (N county / Pavo–Moultrie
+      fringe) / ~-83.991,30.837 (Thomasville Clay St) / ~-83.776,30.800 (Boston) /
+      ~-84.086,31.078 (Meigs). REJECT Thomas County NE (~-100.5,41.5); REJECT
+      Thomas County KS; REJECT Thomasville NC PTRC maps.ptrc.org lookalike;
+      REJECT Thomasville AL; REJECT paid Regrid/ATTOM/USLandGrid. No emails/phones;
+      skip utilities+AADT.
+    status: usable
+
+  - role: tax
+    name: parcels_addresses CURR_VAL (on polygons)
+    restUrl: https://www.thomascountymaps.org/arcgis/rest/services/parcels_addresses/MapServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: TOTALACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      TAXDISTRIC: taxDistrict
+    notes: >
+      Tax/CAMA market value live on preferred parcel polygons (CURR_VAL>0 = 24723).
+      No separate assessed/MAV/FMV-component REST fields recovered — assessed/taxable
+      via qPublic App=ThomasCountyGA HTML digest. SALE_VAL on same layer is present
+      but SALE_VAL>0 = 0 live (do not treat as usable sale history).
+    status: usable
+
+  - role: sales
+    name: null — SALE_VAL REST empty; qPublic Sales Search HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      parcels_addresses exposes SALE_VAL but live SALE_VAL>0 = 0 (2026-09-24).
+      Multi-sale / qualified sale history via qPublic Sales Search HTML AppID=682
+      only (bot 403). Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: zoning_landuse Zoning (county Euclidean + CITY stub)
+    restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      ADD_ZONE: zoningAdditional
+      CONDITIONA: zoningConditional
+      CASE_NO: zoningCase
+      NOTES: zoningNotes
+      web_code: zoningWebCode
+    notes: >
+      County Euclidean zoning polygons (count 1853). ZONING domain: CITY≈909
+      (municipal stub — prefer City of Thomasville planningData/Zoning inside city),
+      AG≈279, R3≈199, CG≈120, R2≈98, R1≈91, RM11≈45, CL≈41, MHP≈33, I≈28, CU≈5,
+      PUD≈3, R4≈2. Twin labeling layer /2. Official CMAP overlays same service.
+      maxRecordCount default — page via envelopes. For Thomasville-city district
+      codes prefer cot-maps.org planningData/Zoning (R-1/R-1A/C-1/…).
+    status: usable
+
+  - role: flu
+    name: zoning_landuse Future Land Use
+    restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Future: fluCode
+      Future_1: flu
+    notes: >
+      Preferred public REST Future Land Use (count 962). Future / Future_1 domains:
+      AG/Agricultural≈327, RR/Rural Residential≈172, ER/Estate Residential≈156,
+      P/Conservation-Plantation≈123, SR/Suburban Residential≈122, HC/Highway
+      Commercial≈36, EI/Employment-Industrial≈13, PI/Public-Institutional≈7,
+      CN/Crossroads-Neighborhood Commercial≈6. Spatial intersect only. Comp-plan
+      PDF certify for critical sites. Companion Historic Districts layer /1.
+    status: usable
+
+  - role: other
+    name: boundaries County Boundary
+    restUrl: https://www.thomascountymaps.org/arcgis/rest/services/boundaries/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      County outline polygon. No separate municipal Boundaries FeatureServer on
+      thomascountymaps.org catalog (2026-09-24) — city filter via TAXDISTRIC soft
+      map, situs, or City of Thomasville cot-maps layers. Skip UTILITIES folder /
+      hydrants per tranche-3.
+    status: partial
+
+municipalities:
+  - name: Thomasville
+    level: city
+    parentFips: "13275"
+    joinToCountyParcels: >
+      Soft TAXDISTRIC IN ('01','02','03') geo-checked around Thomasville
+      (~-83.98,30.84) ∩ parcels_addresses/4; mailing CITY='Thomasville' is owner
+      mail — never sole filter. Prefer spatial intersect with City of Thomasville
+      planningData/Zoning extent when available.
+    layers:
+      - role: zoning
+        name: planningData Zoning (City of Thomasville cot-maps)
+        restUrl: https://cot-maps.org/citygis/rest/services/planningData/Zoning/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONECLASS: zoning
+          ZONEDESC: zoningDesc
+          PARCEL_NO: parcelId
+          HistDist: historicDistrictFlag
+        notes: >
+          Preferred Thomasville-city Euclidean zoning (count 10027; geo-verified
+          ~-83.993,30.795). ZONECLASS top: R-1≈4744, R-1A≈1948, R-2≈769, C-1≈558,
+          M≈495, D-C≈236, R-TH≈171, D-G≈160, D-E≈153, R-2-LU≈147, C-2≈136,
+          C-1A≈117, A≈85 (+ TND/MH/CU overlays). Official public viewers:
+          citygis.maps.arcgis.com Land Use Zoning webappviewer
+          id=5a585f2bd198417d8ffdf4ec1910bbd1; Zoning Look Up Map. Note
+          planningData/zoningPublic MapServer currently stopped (500) — use
+          planningData/Zoning. Rejected maps.ptrc.org Thomasville NC lookalike
+          (Piedmont Triad — wrong state). Skip Electric/Utilities/StormwaterGMC
+          folders per tranche-3.
+        status: usable
+      - role: parcels
+        name: null — county parcels_addresses + Thomasville spatial/TAXDISTRIC
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Thomasville-only CAMA FeatureServer — county parcels_addresses/4 +
+          TAXDISTRIC 01–03 soft / city zoning extent. Tax/sale/owner on county REST
+          + qPublic HTML.
+        status: gap
+      - role: flu
+        name: null — county Future Land Use spatial extract
+        restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Future_1: flu
+        notes: >
+          No Thomasville-only FLU FeatureServer recovered — use county Future Land
+          Use spatial to city. Status partial.
+        status: partial
+    gaps:
+      - "No Thomasville-only parcel CAMA FS — county parcels + TAXDISTRIC/spatial."
+      - "zoningPublic MapServer stopped; planningData/Zoning usable."
+      - "Rejected Thomasville NC PTRC / Thomasville AL lookalikes."
+    status: usable
+
+  - name: Boston
+    level: city
+    parentFips: "13275"
+    joinToCountyParcels: >
+      Soft TAXDISTRIC='05' (~879, ~-83.78,30.80) ∩ county parcels.
+    layers:
+      - role: zoning
+        name: zoning_landuse Zoning Boston spatial extract
+        restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: No Boston-owned zoning FS — county Euclidean ∩ Boston.
+        status: partial
+      - role: parcels
+        name: null — county parcels + TAXDISTRIC=05
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Boston-only CAMA REST.
+        status: gap
+    gaps:
+      - "Boston city parcel/FLU still county layers + assessor HTML."
+    status: partial
+
+  - name: Coolidge
+    level: city
+    parentFips: "13275"
+    joinToCountyParcels: >
+      Soft TAXDISTRIC='07' (~412, ~-83.86,31.02) ∩ county parcels.
+    layers:
+      - role: zoning
+        name: zoning_landuse Zoning Coolidge spatial extract
+        restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: County zoning ∩ Coolidge — no city-owned FS.
+        status: partial
+      - role: parcels
+        name: null — county parcels + TAXDISTRIC=07
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Coolidge-only CAMA REST.
+        status: gap
+    gaps:
+      - "Coolidge parcel/FLU still county layers."
+    status: partial
+
+  - name: Meigs
+    level: city
+    parentFips: "13275"
+    joinToCountyParcels: >
+      Soft TAXDISTRIC='08' (~444, ~-84.09,31.08) ∩ county parcels.
+    layers:
+      - role: zoning
+        name: zoning_landuse Zoning Meigs spatial extract
+        restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: County zoning ∩ Meigs.
+        status: partial
+      - role: parcels
+        name: null — county parcels + TAXDISTRIC=08
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Meigs-only CAMA REST.
+        status: gap
+    gaps:
+      - "Meigs parcel/FLU still county layers."
+    status: partial
+
+  - name: Ochlocknee
+    level: city
+    parentFips: "13275"
+    joinToCountyParcels: >
+      Soft TAXDISTRIC='09' (~373, ~-84.04,30.98) ∩ county parcels.
+    layers:
+      - role: zoning
+        name: zoning_landuse Zoning Ochlocknee spatial extract
+        restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: County zoning ∩ Ochlocknee.
+        status: partial
+      - role: parcels
+        name: null — county parcels + TAXDISTRIC=09
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Ochlocknee-only CAMA REST.
+        status: gap
+    gaps:
+      - "Ochlocknee parcel/FLU still county layers."
+    status: partial
+
+  - name: Barwick
+    level: city
+    parentFips: "13275"
+    joinToCountyParcels: >
+      Soft TAXDISTRIC='06' (~178, ~-83.74,30.90) ∩ county parcels. (Barwick also
+      touches Brooks County — certify FIPS 13275 side.)
+    layers:
+      - role: zoning
+        name: zoning_landuse Zoning Barwick spatial extract
+        restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: County zoning ∩ Barwick (Thomas side).
+        status: partial
+      - role: parcels
+        name: null — county parcels + TAXDISTRIC=06
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Barwick-only CAMA REST.
+        status: gap
+    gaps:
+      - "Barwick straddles Thomas/Brooks — use Thomas TAXDISTRIC=06 only for this card."
+    status: partial
+
+  - name: Pavo
+    level: city
+    parentFips: "13275"
+    joinToCountyParcels: >
+      Soft TAXDISTRIC='10' (~278, ~-83.75,30.97) ∩ county parcels. (Pavo also
+      touches Brooks County — certify FIPS 13275 side.)
+    layers:
+      - role: zoning
+        name: zoning_landuse Zoning Pavo spatial extract
+        restUrl: https://www.thomascountymaps.org/arcgis/rest/services/zoning_landuse/MapServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: County zoning ∩ Pavo (Thomas side).
+        status: partial
+      - role: parcels
+        name: null — county parcels + TAXDISTRIC=10
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Pavo-only CAMA REST.
+        status: gap
+    gaps:
+      - "Pavo straddles Thomas/Brooks — use Thomas TAXDISTRIC=10 only for this card."
+    status: partial
+
+gaps:
+  - "SALE_VAL REST field present but SALE_VAL>0=0 — sale history via qPublic HTML only."
+  - "No assessed/MAV/FMV-component REST — CURR_VAL market only; assessed via qPublic HTML."
+  - "No county municipal Boundaries FeatureServer — TAXDISTRIC soft map + city zoning extent."
+  - "maxRecordCount 1000 on parcels — page via resultOffset / envelopes."
+  - "No parcels FeatureServer twin (FS 500) — MapServer/4 queryable auth none."
+  - "Parcel mailing CITY/STATE nationwide — never municipality filter."
+  - "County ZONING='CITY' is municipal stub — prefer cot-maps planningData/Zoning inside Thomasville."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/thomas)."
+  - "imap/Base_Parcels richer schema but query failed (400) live — do not prefer."
+  - "REJECT Thomas County NE/KS; REJECT Thomasville NC PTRC maps.ptrc.org; REJECT Thomasville AL; REJECT paid Regrid/ATTOM/USLandGrid; skip utilities+AADT; no emails/phones."
+
+license: >
+  Thomas County GIS / CMAP (thomascountymaps.org ArcGIS Server) —
+  parcels_addresses MapServer/4 Parcels, zoning_landuse Zoning/3 + Future Land
+  Use/0, boundaries/0. Official public viewer thomascountymaps.org/cmap/ (linked
+  from thomascountyboc.org/gis-mapping). City of Thomasville GIS (cot-maps.org
+  citygis; Tville_GIS AGOL citygis.maps.arcgis.com) — planningData/Zoning
+  MapServer/0. Assessor HTML: qPublic SchneiderCorp App=ThomasCountyGA /
+  AppID=682 LayerID=11372 (qpublic.net/ga/thomas). Attribution Thomas County /
+  City of Thomasville. Public fields only; no emails/phones; no paid vendors;
+  skip utilities+AADT. REJECT Thomas NE/KS and Thomasville NC/AL lookalikes.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ThomasCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://www.thomascountymaps.org/cmap/
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28:
+    https://www.thomascountymaps.org/arcgis/rest/services/parcels_addresses/MapServer/4 count 24832;
+    extent center [['13275', 'Thomas County']]; sample [['13275', 'Thomas County']]. No change to field
+    map (see layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Boston city"
+      level: city
+      parentFips: "13275"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Coolidge city"
+      level: city
+      parentFips: "13275"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Meigs city"
+      level: city
+      parentFips: "13275"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Ochlocknee town"
+      level: city
+      parentFips: "13275"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Pavo city"
+      level: city
+      parentFips: "13275"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Thomasville city"
+      level: city
+      parentFips: "13275"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Thomas' AND aadt>0
+    altFilter: name LIKE '275-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 275-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 270
+    maxAadt: 29000
+    geoCheck: 269/270 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    filledCount: 24723
+    restUrl: https://www.thomascountymaps.org/arcgis/rest/services/parcels_addresses/MapServer/4
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: SALE_VAL=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 24636
+    restUrl: https://www.thomascountymaps.org/arcgis/rest/services/parcels_addresses/MapServer/4
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=ThomasCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ThomasCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.thomascountymaps.org/cmap/
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Boston city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Coolidge city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Meigs city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Ochlocknee town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Pavo city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Thomasville city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

@@ -1,0 +1,460 @@
+state: GA
+jurisdiction: Decatur County
+fips: "13087"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: SmartGov_Parcel_Layer_6_2025 (BainbridgeGA)
+    restUrl: https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NUM: parcelId
+      PIN: parcelIdAlt
+      R_Key: ownerKey
+      OWN_KEY: ownerKeyAlt
+      OWNER: ownerName
+      LASTNAME: ownerNameAlt
+      ADDRESS2: mailingAddress
+      ADDRESS3: mailingAddress2
+      CITY: mailingCity
+      STATE: mailingState
+      ZIP: mailingZip
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      UNIT: situsUnit
+      ADDRESS_NU: situsNumberAlt
+      STREET: situsStreetCombined
+      CALC_ACRES: acreage
+      TOTAL_ACRE: acreageText
+      TOTALACRES: acreageAlt
+      TAX_DIST: taxDistrict
+      DISTRICT_D: municipality
+      DIGCLASS: dorCode
+      ZONINGCODE: zoning
+      LEGAL_DESC: legalDescription
+      LAT: latitude
+      LON: longitude
+      Shape__Area: shapeArea
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + owner/mailing/situs/acres (City of
+      Bainbridge AGOL org TIhHfn6hMXyrVHu4 owner BainbridgeGA — SmartGov Parcel Layer
+      6_2025). Live count 19046 (2026-09-24). SR NAD83 Georgia West ft (wkid 102667 /
+      2240). OWNER filled ≈18795; LASTNAME ≈17689; CITY mailing ≈17687; HOUSE_NO>0
+      ≈12572; CALC_ACRES 5–150 ≈3546; TOTALACRES 5–150 ≈3550; DIGCLASS filled ≈18795;
+      ZONINGCODE non-null ≈5 (county zoning REST gap). No CURR_VAL/FMV/MAV/SALE on
+      this layer — tax/sale via qPublic AppID=914 HTML. Compose situs HOUSE_NO +
+      STREET_NAM + STTYPE when HOUSE_NO>0. Prefer CALC_ACRES numeric for acreage band.
+      DISTRICT_D / TAX_DIST soft municipality: DISTRICT_D COUNTY≈10710 / BAINBRIDGE≈7420
+      / ATTAPULGUS≈302 / CLIMAX≈202 / BRINSON≈160; TAX_DIST 04≈10729 COUNTY (~-84.73,
+      31.05), 02≈7424 BAINBRIDGE (~-84.61,30.93), 01≈301 ATTAPULGUS (~-84.48,30.75),
+      03≈201 CLIMAX (~-84.42,30.88), 05≈158 BRINSON (~-84.74,30.98) — prefer spatial
+      Bainbridge_City_Limits / Zoning_Map city poly over TAX_DIST alone. digclass:
+      R≈14202, V≈1872, C≈1099, E≈874, A≈480, J≈172, I≈61, P≈35. Companion older
+      Parcels_7_2024/597 DECATURPARCELS (same count 19046) has WinGAP CAMA field names
+      incl. CURR_VAL/SALE_VAL but live >0 counts = 0 (zero-filled) AND exposes
+      HOMEPHONE/WORKPHONE/CELLPHONE/SSN — DO NOT collect PII; prefer this SmartGov
+      layer. sliParcels/30 (~9551) is service-line inventory subset — city-leaning aid
+      only. Geo-verified WGS84 samples ~-84.726,31.050 / ~-84.614,30.933 /
+      ~-84.478,30.753 / ~-84.424,30.875 — Decatur County GA / Bainbridge–Attapulgus–
+      Climax–Brinson / Lake Seminole–Flint River (FIPS 13087; county seat Bainbridge
+      ~-84.58,30.90). REJECT lookalikes: Magnasoft Parcel_Decatur (~-93.76,40.59 Decatur
+      County IA); maps.decaturil.gov Macon Co IL parcels; City of Decatur (DeKalb
+      County GA FIPS 13089) / Decatur AL; paid Regrid/Equator/DynamoSpatial. No
+      emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on SmartGov; qPublic AppID=914 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on SmartGov_Parcel_Layer_6_2025. Companion
+      Parcels_7_2024 exposes CURR_VAL/MAV*/FMV* field names but live >0 = 0
+      (zero-filled REST gap). Assessor HTML: qpublic.net/ga/decatur → AppID=914
+      LayerID=17623 PageTypeID=2 PageID=7902 (search.html accept link; Cloudflare/bot
+      403 automated). Deep-link KeyValue={PARCEL_NUM}:
+      Application.aspx?AppID=914&LayerID=17623&PageTypeID=4&KeyValue={PARCEL_NUM}
+      (also App=DecaturCountyGA&Layer=Parcels&PageType=Report&KeyValue=). Tax
+      Commissioner / payment portals are bills — not CAMA REST.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on SmartGov layer; Parcels_7_2024 SALE_VAL/SALELAND*>0 = 0.
+      Prefer qPublic Sales Search HTML AppID=914. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: Zoning_2023 Zoning 2025 (Bainbridge city)
+    restUrl: https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/Zoning_2023/FeatureServer/46
+    layerId: 46
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRES
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      CALC_ACRES: acreage
+      ADDRESS_NU: situsNumber
+      STREET: situsStreet
+    notes: >
+      Preferred Euclidean zoning for City of Bainbridge only (count 7554; layer id 46
+      "Zoning 2025"). Domain: UR-9≈2652, SR-3≈1765, UR-6≈1538, HC≈389, CBD≈214,
+      UR-12≈186, O-P≈164, INS≈145, LI≈142, NB≈93, PUD≈72, HI≈54, RR-1≈30, MHP≈4.
+      County-wide parcel ZONINGCODE on SmartGov ≈5 — county Euclidean zoning REST gap.
+      Geo Bainbridge GA INTPT ~-84.573,30.905 (GEOID 1304896).
+    status: usable
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Decatur County GA / Bainbridge future land use FeatureServer on BainbridgeGA
+      org (2026-09-24). Comp Plan PDF gap.
+    status: gap
+
+  - role: other
+    name: Zoning_Map / Bainbridge City Limits
+    restUrl: https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/Zoning_Map/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: municipality
+      GEOID: placeGeoid
+      INTPTLAT: latitude
+      INTPTLON: longitude
+    notes: >
+      Preferred spatial Bainbridge city filter (count 1; NAME='Bainbridge'
+      GEOID=1304896 INTPT ~+30.9049,-084.5730). Companion Bainbridge_City_Limits/44
+      may be empty/stale — prefer Zoning_Map/0. Join = spatial intersect onto
+      SmartGov parcels (default). Soft DISTRICT_D='BAINBRIDGE' / TAX_DIST='02' as
+      attribute fallback only.
+    status: usable
+
+municipalities:
+  - name: Bainbridge
+    level: city
+    parentFips: "13087"
+    joinToCountyParcels: >
+      Spatial Zoning_Map/0 NAME='Bainbridge' OR soft DISTRICT_D='BAINBRIDGE' /
+      TAX_DIST='02' (~7420; ~-84.61,30.93).
+    layers:
+      - role: zoning
+        name: Zoning_2023 Zoning 2025
+        restUrl: https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/Zoning_2023/FeatureServer/46
+        layerId: 46
+        geometry: polygon
+        auth: none
+        acreageField: CALC_ACRES
+        coverage: city-only
+        fieldMap:
+          ZONING: zoning
+        notes: City Euclidean zoning — see county zoning layer notes for domain.
+        status: usable
+      - role: flu
+        name: null — no city FLU REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bainbridge FLU FeatureServer — Comp Plan PDF gap.
+        status: gap
+      - role: parcels
+        name: County SmartGov parcels spatial Bainbridge
+        restUrl: https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: CALC_ACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NUM: parcelId
+          OWNER: ownerName
+        notes: No city-owned separate CAMA — county SmartGov + spatial Bainbridge.
+        status: partial
+    gaps:
+      - "No Bainbridge-owned separate parcel CAMA FeatureServer — county SmartGov + city limits/zoning."
+    status: usable
+
+  - name: Attapulgus
+    level: city
+    parentFips: "13087"
+    joinToCountyParcels: >
+      Soft DISTRICT_D='ATTAPULGUS' / TAX_DIST='01' (~301; ~-84.48,30.75).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Attapulgus city zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Attapulgus FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county SmartGov + soft Attapulgus
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County SmartGov + DISTRICT_D='ATTAPULGUS' / TAX_DIST=01.
+        status: gap
+    gaps:
+      - "No Attapulgus city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Climax
+    level: city
+    parentFips: "13087"
+    joinToCountyParcels: >
+      Soft DISTRICT_D='CLIMAX' / TAX_DIST='03' (~201; ~-84.42,30.88).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Climax city zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Climax FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county SmartGov + soft Climax
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County SmartGov + DISTRICT_D='CLIMAX' / TAX_DIST=03.
+        status: gap
+    gaps:
+      - "No Climax city-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Brinson
+    level: city
+    parentFips: "13087"
+    joinToCountyParcels: >
+      Soft DISTRICT_D='BRINSON' / TAX_DIST='05' (~158; ~-84.74,30.98).
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Brinson city zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Brinson FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county SmartGov + soft Brinson
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County SmartGov + DISTRICT_D='BRINSON' / TAX_DIST=05.
+        status: gap
+    gaps:
+      - "No Brinson city-owned zoning/FLU/parcel REST."
+    status: partial
+
+gaps:
+  - "No CURR_VAL/FMV/assessed/sale on SmartGov_Parcel_Layer_6_2025 — tax/sale via qPublic AppID=914 HTML only."
+  - "Parcels_7_2024 CURR_VAL/SALE_VAL field names exist but >0 = 0 (zero-filled); also exposes phone/SSN — DO NOT collect PII."
+  - "County Euclidean zoning REST gap — ZONINGCODE≈5 on parcels; Bainbridge Zoning_2023/46 is city-only."
+  - "No public FLU / character-area FeatureServer on BainbridgeGA org."
+  - "TAX_DIST / DISTRICT_D soft municipality — prefer Zoning_Map/0 spatial Bainbridge; other cities soft-only."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; DecaturCountyGA_WFS 404."
+  - "Rejected lookalikes: Magnasoft Parcel_Decatur (Decatur County IA ~-93.76,40.59); Decatur IL maps.decaturil.gov; City of Decatur DeKalb GA; Decatur AL; paid Regrid/Equator/DynamoSpatial."
+  - "Skip Water_*/ss*/Gas_*/Electric utilities FeatureServers; no AADT; no emails/phones collected."
+
+license: >
+  City of Bainbridge GIS (AGOL org TIhHfn6hMXyrVHu4 owner BainbridgeGA) —
+  SmartGov_Parcel_Layer_6_2025, Zoning_2023, Zoning_Map city limits; companion
+  Parcels_7_2024 (PII fields excluded). Assessor qPublic AppID=914 LayerID=17623
+  (qpublic.net/ga/decatur; decaturcountyga.gov Tax Assessor). Attribution City of
+  Bainbridge / Decatur County Tax Assessors. Public fields only; no emails/phones;
+  no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=914&LayerID=17623&PageTypeID=2&PageID=7902
+jurisdictionGisUrl: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/TIhHfn6hMXyrV
+    Hu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer/0 count 19046; extent center
+    [['13087', 'Decatur County']]; sample [['13087', 'Decatur County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Attapulgus city"
+      level: city
+      parentFips: "13087"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Bainbridge city"
+      level: city
+      parentFips: "13087"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Brinson town"
+      level: city
+      parentFips: "13087"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Climax city"
+      level: city
+      parentFips: "13087"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Decatur' AND aadt>0
+    altFilter: name LIKE '087-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 087-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 210
+    maxAadt: 19800
+    geoCheck: 210/210 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: OWNER
+    filledCount: 18795
+    restUrl: https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=DecaturCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=914&LayerID=17623&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PARCEL_NUM
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 00010008
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=DecaturCountyGA&Layer=Parcels&PageType=Report&KeyValue=00010008
+    verification: 'pattern-tested: real sample ID from PARCEL_NUM; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://www.arcgis.com/apps/mapviewer/index.html?url=https://services5.arcgis.com/TIhHfn6hMXyrVHu4/arcgis/rest/services/SmartGov_Parcel_Layer_6_2025/FeatureServer
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Attapulgus city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Bainbridge city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Brinson town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Climax city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

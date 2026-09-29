@@ -1,0 +1,543 @@
+state: GA
+jurisdiction: Gwinnett County
+fips: "13135"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — county-wide parcels with full CAMA (owner, situs, values, zoning attr)
+  - role: parcels
+    name: GISDataBrowser GC_Parcel Parcels
+    restUrl: https://gis3.gwinnettcounty.com/mapvis/rest/services/GISDataBrowser/GC_Parcel/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATEDACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      TAXPIN: parcelIdAlt
+      CALCULATEDACREAGE: acreage
+      DEEDEDACREAGE: acreageDeeded
+      LEGALAC: acreageLegal
+      OWNER1: ownerName
+      OWNER2: ownerName2
+      MAILADDR: mailingAddress
+      MAILCITY: mailingCity
+      MAILSTAT: mailingState
+      MAILZIP: mailingZip
+      LOCADDR: situsAddress
+      LOCCITY: situsCity
+      LOCZIP: situsZip
+      TOTVAL1: tax.marketValue
+      TAXTOT1: tax.assessedValue
+      LANDVAL1: tax.landMarketValue
+      DWLGVAL1: tax.improvementMarketValue
+      ZONING: zoning
+      ZONEDESC: zoningDescription
+      PROPCLAS: dorCode
+      PCDESC: propertyClassDescription
+      DISTNUM: taxDistrict
+      LRSN: lrsn
+    notes: >
+      Preferred county-wide parcel source. Live count 306061 (2026-09-23).
+      Spatial reference NAD 1983 StatePlane Georgia West FIPS 1002 Feet (wkid 102667 / latestWkid 2240).
+      maxRecordCount 2000. Rich CAMA on polygons: owner, mailing, situs city/zip, zoning code+desc,
+      market/assessed values (TOTVAL1 / TAXTOT1 — values stored as strings; sample TAXTOT1 ≈ 40% of TOTVAL1).
+      Prefer CALCULATEDACREAGE over DEEDEDACREAGE (deeded often 0). TAXPIN is R-prefixed (e.g. R7312 334);
+      PIN omits R (7312 334). No sale price/date on this layer — join Land Value Table (role=sales).
+      No distinct tax.taxableValue; no lastSale.qualified. Folder catalog listing sometimes empty/tokened
+      but this MapServer URL queries publicly without auth.
+    status: usable
+
+  # AGOL hosted parcels — geometry-heavy mirror; CAMA lives on Tax Master table
+  - role: parcels
+    name: Property_and_Tax Parcels (hosted FeatureServer)
+    restUrl: https://services3.arcgis.com/RfpmnkSAQleRbndX/arcgis/rest/services/Property_and_Tax/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATEDACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      TAXPIN: parcelIdAlt
+      CALCULATEDACREAGE: acreage
+      DEEDEDACREAGE: acreageDeeded
+      LRSN: lrsn
+    notes: >
+      Hosted AGOL FeatureServer used by county open-data hub. Live count 309861 (2026-09-23) — slightly
+      higher than MapServer/6. Geometry + PIN/acreage only; NO owner/values/zoning on layer 0.
+      Join Tax Master Table (FeatureServer/3 or MapServer/9) on PIN/LRSN for CAMA. Prefer GC_Parcel/6
+      when a single-layer parcel+attributes source is needed. SR 102667/2240, maxRecordCount 2000.
+    status: partial
+
+  - role: tax
+    name: GC_Parcel Parcels (CAMA values on polygons)
+    restUrl: https://gis3.gwinnettcounty.com/mapvis/rest/services/GISDataBrowser/GC_Parcel/MapServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATEDACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      TOTVAL1: tax.marketValue
+      TAXTOT1: tax.assessedValue
+      LANDVAL1: tax.landMarketValue
+      DWLGVAL1: tax.improvementMarketValue
+      DISTNUM: taxDistrict
+      EXEMPTION_TYPE: exemptionCode
+      PROPCLAS: dorCode
+    notes: >
+      Tax/CAMA values live on the same parcel polygons as role=parcels GC_Parcel/6 (not a separate service).
+      Equivalent non-spatial Tax Master: MapServer/9 count 315001 and AGOL FeatureServer/3 count 315001.
+      Values are string fields. GA assessed typically 40% of fair market; no separate taxableValue field.
+    status: usable
+
+  - role: tax
+    name: Tax Master Table (AGOL)
+    restUrl: https://services3.arcgis.com/RfpmnkSAQleRbndX/arcgis/rest/services/Property_and_Tax/FeatureServer/3
+    layerId: 3
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      RPIN: parcelIdAlt
+      OWNER1: ownerName
+      LOCADDR: situsAddress
+      LOCCITY: situsCity
+      LOCZIP: situsZip
+      MAILADDR: mailingAddress
+      MAILCITY: mailingCity
+      MAILSTAT: mailingState
+      MAILZIP: mailingZip
+      LEGALAC: acreageLegal
+      TOTVAL1: tax.marketValue
+      TAXTOT1: tax.assessedValue
+      LANDVAL1: tax.landMarketValue
+      DWLGVAL1: tax.improvementMarketValue
+      ZONING: zoning
+      ZONEDESC: zoningDescription
+      PROPCLAS: dorCode
+      LRSN: lrsn
+    notes: >
+      Non-spatial table; live count 315001. Join to FeatureServer/0 or GC_Parcel/6 on PIN or LRSN.
+      Same CAMA field family as GC_Parcel/6. Useful when consuming AGOL geometry layer 0.
+    status: usable
+
+  # County zoning polygons — unincorporated + all municipalities
+  - role: zoning
+    name: Property_and_Tax Zoning (county + cities combined)
+    restUrl: https://services3.arcgis.com/RfpmnkSAQleRbndX/arcgis/rest/services/Property_and_Tax/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TYPE: zoning
+      JURISDICTION: zoningJurisdiction
+    notes: >
+      Preferred county-wide zoning POLYGON layer. Live count 12590 (2026-09-23). Combines unincorporated
+      (~7309) and municipal (~5273) zoning. JURISDICTION coded values include UNINCORPORATED plus
+      AUBURN, BERKELEY LAKE, BRASELTON, BUFORD, DACULA, DULUTH, GRAYSON, LAWRENCEVILLE, LILBURN,
+      LOGANVILLE, MULBERRY, NORCROSS, PEACHTREE CORNERS, REST HAVEN, SNELLVILLE, SUGAR HILL, SUWANEE.
+      Spatial-join to parcels on geometry (no shared parcel id on this layer). Parcel attribute ZONING
+      on GC_Parcel/6 is an alternate CAMA zoning string without polygon boundaries.
+      Equivalent split MapServers: GC_Planning/5 Unincorporated Zoning; GC_Planning/12 Municipal Zoning.
+    status: usable
+
+  - role: zoning
+    name: GC_Planning Unincorporated Zoning
+    restUrl: https://gis3.gwinnettcounty.com/mapvis/rest/services/GISDataBrowser/GC_Planning/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TYPE: zoning
+      JURISDICTION: zoningJurisdiction
+    notes: >
+      Unincorporated-only subset of county zoning. Live count 7309. Prefer combined AGOL FeatureServer/1
+      unless filtering to unincorporated only. Same TYPE/JURISDICTION schema as Municipal Zoning /12.
+    status: usable
+
+  - role: zoning
+    name: GC_Planning Municipal Zoning
+    restUrl: https://gis3.gwinnettcounty.com/mapvis/rest/services/GISDataBrowser/GC_Planning/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TYPE: zoning
+      JURISDICTION: zoningJurisdiction
+    notes: >
+      Municipal zoning polygons for cities inside Gwinnett. Live count 5273. Filter JURISDICTION to a
+      city name for city-only extracts. Primary fallback when a city has no own public REST (most cities).
+      Join to county parcels by spatial intersection (no parcel id on this layer).
+    status: usable
+
+  - role: flu
+    name: GC_Planning 2045 Future Development Map
+    restUrl: https://gis3.gwinnettcounty.com/mapvis/rest/services/GISDataBrowser/GC_Planning/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      INTENSITY: flu
+    notes: >
+      County 2045 Unified Plan Future Development Map. Live count only 16 coarse intensity polygons
+      (e.g. High Mix) — NOT parcel-level FLU. Spatial-join only as broad plan context. Daily Communities
+      Map (layer 6, count 87, CENTERNAME) is related plan geography, not FLU codes. City character-area
+      layers (see municipalities) are better FLU proxies where they exist.
+    status: partial
+
+  - role: sales
+    name: Property_and_Tax Land Value Table (sale history)
+    restUrl: https://services3.arcgis.com/RfpmnkSAQleRbndX/arcgis/rest/services/Property_and_Tax/FeatureServer/10
+    layerId: 10
+    geometry: none
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      SALE1AMT: lastSale.price
+      SALE1D: lastSale.date
+      SALE2AMT: priorSale2.price
+      SALE2D: priorSale2.date
+      SALE3AMT: priorSale3.price
+      SALE3D: priorSale3.date
+      ACRES: acreage
+      GRANTOR1: lastSale.grantor
+      DOC1REF: lastSale.docRef
+      LRSN: lrsn
+    notes: >
+      Non-spatial table; live count 323359; ~199806 with SALE1AMT>0 (2026-09-23). Up to 3 sales per
+      parcel (SALE1/2/3 AMT+D). Dates are strings (MM/DD/YYYY); amounts are strings (may be 0 or 1 for
+      non-arms-length). NO lastSale.qualified / validity flag. PIN sample uses R-prefix padded
+      (R1001 003) — join to TAXPIN on GC_Parcel/6 or RPIN on Tax Master (trim spaces). Prefer SALE1*
+      as most-recent. Not a geometry sales layer.
+    status: usable
+
+municipalities:
+  # Cities with independent public ArcGIS REST verified 2026-09-23
+  - name: Lawrenceville
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "PIN on city Zoning Districts ≈ PIN on GC_Parcel/6; also spatial join"
+    layers:
+      - role: zoning
+        name: Lawrenceville Zoning Districts
+        restUrl: https://gisinfo.lawrencevillega.org/server/rest/services/PlanningDevelopment/PlanningDevelopment/MapServer/2
+        layerId: 2
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZoningCode: zoning
+          ZoningCodeDescription: zoningDescription
+          PIN: parcelId
+        notes: >
+          Live count 8538. City of Lawrenceville only. PIN present for attribute join to county parcels.
+          maxRecordCount 10000. SR 102667/2240.
+        status: usable
+      - role: flu
+        name: Lawrenceville Character Areas 2045
+        restUrl: https://gisinfo.lawrencevillega.org/server/rest/services/PlanningDevelopment/PlanningDevelopment/MapServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CharacterAreas2045: flu
+        notes: >
+          Live count 11 character-area polygons (e.g. Downtown). FLU/character proxy; spatial-join to parcels.
+          Lawrenceville2040FDM_new MapServer listed but returned no layers when probed.
+        status: usable
+    gaps:
+      - "No city sale-history REST; use county Land Value Table filtered by spatial city limit / PIN."
+    status: usable
+
+  - name: Duluth
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "PIN / STAXPIN≈TAXPIN attribute join; UDC_Zoning is city code (domain); spatial join also works"
+    layers:
+      - role: zoning
+        name: Duluth Zoning2026
+        restUrl: https://services7.arcgis.com/ZTAeUzNBWlnSi6by/arcgis/rest/services/Zoning2024/FeatureServer/150
+        layerId: 150
+        geometry: polygon
+        auth: none
+        acreageField: CALCULATED
+        coverage: city-only
+        fieldMap:
+          UDC_Zoning: zoning
+          ZONING: zoningCountyCama
+          ZONEDESC: zoningDescription
+          PIN: parcelId
+          STAXPIN: parcelIdAlt
+          OWNER1: ownerName
+          LOCADDR: situsAddress
+          LOCCITY: situsCity
+          LOCZIP: situsZip
+          TOTVAL1: tax.marketValue
+          TAXTOT1: tax.assessedValue
+        notes: >
+          Live count 9873. Parcel-based zoning polygons. Prefer UDC_Zoning (coded 1–17 → RA-200, R-100,
+          R-75, RM, R-50, HRD, C-1, C-2, HC-R, HC-A, O-I, O-N, CBD, M-1, M-2, RD, PUD). ZONING/ZONEDESC
+          appear to be joined county CAMA and can differ from UDC (e.g. HRR vs HRD). CityView app:
+          https://beduluth.maps.arcgis.com/apps/webappviewer/index.html?id=7cab578d4d914cf380e24d604fcb644b
+        status: usable
+      - role: flu
+        name: Duluth CharacterAreas_2024
+        restUrl: https://services7.arcgis.com/ZTAeUzNBWlnSi6by/arcgis/rest/services/CharacterAreas/FeatureServer/108
+        layerId: 108
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CHARC_AREA: flu
+          Label: fluLabel
+        notes: >
+          Live count 16 character-area polygons. Spatial-join to parcels. PDF FLU also referenced on city site.
+        status: usable
+      - role: parcels
+        name: Duluth iWorq Parcels (city extract)
+        restUrl: https://services7.arcgis.com/ZTAeUzNBWlnSi6by/arcgis/rest/services/iWorq_Parcels/FeatureServer/99
+        layerId: 99
+        geometry: polygon
+        auth: none
+        acreageField: CALCULATED
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          TAXPIN: parcelIdAlt
+          OWNER1: ownerName
+          LOCADDR: situsAddress
+          LOCCITY: situsCity
+          LOCZIP: situsZip
+          ZONING: zoning
+          TOTVAL1: tax.marketValue
+          TAXTOT1: tax.assessedValue
+        notes: >
+          Live count 9866 city-subset parcels with CAMA-like fields. Prefer county GC_Parcel/6 for
+          county-wide search; use this only for Duluth-scoped apps.
+        status: partial
+    gaps: []
+    status: usable
+
+  - name: Peachtree Corners
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join for Zoning_Area TYPE polygons; Character_ layer has PIN≈county PIN"
+    layers:
+      - role: zoning
+        name: PTC Zoning_Area_Jan_2023
+        restUrl: https://services3.arcgis.com/jEYjQXUX2JTVoctH/arcgis/rest/services/Parcel_Zoning_Sept_2022/FeatureServer/37
+        layerId: 37
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          TYPE: zoning
+        notes: >
+          Live count 528 zoning-area polygons (TYPE e.g. MH). Spatial-join to county parcels. Open data:
+          https://peachtree-corners-open-data-peachtreecorners.hub.arcgis.com/ Zoning experience map also public.
+        status: usable
+      - role: flu
+        name: PTC Character Area
+        restUrl: https://services3.arcgis.com/jEYjQXUX2JTVoctH/arcgis/rest/services/PTC_Character_Area/FeatureServer/15
+        layerId: 15
+        geometry: polygon
+        auth: none
+        acreageField: Tot_Acre
+        coverage: city-only
+        fieldMap:
+          Character_: flu
+          Character1: fluAlt
+          PIN: parcelId
+          RPIN: parcelIdAlt
+          ZONING: zoning
+          OWNER1: ownerName
+          LOCADDR: situsAddress
+        notes: >
+          Live count 10472 parcel-tied character-area features (e.g. Suburban Neighborhood). PIN/RPIN
+          join to county parcels. Also carries ZONING and owner fields from county extract.
+        status: usable
+      - role: parcels
+        name: PTC_Parcels_2022 (city extract)
+        restUrl: https://services3.arcgis.com/jEYjQXUX2JTVoctH/arcgis/rest/services/PTC_Parcels_2022/FeatureServer/118
+        layerId: 118
+        geometry: polygon
+        auth: none
+        acreageField: CALCULATEDACREAGE
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          TAXPIN: parcelIdAlt
+          CALCULATEDACREAGE: acreage
+        notes: >
+          Live count 10745. Geometry + PIN/acreage (+ some joined tax-master keys). Prefer county
+          GC_Parcel/6 for attributes; this is a city clip.
+        status: partial
+    gaps: []
+    status: usable
+
+  # Cities covered by county Municipal Zoning (GC_Planning/12 or AGOL Zoning/1) — no independent REST found
+  - name: Suwanee
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; filter county Municipal Zoning JURISDICTION='SUWANEE'"
+    layers: []
+    notes: >
+      No public city ArcGIS FeatureServer/MapServer for zoning/FLU found (2026-09-23). City site posts
+      Official Zoning Map and Future Land Use as static maps and points to Gwinnett GIS Data Browser.
+      Use county zoning FeatureServer/1 or GC_Planning/12 with JURISDICTION=SUWANEE (~405 polys in combined layer).
+    status: gap
+
+  - name: Norcross
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='NORCROSS'"
+    layers: []
+    notes: >
+      No independent public zoning/FLU REST found. Use county Municipal Zoning JURISDICTION=NORCROSS (~353).
+    status: gap
+
+  - name: Snellville
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='SNELLVILLE'"
+    layers: []
+    notes: >
+      City posts Zoning & Street Map / Future Land Use / Future Development Map as PDF downloads only.
+      No public REST found. Use county Municipal Zoning JURISDICTION=SNELLVILLE (~417).
+    status: gap
+
+  - name: Buford
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='BUFORD' (note: Buford spans Gwinnett+Hall)"
+    layers: []
+    notes: >
+      No Buford-owned public zoning FeatureServer found in Gwinnett research pass. Use county
+      JURISDICTION=BUFORD (~656). Confirm Hall County sources separately for Hall-side parcels.
+    status: gap
+
+  - name: Sugar Hill
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='SUGAR HILL'"
+    layers: []
+    notes: "No independent public zoning/FLU REST found. County JURISDICTION=SUGAR HILL (~419)."
+    status: gap
+
+  - name: Lilburn
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='LILBURN'"
+    layers: []
+    notes: "No independent public zoning/FLU REST found. County JURISDICTION=LILBURN (~208)."
+    status: gap
+
+  - name: Dacula
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='DACULA'"
+    layers: []
+    notes: "No independent public zoning/FLU REST found. County JURISDICTION=DACULA (~197)."
+    status: gap
+
+  - name: Grayson
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='GRAYSON'"
+    layers: []
+    notes: "No independent public zoning/FLU REST found. County JURISDICTION=GRAYSON (~112)."
+    status: gap
+
+  - name: Berkeley Lake
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='BERKELEY LAKE'"
+    layers: []
+    notes: >
+      Unofficial AGOL "Berkeley Lake Proposed Zoning Districts" exists but is not an official city
+      publication — do not wire. Use county JURISDICTION=BERKELEY LAKE (~45).
+    status: gap
+
+  - name: Loganville
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='LOGANVILLE' (spans Gwinnett+Walton)"
+    layers: []
+    notes: "No Gwinnett-side city REST found. County JURISDICTION=LOGANVILLE (~71). Walton side out of scope."
+    status: gap
+
+  - name: Auburn
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='AUBURN' (mostly Barrow; small Gwinnett footprint)"
+    layers: []
+    notes: "County JURISDICTION=AUBURN (~10). Prefer Barrow County sources for Auburn core."
+    status: gap
+
+  - name: Braselton
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='BRASELTON' (multi-county)"
+    layers: []
+    notes: "County JURISDICTION=BRASELTON (~91). Multi-county town — Jackson/Barrow/Hall also needed for full coverage."
+    status: gap
+
+  - name: Mulberry
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='MULBERRY'"
+    layers: []
+    notes: "County JURISDICTION=MULBERRY (~642). No separate city REST found."
+    status: gap
+
+  - name: Rest Haven
+    level: city
+    parentFips: "13135"
+    joinToCountyParcels: "Spatial join; JURISDICTION='REST HAVEN'"
+    layers: []
+    notes: "County JURISDICTION=REST HAVEN (~10). Tiny municipality; no city REST."
+    status: gap
+
+gaps:
+  - "County 2045 Future Development Map (GC_Planning/7) is only 16 coarse INTENSITY polygons — not parcel-level FLU. Use city character-area layers where available (Lawrenceville, Duluth, Peachtree Corners); other cities lack public FLU REST."
+  - "No lastSale.qualified / deed-validity flag on Land Value Table sales; many SALE*AMT are 0 or 1 (non-market)."
+  - "AGOL Property_and_Tax/FeatureServer/0 parcels are geometry+PIN only — must join Tax Master (/3) or prefer GC_Parcel/MapServer/6."
+  - "Most municipalities (Suwanee, Norcross, Snellville, Buford, Sugar Hill, Lilburn, Dacula, Grayson, Berkeley Lake, Loganville, etc.) have no independent public zoning/FLU REST; rely on county Municipal Zoning JURISDICTION filter + spatial join."
+  - "Planning folder and several GISDataBrowser service names (GC_Zoning, GC_FLU, GC_Sales) return Token Required — use the open GC_Parcel / GC_Planning / AGOL Property_and_Tax endpoints instead."
+  - "Assessor HTML search is qPublic AppID=1282 (and legacy manatron URL); automated clients often get CDN/bot 403 — site is public for humans."
+  - "Value fields (TOTVAL1/TAXTOT1/SALE*AMT) are strings; parse before numeric filters. No distinct tax.taxableValue."
+  - "Buford/Loganville/Auburn/Braselton cross county lines — Gwinnett Municipal Zoning only covers the Gwinnett footprint."
+
+license: "Gwinnett County GIS Open Data portal (gcgis-gwinnettcountyga.hub.arcgis.com) and public MapServer/FeatureServer endpoints; City of Lawrenceville GIS; City of Duluth GIS (DuluthGIS); City of Peachtree Corners open data. Attribution to Gwinnett County GIS / respective cities. Public CAMA fields; do not scrape emails/phones. No paid vendors."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=1282&LayerID=43872&PageTypeID=2&PageID=16058
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"

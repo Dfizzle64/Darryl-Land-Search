@@ -1,0 +1,347 @@
+state: GA
+jurisdiction: Clay County
+fips: "13061"
+level: county
+markets: [Georgia]
+
+layers:
+  # PRIMARY — county-wide parcel polygons + WinGAP CAMA (owner/mailing/situs/acres/FMV)
+  - role: parcels
+    name: Clay_County_Parcels_10_23 Parcel_Regions_w_WinGAP — RVRC_ELA FeatureServer
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Clay_County_Parcels_10_23/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      lastname: ownerName
+      firstname: ownerFirstName
+      address1: mailingAddress
+      address2: mailingAddress2
+      address3: mailingAddress3
+      city: mailingCity
+      state: mailingState
+      zip_code: mailingZip
+      house_no: situsNumber
+      street_nam: situsStreet
+      sttype: situsStreetType
+      Deed_Acres: acreage
+      Draw_Acres: acreageGis
+      totalacres: acreageTotal
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      mavcurr: tax.assessedValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      sale_val: lastSale.price
+      saleland1: lastSale.landPrice
+      saleimp1: lastSale.improvementPrice
+      zoning: zoning
+      taxdistric: taxDistrict
+      legal_desc: legalDescription
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+      lat: latitude
+      lon: longitude
+      qPub_Link: appraiserSearchUrl
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + WinGAP CAMA landbase (River Valley Regional
+      Commission RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM — Clay_County_Parcels_10_23 FeatureServer
+      layer 0 "Parcel_Regions_w_WinGAP"). Live count 3063 (2026-09-24). SR NAD 1983 UTM
+      Zone 16N (wkid 26916). GEO-VERIFY GEORGIA: WGS84 samples ~-85.098,31.770 /
+      ~-85.090,31.770 (Swift Bend / Eufaula Hwy) — Clay County GA / Fort Gaines
+      (~-85.00,31.61) SWGA Chattahoochee ring (Census TIGERweb GEOID 13061 CENTLAT
+      +31.6262293 CENTLON -084.9800249). REJECT Clay County FL qPublic AppID=830
+      LayerID=15008 "Property Appraiser" Green Cove Springs (parcel format
+      29-05-25-…; ~-81.68,30.04). REJECT Clay County AL gis.claycountyal.gov / AL
+      lookalikes (~33.27,-85.81 Ashland). REJECT ClayCounty_Parcels R0MaBWycrb80Pvlu
+      (~-81.83,30.04 Clay FL). REJECT Clay MN/MO/WV AGOL parcels; REJECT Clayton County
+      GA (FIPS 13063) hub/tyler services. lastname filled ≈3051; curr_val>0 ≈3051;
+      Deed_Acres>0 ≈3047; house_no>0 ≈1465; qPub_Link filled 3063. sale_val>0 =0;
+      saleland1>0 ≈14 — sales essentially unused on REST (prefer qPublic Sales HTML).
+      mavcurr>0 =0 — assessed unused; prefer curr_val as market; assessed/taxable via
+      qPublic HTML. city/state/zip_code are OWNER mailing (e.g. Albany GA, Georgetown GA
+      39854 Quitman) — never municipality filter. Compose situs house_no+street_nam+sttype
+      when house_no>0. zoning opaque numeric codes (~2916 filled) — no Euclidean legend
+      on REST. Official human GIS viewer: garc.maps.arcgis.com webappviewer
+      id=603ec184e56e4d07b16939aa1f660e89 ("Clay Parcels and Legal Boundaries", RVRC_ELA).
+      Assessor qPublic App=clayCountyGA (qPub_Link KeyValue deep-link; also
+      App=ClayCountyGA; qpublic.net/ga/clay — search.html 404; bot 403 Application.aspx).
+      ClayCountyGA_WFS 404. claycountyga.net/maps hosts static parcel PDF only.
+      Rejected paid Regrid/ATTOM/DynamoSpatial. WATER/SEWER/gas/electricty present —
+      SKIP per tranche-3 (no utilities). Schema may expose appraiser name fields —
+      DO NOT collect emails/phones.
+    status: usable
+
+  - role: tax
+    name: Clay_County_Parcels_10_23 curr_val / fmv* (on preferred parcels)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Clay_County_Parcels_10_23/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Deed_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_No: parcelId
+      curr_val: tax.marketValue
+      prev_val: tax.priorMarketValue
+      fmvres: tax.marketValueResidential
+      fmvcom: tax.marketValueCommercial
+      fmvacc: tax.marketValueAccessory
+      mavcurr: tax.assessedValue
+      histyr1: tax.histYear1
+      histval1: tax.histValue1
+      histyr2: tax.histYear2
+      histval2: tax.histValue2
+      histyr3: tax.histYear3
+      histval3: tax.histValue3
+    notes: >
+      Tax/CAMA values live on preferred parcel polygons. curr_val>0 ≈3051; mavcurr>0=0 —
+      no usable assessedValue on REST; use curr_val market + qPublic App=clayCountyGA HTML
+      for assessed/taxable. histyr*/histval* are assessment value-year history — NOT sales.
+    status: usable
+
+  - role: sales
+    name: null — sale_val unused; saleland1 sparse (14)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      sale_val>0 =0 on Clay_County_Parcels_10_23/0 (2026-09-24); saleland1>0 ≈14 /
+      saleimp1>0 ≈9 — too sparse for county sales landbase. Prefer qPublic Sales Search
+      HTML App=clayCountyGA. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no public Euclidean zoning FeatureServer (opaque parcel zoning only)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Clay County GA Euclidean zoning FeatureServer found. Parcel attribute zoning
+      (~2916 filled) is opaque numeric codes with no published REST legend — secondary
+      only on parcels layer; not preferred Euclidean districts. Planning PDF/staff gap.
+    status: gap
+
+  - role: flu
+    name: null — no public county FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Clay County GA Future Land Use FeatureServer found (2026-09-24) — Comp Plan PDF / RVRC staff gap.
+    status: gap
+
+municipalities:
+  - name: Fort Gaines
+    level: city
+    parentFips: "13061"
+    joinToCountyParcels: "Spatial clip Clay_County_Parcels_10_23/0 to Fort Gaines city limits (no separate city-limits REST recovered — use Census places / staff boundary)."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Fort Gaines zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Fort Gaines FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county Clay_County_Parcels_10_23/0 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Parcel_No landbase + Fort Gaines poly; county seat Fort Gaines GA (~-85.00,31.61).
+        status: gap
+    gaps:
+      - "No Fort Gaines-owned parcel/zoning/FLU REST separate from RVRC Clay_County_Parcels_10_23."
+    status: partial
+
+  - name: Bluffton
+    level: city
+    parentFips: "13061"
+    joinToCountyParcels: "Spatial clip county parcels; no Bluffton city-limits REST found."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bluffton zoning REST.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Bluffton FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County Clay_County_Parcels_10_23/0 spatial.
+        status: gap
+    gaps:
+      - "No Bluffton-owned zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "sale_val unused (0); saleland1/saleimp1 sparse — no public REST multi-sale history; qPublic App=clayCountyGA HTML only."
+  - "mavcurr assessed unused (mavcurr>0=0) — assessed/taxable via qPublic HTML."
+  - "Parcel zoning opaque numeric — no Euclidean zoning REST."
+  - "No county FLU REST."
+  - "ClayCountyGA_WFS 404; qpublic.net/ga/clay/search.html 404 (home + App=clayCountyGA still live)."
+  - "REJECT Clay County FL AppID=830 / Green Cove Springs; REJECT Clay County AL; REJECT Clay MN/MO/WV; REJECT Clayton County GA 13063."
+  - "WATER/SEWER/gas/electricty skipped (no utilities/AADT per tranche-3)."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial; no emails/phones collected."
+
+license: >
+  River Valley Regional Commission (RVRC_ELA) AGOL Clay_County_Parcels_10_23
+  (services1.arcgis.com/Ug5xGQbHsD8zuZzM — Parcel_Regions_w_WinGAP). Public viewer
+  garc.maps.arcgis.com webappviewer id=603ec184e56e4d07b16939aa1f660e89. Assessor HTML
+  qPublic SchneiderCorp App=clayCountyGA (qpublic.net/ga/clay; qPub_Link KeyValue
+  deep-links). Attribution Clay County Tax Assessors / RVRC. Public fields only;
+  no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=clayCountyGA&Layer=Parcels&PageType=Search
+jurisdictionGisUrl: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=603ec184e56e4d07b16939aa1f660e89
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services1.arcgis.com/Ug5xGQbHsD8zu
+    ZzM/arcgis/rest/services/Clay_County_Parcels_10_23/FeatureServer/0 count 3063; extent center
+    [['13061', 'Clay County']]; sample [['13061', 'Clay County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Bluffton town"
+      level: city
+      parentFips: "13061"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Fort Gaines city"
+      level: city
+      parentFips: "13061"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Clay' AND aadt>0
+    altFilter: name LIKE '061-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 061-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 33
+    maxAadt: 3600
+    geoCheck: 33/33 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - curr_val
+    - a_value
+    - fmvres
+    filledCount: 3051
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Clay_County_Parcels_10_23/FeatureServer/0
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: 'REST sale fields empty/sparse: sale_val=0'
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: lastname
+    filledCount: 3051
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/Clay_County_Parcels_10_23/FeatureServer/0
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=clayCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: Parcel_No
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=clayCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'verified-by-source: county REST layer publishes this exact link pattern with KeyValue = Parcel_No;
+      box test HTTP 403 (Cloudflare challenge)'
+    appSlugSource: county REST qPub link
+  jurisdictionGisUrl:
+    county: https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=603ec184e56e4d07b16939aa1f660e89
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Bluffton town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Fort Gaines city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

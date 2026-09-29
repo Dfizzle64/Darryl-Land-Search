@@ -1,0 +1,283 @@
+state: GA
+jurisdiction: Marion County
+fips: "13197"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: null — no public county ArcGIS parcel FeatureServer found
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      Honest gap: no Marion County GA public parcel FeatureServer/MapServer with cadastral
+      polygons recovered (2026-09-24). Official human viewer = qPublic/Beacon AppID=990
+      LayerID=20167 (qpublic.net/ga/marion Search Records → Application.aspx?AppID=990&
+      LayerID=20167&PageTypeID=2&PageID=8776; also App=MarionCountyGA name pattern). County
+      seat Buena Vista GA (100 Burkhalter Avenue, Buena Vista GA 31803; marioncountyga.org
+      Property Appraisal). Cloudflare/bot 403 blocks automated Application.aspx from research
+      box; public for humans. MarionCountyGA_WFS on wfs.schneidercorp.com returns 404.
+      RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM has MarionAddresses / BuenaVistaAddresses /
+      CityLimits_Marion / Marion_CityLimits / Marion_Roads / Marion_Blocks / Marion_Tracts
+      / MarionVTD — NO Marion parcel FS (contrast ParcelsChattCo for Chattahoochee 13053
+      on same org). Rejected RVRC Parcels4_2026_HUB / Parcels4_2025 / Parcels9_2025HUB2
+      (Harris County / West Point ~-85.16,32.87 — NOT Marion; 0 hits at Buena Vista
+      -84.52,32.32). Rejected TOBVAM BV_Parcels_* (~-106.12,38.83 Buena Vista CO);
+      rejected Marion County FL (gis-marioncounty.opendata.arcgis.com / pa.marion.fl.us
+      ~Ocala); rejected Marion IN (IndyGIS); rejected Marion OR taxlots; rejected paid
+      Regrid/ATTOM/USLandGrid/DynamoSpatial. GEO-VERIFY GEORGIA: Census TIGERweb GEOID
+      13197 CENTLAT +32.3534067 CENTLON -084.5245785; CityLimits_Marion Buena Vista
+      INTPT ~-84.5175638,+32.3184813; BuenaVistaAddresses samples ~-84.516,32.319 —
+      west-central GA Buena Vista / Columbus ring (NOT Marion FL/IN/OR/WV lookalikes).
+      Skip utilities+AADT; no emails/phones.
+    status: gap
+
+  - role: tax
+    name: null — qPublic HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No CURR_VAL/FMV/assessed on public REST. Tax/CAMA via qPublic AppID=990 /
+      App=MarionCountyGA HTML only. Deep-link KeyValue={parcelId}:
+      Application.aspx?AppID=990&LayerID=20167&PageTypeID=4&KeyValue={parcelId}
+      (or App=MarionCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}).
+      Estimate Taxes link PageID=8835 (AppID=990 LayerID=20167 PageTypeID=2). Property-tax
+      payment marioncountyga.governmentwindow.com is billing — not CAMA GIS.
+    status: gap
+
+  - role: sales
+    name: null — qPublic Sales Search HTML only
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No public REST sale history. Prefer qPublic Sales Search / Sales List HTML
+      (AppID=990 / App=MarionCountyGA). Rejected paid Regrid/ATTOM sales extracts.
+    status: gap
+
+  - role: zoning
+    name: null — no public county zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Marion County GA Euclidean zoning REST found (2026-09-24). Municode code of
+      ordinances (library.municode.com/ga/marion_county) — not GIS polygons. Comp Plan /
+      RVRC Impact Planning PDF gap.
+    status: gap
+
+  - role: flu
+    name: null — no public FLU FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No Marion County GA Future Land Use / Character Areas FeatureServer recovered.
+    status: gap
+
+  - role: other
+    name: CityLimits_Marion — Buena Vista city (RVRC_ELA; STATEFP=13)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/CityLimits_Marion/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: cityName
+      GEOID: placeGeoid
+      INTPTLAT: latitude
+      INTPTLON: longitude
+    notes: >
+      Preferred spatial municipality filter (count 1; NAME='Buena Vista'; GEOID=1311728;
+      STATEFP='13'; INTPT ~-84.5176,+32.3185). Twin Marion_CityLimits/0 is geometry-only
+      stub — prefer CityLimits_Marion for NAME/GEOID. Not a parcel substitute.
+    status: usable
+
+  - role: other
+    name: BuenaVistaAddresses (RVRC_ELA situs points — city-only)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/BuenaVistaAddresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NUMBER_: situsNumber
+      ADDRESS: situsStreet
+      APARTMENT: situsUnit
+      MAIN_CPN: parcelIdSoft
+    notes: >
+      Live count 951; ADDRESS filled 951; MAIN_CPN non-blank ≈105 (soft parcel aid only).
+      Geo samples ~-84.516,32.319 / ~-84.520,32.315 — Buena Vista GA. Companion
+      MarionAddresses/0 (count 3251; F1='CO13197' confirms FIPS 13197) is census-block-ish
+      points without usable street fields — prefer BuenaVistaAddresses for situs. No
+      county-wide owner/tax join. DO NOT collect contact fields if present.
+    status: usable
+
+municipalities:
+  - name: Buena Vista
+    level: city
+    parentFips: "13197"
+    joinToCountyParcels: >
+      Spatial CityLimits_Marion/0 NAME='Buena Vista' (~-84.518,32.318) OR
+      BuenaVistaAddresses points — county parcel REST still missing; qPublic HTML only
+      for CAMA. County seat.
+    layers:
+      - role: zoning
+        name: null — no Buena Vista city zoning REST
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Buena Vista GA city zoning FeatureServer found.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Buena Vista FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county qPublic HTML + spatial city limits
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          No Buena Vista-owned CAMA FS. REJECT Colorado TOBVAM BV_Parcels_* (~-106,38.8).
+          Soft situs: BuenaVistaAddresses/0.
+        status: gap
+    gaps:
+      - "No Buena Vista city-owned parcel/zoning/FLU REST — RVRC city limits + addresses only; CAMA via county qPublic."
+    status: partial
+
+gaps:
+  - "No public REST parcels/owner/tax/sales/zoning/FLU for Marion County GA — qPublic AppID=990 LayerID=20167 (App=MarionCountyGA) HTML only."
+  - "MarionCountyGA_WFS 404; no RVRC_ELA Marion parcel FeatureServer (city limits + addresses only)."
+  - "REJECT Marion FL gis-marioncounty.opendata.arcgis.com / pa.marion.fl.us; REJECT Marion IN IndyGIS; REJECT Marion OR; REJECT Buena Vista CO TOBVAM BV_Parcels; REJECT RVRC Parcels4_* Harris/West Point; REJECT paid Regrid/ATTOM/USLandGrid."
+  - "qPublic Application.aspx Cloudflare/bot 403 automated; public for humans (qpublic.net/ga/marion)."
+  - "No emails/phones; no paid vendors; skipped utilities+AADT."
+
+license: >
+  Marion County Tax Assessor qPublic/Beacon AppID=990 LayerID=20167 /
+  App=MarionCountyGA (qpublic.net/ga/marion; marioncountyga.org Property Appraisal).
+  River Valley Regional Commission RVRC_ELA AGOL org Ug5xGQbHsD8zuZzM —
+  CityLimits_Marion; BuenaVistaAddresses; MarionAddresses (FIPS aid). No public ArcGIS
+  parcel service discovered 2026-09-24. Attribution Marion County Tax Assessor / RVRC GIS.
+  Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=990&LayerID=20167&PageTypeID=2&PageID=8776
+jurisdictionGisUrl: https://qpublic.schneidercorp.com/Application.aspx?App=MarionCountyGA&Layer=Parcels&PageType=Maps
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: gap
+  parcelStatusAfter: gap
+  summary: >
+    No county-wide public parcel polygon REST found in pass1 re-verification. Status stays gap.
+  tried:
+    - "ArcGIS Online sharing search: 9 county query variants + 4 county-seat queries, filtered by TIGER point-in-polygon on item extent (0 county-wide parcel hits)"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (1617 services / 3321 polygon layers) - no layer whose samples fall in this county"
+    - "GMASS org ISpzx3B5ZsVA6e1Z (52 services), GDITAdmin 'Parcels - GA - *' catalog (133 items), HOGARC HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma folders, CRC/segrass folders, wfs.schneidercorp.com service list (GA: Butts, Franklin, Grady, Habersham, Perry, Washington only), UGA org PYn6bWCjT6bhw1z3 name-filtered"
+    - "qPublic/Beacon viewer is HTML behind Cloudflare - no public REST; paid vendors (Regrid/ReportAll/LightBox/USLandGrid) not used"
+  cities:
+    - name: "Buena Vista city"
+      level: city
+      parentFips: "13197"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: gap
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Marion' AND aadt>0
+    altFilter: name LIKE '197-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 197-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 66
+    maxAadt: 4420
+    geoCheck: 66/66 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=MarionCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=990&LayerID=20167&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: null
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: null
+    sampleUrl: null
+    verification: 'untested-with-real-id: no public parcel ID source for this county (template from existing card
+      qPublic app); Cloudflare blocks box anyway'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=MarionCountyGA&Layer=Parcels&PageType=Maps
+    note: existing card viewer (HTTP 403 from box)
+    cities:
+    - name: Buena Vista city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

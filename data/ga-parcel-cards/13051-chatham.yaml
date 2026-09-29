@@ -1,0 +1,540 @@
+state: GA
+jurisdiction: Chatham County
+fips: "13051"
+level: county
+markets: [Savannah]
+
+layers:
+  # PRIMARY — county-wide parcels with owner, situs, mailing, acreage, sales+Sale_Quality, tax FMV/assessment, estimated zoning
+  - role: parcels
+    name: Pictometry Parcel Digest (SAGIS all-in-one CAMA)
+    restUrl: https://pub.sagis.org/arcgis/rest/services/Pictometry/ParcelDigest/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Acres: acreage
+      CALCAC: acreageCalculated
+      Owner: ownerName
+      Owner2: ownerName2
+      Mailing_Address: mailingAddress
+      Mailing_City: mailingCity
+      Mailing_State: mailingState
+      Mailing_Zip: mailingZip
+      PropAddress_Full: situsAddress
+      PropAddress_City: situsCity
+      PropAddress_Zip: situsZip
+      Sale_Price: lastSale.price
+      SALE_DATE: lastSale.date
+      Sale_YY: lastSale.year
+      Sale_MM: lastSale.month
+      Sale_DD: lastSale.day
+      Sale_Quality: lastSale.qualified
+      FairMarketValue: tax.marketValue
+      Total_Assessment: tax.assessedValue
+      FMV_Land: tax.landMarketValue
+      FMV_Building: tax.improvementMarketValue
+      ZONEID: zoning
+      ZONE_DESC: zoningDescription
+      Property_Use: dorCode
+      Municipality: municipalityCode
+      Land_Use_1: landUseCode
+    notes: >
+      Preferred county-wide parcel+CAMA source for land search. Live count 127033 (2026-09-23).
+      Spatial reference NAD 1983 StatePlane Georgia East FIPS 1001 Feet (wkid 102666 / latestWkid 2239).
+      maxRecordCount 2000. Geo-verified WGS84 samples ~-80.87, 31.998 (Tybee Island) and ~-81.15, 32.05
+      (Savannah) — Chatham County GA, not Chatham County NC.
+      Rich CAMA on polygons: owner, mailing, situs, Acres (~3296 in app 5–150 acre band), sales with
+      Sale_Quality (Q≈59142 qualified / U≈58835 unqualified; Sale_Price>0 ≈79106), FairMarketValue
+      (~126854 >0), Total_Assessment ≈ 40% of FairMarketValue (GA assessed), FMV_Land / FMV_Building,
+      SALE_DATE, and estimated ZONEID/ZONE_DESC (parcel-attributed zoning from SAGIS spatial assign —
+      prefer official Zoning polygons for authoritative district boundaries).
+      Date_Updated max 2026-06-22 despite stale MapServer description text claiming "Current Digest Year: 2021".
+      Identical schema/count mirror: https://sagisservices.sagis.org/arcgis/rest/services/SAGISorg/MapLayers/MapServer/4
+      ("Property Boundaries (Parcels)"). Prefer this over EnerGov when tax values are required in one query.
+      Municipality codes (tax district): 010=Unincorporated, 020=Savannah, 030=Thunderbolt, 040=Tybee Island,
+      050=Pooler, 060/061=Garden City, 070=Port Wentworth, 080=Bloomingdale, 090=Vernonburg;
+      T020/CID1/TC20=Savannah special districts. Prefer spatial intersect OpenData Municipality for
+      incorporated-city filter (Municipality attr can lag annexation / marsh coding).
+    status: usable
+
+  - role: parcels
+    name: EnerGov Parcel (weekly live ownership — no tax values)
+    restUrl: https://pub.sagis.org/arcgis/rest/services/ChathamCounty/EnerGovForChathamCounty/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Acres: acreage
+      Owner: ownerName
+      Owner2: ownerName2
+      Mailing_Address: mailingAddress
+      Mailing_City: mailingCity
+      Mailing_State: mailingState
+      Mailing_Zip: mailingZip
+      PropAddress_Full: situsAddress
+      PropAddress_City: situsCity
+      PropAddress_Zip: situsZip
+      Sale_Price: lastSale.price
+      Sale_YY: lastSale.year
+      Sale_MM: lastSale.month
+      Sale_DD: lastSale.day
+      Sale_Quality: lastSale.qualified
+      Property_Use: dorCode
+      Municipality: municipalityCode
+      Land_Use_1: landUseCode
+    notes: >
+      Live weekly parcel+ownership mirror. Live count 127454 (2026-09-23) — ~421 more parcels than
+      Pictometry/MapLayers; Date_Updated max 2026-09-21 (fresher than Pictometry 2026-06-22).
+      Same owner/mailing/situs/Acres/sales/Sale_Quality schema as Pictometry. NO FairMarketValue /
+      Total_Assessment / ZONEID — join Pictometry or OpenData Parcel Digest 2025 on PIN for tax.
+      Mirror: Savannah/CitizenServe/MapServer/2 Current Parcels (same count 127454). Prefer
+      Pictometry ParcelDigest when a single-layer parcel+tax source is needed; use this for freshest
+      geometry/ownership/sales without tax.
+    status: usable
+
+  - role: parcels
+    name: OpenData Parcel Digest 2025 (annual tax digest FeatureServer)
+    restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Parcels/FeatureServer/27
+    layerId: 27
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Acres: acreage
+      Owner: ownerName
+      FairMarketValue: tax.marketValue
+      Total_Assessment: tax.assessedValue
+      FMV_Land: tax.landMarketValue
+      FMV_Building: tax.improvementMarketValue
+      Sale_Price: lastSale.price
+      Sale_YY: lastSale.year
+      Sale_Quality: lastSale.qualified
+      Municipality: municipalityCode
+    notes: >
+      Official named 2025 Parcel Digest FeatureServer. Live count 125326; FairMarketValue>0 ≈125155.
+      Date_Updated ≈2025-05-06 — older than Pictometry (2026-06). Same tax field family; NO ZONEID.
+      Prefer Pictometry/MapLayers for current all-in-one; use this when a FeatureServer digest snapshot
+      is required. Historical digests also on OpenData/Parcels FeatureServer (layers 0–26).
+    status: partial
+
+  - role: tax
+    name: Pictometry Parcel Digest (CAMA values on polygons)
+    restUrl: https://pub.sagis.org/arcgis/rest/services/Pictometry/ParcelDigest/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      FairMarketValue: tax.marketValue
+      Total_Assessment: tax.assessedValue
+      FMV_Land: tax.landMarketValue
+      FMV_Building: tax.improvementMarketValue
+    notes: >
+      Tax/CAMA values live on the preferred parcel polygons (not a separate service).
+      Total_Assessment ≈ 0.4×FairMarketValue (GA 40% assessment) on sampled parcels. No distinct
+      tax.taxableValue field beyond Total_Assessment. Equivalent OpenData Digest 2025 FeatureServer/27
+      and SAGISorg/MapLayers/MapServer/4. Tax Commissioner HTML: chathamtax.org; BOA: boa.chathamcountyga.gov.
+    status: usable
+
+  - role: sales
+    name: lastSale on Pictometry / EnerGov parcel polygons
+    restUrl: https://pub.sagis.org/arcgis/rest/services/Pictometry/ParcelDigest/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Sale_Price: lastSale.price
+      SALE_DATE: lastSale.date
+      Sale_YY: lastSale.year
+      Sale_MM: lastSale.month
+      Sale_DD: lastSale.day
+      Sale_Quality: lastSale.qualified
+      Sale_Book: lastSale.docRef
+      Sale_Page: lastSale.docPage
+    notes: >
+      Sale history is on the parcel polygons (not a separate sales table). Live Sale_Price>0 ≈79106
+      on Pictometry; Sale_Quality Q (qualified) ≈59142, U (unqualified) ≈58835, plus sparse other codes.
+      Prefer Sale_Quality='Q' for arms-length comps. SALE_DATE is esri date; Sale_YY/MM/DD are split
+      ints (Sale_YY max 2026 on EnerGov and Pictometry). EnerGov/13 has same sale fields without
+      SALE_DATE. No multi-sale history array on REST — prior sales via qPublic HTML AppID=1094.
+    status: usable
+
+  - role: zoning
+    name: OpenData Boundaries Zoning (county + all municipalities)
+    restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONE: zoning
+      ZONING_DISTRICT: zoningDescription
+      CODE: zoningJurisdictionCode
+      POLYGON_AREA: zoningPolygonArea
+    notes: >
+      Preferred county-wide zoning POLYGON layer (MPC / SAGIS official). Live count 1852 (2026-09-23).
+      CODE domain MUN_CODE: 01=UNICORP (496), 02=SAVANNAH (843), 03=THUNDERBOLT (24), 04=TYBEE ISLAND (43),
+      05=POOLER (159), 06=GARDEN CITY (154), 07=PORT WENTWORTH (80), 08=BLOOMINGDALE (47), 09=VERNONBURG (1).
+      Spatial-join to parcels (no PIN on this layer). Parcel ZONEID on Pictometry is estimated alternate.
+      Mirrors (same 1852 schema): Savannah/CitizenServe/MapServer/5; Savannah/ZoningDevelopment_Map/MapServer/6;
+      SAGISorg/MapLayers/MapServer/5. Prefer FeatureServer OpenData/4 for queries.
+      EnerGovForChathamCounty/MapServer/40 Zoning is UNICORP-only (live CODE=01 count 496) despite
+      description mentioning Savannah — do not prefer for city parcels. AGOL Zoning_BND_AGOL
+      (services6.arcgis.com/…/Zoning_BND_AGOL/FeatureServer/0) is Savannah-only CODE=02 count 853 — flag partial.
+    status: usable
+
+  - role: flu
+    name: OpenData Boundaries Future Land Use (Savannah + unincorporated)
+    restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRES
+    coverage: partial
+    fieldMap:
+      FUTURE_LU: flu
+      PIN: parcelIdAlt
+      CALC_ACRES: acreage
+      COMMENT: fluComment
+    notes: >
+      FLU for City of Savannah and unincorporated Chatham County (MPC). Live count 101682.
+      FUTURE_LU values include Residential- Suburban Single Family (~55174), Residential- Single Family,
+      Traditional Neighborhood, Marsh, Commercial- Suburban, Planned Development, Downtown, etc.
+      PIN present but often dashed format (e.g. 2-0003 -01-001) vs parcel PIN space format
+      (20744 01002) — prefer spatial join over PIN attribute join. Mirror: MapLayers/60;
+      Savannah/ZoningDevelopment_Map/MapServer/7. Does NOT cover Pooler / Garden City / Port Wentworth /
+      Bloomingdale / Tybee / Thunderbolt / Vernonburg FLU — those cities lack public FLU REST (gap).
+    status: partial
+
+  - role: other
+    name: OpenData Municipality (city polygons)
+    restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      CITYID: municipalityCode
+      ACRES: municipalityAcres
+      SQ_MILES: municipalityAreaSqMi
+    notes: >
+      Live count 9: TYBEE ISLAND (TI), VERNONBURG (VB), PORT WENTWORTH (PW), POOLER (PL), GARDEN CITY (GC),
+      THUNDERBOLT (TB), BLOOMINGDALE (BL), SAVANNAH (SAV ≈115.95 sq mi), UNINCORPORATED (COU).
+      City-poly↔county-parcel join key = spatial intersect (no shared parcel id). Mirror:
+      EnerGovForChathamCounty/MapServer/48; MapLayers/15 Municipal Boundary.
+    status: usable
+
+municipalities:
+  - name: Savannah
+    level: city
+    parentFips: "13051"
+    joinToCountyParcels: >
+      Spatial intersect OpenData Municipality NAME='SAVANNAH' (CITYID=SAV). Parcel Municipality attr
+      '020' (~59974) plus specials T020/CID1/TC20 are strong city signals but spatial join preferred.
+      Zoning filter CODE='02' on OpenData Zoning/4 (~843 polys).
+    layers:
+      - role: zoning
+        name: OpenData Zoning CODE=02 (Savannah extract)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ZONING_DISTRICT: zoningDescription
+          CODE: zoningJurisdictionCode
+        notes: >
+          Filter CODE='02'. Live ~843 Savannah zoning polygons (e.g. RSF-5, RMF-2-15, I-L, I-H, M-CO).
+          Same official MPC layer used county-wide — preferred Savannah-local zoning on public REST.
+          AGOL Zoning_BND_AGOL (~853 CODE=02 only) is a Savannah-only mirror with ordinance links —
+          usable city subset but not county-wide. Traditional_Zones/0 is Savannah traditional subset (~115).
+        status: usable
+      - role: flu
+        name: OpenData Future Land Use (Savannah + unincorp)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: CALC_ACRES
+        coverage: city-only
+        fieldMap:
+          FUTURE_LU: flu
+          PIN: parcelIdAlt
+        notes: >
+          Spatial-intersect Savannah city poly. Downtown / Traditional Neighborhood / Residential-* etc.
+          County FLU layer covers Savannah city limits by design.
+        status: usable
+      - role: parcels
+        name: Savannah PropertyValue All Parcel (city extract with tax)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/Savannah/PropertyValue/MapServer/9
+        layerId: 9
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          Owner: ownerName
+          FairMarketValue: tax.marketValue
+          FMV_Land: tax.landMarketValue
+          FMV_Building: tax.improvementMarketValue
+          PropAddress_Full: situsAddress
+          Municipality: municipalityCode
+        notes: >
+          Live count 57228 — mostly Municipality=020 Savannah subset with CAMA tax fields. Prefer
+          county Pictometry ParcelDigest for county-wide search; use this only for Savannah-scoped apps.
+        status: partial
+    gaps:
+      - "No separate City-of-Savannah-owned zoning FeatureServer distinct from SAGIS/MPC countywide layer; city uses CODE=02 filter."
+      - "Savannah PropertyValue/9 is a city subset (~57k) — not full county."
+    status: usable
+
+  - name: Pooler
+    level: city
+    parentFips: "13051"
+    joinToCountyParcels: >
+      Spatial intersect Municipality NAME='POOLER' (CITYID=PL). Parcel Municipality='050' (~13348).
+      Zoning CODE='05' (~159 polys).
+    layers:
+      - role: zoning
+        name: OpenData Zoning CODE=05 (Pooler extract)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ZONING_DISTRICT: zoningDescription
+          CODE: zoningJurisdictionCode
+        notes: >
+          Filter CODE='05'. Sample districts R-2-A/R-2-C, C-P, etc. No independent Pooler zoning REST
+          found — SAGIS/MPC countywide layer is the public source.
+        status: usable
+      - role: parcels
+        name: PoolerParcels Weekly Update (city extract)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/Pooler/PoolerParcels/MapServer/10
+        layerId: 10
+        geometry: polygon
+        auth: none
+        acreageField: Acres
+        coverage: city-only
+        fieldMap:
+          PIN: parcelId
+          Owner: ownerName
+          Acres: acreage
+          Sale_Price: lastSale.price
+          Sale_Quality: lastSale.qualified
+          PropAddress_Full: situsAddress
+          Municipality: municipalityCode
+        notes: >
+          Live count 11214 — all Municipality=050. Owner/sales like EnerGov; NO FairMarketValue
+          (description: values only on official digest). Prefer county Pictometry for tax; this is
+          Pooler-scoped ownership extract.
+        status: partial
+    gaps:
+      - "No Pooler-owned public FLU FeatureServer; county FLU layer does not cover Pooler."
+      - "PoolerParcels has no tax values — join county Pictometry/Digest on PIN."
+    status: usable
+
+  - name: Garden City
+    level: city
+    parentFips: "13051"
+    joinToCountyParcels: >
+      Spatial intersect NAME='GARDEN CITY' (CITYID=GC). Parcel Municipality in ('060','061') (~3465).
+      Zoning CODE='06' (~154).
+    layers:
+      - role: zoning
+        name: OpenData Zoning CODE=06 (Garden City extract)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ZONING_DISTRICT: zoningDescription
+          CODE: zoningJurisdictionCode
+        notes: "Filter CODE='06'. Sample R-A, P-C-2, P-I-1. No independent city zoning REST found."
+        status: usable
+    gaps:
+      - "No Garden City-owned public zoning/FLU REST; use county Zoning CODE=06 + spatial city poly."
+      - "No public city FLU REST."
+    status: usable
+
+  - name: Port Wentworth
+    level: city
+    parentFips: "13051"
+    joinToCountyParcels: >
+      Spatial intersect NAME='PORT WENTWORTH' (CITYID=PW). Parcel Municipality='070' (~5939).
+      Zoning CODE='07' (~80).
+    layers:
+      - role: zoning
+        name: OpenData Zoning CODE=07 (Port Wentworth extract)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ZONING_DISTRICT: zoningDescription
+          CODE: zoningJurisdictionCode
+        notes: "Filter CODE='07'. Sample I-1, C-3, R-4. No independent city zoning/FLU REST found."
+        status: usable
+    gaps:
+      - "No Port Wentworth-owned public zoning/FLU REST; use county Zoning CODE=07."
+    status: usable
+
+  - name: Bloomingdale
+    level: city
+    parentFips: "13051"
+    joinToCountyParcels: >
+      Spatial intersect NAME='BLOOMINGDALE' (CITYID=BL). Parcel Municipality='080' (~1483).
+      Zoning CODE='08' (~47).
+    layers:
+      - role: zoning
+        name: OpenData Zoning CODE=08 (Bloomingdale extract)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ZONING_DISTRICT: zoningDescription
+          CODE: zoningJurisdictionCode
+        notes: "Filter CODE='08'. Sample R-1, R-A, C-1, C-2. No independent city REST found."
+        status: usable
+    gaps:
+      - "No Bloomingdale-owned public zoning/FLU REST; use county Zoning CODE=08."
+    status: usable
+
+  - name: Tybee Island
+    level: city
+    parentFips: "13051"
+    joinToCountyParcels: >
+      Spatial intersect NAME='TYBEE ISLAND' (CITYID=TI). Parcel Municipality='040' (~3908).
+      Zoning CODE='04' (~43). Tybee folder on pub.sagis.org is empty (no services).
+    layers:
+      - role: zoning
+        name: OpenData Zoning CODE=04 (Tybee Island extract)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ZONING_DISTRICT: zoningDescription
+          CODE: zoningJurisdictionCode
+        notes: >
+          Filter CODE='04'. Sample R-1-B, R-T, C-1, M-D, P-C. No Tybee-owned public FeatureServer
+          (Tybee folder empty). Prefer county Zoning CODE=04 + spatial city poly.
+        status: usable
+    gaps:
+      - "pub.sagis.org/Tybee folder has zero services; no city FLU REST."
+    status: usable
+
+  - name: Thunderbolt
+    level: city
+    parentFips: "13051"
+    joinToCountyParcels: >
+      Spatial intersect NAME='THUNDERBOLT' (CITYID=TB). Parcel Municipality='030' (~1235).
+      Zoning CODE='03' (~24).
+    layers:
+      - role: zoning
+        name: OpenData Zoning CODE=03 (Thunderbolt extract)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          ZONING_DISTRICT: zoningDescription
+          CODE: zoningJurisdictionCode
+        notes: "Filter CODE='03'. Sample R-1/R-2/R-3, R-M-H, C-M. No independent city REST found."
+        status: usable
+    gaps:
+      - "No Thunderbolt-owned public zoning/FLU REST; use county Zoning CODE=03."
+    status: usable
+
+  - name: Vernonburg
+    level: city
+    parentFips: "13051"
+    joinToCountyParcels: >
+      Spatial intersect NAME='VERNONBURG' (CITYID=VB; tiny ≈0.42 sq mi). Parcel Municipality='090' (~91).
+      Zoning CODE='09' (1 stub poly ZONE='VERNONBURG').
+    layers:
+      - role: zoning
+        name: OpenData Zoning CODE=09 (Vernonburg stub)
+        restUrl: https://pub.sagis.org/arcgis/rest/services/OpenData/Boundaries/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          ZONE: zoning
+          CODE: zoningJurisdictionCode
+        notes: >
+          Filter CODE='09' — single stub polygon (ZONE=VERNONBURG, ZONING_DISTRICT null). Not detailed
+          district codes. Tiny town; no independent city GIS REST.
+        status: partial
+    gaps:
+      - "Vernonburg zoning is a 1-polygon stub on county layer — no district breakdown; no city FLU REST."
+    status: partial
+
+gaps:
+  - "EnerGov Parcel/13 (freshest weekly ownership, count 127454) has NO FairMarketValue/Total_Assessment — join Pictometry ParcelDigest or OpenData Digest 2025 on PIN for tax, or prefer Pictometry as single-layer parcel+tax."
+  - "Pictometry/MapLayers service description text still says Digest Year 2021 but live Date_Updated is 2026-06-22 and Sale_YY max 2026 — trust live fields over stale description."
+  - "Official zoning polygons (OpenData/4) cover all municipalities via CODE; parcel ZONEID is estimated only — spatial-join polygons for authoritative zoning."
+  - "EnerGov Zoning/40 is UNICORP-only (496) despite description — do not use for Savannah/city parcels."
+  - "AGOL Zoning_BND_AGOL FeatureServer/0 is Savannah-only (CODE=02, ~853) — flag partial; not full-county."
+  - "FLU (OpenData/3, count 101682) is Savannah + unincorporated only — Pooler/Garden City/Port Wentworth/Bloomingdale/Tybee/Thunderbolt/Vernonburg have no public FLU REST."
+  - "FLU PIN format often dashed — prefer spatial join to parcels over PIN equality."
+  - "No multi-sale history array on REST; only latest sale on polygon — prior sales via qPublic AppID=1094 HTML."
+  - "Total_Assessment is GA 40% assessed; no separate tax.taxableValue / exemption breakdown on these layers."
+  - "Tybee folder on pub.sagis.org is empty; MPC folder has agenda/FEMA/MTP — not zoning/parcels."
+  - "Rejected lookalikes: gisservices.chathamcountync.gov (Chatham County NC — wrong state); do not wire NC AssessmentInformation/Cadastral. Open-data hub sometimes surfaces unrelated AGOL — wire only pub.sagis.org / sagisservices.sagis.org verified endpoints."
+  - "qPublic / schneidercorp AppID=1094 may return CDN/bot 403 to automated clients; public for humans."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Savannah Area Geographic Information System (SAGIS) public ArcGIS Server (pub.sagis.org,
+  sagisservices.sagis.org) — Pictometry ParcelDigest, ChathamCounty EnerGovForChathamCounty,
+  OpenData Boundaries/Parcels, Savannah CitizenServe / ZoningDevelopment_Map / PropertyValue,
+  Pooler PoolerParcels, SAGISorg MapLayers. Zoning/FLU maintained with Chatham County–Savannah
+  Metropolitan Planning Commission (thempc.org). Open data portal data-sagis.opendata.arcgis.com.
+  qPublic SchneiderCorp (AppID=1094) for CAMA HTML; boa.chathamcountyga.gov / chathamtax.org for
+  assessor and tax commissioner. Attribution to SAGIS / Chatham County BOA / MPC / respective cities.
+  Public fields only; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=ChathamCountyGA&PageType=Search
+verifiedAt: 2026-09-23
+verifiedBy: "Georgia Public Info Researcher"

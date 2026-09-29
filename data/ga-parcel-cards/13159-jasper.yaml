@@ -1,0 +1,326 @@
+state: GA
+jurisdiction: Jasper County
+fips: "13159"
+level: county
+markets: [Atlanta]
+
+layers:
+  # PRIMARY — NEGRC FDM join carries county parcel polys + WinGAP-ish CAMA + FLU
+  - role: parcels
+    name: JasperCo_FDM_Online_2023_Working FDM_JasperCo_2023 (NEGRC parcel+FLU join)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PARCEL_NO_1: parcelIdJoinSoft
+      REALKEY: parcelKey
+      OWNKEY: ownerKey
+      LASTNAME: ownerName
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      LEGAL_DESC: legalDescription
+      TOTALACRES: acreage
+      GIS_Acres: acreageGis
+      GIS_ACRES_1: acreageGisAlt
+      CURR_VAL: tax.marketValue
+      HOMEEXEMPT: homesteadExempt
+      NEIGHBHOOD: neighborhood
+      CharArea: fluCharacterArea
+      FLU: flu
+      Map_Number: mapSheet
+      Shape__Area: shapeAreaSqM
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + soft CAMA + FLU from NEGRC Jasper County
+      Joint Comp Plan FDM working set (AGOL org Ug5xGQbHsD8zuZzM / beatty.mark /
+      NEGARC_ELA). Live count 8855 (2026-09-24). GIS_Acres 5–150 ≈3267; CURR_VAL>0 ≈1871
+      (partial value fill — not full digest). Prefer GIS_Acres for acreage band; TOTALACRES
+      often string. Join-artifact fields PARCEL_NO_1 / Join_Count — prefer PARCEL_NO as
+      id. NO dedicated county TaxParcels FeatureServer / Schneider WFS (wfs has
+      JasperCountyIA/IN/MO only — wrong state). Official human viewer = qPublic
+      App=JasperCountyGA (qpublic.net/ga/jasper; bot 403). REJECTED City_of_Monticello_GA
+      Parcel FeatureServer (services6…/WjqAE1SlQxuk7dsk) — Regrid-style enriched extract
+      (path /us/ga/jasper/monticello, ll_uuid/ll_gisacre) — paid-vendor pattern, do NOT
+      wire. Geo-verified WGS84 samples ~-83.712,33.497 / ~-83.709,33.498 (Davis Rd north
+      Jasper) — Jasper County GA / Monticello (~-83.68,33.30) (NOT Jasper County IA/IN/MO
+      / SC; NOT Jasper AL). Vintage 2023 FDM working set — not daily-fresh assessor
+      landbase; re-check for newer county CAMA REST periodically.
+    status: usable   # pass1 2026-09-28: was partial; upgraded for Pass 1 (polygon + parcel ID). See pass1_2026-09-28 block.
+
+  - role: tax
+    name: FDM_JasperCo_2023 CURR_VAL (partial on parcel join)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      CURR_VAL: tax.marketValue
+      HOMEEXEMPT: homesteadExempt
+    notes: >
+      CURR_VAL>0 only ≈1871 of 8855 — partial. Full assessed/taxable via qPublic
+      App=JasperCountyGA HTML. Deep-link: Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Report&KeyValue={PARCEL_NO}.
+    status: partial
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Jasper GA multi-sale FeatureServer recovered. Prefer qPublic Sales Search HTML
+      (Yearly Sales layer in Beacon UI is HTML-only). Rejected paid vendors; rejected
+      Regrid Monticello extract sales fields.
+    status: gap
+
+  - role: zoning
+    name: null — no county Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No unincorporated Jasper County zoning FeatureServer recovered. qPublic Beacon UI
+      lists "Jasper County Zoning" as map layer (HTML/bot 403 — no public REST URL
+      recovered). Prefer Monticello_City_Zoning inside city; certify county sites via
+      Planning / zoning map PDF.
+    status: gap
+
+  - role: flu
+    name: FDM_JasperCo_2023 FLU / CharArea (same preferred layer)
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      FLU: flu
+      CharArea: fluCharacterArea
+    notes: >
+      Preferred public REST FLU on FDM parcel join (sample FLU F-A; CharArea RG). Sibling
+      layers: /3 Monticello Future Land Use (1500; CharArea), /4 Shady Dale Future Land
+      Use, /5 Jasper County Future Land Use Categories, /1 City Limits. Certify vs 2023
+      Joint Comp Plan / NEGRC storymap. Status partial — working FDM vintage.
+    status: partial
+
+municipalities:
+  - name: Monticello
+    level: city
+    parentFips: "13159"
+    joinToCountyParcels: >
+      Spatial JasperCo_FDM City Limits (/1) OR Monticello_City_Zoning polys OR soft
+      map prefix M* parcel ids. Centroid ~-83.68,33.30.
+    layers:
+      - role: zoning
+        name: Monticello_City_Zoning
+        restUrl: https://services3.arcgis.com/M9gZILQTOrLt7QKE/arcgis/rest/services/Monticello_City_Zoning/FeatureServer/0
+        layerId: 0
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+          Descriptio: zoningDescription
+        notes: >
+          Preferred Monticello-local zoning polygons. Live count 17. Sample R40/CH geo
+          ~-83.675,33.322 / ~-83.693,33.292 — Monticello GA. Prefer over any county stub.
+        status: usable
+      - role: flu
+        name: Monticello Future Land Use (FDM L3)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/3
+        layerId: 3
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          CharArea: flu
+        notes: Live count 1500 CharArea polys — city FLU from joint Comp Plan FDM.
+        status: partial
+      - role: parcels
+        name: null — use county FDM/2 spatial; REJECT Regrid Monticello extract
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: >
+          Rejected services6.arcgis.com/WjqAE1SlQxuk7dsk City_of_Monticello_GA_Parcel
+          (Regrid ll_* schema, path /us/ga/jasper/monticello) — paid-vendor pattern.
+          Use county FDM/2 filtered to city.
+        status: gap
+    gaps:
+      - "Rejected Regrid-style Monticello parcel FeatureServer (sagesgovdev)."
+    status: usable
+
+  - name: Shady Dale
+    level: city
+    parentFips: "13159"
+    joinToCountyParcels: >
+      Spatial FDM City Limits /4 Shady Dale Future Land Use footprint. Small town east
+      Jasper ~-83.59,33.40 soft.
+    layers:
+      - role: zoning
+        name: null — no city zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Shady Dale zoning FeatureServer recovered.
+        status: gap
+      - role: flu
+        name: Shady Dale Future Land Use (FDM L4)
+        restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Joint Comp Plan FDM Shady Dale FLU layer — certify field map on use.
+        status: partial
+      - role: parcels
+        name: null — county FDM/2 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County FDM parcels + Shady Dale spatial.
+        status: gap
+    gaps:
+      - "No Shady Dale city zoning FeatureServer."
+    status: partial
+
+gaps:
+  - "No dedicated county TaxParcels / WinGAP FeatureServer — FDM_JasperCo_2023 (8855) is 2023 Comp Plan working join, partial CURR_VAL (~1871), not daily assessor landbase."
+  - "No county Euclidean zoning REST URL recovered (Beacon HTML layer only)."
+  - "Rejected Regrid/ATTOM Monticello City_of_Monticello_GA_Parcel extract (ll_* paid pattern)."
+  - "Rejected Schneider WFS JasperCountyIA / JasperCountyINREMC / JasperCountyMO (wrong state)."
+  - "Rejected Story County IA 'Jasper County Parcels' lookalike on AGOL."
+  - "AECOM Bridge_PTIP qpublic_parcel1 not started (500) — not usable."
+  - "No emails/phones collected; no paid vendors."
+
+license: >
+  Northeast Georgia Regional Commission / Jasper County Joint Comprehensive Plan FDM
+  (services1.arcgis.com/Ug5xGQbHsD8zuZzM JasperCo_FDM_Online_2023_Working_WFL1).
+  Monticello_City_Zoning (M9gZILQTOrLt7QKE). Assessor HTML qPublic SchneiderCorp
+  App=JasperCountyGA (qpublic.net/ga/jasper). Attribution to Jasper County / City of
+  Monticello / NEGRC. Public fields only; no emails/phones; no paid vendors
+  (Regrid/ATTOM).
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: partial
+  parcelStatusAfter: usable
+  summary: >
+    Jasper NEGRC FDM 2023 working layer has county-wide polygons + PARCEL_NO + GIS_Acres (8855; 3267 in
+    5-150 ac) - meets Pass 1. Upgraded partial->usable for Pass 1; vintage 2023 comp-plan join, a few
+    edge parcels spill into Newton (sample hit Newton) - filter by TIGER county polygon on load. REST ht
+    tps://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WF
+    L1/FeatureServer/2 live count 8855 (5-150 ac: 3267); parcel ID field PARCEL_NO.
+  tried:
+    - "ArcGIS Online sharing search: 9 query variants ('<County> County parcels', '<County> parcels', 'tax parcels', WinGAP, qPublic, GIS) filtered to items whose extent center is inside the TIGER county polygon"
+    - "Full scan of shared GA regional-commission AGOL org Ug5xGQbHsD8zuZzM (MGRC/NEGRC/RVRC/GARC; 1617 services, 3321 polygon layers) with TIGER point-in-polygon county test"
+    - "GMASS appraisal org services.arcgis.com/ISpzx3B5ZsVA6e1Z (52 services) and GDITAdmin 'Parcels - GA - *' catalog (133 items)"
+    - "HOGARC org services5.arcgis.com/HHvUPZ2XuLOAJxjR, SGRC sgrcmaps.com/alma, CRC maps.crc.ga.gov + portal.segrass.org folders, wfs.schneidercorp.com GA WFS services, UGA org PYn6bWCjT6bhw1z3 (name-filtered)"
+  cities:
+    - name: "Monticello city"
+      level: city
+      parentFips: "13159"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Shady Dale city"
+      level: city
+      parentFips: "13159"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Jasper' AND aadt>0
+    altFilter: name LIKE '159-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 159-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 65
+    maxAadt: 9470
+    geoCheck: 65/65 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: REST
+    valueFields:
+    - CURR_VAL
+    filledCount: null
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/2
+    valueType: fair market / assessed (WinGAP CURR_VAL=FMV, A_VALUE/MAVCURR=assessed-side) where present
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST-partial
+    field: LASTNAME
+    filledCount: 1873
+    restUrl: https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/JasperCo_FDM_Online_2023_Working_WFL1/FeatureServer/2
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: 001    001
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Report&KeyValue=001%20%20%20%20001
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=JasperCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Monticello city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Shady Dale city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

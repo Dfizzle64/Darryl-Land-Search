@@ -1,0 +1,486 @@
+state: GA
+jurisdiction: Dodge County
+fips: "13091"
+level: county
+markets: [Georgia]
+
+layers:
+  - role: parcels
+    name: Dodge_County_Wide_View TaxParcels25 (HOGARC)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Dodge_County_Wide_View/FeatureServer/38
+    layerId: 38
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY (Heart of Georgia Altamaha RC / hogagis org
+      HHvUPZ2XuLOAJxjR; Dodge_County_Wide_View FeatureServer layer 38 "TaxParcels25").
+      Live count 12515 (2026-09-24); PIN filled 12515. Schema is THIN — PIN + geometry
+      only (plus HOGARC multi-layer boat-ramp/parking schema noise — ignore). No
+      owner/mailing/situs/acres/CURR_VAL/sale on this layer. Geo-verified WGS84 samples
+      ~-83.293,32.016 / ~-83.264,31.998 / ~-83.267,32.000 (south-central Dodge) —
+      CountyBoundary/5 CNTYIDFP=13091 NAME=Dodge centroid ~-83.123,32.176 extent
+      lon[-83.374,-82.872] lat[31.900,32.453]; county seat Eastman GA (~-83.18,32.20).
+      Join CAMA via qPublic AppID=730 / App=DodgeCountyGA KeyValue={PIN}.
+      DodgeCountyGA_WFS → 403. REJECT Dodge County WI (gis-dodgecounty.opendata.arcgis.com;
+      geo2.co.dodge.wi.us ~43.4,-88.7); REJECT Dodge NE/MN lookalikes; REJECT paid
+      Regrid/ATTOM/DynamoSpatial. Skip EastmanWaterSewer / city water-sewer layers
+      (utilities+AADT per tranche-3). No emails/phones.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on TaxParcels25; qPublic AppID=730 HTML
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/taxable REST on TaxParcels25. Assessor HTML qpublic.net/ga/dodge
+      → App=DodgeCountyGA / AppID=730 LayerID=11770 PageTypeID=2 PageID=5880 (Search;
+      Cloudflare/bot 403 automated; public for humans). Deep-link KeyValue={PIN}:
+      Application.aspx?App=DodgeCountyGA&Layer=Parcels&PageType=Report&KeyValue={PIN}
+      (also AppID=730&LayerID=11770&PageTypeID=4&KeyValue=).
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No SALEPRICE/SALEDATE on TaxParcels25. qPublic Sales Search / Sales List HTML
+      AppID=730 App=DodgeCountyGA only. Rejected paid Regrid/ATTOM sales.
+    status: gap
+
+  - role: zoning
+    name: null — no county-wide Euclidean zoning FeatureServer
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No Dodge County-wide zoning REST on Dodge_County_Wide_View. City of Eastman
+      Euclidean published separately (City_of_Eastman_View/10 EastmanZoning). County
+      LandUse/23 is FLU/existing land-use polygons, not zoning codes. Comp Plan
+      CharacterAreas/1 are planning character — not Euclidean zoning.
+    status: gap
+
+  - role: flu
+    name: Dodge_County_Wide_View LandUse (FLULU / EXTLU)
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Dodge_County_Wide_View/FeatureServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: Acrerage
+    coverage: county-wide
+    fieldMap:
+      FLULU: flu
+      FLULUDCA: fluDca
+      EXTLU: existingLandUse
+      EXTLUDCA: existingLandUseDca
+      Acrerage: acreage
+    notes: >
+      Preferred Future / existing land-use polygons (NOT parcel-tied — spatial intersect).
+      Live count 13077 (2026-09-24). FLULU domain: Residential≈7053, Forestry≈3546,
+      Agriculture≈1513, Commercial≈485, Public/Institutional≈417,
+      Park/Recreation/Conservation≈26, Transportation/Communication/Utilities≈24,
+      Industrial≈13. Prefer FLULU as flu; EXTLU as existing. Geo extent matches
+      TaxParcels25 / CountyBoundary. Comp Plan character companion CharacterAreas/1
+      (count 73; CharacArea labels Rural Dodge County / Eastman Urban Area / Milan /
+      Rhine / Chester / Chauncey / Downtown Milan / U.S. 280 Corridor) — planning
+      character only (COFLU/EFLU/MFLU city-plan FLU labels).
+    status: usable
+
+  - role: other
+    name: Dodge_County_Wide_View CharacterAreas
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Dodge_County_Wide_View/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      CharacArea: characterArea
+      COFLU: fluCountyPlan
+      EFLU: fluEastmanPlan
+      MFLU: fluMilanPlan
+    notes: >
+      Comp Plan character areas (count 73). Prefer CharacArea label; COFLU/EFLU/MFLU are
+      plan FLU tags — secondary to LandUse/23 FLULU. Official human Land Use viewer:
+      HOGARC.maps.arcgis.com webappviewer id=bd971009402b4149aba90da63ae65907.
+    status: usable
+
+  - role: other
+    name: Dodge_County_Wide_View CountyBoundary
+    restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/Dodge_County_Wide_View/FeatureServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      NAME: countyName
+      STATEFP: stateFips
+      COUNTYFP: countyFips
+      CNTYIDFP: fips
+    notes: >
+      Live count 1 — NAME=Dodge STATEFP=13 COUNTYFP=091 CNTYIDFP=13091 RDC='Heart of
+      Georgia-Altamaha'. Preferred geo-verify poly (centroid ~-83.123,32.176).
+    status: usable
+
+municipalities:
+  - name: Eastman
+    level: city
+    parentFips: "13091"
+    joinToCountyParcels: >
+      Spatial City_of_Eastman_View/4 EastmanCityLimits (count 1) clip of
+      Dodge_County_Wide_View TaxParcels25/38.
+    layers:
+      - role: zoning
+        name: City_of_Eastman_View EastmanZoning
+        restUrl: https://services5.arcgis.com/HHvUPZ2XuLOAJxjR/arcgis/rest/services/City_of_Eastman_View/FeatureServer/10
+        layerId: 10
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          Zoning: zoning
+        notes: >
+          Euclidean city zoning polygons (count 407). Zoning domain: R-1, R-1A, R-1B,
+          R-2, R-2A, B-1, B-2, I, P, cP (+ null). PIN mostly null — spatial join to
+          TaxParcels25. Companion EastmanCityLimits/4; skip EastmanWaterSewer_View
+          utilities. Geo Eastman GA (~-83.18,32.20).
+        status: usable
+      - role: flu
+        name: null — use county LandUse / CharacterAreas EFLU
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Eastman-only FLU FeatureServer — county LandUse/23 + CharacterAreas EFLU.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Eastman-only CAMA — county TaxParcels25/38 + EastmanCityLimits/4.
+        status: gap
+    gaps:
+      - "No Eastman-owned separate parcel/FLU REST — HOGARC county layers + EastmanZoning."
+    status: usable
+
+  - name: Milan
+    level: city
+    parentFips: "13091"
+    joinToCountyParcels: >
+      Spatial City_of_Milan_View/1 MilanCityLimits (or MilanCityLimitsComplete/0) clip of
+      TaxParcels25/38. Milan straddles Dodge/Telfair — City_of_Milan_Telfair_View is
+      Telfair-side companion (do not treat as Dodge-only).
+    layers:
+      - role: zoning
+        name: null — no Milan Euclidean zoning FeatureServer
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: City_of_Milan_View has limits/water/sewer only — no Zoning layer. Skip utilities.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Milan FLU REST — county CharacterAreas MFLU / LandUse spatial.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 + MilanCityLimits.
+        status: gap
+    gaps:
+      - "No Milan city zoning/FLU/parcel REST on HOGARC Milan_View."
+    status: partial
+
+  - name: Chester
+    level: city
+    parentFips: "13091"
+    joinToCountyParcels: Spatial Town_of_Chester_View/0 ChesterTownLimits clip TaxParcels25/38.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: Town_of_Chester_View has limits/water/sewer only — skip utilities; no Zoning.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Chester FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 + ChesterTownLimits.
+        status: gap
+    gaps:
+      - "No Chester zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Chauncey
+    level: city
+    parentFips: "13091"
+    joinToCountyParcels: Spatial City_of_Chauncey_View/0 ChaunceyCityLimits clip TaxParcels25/38.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Chauncey Zoning layer (limits/water/CDBG areas only).
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Chauncey FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 + ChaunceyCityLimits.
+        status: gap
+    gaps:
+      - "No Chauncey zoning/FLU/parcel REST."
+    status: gap
+
+  - name: Rhine
+    level: city
+    parentFips: "13091"
+    joinToCountyParcels: Spatial City_of_Rhine_View/2 RhineCityLimits clip TaxParcels25/38.
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rhine Zoning layer.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Rhine FLU REST.
+        status: gap
+      - role: parcels
+        name: null — county TaxParcels25 spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County TaxParcels25 + RhineCityLimits.
+        status: gap
+    gaps:
+      - "No Rhine zoning/FLU/parcel REST."
+    status: gap
+
+gaps:
+  - "TaxParcels25 is geometry+PIN only — no owner/mailing/situs/acres/CURR_VAL/sale REST; qPublic AppID=730 HTML for CAMA (bot/CDN may 403)."
+  - "No county-wide Euclidean zoning REST — Eastman city EastmanZoning/10 only."
+  - "No public REST lastSale.price/date — qPublic Sales Search HTML AppID=730."
+  - "DodgeCountyGA_WFS 403; qpublic.net/ga/dodge/search.html 404 (home + App=DodgeCountyGA still live)."
+  - "No Milan/Chester/Chauncey/Rhine city zoning/FLU REST."
+  - "REJECT Dodge County WI gis-dodgecounty.opendata / geo2.co.dodge.wi.us; REJECT Dodge NE/MN; REJECT paid Regrid/ATTOM/DynamoSpatial."
+  - "Schema WATER/SEWER utility layers + boat-ramp fields — DO NOT collect (skip utilities+AADT); no emails/phones."
+
+license: >
+  Heart of Georgia Altamaha Regional Commission GIS (hogagis org HHvUPZ2XuLOAJxjR) —
+  Dodge_County_Wide_View (TaxParcels25/38, LandUse/23, CharacterAreas/1, CountyBoundary/5),
+  City_of_Eastman_View (EastmanZoning/10, EastmanCityLimits/4), City_of_Milan_View,
+  Town_of_Chester_View, City_of_Chauncey_View, City_of_Rhine_View. Hub/open data
+  hogarc-hogarc.opendata.arcgis.com. Land Use Viewer HOGARC.maps.arcgis.com webappviewer
+  id=bd971009402b4149aba90da63ae65907. Assessor qpublic.net/ga/dodge AppID=730
+  App=DodgeCountyGA. Attribution HOGARC / Dodge County Tax Assessors / City of Eastman.
+  Public fields only; no emails/phones; no paid vendors; skip utilities+AADT.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=730&LayerID=11770&PageTypeID=2&PageID=5880
+jurisdictionGisUrl: https://HOGARC.maps.arcgis.com/apps/webappviewer/index.html?id=bd971009402b4149aba90da63ae65907
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services5.arcgis.com/HHvUPZ2XuLOAJ
+    xjR/arcgis/rest/services/Dodge_County_Wide_View/FeatureServer/38 count 12515; extent center
+    [['13091', 'Dodge County']]; sample [['13091', 'Dodge County']]. No change to field map (see layer
+    above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Chauncey city"
+      level: city
+      parentFips: "13091"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Chester town"
+      level: city
+      parentFips: "13091"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Eastman city"
+      level: city
+      parentFips: "13091"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Rhine town"
+      level: city
+      parentFips: "13091"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Dodge' AND aadt>0
+    altFilter: name LIKE '091-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 091-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 153
+    maxAadt: 10700
+    geoCheck: 153/153 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: HTML-only
+    field: null
+    filledCount: null
+    restUrl: null
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: no owner field on public REST layer; owner name on qPublic report HTML only (Cloudflare-gated for automation)
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=DodgeCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: https://qpublic.schneidercorp.com/Application.aspx?AppID=730&LayerID=11770&PageTypeID=4&KeyValue={parcelId}
+    parcelIdField: PIN
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: '001001'
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=DodgeCountyGA&Layer=Parcels&PageType=Report&KeyValue=001001
+    verification: 'pattern-tested: real sample ID from PIN; box test HTTP 403 Cloudflare challenge (expected; pattern
+      follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://HOGARC.maps.arcgis.com/apps/webappviewer/index.html?id=bd971009402b4149aba90da63ae65907
+    note: existing card viewer (HTTP 200 from box)
+    cities:
+    - name: Chauncey city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Chester town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Eastman city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Rhine town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

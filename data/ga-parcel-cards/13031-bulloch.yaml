@@ -1,0 +1,432 @@
+state: GA
+jurisdiction: Bulloch County
+fips: "13031"
+level: county
+markets: [Savannah]
+
+layers:
+  - role: parcels
+    name: Bullochparcels_CAMA (official Bulloch GIS AGOL — owner cbrown72)
+    restUrl: https://services6.arcgis.com/XxfLDid4CNOqpdhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189
+    layerId: 1189
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      PROP_PIN: parcelPin
+      PARCEL_NO2: parcelPinAlt
+      REALKEY: ownerKey
+      LASTNAME: ownerName
+      HOUSE_NO: situsNumber
+      STREET_NAM: situsStreet
+      STTYPE: situsStreetType
+      ACRES: acreage
+      TAXDISTRIC: taxDistrict
+      ZONINGCODE: zoning
+      LANDGMD: georgiaMilitiaDistrict
+      LAT: latitude
+      LON: longitude
+    notes: >
+      Preferred COUNTY-WIDE parcel GEOMETRY + partial CAMA (Bulloch County GIS AGOL org
+      XxfLDid4CNOqpdhy; owner cbrown72; hub bulloch-county-gis-data-hub-bulloch-gis.hub.arcgis.com).
+      Live count 37969 (2026-09-24). Layer id 1189 (not 0). maxRecordCount 2000. ACRES 5–150
+      ≈9617; HOUSE_NO>0 ≈29081; LASTNAME ≈37848. ZONINGCODE domain top: AG-5≈15250, R-25≈4590,
+      R20≈1955, R4≈1539, R15≈1295, R-40≈1267, PUD≈1142, R25≈1096, R-80≈1040, plus R-3/R-1/
+      UNK/CR/HC/R10/LI. TAXDISTRIC soft 04≈27167 (majority unincorp), 01≈8301, 02≈1008,
+      08≈644, 03≈481 — prefer spatial City County Limits for municipality. NO CURR_VAL/FMV/
+      mailing/SALEPRICE — qPublic AppID=637 HTML. Compose situs HOUSE_NO+STREET_NAM+STTYPE.
+      Geo-verified ~-81.745,32.455 / ~-81.874,32.449 Bulloch GA Statesboro (~-81.78,32.45).
+      Thinner mirror stabull.org Tax_Assessors_Data/MapServer/3 (34969; PROP_PIN+ACRES) —
+      do not prefer. BullochCountyGA_WFS 404. Rejected paid Regrid/ATTOM/DynamoSpatial.
+    status: usable
+
+  - role: tax
+    name: null — no CURR_VAL on CAMA; qPublic AppID=637
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No market/assessed/esttax on REST. Assessor HTML qpublic.net/ga/bulloch AppID=637 /
+      App=BullochCountyGA (Cloudflare/bot 403 automated; public for humans).
+      Deep-link KeyValue={PARCEL_NO or PROP_PIN}.
+    status: gap
+
+  - role: sales
+    name: null — no public REST sale history
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No SALEPRICE/SALEDATE on CAMA; qPublic Sales Search AppID=637 HTML only.
+    status: gap
+
+  - role: zoning
+    name: Bullochparcels_CAMA ZONINGCODE (parcel-attributed)
+    restUrl: https://services6.arcgis.com/XxfLDid4CNOqpdhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189
+    layerId: 1189
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PARCEL_NO: parcelId
+      ZONINGCODE: zoning
+      TAXDISTRIC: taxDistrict
+    notes: >
+      Parcel-attributed zoning widely filled. Euclidean companion zoning_change_map/3
+      (count 842; FTR_CODE e.g. HC, R-40; org ubipOx65ptjBcDZM). Inside Statesboro prefer
+      city UDO/PDF when diverges.
+    status: usable
+
+  - role: zoning
+    name: zoning_change_map Zoning (Euclidean FTR_CODE)
+    restUrl: https://services3.arcgis.com/ubipOx65ptjBcDZM/arcgis/rest/services/zoning_change_map/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      FTR_CODE: zoning
+      ACRES: acreage
+      ZONING_ID: zoningId
+    notes: Count 842 polygon zoning; spatial-join only. Geo Bulloch GA ~-81.89,32.58.
+    status: usable
+
+  - role: flu
+    name: zoning_change_map Future Landuse
+    restUrl: https://services3.arcgis.com/ubipOx65ptjBcDZM/arcgis/rest/services/zoning_change_map/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      LANDUSEDES: flu
+      LANDUSECOD: fluCode
+    notes: >
+      Count 31. LANDUSEDES: Conservation Area, Park, Downtown, University District, Gateway,
+      Neighborhood Center, Emerging Business, Established Residential Neighborhood,
+      Developing Traditional Neighborhood, Developing Urban Neighnorhood Area, Activity
+      Centers/Regional Centers, Potential Annexation, Residential Redevelopment, Commercial
+      Redevelopment Area #1–3, Urban Core Gateway. LANDUSECOD blank — use LANDUSEDES.
+      Statesboro-centric character — verify outside city.
+    status: usable
+
+  - role: other
+    name: Tax_Assessors_Data City County Limits
+    restUrl: https://stabull.org/server/rest/services/Bulloch_County/Tax_Assessors_Data/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      FTR_CODE: municipality
+      ACRES: acreage
+      Lat: latitude
+      Lon: longitude
+    notes: >
+      Count 6: STATESBORO (2), BROOKLET, PORTAL, REGISTER, UNINCORPORATED. Preferred spatial
+      municipality filter. Use --http1.1 if HTTP/2 errors on stabull.org.
+    status: usable
+
+municipalities:
+  - name: Statesboro
+    level: city
+    parentFips: "13031"
+    joinToCountyParcels: "Spatial City County Limits FTR_CODE='STATESBORO' onto Bullochparcels_CAMA."
+    layers:
+      - role: zoning
+        name: CAMA ZONINGCODE spatial Statesboro
+        restUrl: https://services6.arcgis.com/XxfLDid4CNOqpdhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189
+        layerId: 1189
+        geometry: polygon
+        auth: none
+        acreageField: ACRES
+        coverage: city-only
+        fieldMap:
+          PARCEL_NO: parcelId
+          ZONINGCODE: zoning
+        notes: Prefer parcel ZONINGCODE + spatial; certify vs city UDO/PDF when conflicts.
+        status: partial
+      - role: flu
+        name: Future Landuse spatial Statesboro
+        restUrl: https://services3.arcgis.com/ubipOx65ptjBcDZM/arcgis/rest/services/zoning_change_map/FeatureServer/4
+        layerId: 4
+        geometry: polygon
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap:
+          LANDUSEDES: flu
+        notes: FLU character heavily Statesboro-centric.
+        status: usable
+      - role: parcels
+        name: null — county CAMA spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County CAMA + Statesboro poly.
+        status: gap
+    gaps:
+      - "No Statesboro-owned parcel FeatureServer."
+    status: usable
+
+  - name: Brooklet
+    level: city
+    parentFips: "13031"
+    joinToCountyParcels: "Spatial FTR_CODE='BROOKLET'."
+    layers:
+      - role: zoning
+        name: null — county ZONINGCODE spatial
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Brooklet zoning REST — county ZONINGCODE spatial.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County FLU spatial if coverage reaches.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County CAMA + Brooklet poly.
+        status: gap
+    gaps:
+      - "No Brooklet-owned zoning/FLU/parcel REST."
+    status: partial
+
+  - name: Portal
+    level: city
+    parentFips: "13031"
+    joinToCountyParcels: "Spatial FTR_CODE='PORTAL'."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County ZONINGCODE spatial.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Portal FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County CAMA spatial.
+        status: gap
+    gaps:
+      - "No Portal-owned zoning/FLU REST."
+    status: partial
+
+  - name: Register
+    level: city
+    parentFips: "13031"
+    joinToCountyParcels: "Spatial FTR_CODE='REGISTER'."
+    layers:
+      - role: zoning
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County ZONINGCODE spatial.
+        status: gap
+      - role: flu
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: No Register FLU REST.
+        status: gap
+      - role: parcels
+        name: null
+        restUrl: null
+        layerId: null
+        geometry: none
+        auth: none
+        acreageField: null
+        coverage: city-only
+        fieldMap: {}
+        notes: County CAMA spatial.
+        status: gap
+    gaps:
+      - "No Register-owned zoning/FLU REST."
+    status: partial
+
+gaps:
+  - "No CURR_VAL/FMV/assessed/SALEPRICE on Bullochparcels_CAMA — qPublic AppID=637 HTML only."
+  - "BullochCountyGA_WFS 404."
+  - "stabull Tax_Assessors_Data/3 thinner — prefer AGOL CAMA/1189."
+  - "TAXDISTRIC lacks published name legend — use City County Limits spatial."
+  - "FLU (31) appears Statesboro-centric — verify outside city."
+  - "Rejected paid Regrid/ATTOM/DynamoSpatial."
+  - "No emails/phones; no paid vendors."
+
+license: >
+  Bulloch County GIS AGOL (org XxfLDid4CNOqpdhy cbrown72 Bullochparcels_CAMA; hub
+  bulloch-county-gis-data-hub-bulloch-gis.hub.arcgis.com). stabull.org Tax_Assessors_Data.
+  zoning_change_map (ubipOx65ptjBcDZM). Assessor qpublic.net/ga/bulloch AppID=637.
+  Attribution Bulloch County GIS / Tax Assessor / partner cities. Public fields only;
+  no emails/phones; no paid vendors.
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=637&Layer=Parcels&PageType=Search
+verifiedAt: 2026-09-24
+verifiedBy: "Georgia Public Info Researcher"
+
+pass1_2026-09-28:
+  scope: "GA rural-OZ 2.0 Pass 1 (parcel polygons + parcel IDs for 5-150 ac screening; public GIS only)"
+  parcelStatusBefore: usable
+  parcelStatusAfter: usable
+  summary: >
+    Existing usable parcel layer re-verified live 2026-09-28: https://services6.arcgis.com/XxfLDid4CNOqp
+    dhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189 count 37969; extent center
+    [['13031', 'Bulloch County']]; sample [['13031', 'Bulloch County']]. No change to field map (see
+    layer above).
+  tried:
+    - "Live re-verification of card's preferred usable parcel layer: returnCountOnly count + returnExtentOnly (outSR 4326) + 1-feature sample, both tested against TIGERweb county polygon"
+  cities:
+    - name: "Brooklet city"
+      level: city
+      parentFips: "13031"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Portal town"
+      level: city
+      parentFips: "13031"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Register town"
+      level: city
+      parentFips: "13031"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+    - name: "Statesboro city"
+      level: city
+      parentFips: "13031"
+      parcelsRest: "use county parcel layer (clip by city limits)"
+  verifiedBy: "Georgia Public Info Researcher"
+pass2_2026-09-28:
+  scope: GA rural-OZ 2.0 Pass 2 full suite (AADT, tax, sales, owner, appraiser deep link, jurisdiction GIS); public
+    sources only
+  pass1Status: usable
+  aadt:
+    status: usable
+    source: GDOT Office of Transportation Data traffic count stations (TADA), statewide layer republished by DeKalb
+      County GIS (DeKalbGISAdmin AGOL)
+    restUrl: https://services2.arcgis.com/IxVN2oUE9EYLSnPE/arcgis/rest/services/GDOT_AADT/FeatureServer/1
+    countyFilter: county='Bulloch' AND aadt>0
+    altFilter: name LIKE '031-%' AND aadt>0 (GDOT TC number prefix = county FIPS; identical counts spot-checked)
+    aadtField: aadt
+    stationIdField: name (GDOT TC number e.g. 031-0101)
+    yearField: null
+    dataLastEdit: 2025-12-02 (ET, layer editingInfo)
+    stationCount: 221
+    maxAadt: 39000
+    geoCheck: 220/221 stations fall inside TIGER county polygon with matching county attribute
+    officialExport: 'https://gdottrafficdata.drakewell.com/publicmultinodemap.asp (TADA All Station AADT export:
+      CSV/GeoJSON/Shapefile with Year + Actual/Estimated flag; no public FeatureServer)'
+    countyGaps: 'none: county has stations'
+  tax:
+    status: HTML-only
+    valueFields: null
+    filledCount: null
+    restUrl: null
+    valueType: null
+    taxAmount: html-only (qPublic report / county Tax Commissioner portal); not on any public REST layer found
+    htmlFallback: 'qPublic/Beacon report: Assessment + Valuation sections; tax bill on county Tax Commissioner site'
+  sales:
+    status: HTML-only
+    detail: no sale fields on REST
+    restUrl: null
+    fields: last sale date, price, deed book/page
+    htmlFallback: qPublic/Beacon report Sales section (date, price, deed book/page, grantor/grantee) + Sales Search
+  ownerEntity:
+    status: REST
+    field: LASTNAME
+    filledCount: 37848
+    restUrl: https://services6.arcgis.com/XxfLDid4CNOqpdhy/arcgis/rest/services/Bullochparcels_CAMA/FeatureServer/1189
+    htmlFallback: qPublic/Beacon report page (appraiserSearchUrl)
+    note: owner name only (public record); no phones/emails collected
+  appraiserSearchUrl:
+    template: https://qpublic.schneidercorp.com/Application.aspx?App=BullochCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    templateAlt: null
+    parcelIdField: PARCEL_NO
+    encoding: URL-encode the raw ID and keep internal spaces exactly as stored (WinGAP pads with spaces)
+    sampleParcelId: MS90000010 000
+    sampleUrl: https://qpublic.schneidercorp.com/Application.aspx?App=BullochCountyGA&Layer=Parcels&PageType=Report&KeyValue=MS90000010%20000
+    verification: 'pattern-tested: real sample ID from PARCEL_NO; box test HTTP 403 Cloudflare challenge (expected;
+      pattern follows Schneider qPublic report URL)'
+    appSlugSource: existing card qPublic URL
+  jurisdictionGisUrl:
+    county: https://qpublic.schneidercorp.com/Application.aspx?App=BullochCountyGA&Layer=Parcels&PageType=Map
+    note: no county-run public viewer found; qPublic map viewer (assessor GIS; Cloudflare 403 from box)
+    cities:
+    - name: Brooklet city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Portal town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Register town
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+    - name: Statesboro city
+      gisUrl: null
+      note: no separate city GIS found; use county viewer/layer
+  verifiedBy: Georgia Public Info Researcher
+  verifiedAt: '2026-09-28'

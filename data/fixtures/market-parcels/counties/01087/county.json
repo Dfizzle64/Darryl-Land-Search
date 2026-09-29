@@ -1,0 +1,32 @@
+{
+  "name": "Macon",
+  "fips": "01087",
+  "state": "Alabama",
+  "markets": [
+    "Montgomery"
+  ],
+  "featureCount": 5757,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-macon-parcels-01087",
+  "queryUrl": "https://gis.capturecama.com/arcgis/rest/services/MaconAL/MaconCapture/MapServer/1/query",
+  "gaps": [
+    "Source query returned 5771 rows; 5757 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcel_Polygon (MaconCapture — CaptureCAMA ArcGIS Server) (https://gis.capturecama.com/arcgis/rest/services/MaconAL/MaconCapture/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "The card marks this public parcel layer partial. Attributes that are absent stay empty.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No owner / mailing / value / sale fields on public REST — join by PARCELID to CaptureCAMA HTML (not bulk)",
+    "Snapshot services on maps.capturecama.com are date-stamped and rotate; prefer gis.capturecama.com MaconCapture"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01087/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01087/lookup.json",
+  "sourceCount": 5771,
+  "dropped": 1,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://macon.capturecama.com/mapparceldetail/{PIN}",
+  "gisViewerUrl": "https://macon.capturecama.com/parcelviewer/"
+}

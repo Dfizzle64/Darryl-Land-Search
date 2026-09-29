@@ -19,9 +19,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Jacksonville | other | 26,878 | 5 | 0 | 0 |
 | Big Bend | other | 53,214 | 8 | 2 | 0 |
 | Pensacola | other | 66,437 | 7 | 0 | 0 |
-| Birmingham | other | 38,101 | 3 | 0 | 6 |
-| Mobile | other | 42,446 | 3 | 0 | 2 |
-| Huntsville | other | 29,598 | 4 | 0 | 3 |
+| Birmingham | other | 94,992 | 8 | 0 | 3 |
+| Mobile | other | 51,658 | 4 | 0 | 2 |
+| Huntsville | other | 102,965 | 11 | 0 | 1 |
 | Savannah | other | 19,987 | 5 | 0 | 3 |
 | Columbia | other | 49,244 | 5 | 1 | 7 |
 | Greenville | other | 48,073 | 5 | 0 | 4 |
@@ -34,8 +34,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
 | North-Central Florida | other | 103,358 | 13 | 0 | 0 |
 | Asheville | other | 16,793 | 2 | 0 | 0 |
-| Tuscaloosa | other | 11,596 | 1 | 0 | 3 |
-| Montgomery | other | 26,759 | 3 | 0 | 1 |
+| Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
+| Montgomery | other | 56,134 | 8 | 0 | 1 |
 | Valdosta | other | 5,815 | 1 | 0 | 0 |
 | Macon | other | 3,257 | 1 | 0 | 0 |
 | Athens | other | 2,039 | 1 | 0 | 0 |
@@ -268,13 +268,15 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Bibb | Alabama | 01007 | gap | 0 | unavailable |
-| Blount | Alabama | 01009 | gap | 0 | unavailable |
+| Blount | Alabama | 01009 | complete-gte-5ac | 11,515 | al-blount-parcels-01009 |
+| Calhoun | Alabama | 01015 | complete-gte-5ac | 9,768 | al-calhoun-parcels-01015 |
 | Chilton | Alabama | 01021 | gap | 0 | unavailable |
-| Cullman | Alabama | 01043 | gap | 0 | unavailable |
+| Cullman | Alabama | 01043 | complete-gte-5ac | 14,885 | al-cullman-parcels-01043 |
+| Etowah | Alabama | 01055 | complete-gte-5ac | 11,021 | al-etowah-parcels-01055 |
 | Jefferson | Alabama | 01073 | complete-gte-5ac | 15,641 | al-jefferson-parcels |
 | Shelby | Alabama | 01117 | complete-gte-5ac | 11,994 | al-shelby-cadastral-2025 |
 | St. Clair | Alabama | 01115 | complete-gte-5ac | 10,466 | al-stclair-owner-parcels |
-| Talladega | Alabama | 01121 | gap | 0 | unavailable |
+| Talladega | Alabama | 01121 | complete-gte-5ac | 9,702 | al-talladega-parcels-01121 |
 | Walker | Alabama | 01127 | gap | 0 | unavailable |
 
 ### Mobile
@@ -285,19 +287,25 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Escambia | Alabama | 01053 | gap | 0 | unavailable |
 | George | Mississippi | 28039 | complete-gte-5ac | 7,189 | ms-mdeq-2023-28039 |
 | Mobile | Alabama | 01097 | complete-gte-5ac | 17,270 | al-mobile-agol-capturecama |
+| Monroe | Alabama | 01099 | complete-gte-5ac | 9,212 | al-monroe-parcels-01099 |
 | Washington | Alabama | 01129 | gap | 0 | unavailable |
 
 ### Huntsville
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Cullman | Alabama | 01043 | gap | 0 | unavailable |
-| Jackson | Alabama | 01071 | gap | 0 | unavailable |
+| Cherokee | Alabama | 01019 | complete-gte-5ac | 8,068 | al-cherokee-parcels-01019 |
+| Cullman | Alabama | 01043 | complete-gte-5ac | 14,885 | al-cullman-parcels-01043 |
+| DeKalb | Alabama | 01049 | complete-gte-5ac | 16,704 | al-dekalb-parcels-01049 |
+| Franklin | Alabama | 01059 | complete-gte-5ac | 7,927 | al-franklin-parcels-01059 |
+| Jackson | Alabama | 01071 | complete-gte-5ac | 13,862 | al-jackson-parcels-01071 |
+| Lauderdale | Alabama | 01077 | complete-gte-5ac | 3,840 | al-lauderdale-parcels-01077 |
 | Limestone | Alabama | 01083 | complete-gte-5ac | 5,445 | al-limestone-remap-1 |
 | Lincoln | Tennessee | 47103 | gap | 0 | tn-impact-47103 |
 | Madison | Alabama | 01089 | complete-gte-5ac | 12,312 | al-madison-public-isv-185 |
 | Marshall | Alabama | 01095 | complete-gte-5ac | 11,014 | al-marshall-public-37 |
 | Morgan | Alabama | 01103 | complete-gte-5ac | 827 | al-morgan-vam-10 |
+| Winston | Alabama | 01133 | complete-gte-5ac | 8,081 | al-winston-parcels-01133 |
 
 ### Savannah
 
@@ -481,9 +489,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
-| Greene | Alabama | 01063 | gap | 0 | unavailable |
-| Hale | Alabama | 01065 | gap | 0 | unavailable |
+| Greene | Alabama | 01063 | complete-gte-5ac | 4,327 | al-greene-parcels-01063 |
+| Hale | Alabama | 01065 | complete-gte-5ac | 6,068 | al-hale-parcels-01065 |
 | Pickens | Alabama | 01107 | gap | 0 | unavailable |
+| Sumter | Alabama | 01119 | complete-gte-5ac | 5,461 | al-sumter-parcels-01119 |
 | Tuscaloosa | Alabama | 01125 | complete-gte-5ac | 11,596 | al-tuscaloosa-parcels |
 
 ### Montgomery
@@ -491,9 +500,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Autauga | Alabama | 01001 | complete-gte-5ac | 7,047 | al-autauga-parcels |
+| Barbour | Alabama | 01005 | complete-gte-5ac | 7,226 | al-barbour-parcels-01005 |
+| Bullock | Alabama | 01011 | complete-gte-5ac | 3,579 | al-bullock-parcels-01011 |
+| Dallas | Alabama | 01047 | complete-gte-5ac | 6,351 | al-dallas-parcels-01047 |
 | Elmore | Alabama | 01051 | complete-gte-5ac | 9,758 | al-elmore-parcels |
 | Lowndes | Alabama | 01085 | gap | 0 | unavailable |
+| Macon | Alabama | 01087 | complete-gte-5ac | 5,757 | al-macon-parcels-01087 |
 | Montgomery | Alabama | 01101 | complete-gte-5ac | 9,954 | al-montgomery-parcels |
+| Wilcox | Alabama | 01131 | complete-gte-5ac | 6,462 | al-wilcox-parcels-01131 |
 
 ### Valdosta
 

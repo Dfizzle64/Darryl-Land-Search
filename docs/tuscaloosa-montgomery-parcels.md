@@ -17,9 +17,9 @@ Prattville zoning is ZONING_JULY_2017 (internal layer name Zoning_2022). Vintage
 | Montgomery | 01101 | 9,954 | 10026 | 5106 | 0 | 0 | 0 |
 | Elmore | 01051 | 9,758 | 14848 | 288 | 0 | 0 | 0 |
 | Autauga | 01001 | 7,047 | 7530 | 589 | 0 | 0 | 0 |
-| Hale | 01065 | 0 | — | — | — | — | — |
+| Hale | 01065 | 6,068 | 6084 | — | — | — | — |
 | Pickens | 01107 | 0 | — | — | — | — | — |
-| Greene | 01063 | 0 | — | — | — | — | — |
+| Greene | 01063 | 4,327 | 4327 | — | — | — | — |
 | Lowndes | 01085 | 0 | — | — | — | — | — |
 
 ## Zoning by city
@@ -31,7 +31,8 @@ Prattville zoning is ZONING_JULY_2017 (internal layer name Zoning_2022). Vintage
 
 ## Remaining gaps
 
-- Hale County (01065), Pickens County (01107), and Greene County (01063): no public parcel REST.
+- Pickens County (01107): Flagship, no public parcel REST.
+- Hale County (01065) and Greene County (01063) now have public 5–150 acre extracts from the Alabama rural Opportunity Zone batch. This shelf did not join city zoning for them.
 - Bibb County (01007): still a Birmingham parcel gap. No public REST in this pull.
 - Lowndes County (01085): Montgomery MSA county with no verified public parcel card.
 - Wetumpka: token-gated zoning (HTTP 499). Not joined.

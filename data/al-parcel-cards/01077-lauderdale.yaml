@@ -1,0 +1,143 @@
+state: AL
+jurisdiction: Lauderdale County
+fips: "01077"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: Parcels (Lauderdale Public ISV — CAMA join)
+    restUrl: "https://al41portal.kcsgis.com/al41server/rest/services/Lauderdale_Public_ISV/MapServer/120"
+    layerId: 120
+    geometry: polygon
+    auth: none
+    acreageField: DeededAcres
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      ParcelNum: parcelIdAlt
+      PPIN: parcelIdKey (deep-link)
+      AccountNum: accountNumber
+      Owner: ownerName
+      PrevOwner: ownerNamePrior
+      MailAddr1: mailingAddress.street
+      MailAddr2: mailingAddress.street2
+      CityName: mailingAddress.city
+      StateAbbr: mailingAddress.state
+      ZipCode: mailingAddress.zip
+      PhysAddr: situsAddress
+      DeededAcres: acreage
+      CalculatedAcres: acreageGis
+      TimberAcres: acreageTimber
+      TotalMktValue: tax.marketValue
+      TotalAssdValue: tax.assessedValue
+      LandValue: tax.landValue
+      ImprovementsValue: tax.improvementValue
+      TotalTaxDue: tax.due
+      TaxYear: tax.year
+      DeedDate: lastSale.date
+      SalePrice: lastSale.price
+      CU: currentUse
+      MunCode: municipalityCode
+      LegalDesc: legalDescription
+    notes: >
+      Verified live 2026-09-28 (?f=json 200 + 1-feature query with geometry, outSR 4326). Count 55490; polygon; sample centroid -87.86,34.85 (Florence area, Lauderdale AL — not Lauderdale MS/TN). PID 16-digit; PPIN = deep-link key. Has SalePrice + DeedDate (sample SalePrice 0 — often blank/0). CalculatedAcres often 0 — prefer DeededAcres or compute from Shape.STArea() (sq ft? verify units). Found via ISV config.
+    status: usable
+
+gaps:
+  - SalePrice frequently 0
+  - CalculatedAcres often 0; use DeededAcres or geometry area
+  - altags.com deep link timed out from box 2026-09-28 (pattern from ISV config)
+
+license: "Lauderdale County Revenue / KCS GIS Public ISV; use-at-own-risk"
+appraiserSearchUrl: "https://altags.com/Lauderdale_Revenue/PropertyDetails.aspx?ppin={PIN}"
+appraiserSearchUrlAlt: null
+jurisdictionGisUrl: "https://isv.kcsgis.com/al.lauderdale_revenue/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 7
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 39
+    countyWhere: "YearAADT=2024 AND LUCountyID=39 AND AADT>0"
+    stations2024: 524
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=39 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 524 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://al41portal.kcsgis.com/al41server/rest/services/Lauderdale_Public_ISV/MapServer/120
+  featureCount: 55490
+  taxSaleOwner:
+    ownerName:
+      field: Owner
+      status: usable
+    assessedValue:
+      field: TotalAssdValue
+      status: usable
+      nonNullOrPositiveCount: 55448
+      ofTotal: 55490
+    appraisedOrMarketValue:
+      field: TotalMktValue
+      status: usable
+      nonNullOrPositiveCount: 55448
+      ofTotal: 55490
+    landValue:
+      field: LandValue
+      status: usable
+    improvementValue:
+      field: ImprovementsValue
+      status: usable
+    taxAmount:
+      field: TotalTaxDue
+      status: usable
+      nonNullOrPositiveCount: 46229
+      ofTotal: 55490
+    lastSaleDate:
+      field: DeedDate
+      status: usable
+      nonNullOrPositiveCount: 47735
+      ofTotal: 55490
+    lastSalePrice:
+      field: SalePrice
+      status: usable
+      nonNullOrPositiveCount: 34400
+      ofTotal: 55490
+    ownerEntityType:
+      derivable: true
+      sourceField: Owner
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 4624
+        INC: 847
+        TRUST: 925
+        CORP: 62
+        CHURCH: 516
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://altags.com/Lauderdale_Revenue/PropertyDetails.aspx?ppin={PIN}
+    pinField: PPIN
+    testPin: '31068'
+    verified: 'yes'
+    method: fetched via external fetcher (box gets TLS EOF from altags.com)
+    note: Page returned PPIN 31068, parcel 13-07-25-0-000-012.000 (matches PID), owner, appraised/assessed, tax due, deed date; matches layer.
+  jurisdictionGisUrl:
+    url: https://isv.kcsgis.com/al.lauderdale_revenue/
+    http: 200
+  notes: 'SalePrice is >0 on 34400 of 55490 parcels; many recorded sales carry 0.'

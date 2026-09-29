@@ -1,0 +1,115 @@
+state: AL
+jurisdiction: Macon County
+fips: "01087"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: Parcel_Polygon (MaconCapture — CaptureCAMA ArcGIS Server)
+    restUrl: "https://gis.capturecama.com/arcgis/rest/services/MaconAL/MaconCapture/MapServer/1"
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      CALC_ACRE: acreage
+      TRS: sectionTownshipRange
+      MAP: mapNumber
+      BLOCK: mapBlock
+    notes: >
+      Verified live 2026-09-28: ?f=json 200, anonymous, polygon, count 20282, maxRecordCount 2000; sample centroid -85.53,32.23 (Tuskegee area, Macon AL — not Macon GA). Geometry + PARCELID (16-digit) + CALC_ACRE only: screening-usable for 5–150 ac, but NO owner/value/sale attributes (those live in CaptureCAMA HTML portal). Dated snapshot twin: maps.capturecama.com/arcgis/rest/services/Macon/Macon032026/MapServer/1 (20264). Found via parcel viewer Experience Builder config (macon.capturecama.com/parcelviewer/cdn/18/config.json).
+    status: partial
+
+gaps:
+  - No owner / mailing / value / sale fields on public REST — join by PARCELID to CaptureCAMA HTML (not bulk)
+  - Snapshot services on maps.capturecama.com are date-stamped and rotate; prefer gis.capturecama.com MaconCapture
+
+license: "Macon County (AL) / CaptureCAMA public parcel viewer; use-at-own-risk"
+appraiserSearchUrl: "https://macon.capturecama.com/mapparceldetail/{PIN}"
+appraiserSearchUrlAlt: "https://macon.capturecama.com/propsearch"
+jurisdictionGisUrl: "https://macon.capturecama.com/parcelviewer/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 11
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 44
+    countyWhere: "YearAADT=2024 AND LUCountyID=44 AND AADT>0"
+    stations2024: 209
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=44 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 209 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://gis.capturecama.com/arcgis/rest/services/MaconAL/MaconCapture/MapServer/1
+  featureCount: 20282
+  taxSaleOwner:
+    ownerName:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    appraisedOrMarketValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    landValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    improvementValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    ownerEntityType:
+      derivable: false
+      sourceField: null
+      rule: null
+      likeCounts2026_09_28: null
+      note: Layer has no populated owner; entity type needs the record page (CaptureCAMA property-record page https://macon.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)) or a manual CAMA
+        join on PARCELID.
+  deepLink:
+    pattern: https://macon.capturecama.com/mapparceldetail/{PIN}
+    pinField: PARCELID
+    testPin: '1402090000008001'
+    verified: browser-only (pattern confirmed from viewer config)
+    method: 'pattern read from the county CaptureCAMA Experience Builder config (Embed Parcel Detail widget: capturecama.com/mapparceldetail/{PARCELID}); page fetched 200 but is a React SPA shell (Citizen
+      Access Portal, empty #root)'
+    note: 'Renders in the browser only; content cannot be verified by plain fetch. Alt key in the same config: Assess_Num.'
+  jurisdictionGisUrl:
+    url: https://macon.capturecama.com/parcelviewer/
+    http: 200
+  notes: Partial layer (geometry + parcel ID only).

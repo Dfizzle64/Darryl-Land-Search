@@ -1,0 +1,31 @@
+{
+  "name": "DeKalb",
+  "fips": "01049",
+  "state": "Alabama",
+  "markets": [
+    "Huntsville"
+  ],
+  "featureCount": 16704,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-dekalb-parcels-01049",
+  "queryUrl": "https://al28portal.kcsgis.com/al28server/rest/services/Dekalb_Public_ISV/MapServer/48/query",
+  "gaps": [
+    "Source query returned 17413 rows; 16704 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Current Parcels (DeKalb Public ISV — CAMA join) (https://al28portal.kcsgis.com/al28server/rest/services/Dekalb_Public_ISV/MapServer/48). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "No lastSale.price (deed book/page/date only)",
+    "No county zoning layer seen on Public ISV (subdivision/lot only)"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01049/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01049/lookup.json",
+  "sourceCount": 17413,
+  "dropped": 0,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://dekalbproperty.assurancegov.com/Property/Summary?taxyear=2026&ppin={PIN}",
+  "gisViewerUrl": "https://isv.kcsgis.com/al.dekalb_revenue/"
+}

@@ -1,0 +1,158 @@
+state: AL
+jurisdiction: Elmore County
+fips: "01051"
+level: county
+markets: [Montgomery]
+
+layers:
+  - role: parcels
+    name: Parcels (KCS Elmore/Public)
+    restUrl: "https://web5.kcsgis.com/kcsgis/rest/services/Elmore/Public/MapServer/133"
+    layerId: 133
+    geometry: polygon
+    auth: none
+    acreageField: CALC_ACRE
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PID: parcelIdAlt
+      ParcelNo: parcelIdAlt2
+      GIS_PIDLink: parcelIdAlt3
+      OwnerName: ownerName
+      OwnerName2: ownerName2
+      MailAddress1: mailingAddress.street
+      MailAddress2: mailingAddress.street2
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip: mailingAddress.zip
+      PropertyAddr1: situsAddress
+      CALC_ACRE: acreage
+      ForestAcreage: acreageForest
+      TotalLandValue: tax.landValue
+      TotalImpValue: tax.improvementValue
+      TotalValue: tax.marketValue
+      AssessmentClass: dorCode
+      MunicipalityCode: municipalityCode
+      RecordYear: tax.year
+    notes: >
+      Verified 2026-09-23: HTTP 200 + count 57365. Owner/mail/situs/tax values present;
+      no sale price field. Strings often padded — trim. Public_2022 is annotation-heavy
+      twin — prefer Public/133. ISV: https://isv.kcsgis.com/al.elmore_revenue/
+      AGOL Elmore_County_Parcels (services9…/F8Xig6Pjld0x0gpn) count 51432 is thinner
+      alternate; prefer KCS Public/133.
+    status: usable
+
+  - role: zoning
+    name: Unincorporated Elmore County zoning (none — official FAQ)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-24: Elmore County FAQ — "At present, there are no zoning restrictions
+      or building permit requirements for property located in rural Elmore County."
+      https://www.elmoreco.org/faqs . web5 Elmore/Public has PlanAnno annotation only — no
+      Zoning polygons. Municipal: Millbrook usable; Wetumpka still token/webmap gap
+      (01051-city-wetumpka). Floodplain development permit still required in SFHA.
+    status: gap
+
+gaps:
+  - Unincorporated Elmore: official FAQ confirms no zoning; no Zoning REST on Public MapServer
+  - No lastSale.price on Public/133
+  - Municipal zoning: Millbrook usable; Wetumpka public REST token-gated / webmap-embedded
+  - Trim padded owner/address fields
+
+license: "KCS / Elmore County Revenue GIS (Public); ISV viewer"
+appraiserSearchUrl: "https://isv.kcsgis.com/isvreports/al.elmore/{PIN}.PDF"
+jurisdictionGisUrl: "https://isv.kcsgis.com/al.elmore_revenue/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 26
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=26 AND AADT>0"
+    stations2024: 283
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=26 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 283 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: https://web5.kcsgis.com/kcsgis/rest/services/Elmore/Public/MapServer/133
+  parcelIdField: PARCELID
+  featureCount: 57365
+  note: >
+    Batch 3 closing re-verify 2026-09-28: live count 57365, 1-feature query with polygon geometry OK (sample vertex [-85.96,32.76]), parcel ID field PARCELID present. No field changes checked beyond ID.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://web5.kcsgis.com/kcsgis/rest/services/Elmore/Public/MapServer/133
+  featureCount: 57365
+  taxSaleOwner:
+    ownerName:
+      field: OwnerName
+      status: usable
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: Elmore Revenue Commissioner record (not on the KCS PDF card)
+    appraisedOrMarketValue:
+      field: TotalValue
+      status: usable
+      nonNullOrPositiveCount: 54747
+      ofTotal: 57365
+    landValue:
+      field: TotalLandValue
+      status: usable
+    improvementValue:
+      field: TotalImpValue
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: Elmore Revenue Commissioner record (not on the KCS PDF card)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: Elmore Revenue Commissioner record (not on the KCS PDF card)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: Elmore Revenue Commissioner record (not on the KCS PDF card)
+    ownerEntityType:
+      derivable: true
+      sourceField: OwnerName
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 3291
+        INC: 1571
+        TRUST: 947
+        CORP: 92
+        CHURCH: 395
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://isv.kcsgis.com/isvreports/al.elmore/{PIN}.PDF
+    pinField: PID
+    testPin: 0108330001002000
+    verified: 'yes'
+    method: plain fetch 200 application/pdf (KCS ISV property record card; pattern from ISV viewer.js moreDetails prcLink, idProperty PID)
+    note: PDF record card (2024) returned owner RUSSELL LANDS INC, parcel 01 08 33 0 001 002.000, values. PID differs from PARCELID (PARCELID has an extra digit).
+  jurisdictionGisUrl:
+    url: https://isv.kcsgis.com/al.elmore_revenue/
+    http: null
+  notes: Layer carries appraised values only; no assessed value, tax or sale fields. {PIN} = layer PID.

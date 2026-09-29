@@ -1,0 +1,201 @@
+state: AL
+jurisdiction: Talladega County
+fips: "01121"
+level: county
+markets: [Birmingham]
+
+layers:
+  - role: parcels
+    name: OwnerParcel (Talladega911 Public — CAMA + ZoningCode)
+    restUrl: "https://web5.kcsgis.com/kcsgis/rest/services/Talladega911/Public/MapServer/7"
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: CalcAcres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PARCELID: parcelIdAlt
+      PPIN: parcelIdAlt2
+      PIN_PID: parcelIdAlt3
+      acctNum: parcelIdAlt4
+      Owner: ownerName
+      PreviousOwner: ownerNamePrior
+      MailAdd1: mailingAddress.street
+      MailAdd2: mailingAddress.street2
+      MailAdd3: mailingAddress.street3
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip1: mailingAddress.zip
+      SitusAddNumber: situsAddress.number
+      SitusAddName: situsAddress.street
+      SitusAddCity: situsCity
+      CalcAcres: acreage
+      DeededAcres: acreageDeed
+      TTV: tax.marketValue
+      TAV: tax.assessedValue
+      CLandValue: tax.landValue
+      CImpValue: tax.improvementValue
+      TotalTaxDue: tax.due
+      TaxYearDue: tax.year
+      TaxDist: tax.district
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      DeedRecorded: lastSale.date
+      DeedSigned: lastSale.deedSigned
+      PropertyClass: dorCode
+      ZoningCode: zoning
+      ZoningDesc: zoningDescription
+      Subdivision: subdivision
+      Neighborhood: neighborhood
+      LegalDescription: legalDescription
+    notes: >
+      Verified 2026-09-24: HTTP 200 pjson + count 57181. CRS WKID 102100/3857.
+      maxRecordCount 100000. Sample WGS84 centroid ~-86.34, 33.19 (Talladega AL) —
+      geo-verified. Owner/mail/situs/tax/acres/deed + ZoningCode/ZoningDesc on parcel.
+      No sale price. Prefer CalcAcres. Companion TylerTech Parcels on web6
+      Talladega/Talladega_TylerTech/MapServer/1 (count 57771, similar CAMA schema).
+      ISV: https://isv.kcsgis.com/al.talladega_revenue/. Prefer 911 Public/7 for
+      ZoningCode join-free attributes.
+    status: usable
+
+  - role: parcels
+    name: Parcels (Talladega TylerTech mirror)
+    restUrl: "https://web6.kcsgis.com/kcsgis/rest/services/Talladega/Talladega_TylerTech/MapServer/1"
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: CalcAcres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      PARCELID: parcelIdAlt
+      PPIN: parcelIdAlt2
+      Owner: ownerName
+      CalcAcres: acreage
+      DeededAcres: acreageDeed
+      TTV: tax.marketValue
+      TAV: tax.assessedValue
+    notes: >
+      Verified 2026-09-24: count 57771. Alternate CAMA host; prefer Talladega911
+      Public/7 when ZoningCode needed.
+    status: partial
+
+  - role: zoning
+    name: Zoning via OwnerParcel ZoningCode attribute
+    restUrl: "https://web5.kcsgis.com/kcsgis/rest/services/Talladega911/Public/MapServer/7"
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoningCode: zoning
+      ZoningDesc: zoningDescription
+    notes: >
+      Verified 2026-09-24: ZoningCode/ZoningDesc present on OwnerParcel (many null
+      in rural sample). No separate Zoning district FeatureServer on Talladega911
+      Public or AL61_VAM_City_Districts (empty). Use parcel attributes; municipal
+      district polygons not published separately this pass.
+    status: partial
+
+gaps:
+  - No lastSale.price (deed book/page/date only)
+  - ZoningCode often null outside munis; no standalone zoning polygon layer
+  - FLU not on Talladega911 Public this pass
+
+license: "Talladega County / KCS GIS (Talladega911 Public + TylerTech); use-at-own-risk; not for legal survey"
+appraiserSearchUrl: "https://talladegaproperty.countygovservices.com/Property/Property/Summary?ppin={PIN}&taxyear=2026"
+appraiserSearchUrlAlt: "https://isv.kcsgis.com/al.talladega_revenue/"
+jurisdictionGisUrl: "https://isv.kcsgis.com/al.talladega_revenue/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 61
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=61 AND AADT>0"
+    stations2024: 301
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=61 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 301 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: "https://web5.kcsgis.com/kcsgis/rest/services/Talladega911/Public/MapServer/7"
+  parcelIdField: PIN
+  featureCount: 57181
+  note: >
+    Re-verified live 2026-09-28: ?f=json 200, polygon, count 57181, sample centroid -86.34,33.19 (Sylacauga AL). PIN (int) = PPIN deep-link key; PARCELID 16-digit alt. Owner/Mail*/Situs*/CalcAcres/DeededAcres/TTV/TAV/CLandValue/CImpValue/TotalTaxDue/DeedBook/DeedPage/DeedRecorded present; ZoningCode/ZoningDesc fields present. countygovservices deep link verified (ppin=54154 returns Parcel Info).
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://web5.kcsgis.com/kcsgis/rest/services/Talladega911/Public/MapServer/7
+  featureCount: 57181
+  taxSaleOwner:
+    ownerName:
+      field: Owner
+      status: usable
+    assessedValue:
+      field: TAV
+      status: usable
+      nonNullOrPositiveCount: 56156
+      ofTotal: 57181
+    appraisedOrMarketValue:
+      field: TTV
+      status: usable
+      nonNullOrPositiveCount: 56499
+      ofTotal: 57181
+    landValue:
+      field: CLandValue
+      status: usable
+    improvementValue:
+      field: CImpValue
+      status: usable
+    taxAmount:
+      field: TotalTaxDue
+      status: usable
+      nonNullOrPositiveCount: 48525
+      ofTotal: 57181
+    lastSaleDate:
+      field: DeedRecorded
+      status: usable
+      nonNullOrPositiveCount: 48765
+      ofTotal: 57181
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: property-record page at appraiserSearchUrl
+    ownerEntityType:
+      derivable: true
+      sourceField: Owner
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 4106
+        INC: 1432
+        TRUST: 787
+        CORP: 110
+        CHURCH: 627
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://talladegaproperty.countygovservices.com/Property/Property/Summary?ppin={PIN}&taxyear=2026
+    pinField: PIN
+    testPin: '54154'
+    verified: 'yes'
+    method: plain fetch 200 (AssuranceWeb Property Details Summary)
+    note: Page returned owner SARGENT KEVIN & APRIL (matches layer). ISV config uses /Property/Property/Details?taxyear=2025&ppin={ID}; the Summary form also works.
+  jurisdictionGisUrl:
+    url: https://isv.kcsgis.com/al.talladega_revenue/
+    http: 200
+  notes: No sale price in layer (deed book/page/date only).

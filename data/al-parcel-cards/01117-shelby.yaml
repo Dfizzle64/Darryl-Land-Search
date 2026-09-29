@@ -1,0 +1,184 @@
+state: AL
+jurisdiction: Shelby County
+fips: "01117"
+level: county
+markets: [Birmingham]
+
+layers:
+  - role: parcels
+    name: Parcel Boundary (Cadastral_2025)
+    restUrl: "https://maps.shelbyal.com/gisserver/rest/services/LegacyServices/Cadastral_2025/MapServer/91"
+    layerId: 91
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      Assess_Num: parcelId
+      PROPERTY_NUM: parcelIdAlt
+      Parcel_Num: parcelIdShort
+      NAM1: ownerName
+      NAM2: ownerName2
+      ADR1: mailingAddress.street
+      ADR2: mailingAddress.street2
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP: mailingAddress.zip
+      ZIP4: mailingAddress.zip4
+      PROP_ADR: situsAddress
+      MunCode: situsCity
+      Acreage: acreage
+      ACRES: acreageAlt
+      Deed_Area: acreageDeed
+      SALES_PRICE: lastSale.price
+      INST_DATE1: lastSale.date
+      LN_VL1: tax.marketValue
+      CUR_USE_VL: tax.currentUseValue
+      OVRRIDE_ASD_VL: tax.assessedValue
+      Zoning: zoning
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count 105582. Prefer over C_PARCEL for
+      owner/tax/sale CAMA. CRS WKID 102630 (NAD 1983 StatePlane Alabama West Feet).
+      Sibling folders PTC/DataShare/GISWeb/Cadastral/LandMarkData/SpatialView return
+      HTTP 499 Token Required — avoid. GOOD_SALE / qualified sale flag not on this layer.
+    status: usable
+
+  - role: parcels
+    name: C_PARCEL (PropertyTaxOfficeBase FeatureServer)
+    restUrl: "https://maps.shelbyal.com/gisserver/rest/services/CaptureServices/PropertyTaxOfficeBase/FeatureServer/93"
+    layerId: 93
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      Assess_Num: parcelId
+      Acreage: acreage
+      Zoning: zoning
+    notes: >
+      Verified prior same-day research: ~108455 features; geometry-strong but lacks
+      NAM1/owner/tax/sale CAMA join. Use only as fabric companion to Cadastral_2025/91.
+    status: partial
+
+  - role: zoning
+    name: ZoneAll (district/school/zoning text)
+    restUrl: "https://maps.shelbyal.com/gisserver/rest/services/LegacyServices/ShelbyALZoneAll10/MapServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      idText: zoning
+    notes: Zoning/district text blob in idText — spatial join; parcel Zoning often null.
+    status: partial
+
+gaps:
+  - lastSale.qualified (GOOD_SALE) not on Cadastral_2025/91
+  - FLU / comprehensive plan not found as public county layer
+  - Token-gated sibling folders on same host
+  - ISV_Parcels Indian Springs Village is city-only / SmartGov-restricted — avoid
+
+  - Municipal zoning: 01117-city-helena (usable), pelham (usable via AGOL utility proxy), alabaster (gap); Hoover (01073-city-hoover) spans into Shelby
+
+license: "Shelby County AL GIS — use at own risk; not for legal/engineering/surveying"
+appraiserSearchUrl: "https://ptc.shelbyal.com/parcelviewer/"
+jurisdictionGisUrl: "https://ptc.shelbyal.com/parcelviewer/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 59
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=59 AND AADT>0"
+    stations2024: 480
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=59 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 480 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: https://maps.shelbyal.com/gisserver/rest/services/LegacyServices/Cadastral_2025/MapServer/91
+  parcelIdField: Assess_Num
+  featureCount: 105582
+  note: >
+    Batch 3 closing re-verify 2026-09-28: live count 105582, 1-feature query with polygon geometry OK (sample vertex [-86.5,33.55]), parcel ID field Assess_Num present. No field changes checked beyond ID.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://maps.shelbyal.com/gisserver/rest/services/LegacyServices/Cadastral_2025/MapServer/91
+  featureCount: 105582
+  taxSaleOwner:
+    ownerName:
+      field: NAM1
+      status: usable
+    assessedValue:
+      field: OVRRIDE_ASD_VL
+      status: gap
+      nonNullOrPositiveCount: 0
+      ofTotal: 105582
+      livesAt: https://ptc.shelbyal.com/propsearch
+    appraisedOrMarketValue:
+      field: null
+      status: gap
+      livesAt: 'https://ptc.shelbyal.com/propsearch (layer has components only: LN_VL1/LN_VL2 land, IMP1_VL..IMP6_VL improvements, PREV_YEAR_VL prior-year total)'
+    landValue:
+      field: LN_VL1
+      status: usable
+      nonNullOrPositiveCount: 80898
+      ofTotal: 105582
+    improvementValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA Citizen Access Portal https://ptc.shelbyal.com/propsearch
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA Citizen Access Portal https://ptc.shelbyal.com/propsearch
+    lastSaleDate:
+      field: INST_DATE1
+      status: usable (integer yyyymmdd)
+      nonNullOrPositiveCount: 98353
+      ofTotal: 105582
+    lastSalePrice:
+      field: SALES_PRICE
+      status: gap
+      nonNullOrPositiveCount: 0
+      ofTotal: 105582
+      livesAt: https://ptc.shelbyal.com/propsearch
+    ownerEntityType:
+      derivable: true
+      sourceField: NAM1
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 9507
+        INC: 2942
+        TRUST: 2023
+        CORP: 315
+        CHURCH: 471
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: null
+    pinField: Assess_Num / PROPERTY_NUM
+    testPin: 01 6 23 0 001 001.000
+    verified: 'no'
+    method: Shelby Property Tax Commissioner uses the CaptureCAMA Citizen Access Portal (https://ptc.shelbyal.com/propsearch, React SPA) and an Experience Builder viewer; the viewer Parcel-Detail link is
+      keyed by an internal datasource OBJECTID, not the parcel number
+    note: 'Seen form: https://ptc.shelbyal.com/parcelviewer/?data_id=dataSource_33-18b0a8ef176-layer-12:{OBJECTID}&page=Citizen-Access-Portal&views=Parcel-Detail (OBJECTID of the viewer layer, not a PIN;
+      not verified). Use https://ptc.shelbyal.com/propsearch for lookups.'
+  jurisdictionGisUrl:
+    url: https://ptc.shelbyal.com/parcelviewer/
+    http: null
+  notes: 'The older card fieldMap labels LN_VL1 as market value; it is land value (sample: LN_VL1=912600, IMP1_VL=0, PREV_YEAR_VL=912600). OVRRIDE_ASD_VL and SALES_PRICE are 0 for every parcel. No {PIN}
+    appraiserSearchUrl set (no verifiable deep link); existing appraiserSearchUrl left as-is.'

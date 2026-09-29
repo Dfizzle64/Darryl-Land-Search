@@ -1,0 +1,113 @@
+state: AL
+jurisdiction: Russell County
+fips: '01113'
+level: county
+markets:
+- Columbus GA-AL (Phenix City)
+layers:
+- role: parcels
+  name: Parcels (CaptureCAMA Russell map service, geometry + parcel ID only)
+  restUrl: https://maps.capturecama.com/arcgis/rest/services/Russell/Russell_02122026/MapServer/133
+  layerId: 133
+  geometry: polygon
+  auth: none
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    PARCELID: parcelId (spaced format, e.g. 01 09 32 03 002 001.000)
+    MAP: mapNumber
+    CALC_ACRE: acreage
+    OWNERPARCEL: ownerParcelLink (empty in sample)
+    OWNERPARCEL_ID: ownerParcelLinkId (empty in sample)
+  notes: 'Verified live 2026-09-28: anonymous, polygon, count 36764. Sample centroid -85.05,32.51 (north Russell County AL, west of the Chattahoochee; not Russell County KY/VA). Newest dated service in
+    maps.capturecama.com/arcgis/rest/services/Russell (Russell_02122026); the county Parcel Viewer config (https://russell.capturecama.com/parcelviewer/cdn/20/config.json, web map 14bf7681d0fb4bd5b6889672e37f1284)
+    still points at Russell_06022025/MapServer/133. No owner, value, tax or sale attributes; the viewer pulls CAMA detail from the CaptureCAMA portal by PARCELID. No KCS ISV for Russell (isv.kcsgis.com/al.russell_revenue
+    404). AGOL search only returned Russell County VA (wrong state).'
+  status: partial
+gaps:
+- No owner/value/tax/sale attributes in the public parcel layer (geometry + PARCELID only)
+- Phenix City zoning published only as a PDF (City of Phenix City Zoning Map 2025/2026) plus a 'Find My Zoning District' web app whose REST source was not resolved
+license: Russell County Revenue Commission / CaptureCAMA public parcel viewer; use-at-own-risk
+appraiserSearchUrl: https://russell.capturecama.com/mapparceldetail/{PIN}
+appraiserSearchUrlAlt: https://www.russellcountyrevenuecommissioner.com/
+jurisdictionGisUrl: https://russell.capturecama.com/parcelviewer/
+ruralOz2:
+  status: not a rural OZ 2.0 candidate county
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+enrichment:
+  aadt:
+    source: ALDOT TDM Public (TrafficCounterPoint)
+    restUrl: https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0
+    layerId: 0
+    field: AADT
+    yearField: YearAADT
+    year: 2024
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    luCountyId: 57
+    countyWhere: YearAADT=2024 AND LUCountyID=57 AND AADT>0
+    stations2024: 301
+    verifiedAt: '2026-09-28'
+    verifiedBy: Alabama Public Info Researcher
+    notes: LUCountyID=57 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 301 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID,
+      fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/.
+
+pass2Statewide2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://maps.capturecama.com/arcgis/rest/services/Russell/Russell_02122026/MapServer/133
+  featureCount: 36764
+  taxSaleOwner:
+    ownerName:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    appraisedOrMarketValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    landValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    improvementValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA)
+    ownerEntityType:
+      derivable: false
+      sourceField: null
+      rule: null
+      likeCounts2026_09_28: null
+      note: No owner in layer; entity type only derivable from CaptureCAMA property-record page https://russell.capturecama.com/mapparceldetail/{PIN} (browser-rendered SPA).
+  deepLink:
+    pattern: https://russell.capturecama.com/mapparceldetail/{PIN}
+    pinField: PARCELID
+    testPin: 01 09 32 03 002 001.000
+    verified: browser-only (pattern confirmed from viewer config)
+    method: 'Pattern read from the Russell CaptureCAMA Experience Builder config (Embed Parcel Detail widget: mapparceldetail/{PARCELID}); the page fetched 200 but it''s a React SPA shell (Citizen Access
+      Portal)'
+    note: Not rendered in a browser this run. PARCELID contains spaces, so URL-encode it.
+  jurisdictionGisUrl:
+    url: https://russell.capturecama.com/parcelviewer/
+    http: 200
+  notes: Public parcel layer is geometry + PARCELID only, so every tax/sale/owner field is a gap here and lives on the CaptureCAMA record page.

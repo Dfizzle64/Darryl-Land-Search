@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T01:37:15Z",
+  "generatedAt": "2026-09-29T02:05:10Z",
   "market": "Tuscaloosa",
   "tier": "other",
-  "parcelCount": 11596,
+  "parcelCount": 27452,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -20,39 +20,49 @@
       "name": "Greene",
       "fips": "01063",
       "state": "Alabama",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4327,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "al-greene-parcels-01063",
+      "queryUrl": "https://services8.arcgis.com/XI1FxP9uZwSBSNV8/arcgis/rest/services/GreeneAL_Service/FeatureServer/5/query",
       "gaps": [
-        "Greene County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+        "Parcels are Parcels (GreeneAL_Service — AGD-hosted AGOL for Greene County) (https://services8.arcgis.com/XI1FxP9uZwSBSNV8/arcgis/rest/services/GreeneAL_Service/FeatureServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "No situs address or sale price on parcel layer",
+        "No public zoning REST"
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/01063/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01063/lookup.json",
+      "tileCount": 9,
+      "sourceCount": 4327
     },
     {
       "name": "Hale",
       "fips": "01065",
       "state": "Alabama",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 6068,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "al-hale-parcels-01065",
+      "queryUrl": "https://services9.arcgis.com/AhiZvN2uMZkZVfSu/arcgis/rest/services/Hale_Web_Service/FeatureServer/10/query",
       "gaps": [
-        "Hale County has Flagship/CaptureCAMA HTML only. No usable public parcel REST in this pull. Polygons were not invented."
+        "Source query returned 6084 rows; 6068 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are PARCELS (Hale County AGOL Hale_Web_Service) (https://services9.arcgis.com/AhiZvN2uMZkZVfSu/arcgis/rest/services/Hale_Web_Service/FeatureServer/10). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "No public zoning / FLU REST for Hale County",
+        "No lastSale.price (deed book/page/date only)",
+        "CaptureCAMA/alabamagis Flagship portals absent; use AGOL Hale_Web_Service/10"
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/01065/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01065/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 6084
     },
     {
       "name": "Pickens",
@@ -72,6 +82,31 @@
       "lookup": null,
       "tileCount": null,
       "sourceCount": null
+    },
+    {
+      "name": "Sumter",
+      "fips": "01119",
+      "state": "Alabama",
+      "featureCount": 5461,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "al-sumter-parcels-01119",
+      "queryUrl": "https://maps.capturecama.com/arcgis/rest/services/Sumter/Sumter03282024/MapServer/2/query",
+      "gaps": [
+        "Source query returned 16242 rows; 5461 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Parcels are PARCEL (Sumter CaptureCAMA snapshot 2024-03-28) (https://maps.capturecama.com/arcgis/rest/services/Sumter/Sumter03282024/MapServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "The card marks this public parcel layer partial. Attributes that are absent stay empty.",
+        "Property-appraiser links are stored from the card pattern and were not requested.",
+        "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+        "Owner/value/acreage columns empty — geometry + PARCEL_NUM only",
+        "No pagination; 2024 vintage"
+      ],
+      "path": "data/fixtures/market-parcels/counties/01119/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/01119/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 16242
     },
     {
       "name": "Tuscaloosa",

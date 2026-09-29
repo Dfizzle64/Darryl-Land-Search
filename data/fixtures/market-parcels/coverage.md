@@ -10,8 +10,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 86,151 | 14 | 0 | 1 |
 | Nashville | primary | 169,243 | 25 | 0 | 3 |
-| Charlotte | primary | 112,019 | 13 | 0 | 2 |
-| Raleigh-Durham | primary | 151,530 | 17 | 0 | 0 |
+| Charlotte | primary | 118,015 | 14 | 0 | 2 |
+| Raleigh-Durham | primary | 177,604 | 23 | 0 | 0 |
 | South Florida | shelf | 41,693 | 3 | 1 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
 | Vero Beach | other | 23,480 | 5 | 0 | 0 |
@@ -29,11 +29,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Knoxville | other | 130,277 | 22 | 0 | 2 |
 | Memphis | other | 95,916 | 19 | 0 | 1 |
 | Jackson | other | 35,353 | 7 | 0 | 0 |
-| Winston-Salem | other | 92,199 | 9 | 0 | 0 |
-| Wilmington | other | 47,320 | 6 | 0 | 0 |
+| Winston-Salem | other | 95,812 | 10 | 0 | 0 |
+| Wilmington | other | 74,964 | 11 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
 | North-Central Florida | other | 103,358 | 13 | 0 | 0 |
-| Asheville | other | 16,793 | 2 | 0 | 0 |
+| Asheville | other | 59,329 | 9 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
 | Montgomery | other | 56,134 | 8 | 0 | 1 |
 | Valdosta | other | 5,815 | 1 | 0 | 0 |
@@ -156,6 +156,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Alexander | North Carolina | 37003 | complete-gte-5ac | 5,996 | nc-alexander-parcels-37003 |
 | Anson | North Carolina | 37007 | complete-gte-5ac | 5,820 | nc-anson-vector-37007 |
 | Cabarrus | North Carolina | 37025 | complete-gte-5ac | 6,983 | nc-cabarrus-tax-parcels-37025 |
 | Catawba | North Carolina | 37035 | complete-gte-5ac | 8,502 | nc-onemap-37035 |
@@ -177,10 +178,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Alamance | North Carolina | 37001 | complete-gte-5ac | 8,846 | nc-onemap-37001 |
+| Bertie | North Carolina | 37015 | complete-gte-5ac | 4,411 | nc-bertie-parcels-37015 |
+| Caswell | North Carolina | 37033 | complete-gte-5ac | 5,286 | nc-caswell-parcels-37033 |
 | Chatham | North Carolina | 37037 | complete-gte-5ac | 13,229 | nc-onemap-37037 |
+| Chowan | North Carolina | 37041 | complete-gte-5ac | 2,130 | nc-chowan-parcels-37041 |
 | Durham | North Carolina | 37063 | complete-gte-5ac | 4,940 | durham-property-37063 |
+| Edgecombe | North Carolina | 37065 | complete-gte-5ac | 4,257 | nc-edgecombe-parcels-37065 |
 | Franklin | North Carolina | 37069 | complete-gte-5ac | 7,639 | nc-onemap-37069 |
 | Granville | North Carolina | 37077 | complete-gte-5ac | 7,150 | nc-onemap-37077 |
+| Greene | North Carolina | 37079 | complete-gte-5ac | 3,557 | nc-greene-parcels-37079 |
+| Halifax | North Carolina | 37083 | complete-gte-5ac | 6,433 | nc-halifax-parcels-37083 |
 | Harnett | North Carolina | 37085 | complete-gte-5ac | 11,657 | nc-onemap-37085 |
 | Johnston | North Carolina | 37101 | complete-gte-5ac | 14,113 | nc-onemap-37101 |
 | Lee | North Carolina | 37105 | complete-gte-5ac | 4,858 | nc-onemap-37105 |
@@ -447,6 +454,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Alleghany | North Carolina | 37005 | complete-gte-5ac | 3,613 | nc-alleghany-parcels-37005 |
 | Davidson | North Carolina | 37057 | complete-gte-5ac | 12,063 | nc-davidson-opengov-37057 |
 | Davie | North Carolina | 37059 | complete-gte-5ac | 5,728 | davie-county-gis-parcels |
 | Forsyth | North Carolina | 37067 | complete-gte-5ac | 8,135 | nc-mapforsyth-37067 |
@@ -461,8 +469,13 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Beaufort | North Carolina | 37013 | complete-gte-5ac | 8,050 | nc-beaufort-parcels-37013 |
+| Bladen | North Carolina | 37017 | complete-gte-5ac | 8,300 | nc-bladen-parcels-37017 |
 | Brunswick | North Carolina | 37019 | complete-gte-5ac | 7,533 | bcgis-seamless-37019 |
+| Carteret | North Carolina | 37031 | complete-gte-5ac | 3,283 | nc-carteret-parcels-37031 |
 | Columbus | North Carolina | 37047 | complete-gte-5ac | 12,025 | nc-onemap-37047 |
+| Craven | North Carolina | 37049 | complete-gte-5ac | 5,945 | nc-craven-parcels-37049 |
+| Dare | North Carolina | 37055 | complete-gte-5ac | 2,066 | nc-dare-parcels-37055 |
 | Duplin | North Carolina | 37061 | complete-gte-5ac | 11,397 | nc-onemap-37061 |
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,263 | nc-new-hanover-parcels-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
@@ -500,7 +513,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
+| Ashe | North Carolina | 37009 | complete-gte-5ac | 8,966 | nc-ashe-parcels-37009 |
+| Avery | North Carolina | 37011 | complete-gte-5ac | 3,925 | nc-avery-parcels-37011 |
 | Buncombe | North Carolina | 37021 | complete-gte-5ac | 10,523 | nc-buncombe-opendata-37021 |
+| Burke | North Carolina | 37023 | complete-gte-5ac | 7,930 | nc-burke-parcels-37023 |
+| Caldwell | North Carolina | 37027 | complete-gte-5ac | 8,109 | nc-caldwell-parcels-37027 |
+| Cherokee | North Carolina | 37039 | complete-gte-5ac | 6,293 | nc-cherokee-parcels-37039 |
+| Graham | North Carolina | 37075 | complete-gte-5ac | 1,920 | nc-graham-parcels-37075 |
+| Haywood | North Carolina | 37087 | complete-gte-5ac | 5,393 | nc-haywood-parcels-37087 |
 | Henderson | North Carolina | 37089 | complete-gte-5ac | 6,270 | nc-henderson-parcels-37089 |
 
 ### Tuscaloosa

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T02:23:41Z",
+  "generatedAt": "2026-09-29T02:54:29Z",
   "market": "Winston-Salem",
   "tier": "other",
-  "parcelCount": 92199,
+  "parcelCount": 95812,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -16,6 +16,31 @@
     "Orange, Osceola, and Polk point at the existing Orlando complete extract."
   ],
   "counties": [
+    {
+      "name": "Alleghany",
+      "fips": "37005",
+      "state": "North Carolina",
+      "featureCount": 3613,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-alleghany-parcels-37005",
+      "queryUrl": "https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/11/query",
+      "gaps": [
+        "Parcels are NC/Alleghany Parcels (PRIMARY geometry + owner + deed) (https://www.webgis.net/arcgis/rest/services/NC/Alleghany/MapServer/11). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 3628 rows; 3613 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax gap, sale partial). Pass 2 counted 173 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Pass 2 tax status is gap. Scrubbed or missing tax values were not copied off the parcel layer.",
+        "Pass 2 sale: DEED_DATE (string) only; price on ITSPublicAL AppraisalCard PDF SALES DATA grid.",
+        "Pass 2 tax join matched 3559 of 3613 parcel ids.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37005/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37005/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 3628
+    },
     {
       "name": "Davidson",
       "fips": "37057",

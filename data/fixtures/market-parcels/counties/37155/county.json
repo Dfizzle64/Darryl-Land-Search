@@ -1,0 +1,30 @@
+{
+  "name": "Robeson",
+  "fips": "37155",
+  "state": "North Carolina",
+  "markets": [
+    "Wilmington"
+  ],
+  "featureCount": 12583,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-robeson-parcels-37155",
+  "queryUrl": "https://services7.arcgis.com/miWUVbMhSUq6a8y1/arcgis/rest/services/Robeson_County_Parcels/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are AGOL Robeson County Parcels (PRIMARY CAMA) (https://services7.arcgis.com/miWUVbMhSUq6a8y1/arcgis/rest/services/Robeson_County_Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 14307 rows; 12583 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 975 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Robeson pass-2 tax fields are land and improvement assessed values. Those components are not summed into a total market or assessed value.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37155/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37155/lookup.json",
+  "sourceCount": 14307,
+  "dropped": 21,
+  "tileCount": 9,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://www.ustaxdata.com/nc/robeson/account.cfm?parcelID={MAPNO}",
+  "gisViewerUrl": "https://maps2.roktech.net/ROKMAPS_Robeson/"
+}

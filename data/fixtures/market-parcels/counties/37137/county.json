@@ -1,0 +1,29 @@
+{
+  "name": "Pamlico",
+  "fips": "37137",
+  "state": "North Carolina",
+  "markets": [
+    "Wilmington"
+  ],
+  "featureCount": 3154,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-pamlico-parcels-37137",
+  "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Pamlico_ParcelService/FeatureServer/5/query",
+  "gaps": [
+    "Parcels are Pamlico_ParcelService Parcel_Poly (PRIMARY county AGOL CAMA + SALE_AMT) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Pamlico_ParcelService/FeatureServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3155 rows; 3154 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 117 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37137/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37137/lookup.json",
+  "sourceCount": 3155,
+  "dropped": 0,
+  "tileCount": 7,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "http://dl.agd.cc/prc/nc/pamlico/{MAPID}.pdf",
+  "gisViewerUrl": "https://webapp.agdmaps.com/nc/pamlico/"
+}

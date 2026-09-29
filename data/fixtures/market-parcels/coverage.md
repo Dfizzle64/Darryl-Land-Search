@@ -10,8 +10,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 86,151 | 14 | 0 | 1 |
 | Nashville | primary | 169,243 | 25 | 0 | 3 |
-| Charlotte | primary | 118,015 | 14 | 0 | 2 |
-| Raleigh-Durham | primary | 177,604 | 23 | 0 | 0 |
+| Charlotte | primary | 129,191 | 16 | 0 | 2 |
+| Raleigh-Durham | primary | 215,243 | 30 | 0 | 0 |
 | South Florida | shelf | 41,693 | 3 | 1 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
 | Vero Beach | other | 23,480 | 5 | 0 | 0 |
@@ -30,10 +30,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Memphis | other | 95,916 | 19 | 0 | 1 |
 | Jackson | other | 35,353 | 7 | 0 | 0 |
 | Winston-Salem | other | 95,812 | 10 | 0 | 0 |
-| Wilmington | other | 74,964 | 11 | 0 | 0 |
+| Wilmington | other | 100,686 | 16 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
 | North-Central Florida | other | 103,358 | 13 | 0 | 0 |
-| Asheville | other | 59,329 | 9 | 0 | 0 |
+| Asheville | other | 89,533 | 15 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
 | Montgomery | other | 56,134 | 8 | 0 | 1 |
 | Valdosta | other | 5,815 | 1 | 0 | 0 |
@@ -168,6 +168,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Lancaster | South Carolina | 45057 | gap | 0 | unavailable |
 | Lincoln | North Carolina | 37109 | complete-gte-5ac | 6,563 | nc-lincoln-operational-37109 |
 | Mecklenburg | North Carolina | 37119 | complete-gte-5ac | 8,402 | meck-taxparcel-camadata-37119 |
+| Montgomery | North Carolina | 37123 | complete-gte-5ac | 5,957 | nc-montgomery-parcels-37123 |
+| Richmond | North Carolina | 37153 | complete-gte-5ac | 5,219 | nc-richmond-parcels-37153 |
 | Rowan | North Carolina | 37159 | complete-gte-5ac | 10,375 | nc-rowan-open-data-37159 |
 | Stanly | North Carolina | 37167 | complete-gte-5ac | 8,024 | nc-onemap-37167 |
 | Union | North Carolina | 37179 | complete-gte-5ac | 13,025 | nc-union-atlas-37179 |
@@ -189,11 +191,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Greene | North Carolina | 37079 | complete-gte-5ac | 3,557 | nc-greene-parcels-37079 |
 | Halifax | North Carolina | 37083 | complete-gte-5ac | 6,433 | nc-halifax-parcels-37083 |
 | Harnett | North Carolina | 37085 | complete-gte-5ac | 11,657 | nc-onemap-37085 |
+| Hertford | North Carolina | 37091 | complete-gte-5ac | 2,701 | nc-hertford-parcels-37091 |
+| Hoke | North Carolina | 37093 | complete-gte-5ac | 3,202 | nc-hoke-parcels-37093 |
 | Johnston | North Carolina | 37101 | complete-gte-5ac | 14,113 | nc-onemap-37101 |
 | Lee | North Carolina | 37105 | complete-gte-5ac | 4,858 | nc-onemap-37105 |
+| Martin | North Carolina | 37117 | complete-gte-5ac | 3,561 | nc-martin-parcels-37117 |
+| Moore | North Carolina | 37125 | complete-gte-5ac | 12,638 | nc-moore-parcels-37125 |
 | Nash | North Carolina | 37127 | complete-gte-5ac | 8,292 | nc-onemap-37127 |
+| Northampton | North Carolina | 37131 | complete-gte-5ac | 4,840 | nc-northampton-parcels-37131 |
 | Orange | North Carolina | 37135 | complete-gte-5ac | 9,375 | nc-orange-webparcel-37135 |
+| Pasquotank | North Carolina | 37139 | complete-gte-5ac | 2,779 | nc-pasquotank-parcels-37139 |
 | Person | North Carolina | 37145 | complete-gte-5ac | 5,956 | nc-onemap-37145 |
+| Pitt | North Carolina | 37147 | complete-gte-5ac | 7,918 | nc-pitt-parcels-37147 |
 | Sampson | North Carolina | 37163 | complete-gte-5ac | 14,031 | nc-onemap-37163 |
 | Vance | North Carolina | 37181 | complete-gte-5ac | 3,181 | nc-onemap-37181 |
 | Wake | North Carolina | 37183 | complete-gte-5ac | 12,436 | nc-wake-county-parcels |
@@ -477,9 +486,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Craven | North Carolina | 37049 | complete-gte-5ac | 5,945 | nc-craven-parcels-37049 |
 | Dare | North Carolina | 37055 | complete-gte-5ac | 2,066 | nc-dare-parcels-37055 |
 | Duplin | North Carolina | 37061 | complete-gte-5ac | 11,397 | nc-onemap-37061 |
+| Hyde | North Carolina | 37095 | complete-gte-5ac | 2,394 | nc-hyde-parcels-37095 |
+| Jones | North Carolina | 37103 | complete-gte-5ac | 2,349 | nc-jones-parcels-37103 |
+| Lenoir | North Carolina | 37107 | complete-gte-5ac | 5,242 | nc-lenoir-parcels-37107 |
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,263 | nc-new-hanover-parcels-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
+| Pamlico | North Carolina | 37137 | complete-gte-5ac | 3,154 | nc-pamlico-parcels-37137 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,355 | nc-pender-energov-37141 |
+| Robeson | North Carolina | 37155 | complete-gte-5ac | 12,583 | nc-robeson-parcels-37155 |
 
 ### Heartland
 
@@ -522,6 +536,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Graham | North Carolina | 37075 | complete-gte-5ac | 1,920 | nc-graham-parcels-37075 |
 | Haywood | North Carolina | 37087 | complete-gte-5ac | 5,393 | nc-haywood-parcels-37087 |
 | Henderson | North Carolina | 37089 | complete-gte-5ac | 6,270 | nc-henderson-parcels-37089 |
+| Jackson | North Carolina | 37099 | complete-gte-5ac | 6,732 | nc-jackson-parcels-37099 |
+| Macon | North Carolina | 37113 | complete-gte-5ac | 6,321 | nc-macon-parcels-37113 |
+| Madison | North Carolina | 37115 | complete-gte-5ac | 6,897 | nc-madison-parcels-37115 |
+| McDowell | North Carolina | 37111 | complete-gte-5ac | 1,736 | nc-mcdowell-parcels-37111 |
+| Mitchell | North Carolina | 37121 | complete-gte-5ac | 3,835 | nc-mitchell-parcels-37121 |
+| Polk | North Carolina | 37149 | complete-gte-5ac | 4,683 | nc-polk-parcels-37149 |
 
 ### Tuscaloosa
 

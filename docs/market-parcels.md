@@ -39,6 +39,8 @@ Alabama rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the fi
 
 North Carolina rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 pass-1 counties that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Alexander, Alleghany, Ashe, Avery, Beaufort, Bertie, Bladen, Burke, Caldwell, Carteret, Caswell, Cherokee, Chowan, Craven, Dare, Edgecombe, Graham, Greene, Halifax, and Haywood. Buncombe and Henderson were already complete and were not re-pulled. No endpoint in that stretch was unreachable. Alexander pages with orderByFields because the MapServer has no object id; its returnCountOnly figure repeats PROPERTY 99999 rows, so the stored count is the distinct parcel ids that page. Ashe pages with resultRecordCount. Counties already on a shelf stayed there. The others were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Chowan tax values were scrubbed on the layer and were not copied. Alleghany tax is the NC OneMap fallback join. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
 
+North Carolina rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for the next 20 pass-1 counties starting at Hertford that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Hertford, Hoke, Hyde, Jackson, Jones, Lenoir, McDowell, Macon, Madison, Martin, Mitchell, Montgomery, Moore, Northampton, Pamlico, Pasquotank, Pitt, Polk, Richmond, and Robeson. No county in that stretch was already a complete extract, and no endpoint was unreachable. Rutherford was the next verified row and was not loaded because the batch of 20 was already filled. Jackson pages with resultRecordCount, and AssessedAcres is filtered with CAST AS FLOAT. Hoke uses the county AGOL June2025 layer, which has geometry, parcel id, and acreage only. Hoke, Mitchell, and Robeson repeat a parcel id across rows; the extract keeps one geometry per parcel id. Madison tax is the NC OneMap fallback join, and that county has no sale date on the public layer. Hyde has no sale price or date on the public layer. Robeson tax fields are land and improvement assessed values and are not summed into a total. Counties were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. A pass-2 sample account id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
+
 Tennessee rural Opportunity Zone batch 3 loads the next 20 pass1-order counties that were not already a complete extract: Benton, Carter, Clay, Fentress, Franklin, Hancock, Hawkins, Humphreys, Jackson, Johnson, Lake, Lawrence, Marion, McMinn, Obion, Pickett, Scott, Sullivan, Tipton, and Wayne. Maury, Shelby, and Sumner were already complete and were not replaced. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Lawrence, McMinn, and Marion are labeled 2025. Tipton is labeled 2026. Fentress has no public bulk sale/value layer, so those fields stay empty. The other fifteen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. Sullivan zoning is joined on GISLINK. McMinn, Marion, and Tipton zoning polygons are stamped by centroid, with a later city layer replacing the county code only inside that city. The other counties leave zoning empty. The TPAD link is stored and not requested. Owner phone and email are not ingested. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
 
 The next twenty Tennessee rural-OZ counties use the same public-GIS loader. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Hamblen uses the MH-GIS assessor CAMA and is labeled 2026. The other nineteen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. The TPAD link is stored and not requested. Owner phone and email are not ingested. Bradley and Grainger were already loaded and were not replaced. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
@@ -59,8 +61,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 86,151 | 14 | 0 | 1 |
 | Nashville | primary | 169,243 | 25 | 0 | 3 |
-| Charlotte | primary | 118,015 | 14 | 0 | 2 |
-| Raleigh-Durham | primary | 177,604 | 23 | 0 | 0 |
+| Charlotte | primary | 129,191 | 16 | 0 | 2 |
+| Raleigh-Durham | primary | 215,243 | 30 | 0 | 0 |
 | South Florida | shelf | 41,693 | 3 | 1 | 0 |
 | SWFL | other | 32,749 | 4 | 0 | 0 |
 | Vero Beach | other | 23,480 | 5 | 0 | 0 |
@@ -79,10 +81,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Memphis | other | 95,916 | 19 | 0 | 1 |
 | Jackson | other | 35,353 | 7 | 0 | 0 |
 | Winston-Salem | other | 95,812 | 10 | 0 | 0 |
-| Wilmington | other | 74,964 | 11 | 0 | 0 |
+| Wilmington | other | 100,686 | 16 | 0 | 0 |
 | Heartland | shelf | 21,163 | 4 | 1 | 0 |
 | North-Central Florida | other | 103,358 | 13 | 0 | 0 |
-| Asheville | other | 59,329 | 9 | 0 | 0 |
+| Asheville | other | 89,533 | 15 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
 | Montgomery | other | 56,134 | 8 | 0 | 1 |
 | Valdosta | other | 5,815 | 1 | 0 | 0 |
@@ -217,6 +219,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Lancaster | South Carolina | 45057 | gap | 0 | unavailable |
 | Lincoln | North Carolina | 37109 | complete-gte-5ac | 6,563 | nc-lincoln-operational-37109 |
 | Mecklenburg | North Carolina | 37119 | complete-gte-5ac | 8,402 | meck-taxparcel-camadata-37119 |
+| Montgomery | North Carolina | 37123 | complete-gte-5ac | 5,957 | nc-montgomery-parcels-37123 |
+| Richmond | North Carolina | 37153 | complete-gte-5ac | 5,219 | nc-richmond-parcels-37153 |
 | Rowan | North Carolina | 37159 | complete-gte-5ac | 10,375 | nc-rowan-open-data-37159 |
 | Stanly | North Carolina | 37167 | complete-gte-5ac | 8,024 | nc-onemap-37167 |
 | Union | North Carolina | 37179 | complete-gte-5ac | 13,025 | nc-union-atlas-37179 |
@@ -238,11 +242,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Greene | North Carolina | 37079 | complete-gte-5ac | 3,557 | nc-greene-parcels-37079 |
 | Halifax | North Carolina | 37083 | complete-gte-5ac | 6,433 | nc-halifax-parcels-37083 |
 | Harnett | North Carolina | 37085 | complete-gte-5ac | 11,657 | nc-onemap-37085 |
+| Hertford | North Carolina | 37091 | complete-gte-5ac | 2,701 | nc-hertford-parcels-37091 |
+| Hoke | North Carolina | 37093 | complete-gte-5ac | 3,202 | nc-hoke-parcels-37093 |
 | Johnston | North Carolina | 37101 | complete-gte-5ac | 14,113 | nc-onemap-37101 |
 | Lee | North Carolina | 37105 | complete-gte-5ac | 4,858 | nc-onemap-37105 |
+| Martin | North Carolina | 37117 | complete-gte-5ac | 3,561 | nc-martin-parcels-37117 |
+| Moore | North Carolina | 37125 | complete-gte-5ac | 12,638 | nc-moore-parcels-37125 |
 | Nash | North Carolina | 37127 | complete-gte-5ac | 8,292 | nc-onemap-37127 |
+| Northampton | North Carolina | 37131 | complete-gte-5ac | 4,840 | nc-northampton-parcels-37131 |
 | Orange | North Carolina | 37135 | complete-gte-5ac | 9,375 | nc-orange-webparcel-37135 |
+| Pasquotank | North Carolina | 37139 | complete-gte-5ac | 2,779 | nc-pasquotank-parcels-37139 |
 | Person | North Carolina | 37145 | complete-gte-5ac | 5,956 | nc-onemap-37145 |
+| Pitt | North Carolina | 37147 | complete-gte-5ac | 7,918 | nc-pitt-parcels-37147 |
 | Sampson | North Carolina | 37163 | complete-gte-5ac | 14,031 | nc-onemap-37163 |
 | Vance | North Carolina | 37181 | complete-gte-5ac | 3,181 | nc-onemap-37181 |
 | Wake | North Carolina | 37183 | complete-gte-5ac | 12,436 | nc-wake-county-parcels |
@@ -526,9 +537,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Craven | North Carolina | 37049 | complete-gte-5ac | 5,945 | nc-craven-parcels-37049 |
 | Dare | North Carolina | 37055 | complete-gte-5ac | 2,066 | nc-dare-parcels-37055 |
 | Duplin | North Carolina | 37061 | complete-gte-5ac | 11,397 | nc-onemap-37061 |
+| Hyde | North Carolina | 37095 | complete-gte-5ac | 2,394 | nc-hyde-parcels-37095 |
+| Jones | North Carolina | 37103 | complete-gte-5ac | 2,349 | nc-jones-parcels-37103 |
+| Lenoir | North Carolina | 37107 | complete-gte-5ac | 5,242 | nc-lenoir-parcels-37107 |
 | New Hanover | North Carolina | 37129 | complete-gte-5ac | 2,263 | nc-new-hanover-parcels-37129 |
 | Onslow | North Carolina | 37133 | complete-gte-5ac | 6,747 | nc-onemap-37133 |
+| Pamlico | North Carolina | 37137 | complete-gte-5ac | 3,154 | nc-pamlico-parcels-37137 |
 | Pender | North Carolina | 37141 | complete-gte-5ac | 7,355 | nc-pender-energov-37141 |
+| Robeson | North Carolina | 37155 | complete-gte-5ac | 12,583 | nc-robeson-parcels-37155 |
 
 ### Heartland
 
@@ -571,6 +587,12 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Graham | North Carolina | 37075 | complete-gte-5ac | 1,920 | nc-graham-parcels-37075 |
 | Haywood | North Carolina | 37087 | complete-gte-5ac | 5,393 | nc-haywood-parcels-37087 |
 | Henderson | North Carolina | 37089 | complete-gte-5ac | 6,270 | nc-henderson-parcels-37089 |
+| Jackson | North Carolina | 37099 | complete-gte-5ac | 6,732 | nc-jackson-parcels-37099 |
+| Macon | North Carolina | 37113 | complete-gte-5ac | 6,321 | nc-macon-parcels-37113 |
+| Madison | North Carolina | 37115 | complete-gte-5ac | 6,897 | nc-madison-parcels-37115 |
+| McDowell | North Carolina | 37111 | complete-gte-5ac | 1,736 | nc-mcdowell-parcels-37111 |
+| Mitchell | North Carolina | 37121 | complete-gte-5ac | 3,835 | nc-mitchell-parcels-37121 |
+| Polk | North Carolina | 37149 | complete-gte-5ac | 4,683 | nc-polk-parcels-37149 |
 
 ### Tuscaloosa
 

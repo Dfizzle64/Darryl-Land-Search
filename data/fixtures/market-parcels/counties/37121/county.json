@@ -1,0 +1,30 @@
+{
+  "name": "Mitchell",
+  "fips": "37121",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 3835,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-mitchell-parcels-37121",
+  "queryUrl": "https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew/MapServer/12/query",
+  "gaps": [
+    "Parcels are WebMapNew Parcels (CAMA + polygons) (https://mapping.mitchellcountync.gov/arcgis/rest/services/WebMapNew/MapServer/12). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 4221 rows; 3835 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale partial). Pass 2 counted 123 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale: Price not on REST; NCPTS Mitchell parcel-detail page is the public source.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37121/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37121/lookup.json",
+  "sourceCount": 4221,
+  "dropped": 0,
+  "tileCount": 5,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/mitchell/parcel-detail/{GISPIN}",
+  "gisViewerUrl": "https://mapping.mitchellcountync.gov/maps/"
+}

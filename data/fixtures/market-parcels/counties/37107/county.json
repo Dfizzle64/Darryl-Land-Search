@@ -1,0 +1,29 @@
+{
+  "name": "Lenoir",
+  "fips": "37107",
+  "state": "North Carolina",
+  "markets": [
+    "Wilmington"
+  ],
+  "featureCount": 5242,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-lenoir-parcels-37107",
+  "queryUrl": "https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/6/query",
+  "gaps": [
+    "Parcels are Parcels_Zoning_Addressing / Parcels (PRIMARY) (https://services3.arcgis.com/bDx73HOFAO3oSeDq/arcgis/rest/services/Parcels_Zoning_Addressing/FeatureServer/6). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 5326 rows; 5242 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 469 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37107/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37107/lookup.json",
+  "sourceCount": 5326,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://property.spatialest.com/nc/lenoir/#/property/{Record_Num}",
+  "gisViewerUrl": "https://lenoirco.maps.arcgis.com/apps/webappviewer/index.html?id=68c0618065d04f1182fb86cb5b6647de"
+}

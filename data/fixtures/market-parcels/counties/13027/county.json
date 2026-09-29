@@ -1,0 +1,30 @@
+{
+  "name": "Brooks",
+  "fips": "13027",
+  "state": "Georgia",
+  "markets": [
+    "Valdosta"
+  ],
+  "featureCount": 3009,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-brooks-parcels-13027",
+  "queryUrl": "https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0/query",
+  "gaps": [
+    "Parcels are Brooks Boundaries Parcel Info (SGRC) (https://www.sgrcmaps.com/alma/rest/services/Brooks/Boundaries/MapServer/0). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3057 rows; 3009 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax REST, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13027/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13027/lookup.json",
+  "sourceCount": 3057,
+  "dropped": 1,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=BrooksCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://www.arcgis.com/apps/mapviewer/index.html?webmap=63c4a5f4cc3341dab729b216e5009cca"
+}

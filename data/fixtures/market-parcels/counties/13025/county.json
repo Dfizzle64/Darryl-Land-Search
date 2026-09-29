@@ -1,0 +1,29 @@
+{
+  "name": "Brantley",
+  "fips": "13025",
+  "state": "Georgia",
+  "markets": [
+    "Valdosta"
+  ],
+  "featureCount": 2980,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-brantley-parcels-13025",
+  "queryUrl": "https://services3.arcgis.com/86pyA5PND5NdokIc/arcgis/rest/services/Brantley_Parcels_view/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Brantley_Parcels view (county AGOL / bcgis100) (https://services3.arcgis.com/86pyA5PND5NdokIc/arcgis/rest/services/Brantley_Parcels_view/FeatureServer/0). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax REST, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13025/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13025/lookup.json",
+  "sourceCount": 2980,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=brantleyCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=brantleyCountyGA&Layer=Parcels&PageType=Maps"
+}

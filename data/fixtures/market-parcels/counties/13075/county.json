@@ -1,0 +1,29 @@
+{
+  "name": "Cook",
+  "fips": "13075",
+  "state": "Georgia",
+  "markets": [
+    "Valdosta"
+  ],
+  "featureCount": 2437,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-cook-parcels-13075",
+  "queryUrl": "https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0/query",
+  "gaps": [
+    "Parcels are Cook/Cook_Parcels Parcels — SGRC alma MapServer (https://www.sgrcmaps.com/alma/rest/services/Cook/Cook_Parcels/MapServer/0). Published acreage is filtered to 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Pass 2 enrichment is from rural-oz-pass2 csv (tax REST, sale HTML-only, owner REST). GDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale is HTML-only. Zero-filled SALE_VAL columns are not stored as a sale price, and qPublic was not requested.",
+    "Property-appraiser links are filled from the pass-2 template with each parcel id and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13075/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13075/lookup.json",
+  "sourceCount": 2437,
+  "dropped": 0,
+  "tileCount": 4,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=cookCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=cookCountyGA&Layer=Parcels&PageType=Maps"
+}

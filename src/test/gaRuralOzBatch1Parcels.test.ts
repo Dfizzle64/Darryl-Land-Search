@@ -190,8 +190,10 @@ describe("Georgia rural OZ batch 1 parcels", () => {
           problems.push(`${item.fips} ${feature.properties.parcelId} keys ${keys.join(" ")}`);
         }
         const owner = `${feature.properties.ownerName || ""} ${feature.properties.ownerName2 || ""}`;
-        if (/@/.test(owner) || /\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b/.test(owner)) {
-          problems.push(`${item.fips} ${feature.properties.parcelId} contact ${owner}`);
+        const mail = feature.properties.mailingAddress;
+        const contact = `${owner} ${mail?.line1 || ""} ${mail?.line2 || ""}`;
+        if (/[^@\s]+@[^@\s]+\.[A-Za-z]{2,}/.test(contact) || /\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b/.test(contact)) {
+          problems.push(`${item.fips} ${feature.properties.parcelId} contact ${contact}`);
         }
         if (feature.properties.opportunityZone != null || feature.properties.oz2Eligibility != null) {
           problems.push(`${item.fips} ${feature.properties.parcelId} oz`);

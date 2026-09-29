@@ -1,0 +1,33 @@
+{
+  "name": "Union",
+  "fips": "45087",
+  "state": "South Carolina",
+  "markets": [
+    "Greenville"
+  ],
+  "featureCount": 4307,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-union-parcels-45087",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18/query",
+  "gaps": [
+    "Source query returned 4315 rows; 4307 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA Statewide_Parcels filtered to Union County (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Primary parcels now SC RFA Statewide_Parcels (layer 18, where County='Union County'), state-hosted inside a boundary-program map — fragile; alt source retained.",
+    "Parcel polygons loadable from AGOL UNION_SC_PARCELS_WFL1/FeatureServer/2 (18,885; 2026-03-30 snapshot) — publisher account mitchelllh not confirmed as county; prefer a county-published source if one appears.",
+    "No county-published Union County SC parcel REST verified (GIS office page points to data orders); the AGOL layer above is third-party/unconfirmed publisher.",
+    "PublicGisUrl/PA link: qPublic search at https://www.qpublic.net/sc/union/search.html; use parcelId as the 13-digit SC tax map number in the search form. No stable parcel-specific deep link verified."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45087/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45087/lookup.json",
+  "sourceCount": 4315,
+  "dropped": 0,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=861&LayerID=16112&PageTypeID=4&PageID=7170&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=861&LayerID=16112&PageTypeID=2&PageID=7168"
+}

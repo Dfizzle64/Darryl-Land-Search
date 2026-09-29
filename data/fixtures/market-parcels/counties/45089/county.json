@@ -1,0 +1,32 @@
+{
+  "name": "Williamsburg",
+  "fips": "45089",
+  "state": "South Carolina",
+  "markets": [
+    "Charleston"
+  ],
+  "featureCount": 7174,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-williamsburg-parcels-45089",
+  "queryUrl": "https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Georgetown_Williamsburg_Web_Map_WFL1/FeatureServer/4/query",
+  "gaps": [
+    "Source query returned 7514 rows; 7174 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are SC RFA Williamsburg Parcels (county-specific layer w/ CAMA, boundary program map) (https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Georgetown_Williamsburg_Web_Map_WFL1/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Williamsburg County') plus RFA county-specific layer; state-hosted inside boundary-program maps — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28.",
+    "No countywide zoning or FLU REST layer verified.",
+    "Rejected SCDOT SC_Parcels token layer."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45089/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45089/lookup.json",
+  "sourceCount": 7514,
+  "dropped": 320,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://williamsburgsc.wthgis.com/",
+  "gisViewerUrl": "https://williamsburgsc.wthgis.com/"
+}

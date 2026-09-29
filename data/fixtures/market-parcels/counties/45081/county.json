@@ -5,19 +5,29 @@
   "markets": [
     "Columbia"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 5735,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "sc-saluda-parcels-45081",
+  "queryUrl": "https://saludacountysc.net/arcgis/rest/services/ParcelViewers/PublicWebsite_Pro/MapServer/4/query",
   "gaps": [
-    "Statewide South Carolina open data is parcel centroids (Revenue and Fiscal Affairs), not polygons. This county's polygon service was missing or token-gated (Charleston County GIS requires a token)."
+    "Source query returned 5814 rows; 5735 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Saluda County Parcels + AssessorData join (county ArcGIS Server, PublicWebsite_Pro) (https://saludacountysc.net/arcgis/rest/services/ParcelViewers/PublicWebsite_Pro/MapServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Saluda County') plus RFA county-specific layer; state-hosted inside boundary-program maps — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28.",
+    "SCDOT statewide SC_Parcels requires token — not usable as primary.",
+    "Zoning/FLU REST not verified.",
+    "WTH GIS viewer http://saluda.sc.wthgis.com/ live. No anonymous county-native FeatureServer verified."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/45081/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45081/lookup.json",
+  "sourceCount": 5814,
+  "dropped": 1,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://saludacountysc.net/assessorsearch/MoreDetail.asp?MAP_NUMBER={parcelId}",
+  "gisViewerUrl": "https://saludacountysc.net/SaludaCountyViewer/"
 }

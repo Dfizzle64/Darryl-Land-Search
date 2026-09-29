@@ -35,6 +35,8 @@ Valdosta, Macon, Athens, Hilton Head, and Jackson MS are parcel shelves with no 
 
 South Carolina rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 interim-list counties that were not already a complete extract and whose card endpoint answered: Abbeville, Aiken, Allendale, Bamberg, Barnwell, Cherokee, Chester, Chesterfield, Clarendon, Colleton, Darlington, Dillon, Edgefield, Fairfield, Florence, Georgetown, Greenwood, Hampton, Horry, and Jasper. Anderson's NewPropertyViewer service closed the TLS connection and was skipped. Beaufort, Charleston, Dorchester, and Greenville were already on the card endpoint. Berkeley stays the existing Addr_muni extract. Edgefield uses the new RFA Edgefield_McCormick_Greenwood layer 9. City cards (Hilton Head, Myrtle Beach, and the other municipalities) are not this batch. qPublic and Beacon property-appraiser patterns are stored and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. AADT wiring and tract eligibility were not changed.
 
+South Carolina rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for Anderson (retried from batch 1) and the interim-list counties after Jasper that were not already a complete extract and whose card endpoint answered: Anderson, Kershaw, Lancaster, Laurens, Lee, McCormick, Marion, Marlboro, Newberry, Oconee, Orangeburg, Pickens, Richland, Saluda, Union, Williamsburg, and York. Lexington and Spartanburg were already complete and were not re-pulled. Sumter's BaseMaps service was not started and was skipped. Calhoun has no usable public parcel layer and was not a fill. Beaufort, Charleston, Dorchester, Greenville, and Berkeley stay the existing extracts. Anderson's NewPropertyViewer certificate chain was missing the DigiCert intermediate; the pull trusts that intermediate and does not disable certificate checks. Anderson acreage is geodesic polygon area because the county layer has no acre field, and owner names are joined from the RFA statewide layer named on the card. Anderson sale years are stored as January 1 of the published year. Kershaw uses the RFA Fairfield_Kershaw_Richland layer 7. McCormick and Williamsburg use the RFA CAMA layers and CAST string acres. Saluda uses the county PublicWebsite_Pro layer. Laurens acre text is not filterable server-side, so the pull prefilters on shape area and keeps the published acres when they fall in band. Lancaster keeps GIS acres when deed acres are outside the band. Richland replaces the Columbia city sample with the countywide RFA layer. Lee market value is the sum of the land, lot, and building components on the card. Counties already on a shelf stayed there. McCormick joined Columbia, Marion, Marlboro, and Williamsburg joined Charleston, and Union joined Greenville. No new market shelf was added. qPublic and Beacon property-appraiser patterns are stored and were not requested. A sample account id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status was added. AADT wiring and tract eligibility were not changed.
+
 Alabama rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 priority-list counties that had a public parcel layer, were not already a complete extract, and whose card endpoint answered: Calhoun, Dallas, DeKalb, Etowah, Talladega, Macon, Jackson, Barbour, Franklin, Lauderdale, Monroe, Blount, Cullman, Bullock, Greene, Sumter, Wilcox, Hale, Winston, and Cherokee. Colbert's KCS service was not started and was skipped. Flagship counties with no public parcel REST were skipped. Limestone, Marshall, Baldwin, St. Clair, Madison, Mobile, Morgan, Elmore, Autauga, Jefferson, Shelby, and Montgomery were already complete and were not re-pulled. The loader strips leading zeros from a Mobile account number for links; Mobile itself was not re-pulled. Shelby stays the existing Cadastral_2025 extract, and the loader reads that card's field map as written. Counties already on a shelf stayed there. The others were added to the nearest existing Alabama shelf: Birmingham, Huntsville, Montgomery, Mobile, or Tuscaloosa. No new market shelf was added. Macon, Barbour, and Monroe use partial public layers. Sumter has no acre field and Wilcox's acre field is sparse, so those two use geodesic polygon area. Blount acreage is CalculatedAcreage because DeededAcres is empty on most parcels. Property-appraiser links are stored from the card pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. AADT wiring and tract eligibility were not changed.
 
 Tennessee parcel batch 4 loads the remaining rural Opportunity Zone counties after Carter (pass1 order 65) that were not already a complete extract, then fills the batch from the rest-of-state list in rest order: Marshall, Perry, Polk, Smith, Stewart, Union, White, Crockett, Fayette, Giles, Houston, Lewis, Lincoln, Loudon, Meigs, Moore, Trousdale, Unicoi, Van Buren, and Washington. Jefferson and Knox were already complete, as were Blount, Cheatham, Davidson, Hamilton, Madison, Montgomery, Rutherford, and Williamson, and those extracts were not replaced. No Tennessee county without a complete extract remains for a later batch. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Meigs is labeled 2025. Unicoi and Washington are labeled 2026. The other seventeen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. Perry GISLINK coverage is flagged below 90 percent, so unmatched parcels use a spatial fallback onto the 2023 layer and are stamped joinMethod spatial-parent-2023. That sale and value are the pre-split parent record, not the parcel's own sale. Marshall zoning is Lewisburg district polygons by centroid. Fayette and Lincoln zoning join on GISLINK. Meigs and Decatur zoning polygons are stamped by centroid, with the later city layer replacing the county code only inside that city. Washington zoning polygons are stamped by centroid. Unicoi keeps a non-blank ZONING value from the sales layer. The other counties leave zoning empty. The TPAD link is stored and not requested. Owner phone and email are not ingested. Counties whose card market was empty were placed on the nearest existing shelf: Stewart, White, and Van Buren on Nashville; Crockett on Jackson; Unicoi and Washington on Knoxville. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
@@ -65,9 +67,9 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | --- | --- | ---: | ---: | ---: | ---: |
 | Atlanta | primary | 93,811 | 17 | 0 | 18 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
-| Charleston | primary | 86,151 | 14 | 0 | 1 |
+| Charleston | primary | 113,262 | 18 | 0 | 0 |
 | Nashville | primary | 202,510 | 34 | 0 | 0 |
-| Charlotte | primary | 132,539 | 17 | 0 | 2 |
+| Charlotte | primary | 157,704 | 19 | 0 | 0 |
 | Raleigh-Durham | primary | 236,519 | 37 | 0 | 0 |
 | South Florida | shelf | 40,322 | 3 | 1 | 0 |
 | SWFL | other | 32,170 | 4 | 0 | 0 |
@@ -80,8 +82,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Mobile | other | 51,658 | 4 | 0 | 2 |
 | Huntsville | other | 132,496 | 16 | 0 | 0 |
 | Savannah | other | 19,987 | 5 | 0 | 3 |
-| Columbia | other | 49,244 | 5 | 1 | 7 |
-| Greenville | other | 48,073 | 5 | 0 | 4 |
+| Columbia | other | 96,799 | 12 | 0 | 2 |
+| Greenville | other | 91,872 | 10 | 0 | 0 |
 | Chattanooga | other | 51,467 | 10 | 0 | 4 |
 | Knoxville | other | 146,507 | 26 | 0 | 0 |
 | Memphis | other | 102,576 | 20 | 0 | 0 |
@@ -174,7 +176,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Georgetown | South Carolina | 45043 | complete-gte-5ac | 3,963 | sc-georgetown-parcels-45043 |
 | Hampton | South Carolina | 45049 | complete-gte-5ac | 3,402 | sc-hampton-parcels-45049 |
 | Horry | South Carolina | 45051 | complete-gte-5ac | 12,037 | sc-horry-parcels-45051 |
-| Orangeburg | South Carolina | 45075 | gap | 0 | unavailable |
+| Marion | South Carolina | 45067 | complete-gte-5ac | 3,697 | sc-marion-parcels-45067 |
+| Marlboro | South Carolina | 45069 | complete-gte-5ac | 3,632 | sc-marlboro-parcels-45069 |
+| Orangeburg | South Carolina | 45075 | complete-gte-5ac | 12,608 | sc-orangeburg-parcels-45075 |
+| Williamsburg | South Carolina | 45089 | complete-gte-5ac | 7,174 | sc-williamsburg-parcels-45089 |
 
 ### Nashville
 
@@ -228,7 +233,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Davidson | North Carolina | 37057 | complete-gte-5ac | 12,063 | nc-davidson-opengov-37057 |
 | Gaston | North Carolina | 37071 | complete-gte-5ac | 6,815 | nc-gaston-publicgis-37071 |
 | Iredell | North Carolina | 37097 | complete-gte-5ac | 10,768 | nc-iredell-taxsql-37097 |
-| Lancaster | South Carolina | 45057 | gap | 0 | unavailable |
+| Lancaster | South Carolina | 45057 | complete-gte-5ac | 13,416 | sc-lancaster-parcels-45057 |
 | Lincoln | North Carolina | 37109 | complete-gte-5ac | 6,563 | nc-lincoln-operational-37109 |
 | Mecklenburg | North Carolina | 37119 | complete-gte-5ac | 8,402 | meck-taxparcel-camadata-37119 |
 | Montgomery | North Carolina | 37123 | complete-gte-5ac | 5,957 | nc-montgomery-parcels-37123 |
@@ -237,7 +242,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Scotland | North Carolina | 37165 | complete-gte-5ac | 3,348 | nc-scotland-parcels-37165 |
 | Stanly | North Carolina | 37167 | complete-gte-5ac | 8,024 | nc-onemap-37167 |
 | Union | North Carolina | 37179 | complete-gte-5ac | 13,025 | nc-union-atlas-37179 |
-| York | South Carolina | 45091 | gap | 0 | unavailable |
+| York | South Carolina | 45091 | complete-gte-5ac | 11,749 | sc-york-parcels-45091 |
 
 ### Raleigh-Durham
 
@@ -430,13 +435,14 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Chesterfield | South Carolina | 45025 | complete-gte-5ac | 8,287 | sc-chesterfield-parcels-45025 |
 | Edgefield | South Carolina | 45037 | complete-gte-5ac | 5,811 | sc-edgefield-parcels-45037 |
 | Fairfield | South Carolina | 45039 | complete-gte-5ac | 5,031 | sc-fairfield-parcels-45039 |
-| Kershaw | South Carolina | 45055 | gap | 0 | unavailable |
-| Lee | South Carolina | 45061 | gap | 0 | unavailable |
+| Kershaw | South Carolina | 45055 | complete-gte-5ac | 8,685 | sc-kershaw-parcels-45055 |
+| Lee | South Carolina | 45061 | complete-gte-5ac | 3,908 | sc-lee-parcels-45061 |
 | Lexington | South Carolina | 45063 | complete-gte-5ac | 13,975 | sc-lexington-property-4 |
-| Newberry | South Carolina | 45071 | gap | 0 | unavailable |
-| Orangeburg | South Carolina | 45075 | gap | 0 | unavailable |
-| Richland | South Carolina | 45079 | sample | 638 | sc-columbia-city-landrecords |
-| Saluda | South Carolina | 45081 | gap | 0 | unavailable |
+| McCormick | South Carolina | 45065 | complete-gte-5ac | 1,863 | sc-mccormick-parcels-45065 |
+| Newberry | South Carolina | 45071 | complete-gte-5ac | 6,717 | sc-newberry-parcels-45071 |
+| Orangeburg | South Carolina | 45075 | complete-gte-5ac | 12,608 | sc-orangeburg-parcels-45075 |
+| Richland | South Carolina | 45079 | complete-gte-5ac | 8,677 | sc-richland-parcels-45079 |
+| Saluda | South Carolina | 45081 | complete-gte-5ac | 5,735 | sc-saluda-parcels-45081 |
 | Sumter | South Carolina | 45085 | gap | 0 | unavailable |
 
 ### Greenville
@@ -444,14 +450,15 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | County | State | FIPS | Coverage | Parcels | Source |
 | --- | --- | --- | --- | ---: | --- |
 | Abbeville | South Carolina | 45001 | complete-gte-5ac | 5,266 | sc-abbeville-parcels-45001 |
-| Anderson | South Carolina | 45007 | gap | 0 | unavailable |
+| Anderson | South Carolina | 45007 | complete-gte-5ac | 12,288 | sc-anderson-parcels-45007 |
 | Cherokee | South Carolina | 45021 | complete-gte-5ac | 6,302 | sc-cherokee-parcels-45021 |
 | Greenville | South Carolina | 45045 | complete-gte-5ac | 14,959 | sc-greenville-gcgia-tax-parcel |
 | Greenwood | South Carolina | 45047 | complete-gte-5ac | 5,341 | sc-greenwood-parcels-45047 |
-| Laurens | South Carolina | 45059 | gap | 0 | unavailable |
-| Oconee | South Carolina | 45073 | gap | 0 | unavailable |
-| Pickens | South Carolina | 45077 | gap | 0 | unavailable |
+| Laurens | South Carolina | 45059 | complete-gte-5ac | 8,633 | sc-laurens-parcels-45059 |
+| Oconee | South Carolina | 45073 | complete-gte-5ac | 9,314 | sc-oconee-parcels-45073 |
+| Pickens | South Carolina | 45077 | complete-gte-5ac | 9,257 | sc-pickens-parcels-45077 |
 | Spartanburg | South Carolina | 45083 | complete-gte-5ac | 16,205 | sc-spartanburg-cama-parcels |
+| Union | South Carolina | 45087 | complete-gte-5ac | 4,307 | sc-union-parcels-45087 |
 
 ### Chattanooga
 

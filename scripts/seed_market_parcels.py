@@ -935,10 +935,33 @@ def gap_reason(county: dict) -> str:
     return "No open parcel polygon endpoint was confirmed for this county."
 
 
+def al_batch2_shipped(fips: str) -> dict | None:
+    """Rural OZ batch 2 writes county GIS tiles. A later market reseed must not replace them with a gap."""
+    manifest = ROOT / "data" / "al-parcel-cards" / "batch2-result.json"
+    if not manifest.exists():
+        return None
+    try:
+        report = json.loads(manifest.read_text())
+    except json.JSONDecodeError:
+        return None
+    pulled = {str(item.get("fips") or "").zfill(5) for item in report.get("pulled") or []}
+    if fips not in pulled:
+        return None
+    return {
+        "kind": "shipped",
+        "source": "al-rural-oz-batch2",
+        "url": None,
+        "coverage": "complete-gte-5ac",
+    }
+
+
 def spec_for(county: dict) -> dict:
     fips = county["fips"]
     if fips in ORLANDO_REUSE:
         return {"kind": "reuse-orlando"}
+    shipped_al = al_batch2_shipped(fips)
+    if shipped_al:
+        return shipped_al
     override = county_override(fips)
     if override:
         return override
@@ -1206,6 +1229,8 @@ South Carolina rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for
 Alabama rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 priority-list counties that had a public parcel layer, were not already a complete extract, and whose card endpoint answered: Calhoun, Dallas, DeKalb, Etowah, Talladega, Macon, Jackson, Barbour, Franklin, Lauderdale, Monroe, Blount, Cullman, Bullock, Greene, Sumter, Wilcox, Hale, Winston, and Cherokee. Colbert's KCS service was not started and was skipped. Flagship counties with no public parcel REST were skipped. Limestone, Marshall, Baldwin, St. Clair, Madison, Mobile, Morgan, Elmore, Autauga, Jefferson, Shelby, and Montgomery were already complete and were not re-pulled. The loader strips leading zeros from a Mobile account number for links; Mobile itself was not re-pulled. Shelby stays the existing Cadastral_2025 extract, and the loader reads that card's field map as written. Counties already on a shelf stayed there. The others were added to the nearest existing Alabama shelf: Birmingham, Huntsville, Montgomery, Mobile, or Tuscaloosa. No new market shelf was added. Macon, Barbour, and Monroe use partial public layers. Sumter has no acre field and Wilcox's acre field is sparse, so those two use geodesic polygon area. Blount acreage is CalculatedAcreage because DeededAcres is empty on most parcels. Property-appraiser links are stored from the card pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. AADT wiring and tract eligibility were not changed.
 
 Tennessee parcel batch 4 loads the remaining rural Opportunity Zone counties after Carter (pass1 order 65) that were not already a complete extract, then fills the batch from the rest-of-state list in rest order: Marshall, Perry, Polk, Smith, Stewart, Union, White, Crockett, Fayette, Giles, Houston, Lewis, Lincoln, Loudon, Meigs, Moore, Trousdale, Unicoi, Van Buren, and Washington. Jefferson and Knox were already complete, as were Blount, Cheatham, Davidson, Hamilton, Madison, Montgomery, Rutherford, and Williamson, and those extracts were not replaced. No Tennessee county without a complete extract remains for a later batch. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Meigs is labeled 2025. Unicoi and Washington are labeled 2026. The other seventeen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. Perry GISLINK coverage is flagged below 90 percent, so unmatched parcels use a spatial fallback onto the 2023 layer and are stamped joinMethod spatial-parent-2023. That sale and value are the pre-split parent record, not the parcel's own sale. Marshall zoning is Lewisburg district polygons by centroid. Fayette and Lincoln zoning join on GISLINK. Meigs and Decatur zoning polygons are stamped by centroid, with the later city layer replacing the county code only inside that city. Washington zoning polygons are stamped by centroid. Unicoi keeps a non-blank ZONING value from the sales layer. The other counties leave zoning empty. The TPAD link is stored and not requested. Owner phone and email are not ingested. Counties whose card market was empty were placed on the nearest existing shelf: Stewart, White, and Van Buren on Nashville; Crockett on Jackson; Unicoi and Washington on Knoxville. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
+
+Alabama rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for the remaining counties that had a public parcel layer, were not already a complete extract, and whose card endpoint answered: Henry, Lawrence, Coosa, Cleburne, Houston, Lee, and Russell. Colbert's KCS service was still not started and was skipped after one retry. Tuscaloosa was already a complete extract and was not re-pulled. The 26 Flagship counties with no public parcel REST were not requested. Henry has no acreage field, so acreage is geodesic polygon area, and the shapefile is paged by object id because result offsets are rejected. Henry sale dates are the trailing date on the deed book/page field. Coosa, Cleburne, and Russell public layers have no owner, value, or sale attributes. Cleburne's empty owner-phone column is not ingested. Lee property-appraiser links use each parcel's own 16-digit id from the card pattern; a sample account is not copied onto every parcel, and the page was not requested. Counties already on a shelf stayed there. The others were added to the nearest existing Alabama shelf: Henry, Coosa, Houston, Lee, and Russell on Montgomery; Lawrence on Huntsville; Cleburne on Birmingham. Atlanta is a fraction of a mile closer to Heflin, and an Alabama shelf is preferred. No new market shelf was added. Property-appraiser links are stored from the card pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. AADT wiring and tract eligibility were not changed.
 
 North Carolina rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 pass-1 counties that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Alexander, Alleghany, Ashe, Avery, Beaufort, Bertie, Bladen, Burke, Caldwell, Carteret, Caswell, Cherokee, Chowan, Craven, Dare, Edgecombe, Graham, Greene, Halifax, and Haywood. Buncombe and Henderson were already complete and were not re-pulled. No endpoint in that stretch was unreachable. Alexander pages with orderByFields because the MapServer has no object id; its returnCountOnly figure repeats PROPERTY 99999 rows, so the stored count is the distinct parcel ids that page. Ashe pages with resultRecordCount. Counties already on a shelf stayed there. The others were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Chowan tax values were scrubbed on the layer and were not copied. Alleghany tax is the NC OneMap fallback join. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
 

@@ -5,19 +5,29 @@
   "markets": [
     "Birmingham"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 11515,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "al-blount-parcels-01009",
+  "queryUrl": "https://web5.kcsgis.com/kcsgis/rest/services/Blount/Public/MapServer/32/query",
   "gaps": [
-    "Alabama has no unified statewide parcel service. This county was not on a verified open polygon endpoint in this pull."
+    "Source query returned 11980 rows; 11515 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (Blount Public KCS MapServer) (https://web5.kcsgis.com/kcsgis/rest/services/Blount/Public/MapServer/32). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "{'Unincorporated Blount AL': 'no Zoning REST on Public/32; do not use Blount TN GIS'}",
+    "situsAddress not on public layer",
+    "lastSale not on public layer",
+    "zoning / FLU not in Blount/Public catalog"
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/01009/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01009/lookup.json",
+  "sourceCount": 11980,
+  "dropped": 68,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://altags.com/Blount_License/PropertyDetails.aspx?taxyear=2026&ppin={PIN}",
+  "gisViewerUrl": "https://isv.kcsgis.com/al.blount_revenue/"
 }

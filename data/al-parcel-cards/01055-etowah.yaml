@@ -1,0 +1,143 @@
+state: AL
+jurisdiction: Etowah County
+fips: "01055"
+level: county
+markets: [Rural OZ 2.0]
+
+layers:
+  - role: parcels
+    name: Parcels (Etowah Public ISV — CAMA join)
+    restUrl: "https://web3.kcsgis.com/kcsgis/rest/services/Etowah/Etowah_Public_ISV/MapServer/91"
+    layerId: 91
+    geometry: polygon
+    auth: none
+    acreageField: CalcAcres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelIdKey (PPIN deep-link)
+      PARCELID: parcelId
+      Owner: ownerName
+      PreviousOwner: ownerNamePrior
+      MailAdd1: mailingAddress.street
+      MailAdd2: mailingAddress.street2
+      MailCity: mailingAddress.city
+      MailState: mailingAddress.state
+      MailZip1: mailingAddress.zip
+      SitusAddNumber: situsAddress.number
+      SitusAddName: situsAddress.street
+      SitusAddCity: situsCity
+      CalcAcres: acreage
+      DeededAcres: acreageDeed
+      TimberAcres: acreageTimber
+      TTV: tax.marketValue
+      TAV: tax.assessedValue
+      CLandValue: tax.landValue
+      CImpValue: tax.improvementValue
+      TotalTaxDue: tax.due
+      TaxDist: tax.district
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      Neighborhood: neighborhood
+      LegalDescription: legalDescription
+      ParcelID_GISlink: parcelIdFormatted
+      ZoningCode: zoning
+      ZoningDesc: zoningDescription
+      CurrentUseValue: tax.currentUseValue
+      TaxYearDue: tax.year
+    notes: >
+      Verified live 2026-09-28 (?f=json 200 + 1-feature query with geometry, outSR 4326). Count 75665; polygon; maxRecordCount 2000; sample centroid -85.80,34.13 (Coosa River, Etowah AL). PARCELID 16-digit; PIN (text) = deep-link ppin. Owner/mail/situs/CalcAcres/TTV/TAV/tax due/DeedBook/DeedPage; ZoningCode/ZoningDesc attributes present (population not checked). No DeedRecorded date or sale price. Found via ISV config.
+    status: usable
+
+gaps:
+  - No sale price or deed date (book/page only)
+  - ZoningCode population unverified
+
+license: "Etowah County Revenue Commission / KCS GIS Public ISV; use-at-own-risk"
+appraiserSearchUrl: "https://etowahproperty.assurancegov.com/Property/Details?taxyear=2026&ppin={PIN}"
+appraiserSearchUrlAlt: null
+jurisdictionGisUrl: "https://isv.kcsgis.com/al.etowah_revenue/"
+ruralOz2:
+  source: "IRS Rev. Proc. 2026-14 appendix (Rural Status=Rural)"
+  ruralEligibleTracts: 13
+  candidateList: /workspace/gis-research/enrichment/AL/rural-oz2-candidate-counties-2026-09-28.csv
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    yearField: "YearAADT"
+    year: 2024
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    luCountyId: 28
+    countyWhere: "YearAADT=2024 AND LUCountyID=28 AND AADT>0"
+    stations2024: 535
+    verifiedAt: "2026-09-28"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "LUCountyID=28 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 535 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location. Latest usable AADT year=2024 (2025 shells exist, AADT null). Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/."
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://web3.kcsgis.com/kcsgis/rest/services/Etowah/Etowah_Public_ISV/MapServer/91
+  featureCount: 75665
+  taxSaleOwner:
+    ownerName:
+      field: Owner
+      status: usable
+    assessedValue:
+      field: TAV
+      status: usable
+      nonNullOrPositiveCount: 75471
+      ofTotal: 75665
+    appraisedOrMarketValue:
+      field: TTV
+      status: usable
+      nonNullOrPositiveCount: 75520
+      ofTotal: 75665
+    landValue:
+      field: CLandValue
+      status: usable
+    improvementValue:
+      field: CImpValue
+      status: usable
+    taxAmount:
+      field: TotalTaxDue
+      status: usable
+      nonNullOrPositiveCount: 61405
+      ofTotal: 75665
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: AssuranceWeb property page (deed info); layer has DeedBook/DeedPage only
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: property-record page at appraiserSearchUrl
+    ownerEntityType:
+      derivable: true
+      sourceField: Owner
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 5558
+        INC: 1484
+        TRUST: 1080
+        CORP: 123
+        CHURCH: 840
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://etowahproperty.assurancegov.com/Property/Details?taxyear=2026&ppin={PIN}
+    pinField: PIN
+    testPin: '1'
+    verified: 'yes'
+    method: plain fetch 200 (AssuranceWeb Property Details Summary)
+    note: Page returned the matching PIN, parcel number and owner; shows values, tax due, deed and acreage. taxyear=2026 is labelled a future/estimate year; use taxyear=2025 for certified values.
+  jurisdictionGisUrl:
+    url: https://isv.kcsgis.com/al.etowah_revenue/
+    http: 200

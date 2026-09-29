@@ -1,0 +1,194 @@
+state: AL
+jurisdiction: Jefferson County
+fips: "01073"
+level: county
+markets: [Birmingham]
+
+layers:
+  - role: parcels
+    name: Parcels (JCC Basemap)
+    restUrl: "https://jccgis.jccal.org/server/rest/services/Basemap/Parcels/MapServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES_APR
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PID: parcelIdAlt
+      ParcelNo: parcelIdAlt2
+      APP_PID: parcelIdAlt3
+      OWNERNAME: ownerName
+      Name2: ownerName2
+      PROP_MAIL: mailingAddress.street
+      CITYMAIL: mailingAddress.city
+      STATE_Mail: mailingAddress.state
+      ZIP_MAIL: mailingAddress.zip
+      ADDR_APR: situsAddress
+      Bldg_Number: situsAddress.number
+      Street_Name: situsAddress.street
+      Street_Type: situsAddress.streetType
+      Street_Dir: situsAddress.dir
+      Property_City: situsCity
+      ZIP: situsZip
+      ACRES_APR: acreage
+      GIS_ACRES: acreageGis
+      PriAcreage: acreageAlt
+      AssdValue: tax.assessedValue
+      PrevParcelLand: tax.landValuePrior
+      PrevParcelImp: tax.improvementValuePrior
+      PrevParcelTotal: tax.marketValuePrior
+      Ownership: ownershipType
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count 410142. maxRecordCount 2000.
+      OWNERNAME often fixed-width padded — trim on ingest. AssdValue is AL fractional
+      assessed value (class ratios), not full market. Prefer county JCC over City of
+      Birmingham EssentialsPublic MapServer (may mirror neighboring counties).
+      Open data portal referenced: data-jeffco-al.opendata.arcgis.com
+    status: usable
+
+  - role: zoning
+    name: Zoning (DDS FutureLandUse — unincorporated authoritative)
+    restUrl: "https://jccgis.jccal.org/server/rest/services/DDS/FutureLandUse/FeatureServer/4"
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZNCODE: zoning
+      ZNCODE_ID: zoningCodeId
+      AUTHORITYID: zoningAuthority
+      CASENUMB: zoningCaseNumber
+      DATE_ZACTION: zoningActionDate
+    notes: >
+      Verified 2026-09-24: HTTP 200 pjson + count 10678 (AUTHORITYID=1 Jefferson County
+      subset 10582). Layer description: "authoritative Zoning layer for Unincorporated
+      Jefferson County" (Dept of Development Services). ZNCODE domains include A-1, R-1..R-6,
+      C-1, I-1/I-3, INST-*, etc. (64 distinct codes sampled). CRS WKID 102630. maxRecordCount
+      2000. MapServer twin DDS/Zoning/MapServer/3 (count 10582, same schema). Prefer this
+      FeatureServer/4 over AGOL draft mirrors Current_Zoning (396) /
+      Zoning_March_2025_BESTNEWZONELAYER (750) on org GWcL4L1LrmhPd7DI — incomplete drafts.
+      Spatial-join onto Basemap/Parcels/0 for unincorporated; municipal cards win inside
+      city limits (Birmingham/Hoover/Vestavia/Homewood).
+    status: usable
+
+  - role: flu
+    name: Future Land Use (DDS FutureLandUse)
+    restUrl: "https://jccgis.jccal.org/server/rest/services/DDS/FutureLandUse/FeatureServer/2"
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+      FLU_Type: fluType
+      Acreage: acreage
+      APP_PID: parcelIdAlt
+    notes: >
+      Verified 2026-09-24: count 67260. Consultant FLU added 2025-05-08 per layer desc.
+      Codes sampled ER/AR/etc. Prefer for comprehensive-plan overlay; zoning remains
+      FeatureServer/4 for district codes.
+    status: usable
+
+gaps:
+  - Full market / sale fields not confirmed complete on this basemap layer this run
+  - Do not use Birmingham city-mirrored Shelby polygons as Jefferson jurisdiction
+  - AGOL org GWcL4L1LrmhPd7DI Current_Zoning / Zoning_March_2025 drafts are incomplete — use DDS FS/4
+  - Municipal zoning still preferred inside city limits: 01073-city-birmingham (+FLU), hoover, vestavia-hills (partial), homewood; Hoover also spans Shelby
+
+license: "Jefferson County Commission GIS / Department of Development Services"
+appraiserSearchUrl: null
+jurisdictionGisUrl: "https://jccgis.jccal.org/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 37
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=37 AND AADT>0"
+    stations2024: 2239
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=37 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 2239 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: https://jccgis.jccal.org/server/rest/services/Basemap/Parcels/MapServer/0
+  parcelIdField: PARCELID
+  featureCount: 410170
+  note: >
+    Batch 3 closing re-verify 2026-09-28: live count 410170, 1-feature query with polygon geometry OK (sample vertex [-86.81,33.75]), parcel ID field PARCELID present. No field changes checked beyond ID.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://jccgis.jccal.org/server/rest/services/Basemap/Parcels/MapServer/0
+  featureCount: 410170
+  taxSaleOwner:
+    ownerName:
+      field: OWNERNAME
+      status: usable
+    assessedValue:
+      field: AssdValue
+      status: usable
+      nonNullOrPositiveCount: 408246
+      ofTotal: 410170
+    appraisedOrMarketValue:
+      field: PrevParcelTotal
+      status: partial (prior-year total appraised value)
+      nonNullOrPositiveCount: 406603
+      ofTotal: 410170
+    landValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA Citizen Access Portal https://eringcapture.jccal.org/propsearch (search by 16-digit PARCELID)
+    improvementValue:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA Citizen Access Portal https://eringcapture.jccal.org/propsearch (search by 16-digit PARCELID)
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA Citizen Access Portal https://eringcapture.jccal.org/propsearch (search by 16-digit PARCELID)
+    lastSaleDate:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA Citizen Access Portal https://eringcapture.jccal.org/propsearch (search by 16-digit PARCELID)
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: CaptureCAMA Citizen Access Portal https://eringcapture.jccal.org/propsearch (search by 16-digit PARCELID)
+    ownerEntityType:
+      derivable: true
+      sourceField: OWNERNAME
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 82457
+        INC: 11877
+        TRUST: 5222
+        CORP: 2208
+        CHURCH: 3711
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: null
+    pinField: PARCELID (16 digits, no spaces)
+    testPin: 0100193000002000
+    verified: 'no'
+    method: Jefferson moved to the CaptureCAMA Citizen Access Portal (https://eringcapture.jccal.org/propsearch, React SPA); no stable per-parcel URL found in its main bundle within the time box
+    note: 'Use the search page https://eringcapture.jccal.org/propsearch (Parcel # tab, 16-digit PID without spaces). The old caportal ASPX search needs a POSTed hidden field, so it is not a GET deep link.'
+  jurisdictionGisUrl:
+    url: https://jccgis.jccal.org/
+    http: null
+  notes: No current market value, tax due or sale fields in the layer; PrevParcelLand/PrevParcelImp/PrevParcelTotal are prior-year values. No {PIN} appraiserSearchUrl set (no verifiable deep link).

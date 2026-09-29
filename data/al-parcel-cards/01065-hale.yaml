@@ -1,0 +1,172 @@
+state: AL
+jurisdiction: Hale County
+fips: "01065"
+level: county
+markets: [Tuscaloosa]
+
+layers:
+  - role: parcels
+    name: PARCELS (Hale County AGOL Hale_Web_Service)
+    restUrl: "https://services9.arcgis.com/AhiZvN2uMZkZVfSu/arcgis/rest/services/Hale_Web_Service/FeatureServer/10"
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: TOTAL_AC
+    coverage: county-wide
+    fieldMap:
+      PARCEL_ID: parcelId
+      PPIN: parcelIdAlt
+      ACCOUNT: parcelIdAlt2
+      ASSESS_NUM: parcelIdAlt3
+      PRINT_: parcelIdAlt4
+      OWNERNAME: ownerName
+      CONAME: ownerName2
+      ADDRESS1: mailingAddress.street
+      ADDRESS2: mailingAddress.street2
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP: mailingAddress.zip
+      SITUS_ADDR: situsAddress
+      PROPADDR1: situsAddressAlt
+      TOTAL_AC: acreage
+      DEEDACRES: acreageDeed
+      LAND_VAL: tax.landValue
+      IMP_VAL: tax.improvementValue
+      NEW_VAL: tax.newValue
+      TOTALVALUE: tax.marketValue
+      TAXES: tax.due
+      DEED_DATE: lastSale.date
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      MUNNAME: municipality
+      MUNICIPAL: municipalityCode
+      LEGAL: legalDescription
+      YEAR_BLT: yearBuilt
+      SQFT: buildingSqft
+    notes: >
+      Verified 2026-09-24: HTTP 200 pjson + count 16418. CRS WKID 102630 (AL West State
+      Plane). maxRecordCount 1000. Sample WGS84 centroid ~-87.42, 32.99 (Hale AL —
+      Greensboro area) — geo-verified AL Hale, not wrong-state. Owner/mail/situs/tax/
+      deed acres present; no sale price field (deed book/page/date only). Viewer:
+      https://experience.arcgis.com/experience/72a1479e2a384853bf7b3c512083c308
+      and HCAL webappviewer id=096bf46a286340ffa7f5e5b78fb2800c. Prefer TOTAL_AC for
+      5–150 ac filter (DEEDACRES also present). CaptureCAMA/alabamagis Flagship absent
+      for Hale — this AGOL org HaleCounty is the public REST.
+    status: usable
+
+  - role: zoning
+    name: Unincorporated Hale County zoning (none found)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-24: Hale_Web_Service has cadastral/transport only — no Zoning
+      district layer. AGOL search Hale County Alabama zoning returned no public district
+      FeatureServer. Municipal zoning (Greensboro/Moundville) not separately published
+      as REST this pass.
+    status: gap
+
+gaps:
+  - No public zoning / FLU REST for Hale County
+  - No lastSale.price (deed book/page/date only)
+  - CaptureCAMA/alabamagis Flagship portals absent; use AGOL Hale_Web_Service/10
+
+license: "Hale County GIS (AGOL org HaleCounty / Hale_Web_Service); no separate open-license text on REST"
+appraiserSearchUrl: "http://apps.agdmaps.com/print/al/hale/index.html?PARCELID={PIN}"
+appraiserSearchUrlAlt: "https://experience.arcgis.com/experience/72a1479e2a384853bf7b3c512083c308"
+jurisdictionGisUrl: "https://experience.arcgis.com/experience/72a1479e2a384853bf7b3c512083c308"
+jurisdictionGisUrlAlt: "https://HCAL.maps.arcgis.com/apps/webappviewer/index.html?id=096bf46a286340ffa7f5e5b78fb2800c"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 33
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=33 AND AADT>0"
+    stations2024: 134
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=33 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 134 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: "https://services9.arcgis.com/AhiZvN2uMZkZVfSu/arcgis/rest/services/Hale_Web_Service/FeatureServer/10"
+  parcelIdField: PARCEL_ID
+  featureCount: 16418
+  note: >
+    CONFLICT SETTLED 2026-09-28: parcels are USABLE (card was already usable; INDEX Tuscaloosa table row saying gap was stale and is corrected). Re-verified AGOL Hale_Web_Service/FeatureServer/10 live: polygon, count 16418, sample centroid -87.43,33.00 (Hale AL); PARCEL_ID, OWNERNAME, ADDRESS1/CITY/STATE/ZIP, SITUS_ADDR, TOTAL_AC, DEEDACRES, LAND_VAL/IMP_VAL/TOTALVALUE, DEED_BOOK/PAGE/DATE. Hosted by AGD (agdmaps.com) for the county; deep link = Print1 field pattern apps.agdmaps.com/print/al/hale/index.html?PARCELID={PARCEL_ID}. Alternate geometry-only: maps.capturecama.com/arcgis/rest/services/Hale/HALE_11132024/MapServer/921 (16288; PARCELID+CALC_ACRE, no owner) — keep AGOL as primary.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://services9.arcgis.com/AhiZvN2uMZkZVfSu/arcgis/rest/services/Hale_Web_Service/FeatureServer/10
+  featureCount: 16418
+  taxSaleOwner:
+    ownerName:
+      field: OWNERNAME
+      status: usable
+    assessedValue:
+      field: null
+      status: gap
+      livesAt: AGD print card (browser) or Hale County Revenue Commissioner office
+    appraisedOrMarketValue:
+      field: TOTALVALUE
+      status: usable
+      nonNullOrPositiveCount: 16070
+      ofTotal: 16418
+    landValue:
+      field: LAND_VAL
+      status: usable
+    improvementValue:
+      field: IMP_VAL
+      status: usable
+    taxAmount:
+      field: TAXES
+      status: partial
+      nonNullOrPositiveCount: 2302
+      ofTotal: 16418
+    lastSaleDate:
+      field: DEED_DATE
+      status: usable
+      nonNullOrPositiveCount: 16217
+      ofTotal: 16418
+    lastSalePrice:
+      field: null
+      status: gap
+      livesAt: AGD print card (browser) or Hale County Revenue Commissioner office
+    ownerEntityType:
+      derivable: true
+      sourceField: OWNERNAME
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 1005
+        INC: 340
+        TRUST: 273
+        CORP: 143
+        CHURCH: 217
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: http://apps.agdmaps.com/print/al/hale/index.html?PARCELID={PIN}
+    pinField: PARCEL_ID
+    testPin: '0101010000001000'
+    verified: browser-only
+    method: plain fetch 200 returns a Leaflet print template; parcel data is filled in by JavaScript
+    note: Renders in the browser only; cannot be verified by fetch.
+  jurisdictionGisUrl:
+    url: https://experience.arcgis.com/experience/72a1479e2a384853bf7b3c512083c308
+    http: public AGOL item (anonymous search hit)
+  notes: 'Closes LSB polish request: jurisdictionGisUrl = Hale County GIS Parcel Viewer (public Experience Builder, owner HaleCounty); Web AppBuilder app as alt. DEED_DATE has 1900-01-01 placeholders.'

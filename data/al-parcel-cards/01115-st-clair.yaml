@@ -1,0 +1,175 @@
+state: AL
+jurisdiction: St. Clair County
+fips: "01115"
+level: county
+markets: [Birmingham]
+
+layers:
+  - role: parcels
+    name: Owner Parcels (PublicParcelViewerStPln)
+    restUrl: "https://map.stclairco.com/arcgis/rest/services/PublicParcelViewerStPln/MapServer/57"
+    layerId: 57
+    geometry: polygon
+    auth: none
+    acreageField: DEEDED_ACR
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      PPIN: parcelIdAlt
+      NAME_1: ownerName
+      ADDRESS_1: mailingAddress.street
+      ADDRESS_2: mailingAddress.street2
+      ADDRESS_3: mailingAddress.street3
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIPCODE: mailingAddress.zip
+      STREET_ADD: situsAddress
+      DEEDED_ACR: acreage
+      CALCULAT_1: acreageGis
+      SALE_PRICE: lastSale.price
+      SALE_DATE: lastSale.date
+      GOOD_SALE: lastSale.qualified
+      ActualPric: lastSale.priceAlt
+      SaleType: lastSale.type
+      TOTAL_VALU: tax.marketValue
+      TOTAL_ASSD: tax.assessedValue
+      TOTAL_LAND: tax.landValue
+      TOTAL_IMPR: tax.improvementValue
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count 61242. FeatureServer SOE for this
+      service returns 500 — use MapServer query. CRS WKID 102629 (AL East State Plane Feet).
+      maxRecordCount 2000. Revenue Commissioner / AL DOR mapping maintained.
+    status: usable
+
+  - role: parcels
+    name: OwnerParcel_Ingen (cleaner CAMA names)
+    restUrl: "https://map.stclairco.com/arcgis/rest/services/OwnerParcel_Ingen/MapServer/16"
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: DEEDED_ACRES
+    coverage: county-wide
+    fieldMap:
+      PARCELID: parcelId
+      DEEDED_ACRES: acreage
+      TOTAL_VALUE: tax.marketValue
+      TOTAL_ASSD_VALUE: tax.assessedValue
+      GOOD_SALE: lastSale.qualified
+    notes: Same ownership/tax/sale cluster with less-truncated field names; prefer for joins.
+    status: usable
+
+  - role: zoning
+    name: Owner Parcel Zone View (zoned subset)
+    restUrl: "https://map.stclairco.com/arcgis/rest/services/Owner_Parcel_Zone_View_v3/MapServer/3"
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      ZoneCode: zoning
+      OverlayZone: zoningOverlay
+      CompPlan: flu
+      TaxDist: tax.district
+    notes: Zoned parcels only — not countywide coverage for every parcel.
+    status: partial
+
+gaps:
+  - Zoning/FLU only on zoned-parcel subset layer
+  - FeatureServer endpoint for PublicParcelViewer returns 500
+
+license: "St. Clair County Revenue Commissioner's Office (viewer copyright); no separate open-license on REST"
+appraiserSearchUrl: "https://www.ingproperty.com/StClair_Revenue/PropertyDetails.aspx?taxyear=2026&ppin={PIN}"
+jurisdictionGisUrl: "https://map.stclairco.com/parcelviewer/"
+verifiedAt: 2026-09-28
+verifiedBy: Alabama Public Info Researcher
+
+enrichment:
+  aadt:
+    luCountyId: 58
+    year: 2024
+    countyWhere: "YearAADT=2024 AND LUCountyID=58 AND AADT>0"
+    stations2024: 238
+    countyCheckedAt: "2026-09-28"
+    countyNote: "LUCountyID=58 is the 1-67 alphabetical index (Saint Clair sorts before Shelby, so LUCountyID=(FIPS3+1)/2); 238 stations with 2024 AADT>0 in this county (outStatistics count grouped by LUCountyID, fetched 2026-09-28 via external fetcher because aldotgis.dot.state.al.us TLS-EOFs from the box). Spot-checked LUCountyID 6=Bullock and 58=St. Clair by point location."
+    source: "ALDOT TDM Public (TrafficCounterPoint)"
+    restUrl: "https://aldotgis.dot.state.al.us/pubgis2/rest/services/EGISATDServices/TDMPublic/MapServer/0"
+    layerId: 0
+    field: "AADT"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Alabama Public Info Researcher"
+    notes: "Official ALDOT EGISATDServices/TDMPublic MapServer; ~282482 multi-year points (YearAADT 2014–2025). Latest usable AADT year=2024 (~22009 with AADT>0; 2025 shells exist but AADT still null as of 2026-09-24). Filter YearAADT=2024; optional LUCountyID (1–67 alpha county index, e.g. Autauga=1 Jefferson=37 Madison=45). Companion YearAADT field. Auth none. Viewer https://aldotgis.dot.state.al.us/TDMPublic/. Dig: enrichment/AL/aadt-aldot-2026-09-24.md"
+
+pass1RuralOz2026_09_28:
+  parcelRestUrl: https://map.stclairco.com/arcgis/rest/services/PublicParcelViewerStPln/MapServer/57
+  parcelIdField: PARCELID
+  featureCount: 61242
+  note: >
+    Batch 3 closing re-verify 2026-09-28: live count 61242, 1-feature query with polygon geometry OK (sample vertex [-86.26,33.51]), parcel ID field PARCELID present. No field changes checked beyond ID.
+
+pass2RuralOz2026_09_28:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Alabama Public Info Researcher
+  parcelRestUrl: https://map.stclairco.com/arcgis/rest/services/PublicParcelViewerStPln/MapServer/57
+  featureCount: 61242
+  taxSaleOwner:
+    ownerName:
+      field: NAME_1
+      status: usable
+    assessedValue:
+      field: TOTAL_ASSD
+      status: usable
+      nonNullOrPositiveCount: 58705
+      ofTotal: 61242
+    appraisedOrMarketValue:
+      field: TOTAL_VALU
+      status: usable
+      nonNullOrPositiveCount: 59186
+      ofTotal: 61242
+    landValue:
+      field: TOTAL_LAND
+      status: usable
+    improvementValue:
+      field: TOTAL_IMPR
+      status: usable
+    taxAmount:
+      field: null
+      status: gap
+      livesAt: property-record page at appraiserSearchUrl
+    lastSaleDate:
+      field: SALE_DATE
+      status: usable
+      nonNullOrPositiveCount: 53954
+      ofTotal: 61242
+    lastSalePrice:
+      field: SALE_PRICE
+      status: usable
+      nonNullOrPositiveCount: 35489
+      ofTotal: 61242
+    ownerEntityType:
+      derivable: true
+      sourceField: NAME_1
+      rule: UPPER(owner) matches \b(LLC|L\.L\.C|INC|CORP|CORPORATION|CO|COMPANY|LP|LLP|LTD|PARTNERSHIP|TRUST|TRUSTEE|ESTATE|CHURCH|BANK|ASSOCIATION|AUTHORITY|CITY OF|COUNTY|STATE OF|USA|U\.S\.A)\b -> entity
+        type LLC/CORP/TRUST/ESTATE/CHURCH/GOVT; else INDIVIDUAL
+      likeCounts2026_09_28:
+        LLC: 5440
+        INC: 1438
+        TRUST: 844
+        CORP: 76
+        CHURCH: 431
+      note: Derived client-side from owner string; counts are UPPER(owner) LIKE '%X%' and overlap (e.g. TRUSTEE matches TRUST).
+  deepLink:
+    pattern: https://www.ingproperty.com/StClair_Revenue/PropertyDetails.aspx?taxyear=2026&ppin={PIN}
+    pinField: PPIN
+    testPin: '34204'
+    verified: 'yes'
+    method: fetched via external fetcher (box gets TLS EOF from ingproperty.com); link found on stclairtax.com
+    note: Page returned PPIN 34204, parcel 29-09-31-4-001-032.000, owner CHANCEY ROBERT & LEAH W, appraised 2,000 / assessed 200, tax due, deed date 8/12/2013 (all match layer).
+  jurisdictionGisUrl:
+    url: https://map.stclairco.com/parcelviewer/
+    http: null
+  notes: Tax due not in layer (on the ingproperty page). SALE_PRICE is often 0; ActualPric/GOOD_SALE/SaleType are also present. Viewer URL redirects to https://map.stclairco.com/ParcelViewerEX (Experience
+    Builder).

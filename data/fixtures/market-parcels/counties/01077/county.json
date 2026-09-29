@@ -1,0 +1,32 @@
+{
+  "name": "Lauderdale",
+  "fips": "01077",
+  "state": "Alabama",
+  "markets": [
+    "Huntsville"
+  ],
+  "featureCount": 3840,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "al-lauderdale-parcels-01077",
+  "queryUrl": "https://al41portal.kcsgis.com/al41server/rest/services/Lauderdale_Public_ISV/MapServer/120/query",
+  "gaps": [
+    "Source query returned 3951 rows; 3840 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (Lauderdale Public ISV — CAMA join) (https://al41portal.kcsgis.com/al41server/rest/services/Lauderdale_Public_ISV/MapServer/120). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Property-appraiser links are stored from the card pattern and were not requested.",
+    "Owner phone and email are not ingested. ALDOT AADT stays the query-time statewide join.",
+    "SalePrice frequently 0",
+    "CalculatedAcres often 0; use DeededAcres or geometry area",
+    "altags.com deep link timed out from box 2026-09-28 (pattern from ISV config)"
+  ],
+  "path": "data/fixtures/market-parcels/counties/01077/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/01077/lookup.json",
+  "sourceCount": 3951,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://altags.com/Lauderdale_Revenue/PropertyDetails.aspx?ppin={PIN}",
+  "gisViewerUrl": "https://isv.kcsgis.com/al.lauderdale_revenue/"
+}

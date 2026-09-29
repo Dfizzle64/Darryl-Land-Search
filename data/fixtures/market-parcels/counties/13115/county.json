@@ -1,0 +1,33 @@
+{
+  "name": "Floyd",
+  "fips": "13115",
+  "state": "Georgia",
+  "markets": [
+    "Chattanooga"
+  ],
+  "featureCount": 7575,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-floyd-parcels-13115",
+  "queryUrl": "https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentParcels/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are CurrentParcels (Rome-Floyd GIS — as of 6/30/2026) (https://services2.arcgis.com/nV67H1IJR8GS6SAA/arcgis/rest/services/CurrentParcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Pass 2 sale status is REST, but the live CurrentParcels layer has no sale price or date field, so sale stays empty.",
+    "Source query returned 7576 rows; 7575 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Counted 7575 distinct parcel ids.",
+    "Pass 2 tax is REST, sale is REST, and owner is REST. HTML-only values were not scraped.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13115/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13115/lookup.json",
+  "sourceCount": 7576,
+  "dropped": 0,
+  "tileCount": 5,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=802&LayerID=13374&PageTypeID=4&PageID=6034&KeyValue={parcelId}",
+  "gisViewerUrl": "https://romefloydgis.maps.arcgis.com/apps/webappviewer/index.html?id=51fd62729e134a95848be61fdcfae6f4",
+  "pulledOn": "2026-09-29"
+}

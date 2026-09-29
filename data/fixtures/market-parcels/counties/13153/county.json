@@ -1,0 +1,33 @@
+{
+  "name": "Houston",
+  "fips": "13153",
+  "state": "Georgia",
+  "markets": [
+    "Macon"
+  ],
+  "featureCount": 3691,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-houston-parcels-13153",
+  "queryUrl": "https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are HoustonCoParcels_withOwner — Houston County Parcels (MGRC AGOL) (https://services1.arcgis.com/Ug5xGQbHsD8zuZzM/arcgis/rest/services/HoustonCoParcels_withOwner/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Source query returned 3897 rows; 3691 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Counted 3691 distinct parcel ids.",
+    "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13153/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13153/lookup.json",
+  "sourceCount": 3897,
+  "dropped": 0,
+  "tileCount": 5,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=HoustonCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://garc.maps.arcgis.com/apps/webappviewer/index.html?id=bc820c2f01784c4f8e47e7327e866932",
+  "pulledOn": "2026-09-29"
+}

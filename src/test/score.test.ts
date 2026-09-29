@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { filterParcels } from "../lib/filters";
 import { effectiveScoreWeights, rankSites, risingScore, scoreParcel } from "../lib/score";
-import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "../lib/types";
+import { DEFAULT_FILTERS, type FilterState, type FluConfig, type ParcelFeature, type ZoningConfig } from "../lib/types";
 
 const zoningConfig: ZoningConfig = {
   version: 2,
@@ -39,19 +39,13 @@ const fluConfig: FluConfig = {
 };
 
 const filters: FilterState = {
+  ...DEFAULT_FILTERS,
   considerOpportunityZone: true,
   considerZoning: true,
   landUseFilter: "off",
-  includePlannedDevelopment: true,
-  includeConditionalZoning: false,
-  ozFilter: "either",
   minAcreage: 1,
-  includeUnknownAcreage: true,
   minIncome: 50000,
-  incomeGeography: "tract",
-  includeUnknownIncome: true,
   minAadt: 10000,
-  includeUnknownAadt: true,
 };
 
 function feature(partial: Partial<ParcelFeature["properties"]>): ParcelFeature {

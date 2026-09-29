@@ -7,6 +7,12 @@ medianHouseholdIncome when ACS 5-year 2020–2024 B19013 has a positive
 estimate for that 2020 GEOID. Tracts missing from the table omit the
 property (unknown income, not zero).
 
+Rent series are joined the same way. Field names match
+src/lib/tractRent.ts TRACT_RENT_SOURCES. Only plain numbers are written
+(e, m, and g). Join codes j/z/c stay out of the file. A tract missing from
+a series omits that property. There is no state allow-list, so a later
+rent file that adds Mississippi (FIPS 28) is picked up on the next run.
+
 Tracts that are not on an eligibility fixture are omitted. South Carolina
 keeps the governor-nominated GEOID list only.
 """
@@ -27,6 +33,43 @@ OUT = FIXTURES / "oz2-eligible-overview.geojson"
 MS_STATEWIDE = FIXTURES / "oz2-ms-statewide.geojson"
 ACS = FIXTURES / "acs-b19013-tracts.json"
 NOMINATED = ROOT / "data" / "oz" / "sc-oz2-nominated-official-sccommerce-2026-09-23.csv"
+
+# (file, (source key, property name, kind)). Kinds: level and moe must be
+# positive; growth may be zero or negative. j/z/c are never copied.
+RENT_LAYERS = (
+    (
+        "acs-b25064-tracts.json",
+        (
+            ("e", "medianGrossRent", "level"),
+            ("m", "medianGrossRentMoe", "moe"),
+            ("g", "medianGrossRentGrowth", "growth"),
+        ),
+    ),
+    ("hud-safmr-2br-tracts.json", (("e", "safmr2Br", "level"),)),
+    (
+        "zillow-zori-mf-tracts.json",
+        (
+            ("e", "zoriMf5Plus", "level"),
+            ("g", "zoriMf5PlusGrowth", "growth"),
+        ),
+    ),
+    (
+        "zillow-zori-all-tracts.json",
+        (
+            ("e", "zoriAll", "level"),
+            ("g", "zoriAllGrowth", "growth"),
+        ),
+    ),
+    (
+        "apartmentlist-county-tracts.json",
+        (
+            ("e", "apartmentListCountyRent", "level"),
+            ("g", "apartmentListCountyRentGrowth", "growth"),
+        ),
+    ),
+)
+
+RENT_KEYS = tuple(dest for _file, fields in RENT_LAYERS for _src, dest, _kind in fields)
 
 # ~2 km. Enough for a Southeast view at zooms 4–7; detail geometry takes over at 8.
 TOLERANCE = 0.02
@@ -54,8 +97,36 @@ def income_by_geoid() -> dict[str, int]:
     found: dict[str, int] = {}
     for geoid, row in (table.get("tracts") or {}).items():
         estimate = row.get("e") if isinstance(row, dict) else None
-        if isinstance(estimate, (int, float)) and estimate > 0:
+        if isinstance(estimate, (int, float)) and not isinstance(estimate, bool) and estimate > 0:
             found[str(geoid)] = int(estimate)
+    return found
+
+
+def metric_value(raw, kind: str):
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        return None
+    if kind == "growth":
+        return float(raw)
+    if raw > 0:
+        return int(raw) if float(raw).is_integer() else raw
+    return None
+
+
+def rent_by_geoid() -> dict[str, dict]:
+    found: dict[str, dict] = {}
+    for filename, fields in RENT_LAYERS:
+        path = FIXTURES / filename
+        if not path.exists():
+            raise RuntimeError(f"Missing rent fixture {path}")
+        table = json.loads(path.read_text())
+        for geoid, row in (table.get("tracts") or {}).items():
+            if not isinstance(row, dict):
+                continue
+            props = found.setdefault(str(geoid), {})
+            for source_key, dest_key, kind in fields:
+                value = metric_value(row.get(source_key), kind)
+                if value is not None:
+                    props[dest_key] = value
     return found
 
 
@@ -112,6 +183,7 @@ def simplified(geom):
 def main() -> None:
     nominated = nominated_geoids()
     incomes = income_by_geoid()
+    rents = rent_by_geoid()
     seen: set[str] = set()
     skipped_sc = 0
     features = []
@@ -155,6 +227,10 @@ def main() -> None:
             income = incomes.get(geoid)
             if income is not None:
                 properties["medianHouseholdIncome"] = income
+            rent = rents.get(geoid) or {}
+            for key in RENT_KEYS:
+                if key in rent:
+                    properties[key] = rent[key]
             features.append({"type": "Feature", "properties": properties, "geometry": geometry})
 
     features.sort(key=lambda feature: (feature["properties"]["state"], not feature["properties"]["rural"], feature["properties"]["tractGeoid"]))
@@ -166,10 +242,11 @@ def main() -> None:
     text = json.dumps(payload, separators=(",", ":"))
     OUT.write_text(text)
     known = sum(1 for feature in features if "medianHouseholdIncome" in feature["properties"])
+    with_rent = sum(1 for feature in features if any(key in feature["properties"] for key in RENT_KEYS))
     print(
         f"wrote {OUT.name}: features={len(features)} tracts={len(seen)} "
         f"with_income={known} unknown_income={len(features) - known} "
-        f"skipped_sc={skipped_sc} bytes={OUT.stat().st_size}"
+        f"with_rent={with_rent} skipped_sc={skipped_sc} bytes={OUT.stat().st_size}"
     )
 
 

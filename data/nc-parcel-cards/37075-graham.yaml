@@ -1,0 +1,270 @@
+state: NC
+jurisdiction: Graham County
+fips: "37075"
+level: county
+markets: [Asheville]
+slug: graham
+cntyfips: "075"
+
+municipalities:
+  - name: Robbinsville
+    role: county-seat
+    zoningLayer: null
+    notes: County seat; no zoning FeatureServer; CPNI 2022 recommended considering zoning
+  - name: Lake Santeetlah
+    role: city-first-zoning-pdf
+    zoningLayer: null
+    zoningDocs:
+      - https://www.townoflakesanteetlah.org/uploads/6/9/3/2/69322769/amended_zoning_ordinance_4_14_26.pdf
+      - https://www.townoflakesanteetlah.org/zoning.html
+    fluDocs:
+      - https://www.townoflakesanteetlah.org/uploads/6/9/3/2/69322769/land_use_plan.pdf
+    notes: Only municipality with published zoning/FLU docs; no public zoning FeatureServer
+  - name: Fontana Dam
+    role: gap
+    notes: No zoning REST found
+  - name: Unincorporated Graham
+    role: gap
+    notes: Mountain-county pattern — largely unzoned on public REST
+
+layers:
+  - role: parcels
+    name: GrahamAGOL Parcels (CAMA + polygons)
+    restUrl: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/6
+    alternateUrls:
+      - https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/15
+      - https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/16
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: calcacres
+    coverage: county-wide
+    fieldMap:
+      PARNUM: parcelId
+      parno: parcelId
+      PIN_1: parcelId
+      pin: parcelIdOneMap
+      ACCT_NO: parcelIdAccount
+      calcacres: acreage
+      totalacres: acreage
+      ACREAGE: acreage
+      OWNER_NAME: ownerName
+      NAME: ownerName
+      ADDR_1: mailingAddress
+      ADDR_2: mailingAddress
+      ADDR_3: mailingAddress
+      CITY: mailingAddress
+      STATE: mailingAddress
+      ZIP: mailingAddress
+      HOUSE_NUMB: situsAddress
+      DIRECTION: situsAddress
+      STREET_NM: situsAddress
+      STREET_TYP: situsAddress
+      STREET_SUF: situsAddress
+      ADDRESS: situsAddress
+      LEGAL_1: legalDescription
+      LEGAL_2: legalDescription
+      SALEPRICE: lastSale.price
+      DEED_DATE: lastSale.date
+      STAMPS: lastSale.price
+      DEEDBOOK: deed
+      DEEDPAGE: deed
+      LAND_VALU: tax.marketValue
+      BUILD_VALU: tax.marketValue
+      XFOB_VALUE: tax.marketValue
+      TOTAL_VALU: tax.assessedValue
+      PRC_link: appraiserSearchUrl
+    notes: >
+      PRIMARY verified 2026-09-24: count 9459; calcacres BETWEEN 5 AND 150 → 1963;
+      totalacres 5–150 → 2172; SALEPRICE>0 → 4457; TOTAL_VALU>0 → 9117;
+      OWNER_NAME IS NOT NULL → 9119; PRC_link populated → 9459. CRS 102719/2264.
+      MaxRecordCount 1000 — paginate. Sample PARNUM 553800010002 / pin 5508816230
+      GIBSON CLAUDINE centroid ≈ -83.997, 35.243. Twins /15 and /16 same schema.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+    notes: >
+      Filter cntyfips='075'; count 9840; gisacres 5–150 → 1968; parval>0 → 9105;
+      join OneMap parno = county pin (NOT PARNUM) — verified 5538864002 RENNER /
+      5528228998 STITH; saledatetx empty county-wide — prefer county SALEPRICE.
+    status: usable
+
+  - role: other
+    name: Municipal Boundaries
+    restUrl: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      MunicipalBoundaryName: municipality
+    notes: Robbinsville + Fontana Dam + Lake Santeetlah (count 3)
+    status: usable
+
+  - role: zoning
+    name: Lake Santeetlah Zoning (cities-first PDF)
+    restUrl: null
+    geometry: none
+    auth: none
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      No FeatureServer. Ordinance PDF amended_zoning_ordinance_4_14_26.pdf +
+      zoning.html. Robbinsville / Fontana Dam / unincorporated — unzoned on REST.
+      Reject REGIS GrahZoning* (City of Graham, Alamance).
+    status: gap
+
+  - role: flu
+    name: Future Land Use
+    restUrl: null
+    geometry: none
+    auth: none
+    coverage: none
+    fieldMap: {}
+    notes: >
+      No FLU FeatureServer. Lake Santeetlah Land Use Plan PDF
+      townoflakesanteetlah.org/.../land_use_plan.pdf; NCDOT Graham CTP ≠ FLU.
+    status: gap
+
+gaps:
+  - No public zoning FeatureServer (Lake Santeetlah PDF only; Robbinsville/Fontana Dam/unincorp unzoned)
+  - No public FLU FeatureServer (Santeetlah LUP PDF; NCDOT CTP ≠ FLU)
+  - County Tax_View FeatureServer token-gated; grahamconc Tax Map WAB subscription canceled
+  - ACREAGE is text (use calcacres/totalacres for numeric filters)
+  - OneMap parno joins county pin not PARNUM
+  - OneMap saledatetx empty; prefer county SALEPRICE + DEED_DATE
+  - OneMap count (~9840) exceeds GrahamAGOL (~9459)
+  - Reject REGIS City-of-Graham (Alamance) GrahZoning* services
+  - Utilities / AADT / emails / phones / paid vendors excluded
+
+license: "Graham County GIS / Tax Assessor / Land Records; NCGS 132-10; attribute Town of Lake Santeetlah for municipal zoning/FLU PDFs; AGD Online hosts viewer"
+appraiserSearchUrl: "https://bttaxpayerportal.com/itspublicgr/AppraisalCard.aspx?parcel={PARNUM}"
+jurisdictionGisUrl: https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=561a20cc33894cb98ff18aa6925af254
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GrahamAGOL/FeatureServer/6
+  parcelIdField: PARNUM
+  acreageFilter: calcacres >= 5 AND calcacres <= 150
+  acres5to150Live: 1963
+  parcelCountLive: 9459
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='GRAHAM'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GRAHAM%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GRAHAM%27&returnCountOnly=true&f=json
+      liveStationCount: 104
+      stationsWithAADT2022: 74
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Graham'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Graham%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Graham%27&returnCountOnly=true&f=json
+      liveStationCount: 103
+      stationsWithAADT2025: 64
+      stationsWithAADT2024: 64
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TOTAL_VALU
+    - LAND_VALU
+    allTaxFieldsOnLayer:
+    - LAND_VALU
+    - BUILD_VALU
+    - XFOB_VALUE
+    - TOTAL_VALU
+    liveNonZero:
+      TOTAL_VALU: 9117
+      LAND_VALU: 9113
+    status: ok
+  sale:
+    priceFields:
+    - SALEPRICE
+    - STAMPS
+    dateFields:
+    - DEED_DATE
+    livePriceNonZero:
+      SALEPRICE: 4457
+      STAMPS: 866
+    liveDateNonNull:
+      DEED_DATE: 9021
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - OWNER_NAME
+    - NAME
+    primaryOwnerField: OWNER_NAME
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWNER_NAME) LIKE '% LLC%' OR UPPER(OWNER_NAME) LIKE '% INC%' OR UPPER(OWNER_NAME) LIKE '% LP%' OR UPPER(OWNER_NAME) LIKE '% LLP%' OR UPPER(OWNER_NAME) LIKE '% LTD%' OR UPPER(OWNER_NAME) LIKE '% TRUST%' OR UPPER(OWNER_NAME) LIKE '% CHURCH%' OR UPPER(OWNER_NAME) LIKE '% COMPANY%' OR UPPER(OWNER_NAME) LIKE '% PARTNERSHIP%' OR UPPER(OWNER_NAME) LIKE '% HOLDINGS%' OR UPPER(OWNER_NAME) LIKE '% PROPERTIES%' OR UPPER(OWNER_NAME) LIKE '% CORP%' OR UPPER(OWNER_NAME) LIKE '%,LLC%' OR UPPER(OWNER_NAME) LIKE '%,INC%' OR UPPER(OWNER_NAME) LIKE 'CITY OF %' OR UPPER(OWNER_NAME) LIKE 'COUNTY OF %' OR UPPER(OWNER_NAME) LIKE 'STATE OF %' OR UPPER(OWNER_NAME) LIKE 'TOWN OF %')
+    liveEntityCountAll: 1085
+    liveEntityCount5to150ac: 232
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://bttaxpayerportal.com/itspublicgr/AppraisalCard.aspx?parcel={PARNUM}
+    testedParcelId: '5538000028120'
+    testedUrl: https://bttaxpayerportal.com/itspublicgr/AppraisalCard.aspx?parcel=5538000028120
+    httpStatus: 200
+    contentType: text/html; charset=utf-8
+    contentVerified: true
+    note: Owner and parcel id verified in the response.
+  gisViewer:
+    url: https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=561a20cc33894cb98ff18aa6925af254
+    httpStatus: 200
+    pageTitle: ArcGIS Web Application
+    arcgisItem:
+      access: public
+      title: Graham County NC GIS Viewer
+      type: Web Mapping Application
+      err: null
+  gaps: []

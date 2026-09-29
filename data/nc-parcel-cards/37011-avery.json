@@ -1,0 +1,683 @@
+{
+  "state": "NC",
+  "jurisdiction": "Avery County",
+  "county": "Avery",
+  "fips": "37011",
+  "cntyfips": "011",
+  "slug": "avery",
+  "level": "county",
+  "markets": [
+    "Boone",
+    "Asheville"
+  ],
+  "msa": "Boone / Asheville shed",
+  "crs_preferred": {
+    "wkid": 103122,
+    "latestWkid": 6543,
+    "name": "NAD 1983 (2011) StatePlane North Carolina FIPS 3200 Ft Intl"
+  },
+  "jurisdictionGisUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=7c399996997242bdbf2a0bf5c18e3a2a",
+  "gisDeepLinkTemplate": "https://apps.agdmaps.com/print/nc/avery/index.html?Name={PIN}",
+  "gisDeepLinkNotes": "AGD short http://avery.agdmaps.com/ \u2192 webappviewer. Viewer Search sources: ACCT_NO, ADDR_*, Name(PIN), OWNER_NAME. No ?pin= querystring documented; use print ?Name={PIN} or in-app Search.",
+  "countyRestRoot": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer",
+  "mappingPageUrl": "https://averycountync.gov/business/mapping/index.php",
+  "appraiserSearchUrl": "http://webtax.averycountync.gov/ITSPublic/AppraisalCard.aspx?id={PARNUM}",
+  "appraiserSearchUrlNotes": "PARNUM = PIN + '00000' (17-digit). Verified 18020053208300000 \u2192 GRIFFITH PDF; 12-digit PIN alone does not return PDF. Layer/5 PRC field embeds same URL.",
+  "paBasicSearchUrl": "http://webtax.averycountync.gov/ITSPublic/",
+  "itsRealEstateUrl": "http://webtax.averycountync.gov/itsnet/RealEstate.aspx",
+  "itsSalesUrl": "http://webtax.averycountync.gov/itsnet/Sales.aspx",
+  "itsTaxBillUrl": "http://webtax.averycountync.gov/itsnet/TaxBill.aspx",
+  "paDeepLinkKey": "PARNUM",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "Name",
+    "PARNUM",
+    "parno",
+    "ACCT_NO"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/avery/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/avery/parcel-detail/{PIN}",
+  "taxPayPortalUrl": "http://avery.webtaxpay.com/",
+  "planningUrl": "https://www.averycountync.gov/departments/planning_departmentplanning.php",
+  "ordinancePageUrl": "https://averycountync.gov/departments/ordinance_page/index.php",
+  "landUseUpdateDocx": "https://www.averycountync.gov/departments/Avery%20County%20Land%20Use%20Update.docx",
+  "landUseUpdateNotes": "Planning menu link; cms3.revize target returned 404 on 2026-09-24 \u2014 FLU REST/PDF gap",
+  "bannerElkExperienceUrl": "https://experience.arcgis.com/experience/5111c6cc1b8140d2b7f491c87593c7dd/",
+  "bannerElkGisPage": "https://townofbannerelk.org/mapping-and-gis/",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='011'",
+  "hccogRestRoot": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services",
+  "rejectedLayers": [
+    {
+      "name": "HCCOG Avery_County_Parcels",
+      "url": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Avery_County_Parcels/FeatureServer/0",
+      "reason": "Mislabeled \u2014 extent/cities are Ashe (Jefferson/West Jefferson/Lansing); not Avery"
+    }
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "Name",
+        "PARNUM",
+        "parno"
+      ],
+      "bestLayer": "Avery_AGOL/21",
+      "notes": "PIN/Name (12-digit) for NCPTS + AGD print; PARNUM (17-digit) for AppraisalCard"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Avery_AGOL/21"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "Calculated_Acreage",
+        "ACREAGE",
+        "Caculated_Acres",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 4043,
+      "bestLayer": "Avery_AGOL/21"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNER_NAME",
+        "NAME_1",
+        "ownname"
+      ],
+      "bestLayer": "Avery_AGOL/21"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "ADDR_1",
+        "ADDR_2",
+        "ADDR_3",
+        "CITY",
+        "STATE",
+        "ZIP"
+      ],
+      "bestLayer": "Avery_AGOL/21"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "ADDRESS",
+        "siteadd"
+      ],
+      "bestLayer": "Avery_AGOL/21"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SALEPRICE",
+        "DEED_DATE",
+        "STAMPS"
+      ],
+      "bestLayer": "Avery_AGOL/21",
+      "notes": "DEED_DATE is YYYYMMDD integer; ITS Sales.aspx for interactive sale search"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TOTAL_VALU",
+        "LAND_VALU",
+        "BUILD_VALU",
+        "XFOB_VALUE"
+      ],
+      "bestLayer": "Avery_AGOL/21"
+    },
+    "zoning": {
+      "present": true,
+      "citiesFirst": true,
+      "fields": [
+        "Zone_code",
+        "ZONE_CODE",
+        "ZoneAbbrev"
+      ],
+      "bestLayer": "Zoning_Avery_County_Municipalities + Town_of_Banner_Elk_Zoning"
+    },
+    "flu": {
+      "present": false,
+      "partial": true,
+      "bestLayer": null,
+      "caveat": "Land Use Update.docx link 404 \u2014 no public FLU FeatureServer"
+    }
+  },
+  "municipalities": {
+    "Newland": {
+      "role": "county seat; zoning REST gap",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "cityLimitsUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/4",
+      "notes": "County seat; mailing CITY count ~5564 on Parcels_Reval; no public zoning FeatureServer"
+    },
+    "Banner Elk": {
+      "role": "city-first zoning",
+      "incorporated": true,
+      "hasLocalGis": true,
+      "zoningPrefer": "Town_of_Banner_Elk_Zoning/0 Zone_code; muni FS/4 secondary",
+      "zoningUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Town_of_Banner_Elk_Zoning/FeatureServer/0",
+      "zoningCount": 1619,
+      "alternateZoningUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Zoning_Avery_County_Municipalities/FeatureServer/4",
+      "alternateZoningCount": 1616,
+      "zoneCodes": [
+        "C-1",
+        "C-1P",
+        "C-2",
+        "CZD",
+        "G-O",
+        "M-E",
+        "M-U",
+        "R-1",
+        "R-1-U",
+        "R-2",
+        "RC"
+      ],
+      "etjBoundaryUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Banner_Elk_ETJ/FeatureServer/0",
+      "etjBoundaryCount": 1,
+      "experienceUrl": "https://experience.arcgis.com/experience/5111c6cc1b8140d2b7f491c87593c7dd/",
+      "notes": "Primary resort/commercial center; Experience Builder via HCCOG"
+    },
+    "Elk Park": {
+      "role": "incorporated; zoning REST gap",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "baseDataUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Elk_Park_Base_Data_Feature_Service_Publish/FeatureServer",
+      "notes": "Town limits + parcel clip; no public zoning FeatureServer"
+    },
+    "Crossnore": {
+      "role": "incorporated; zoning REST gap",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "notes": "Town limits on Avery_AGOL/4; no public zoning FeatureServer"
+    },
+    "Sugar Mountain": {
+      "role": "city-first zoning",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": "Zoning_Avery_County_Municipalities/2 ZONE_CODE",
+      "zoningUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Zoning_Avery_County_Municipalities/FeatureServer/2",
+      "zoningCount": 36,
+      "zoneCodes": [
+        "R-1",
+        "R-2",
+        "R-3",
+        "C-B",
+        "R-C",
+        "M-U"
+      ],
+      "notes": "Village zoning district polygons"
+    },
+    "Beech Mountain": {
+      "role": "city-first zoning (multi-county)",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": "Zoning_Avery_County_Municipalities/3 ZONE_CODE",
+      "zoningUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Zoning_Avery_County_Municipalities/FeatureServer/3",
+      "zoningCount": 45,
+      "zoneCodes": [
+        "BMRI",
+        "CS",
+        "CS2",
+        "R1",
+        "R2",
+        "R2A",
+        "R3A",
+        "R3PUD",
+        "MH",
+        "MP",
+        "PS",
+        "PS-C"
+      ],
+      "notes": "Spans Avery + Watauga; use Avery HCCOG layer for Avery-side parcels"
+    },
+    "Seven Devils": {
+      "role": "city-first zoning (multi-county)",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": "Zoning_Avery_County_Municipalities/1 ZoneAbbrev",
+      "zoningUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Zoning_Avery_County_Municipalities/FeatureServer/1",
+      "zoningCount": 1032,
+      "zoneCodes": [
+        "MDR",
+        "LDR",
+        "SC",
+        "HDR",
+        "GB",
+        "PARKS",
+        "RB"
+      ],
+      "notes": "Spans Avery + Watauga; HCCOG SevenDevils_TownLimits also available"
+    },
+    "Linville": {
+      "role": "village; zoning REST gap",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "notes": "On Avery_AGOL/4 IncorporatedMunicipality; no zoning FS"
+    },
+    "Grandfather Village": {
+      "role": "village; zoning REST gap",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "notes": "On Avery_AGOL/4; no zoning FS"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Avery_AGOL Parcels_Reval (PRIMARY CAMA)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/21",
+      "alternateUrls": [
+        "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/5",
+        "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/25"
+      ],
+      "layerId": 21,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Calculated_Acreage",
+      "coverage": "county-wide",
+      "status": "usable",
+      "primary": true,
+      "counts": {
+        "total": 24610,
+        "acres5to150": 4043,
+        "salesPriceGt0": 11765,
+        "salesPriceGt0InRange": 1475,
+        "marketValueGt0": 24122,
+        "ownerNonEmpty": 24280
+      },
+      "fieldMap": {
+        "PIN": "parcelId",
+        "Name": "parcelId",
+        "PARNUM": "parcelIdAlt",
+        "ACCT_NO": "other",
+        "Calculated_Acreage": "acreage",
+        "ACREAGE": "acreage",
+        "OWNER_NAME": "ownerName",
+        "NAME_1": "ownerName",
+        "ADDR_1": "mailingAddress",
+        "ADDR_2": "mailingAddress",
+        "ADDR_3": "mailingAddress",
+        "CITY": "mailingAddress",
+        "STATE": "mailingAddress",
+        "ZIP": "mailingAddress",
+        "ADDRESS": "situsAddress",
+        "SALEPRICE": "lastSale.price",
+        "DEED_DATE": "lastSale.date",
+        "STAMPS": "lastSale.price",
+        "TOTAL_VALU": "tax.marketValue",
+        "LAND_VALU": "tax.landValue",
+        "BUILD_VALU": "tax.improvementValue",
+        "XFOB_VALUE": "tax.otherValue",
+        "DEEDBOOK": "other",
+        "DEEDPAGE": "other"
+      },
+      "notes": "PRIMARY wire-first. MaxRecordCount 1000. CRS 103122/6543. Sample PIN 180200532083 / PARNUM 18020053208300000 centroid \u2248 -82.026, 35.972 (Newland/Avery)."
+    },
+    {
+      "role": "parcels",
+      "name": "Avery_AGOL Parcels (viewer twin + PRC)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Caculated_Acres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "counts": {
+        "total": 24632,
+        "acres5to150": 4042,
+        "marketValueGt0": 24324
+      },
+      "fieldMap": {
+        "PIN": "parcelId",
+        "PARNUM": "parcelIdAlt",
+        "Caculated_Acres": "acreage",
+        "OWNER_NAME": "ownerName",
+        "ADDRESS": "situsAddress",
+        "TOTAL_VALU": "tax.marketValue",
+        "LAND_VALU": "tax.landValue",
+        "BUILD_VALU": "tax.improvementValue",
+        "PRC": "appraiserSearchUrl",
+        "PRINT_": "other"
+      },
+      "notes": "Viewer operational layer. PRC embeds AppraisalCard URL. No SALEPRICE \u2014 prefer /21 for sale. Typo field Caculated_Acres."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "partial",
+      "filter": "cntyfips='011'",
+      "counts": {
+        "total": 24598,
+        "acres5to150": 4223,
+        "ownerNonEmpty": 24258,
+        "parvalGt0": 24257,
+        "saledateNotNull": 0
+      },
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "mcity": "mailingAddress",
+        "mstate": "mailingAddress",
+        "mzip": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "saledatetx": "lastSale.date"
+      },
+      "notes": "No sale price. saledate/saledatetx empty. Prefer Avery_AGOL/21 for SALEPRICE + current tax."
+    },
+    {
+      "role": "zoning",
+      "name": "Town of Banner Elk Zoning (preferred BE)",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Town_of_Banner_Elk_Zoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "municipality": "Banner Elk",
+      "counts": {
+        "total": 1619
+      },
+      "fieldMap": {
+        "Zone_code": "zoning",
+        "Zone_descr": "zoning"
+      },
+      "notes": "Updated 4/2/2026. Codes: C-1, C-1P, C-2, CZD, G-O, M-E, M-U, R-1, R-1-U, R-2, RC."
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning Avery Municipalities \u2014 Banner Elk",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Zoning_Avery_County_Municipalities/FeatureServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "municipality": "Banner Elk",
+      "counts": {
+        "total": 1616
+      },
+      "fieldMap": {
+        "Zone_code": "zoning",
+        "Zone_descr": "zoning"
+      },
+      "notes": "HCCOG combined service twin of dedicated BE zoning."
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning Avery Municipalities \u2014 Sugar Mountain",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Zoning_Avery_County_Municipalities/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "municipality": "Sugar Mountain",
+      "counts": {
+        "total": 36
+      },
+      "fieldMap": {
+        "ZONE_CODE": "zoning",
+        "ZoneDescript": "zoning",
+        "Jurisdiction": "other"
+      },
+      "notes": "Codes: R-1, R-2, R-3, C-B, R-C, M-U."
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning Avery Municipalities \u2014 Beech Mountain",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Zoning_Avery_County_Municipalities/FeatureServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "municipality": "Beech Mountain",
+      "counts": {
+        "total": 45
+      },
+      "fieldMap": {
+        "ZONE_CODE": "zoning",
+        "ZoneDescript": "zoning",
+        "Label": "zoning"
+      },
+      "notes": "2022-07-05 vintage. Multi-county town."
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning Avery Municipalities \u2014 Seven Devils",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Zoning_Avery_County_Municipalities/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "municipality": "Seven Devils",
+      "counts": {
+        "total": 1032
+      },
+      "fieldMap": {
+        "ZoneAbbrev": "zoning",
+        "ZoneClass": "zoning"
+      },
+      "notes": "Codes: MDR, LDR, SC, HDR, GB, PARKS, RB. Multi-county town."
+    },
+    {
+      "role": "other",
+      "name": "Avery_AGOL IncorporatedMunicipality (muni routing)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "municipal",
+      "status": "usable",
+      "counts": {
+        "total": 9
+      },
+      "fieldMap": {
+        "Inc_Muni": "other"
+      },
+      "notes": "NEWLAND, BANNER ELK, ELK PARK, CROSSNORE, SUGAR MOUNTAIN, BEECH MOUNTAIN, SEVEN DEVILS, LINVILLE, GRANDFATHER VILLAGE"
+    },
+    {
+      "role": "other",
+      "name": "Banner Elk ETJ boundary",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Banner_Elk_ETJ/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "etj",
+      "status": "partial",
+      "counts": {
+        "total": 1
+      },
+      "fieldMap": {},
+      "notes": "Boundary polygon only \u2014 zoning districts live on BannerElk zoning layers"
+    },
+    {
+      "role": "flu",
+      "name": "Avery County Land Use Update (docx \u2014 broken link)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "gap",
+      "documentUrl": "https://www.averycountync.gov/departments/Avery%20County%20Land%20Use%20Update.docx",
+      "notes": "Planning menu points here; cms3.revize returned 404 (2026-09-24). No public FLU FeatureServer. Ordinance-based land-use controls only for unincorporated Avery."
+    }
+  ],
+  "gaps": [
+    "FLU REST gap \u2014 Land Use Update.docx link 404; no county FLU FeatureServer",
+    "Unincorporated Avery has no countywide zoning REST (ordinance-based only); cities-first Banner Elk/Sugar/Beech/Seven Devils",
+    "Newland / Crossnore / Elk Park / Linville / Grandfather Village zoning REST gaps \u2014 limits only",
+    "HCCOG Avery_County_Parcels is mislabeled Ashe data \u2014 do not wire",
+    "OneMap saledate empty for cntyfips='011'; no sale price on OneMap \u2014 use Avery_AGOL/21 SALEPRICE",
+    "Parcels/5 lacks SALEPRICE \u2014 prefer /21 for sale; /5 for PRC template",
+    "CRS 103122/6543 (NAD83 2011) \u2014 not legacy 102719/2264",
+    "Utilities / AADT / emails / phones / paid vendors intentionally excluded"
+  ],
+  "license": "Avery County Tax Assessor / AGD Maps (Avery_AGOL); Town of Banner Elk; Village of Sugar Mountain; Town of Beech Mountain; Town of Seven Devils; High Country COG (municipal zoning). Not survey quality. Commercial resale subject to NCGS 132-10.",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 14,
+  "tranche": 3,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Avery_AGOL/FeatureServer/21",
+    "parcelIdField": "PIN",
+    "acreageFilter": "Calculated_Acreage >= 5 AND Calculated_Acreage <= 150",
+    "acres5to150Live": 4043,
+    "parcelCountLive": 24610,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='AVERY'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27AVERY%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27AVERY%27&returnCountOnly=true&f=json",
+        "liveStationCount": 132,
+        "stationsWithAADT2022": 95
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Avery'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Avery%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Avery%27&returnCountOnly=true&f=json",
+        "liveStationCount": 132,
+        "stationsWithAADT2025": 74,
+        "stationsWithAADT2024": 95,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TOTAL_VALU",
+        "LAND_VALU"
+      ],
+      "allTaxFieldsOnLayer": [
+        "TOTAL_VALU",
+        "LAND_VALU",
+        "BUILD_VALU",
+        "XFOB_VALUE"
+      ],
+      "liveNonZero": {
+        "TOTAL_VALU": 24122,
+        "LAND_VALU": 24094
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SALEPRICE"
+      ],
+      "dateFields": [
+        "DEED_DATE"
+      ],
+      "livePriceNonZero": {
+        "SALEPRICE": 11765
+      },
+      "liveDateNonNull": {
+        "DEED_DATE": 23473
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNER_NAME",
+        "NAME_1"
+      ],
+      "primaryOwnerField": "OWNER_NAME",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNER_NAME) LIKE '% LLC%' OR UPPER(OWNER_NAME) LIKE '% INC%' OR UPPER(OWNER_NAME) LIKE '% LP%' OR UPPER(OWNER_NAME) LIKE '% LLP%' OR UPPER(OWNER_NAME) LIKE '% LTD%' OR UPPER(OWNER_NAME) LIKE '% TRUST%' OR UPPER(OWNER_NAME) LIKE '% CHURCH%' OR UPPER(OWNER_NAME) LIKE '% COMPANY%' OR UPPER(OWNER_NAME) LIKE '% PARTNERSHIP%' OR UPPER(OWNER_NAME) LIKE '% HOLDINGS%' OR UPPER(OWNER_NAME) LIKE '% PROPERTIES%' OR UPPER(OWNER_NAME) LIKE '% CORP%' OR UPPER(OWNER_NAME) LIKE '%,LLC%' OR UPPER(OWNER_NAME) LIKE '%,INC%' OR UPPER(OWNER_NAME) LIKE 'CITY OF %' OR UPPER(OWNER_NAME) LIKE 'COUNTY OF %' OR UPPER(OWNER_NAME) LIKE 'STATE OF %' OR UPPER(OWNER_NAME) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 3392,
+      "liveEntityCount5to150ac": 618,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "http://webtax.averycountync.gov/ITSPublic/AppraisalCard.aspx?id={PARNUM}",
+      "testedParcelId": "08930072674600000",
+      "testedUrl": "http://webtax.averycountync.gov/ITSPublic/AppraisalCard.aspx?id=08930072674600000",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=7c399996997242bdbf2a0bf5c18e3a2a",
+      "httpStatus": 200,
+      "pageTitle": "ArcGIS Web Application",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Avery NC Public Parcel Viewer",
+        "type": "Web Mapping Application",
+        "err": null
+      }
+    },
+    "gaps": []
+  }
+}

@@ -1,0 +1,492 @@
+{
+  "county": "Macon",
+  "state": "NC",
+  "msa": "Asheville MSA",
+  "fips": "37113",
+  "cntyfips": "113",
+  "slug": "macon",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "County JustParcels / AdditionalLayers / Avineon services use 102719/2264. Highlands AGOL Zoning_01_2025 uses Web Mercator \u2014 project for joins.",
+  "viewerLinkTemplate": "https://gis2.maconnc.org/maps/default.htm",
+  "viewerLinkTemplates": [
+    "https://gis2.maconnc.org/maps/default.htm",
+    "https://gis2.maconnc.org/ITSPublic/AppraisalCard.aspx?id={PIN}",
+    "https://gis2.maconnc.org/ITSPublic/TaxBillSearch/Parcel/{PIN}",
+    "https://lrcpwa.ncptscloud.com/macon/parcel-detail/{PIN}",
+    "https://highlandsnc.maps.arcgis.com/apps/webappviewer/index.html?id=e6c775ca7d3f425985807a0502282351"
+  ],
+  "appraiserSearchUrl": "https://gis2.maconnc.org/ITSPublic/AppraisalCard.aspx?id={PIN}",
+  "appraiserSearchUrlNotes": "Verified 2026-09-24: returns PDF for PIN 6585900111 (MACON COUNTY CARE NETWORK). Alias https://gis.maconnc.org/ITSPublic/AppraisalCard.aspx?id={PIN}. Prefer gis2 over bttaxpayerportal ITSPublicMA empty shell.",
+  "jurisdictionGisUrl": "https://gis2.maconnc.org/maps/default.htm",
+  "joinKeys": [
+    "PIN",
+    "parno",
+    "TAXID",
+    "YearBillNumber"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "parno",
+        "YearBillNumber"
+      ],
+      "bestLayer": "JustParcels/TaxParcels",
+      "notes": "10-digit PIN for AppraisalCard / TaxBillSearch / NCPTS; join OneMap parno"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "JustParcels/TaxParcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "ACREAGE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 6329,
+      "bestLayer": "JustParcels/TaxParcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNER_NAME",
+        "ownname"
+      ],
+      "bestLayer": "JustParcels/TaxParcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "OWNER_ADDR1",
+        "OWNER_ADDR2",
+        "CSZ",
+        "CITY",
+        "STATE",
+        "ZIP",
+        "mailadd"
+      ],
+      "bestLayer": "JustParcels/TaxParcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PROP_ADDR",
+        "siteadd"
+      ],
+      "bestLayer": "JustParcels/TaxParcels"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SALES_PRICE",
+        "DATE_RECORDED",
+        "DATE_RECORDED_TEXT",
+        "VALID_SALE",
+        "SalePrice",
+        "DeedDate",
+        "QualifiedCode",
+        "FIRST_GRANTOR_NAME"
+      ],
+      "bestLayer": "JustParcels/TaxParcels",
+      "notes": "SALES_PRICE>0 \u2192 25352 on parcels; Sales/1 SalePrice>0 \u2192 24801; OneMap has no price"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "ASSESSED_VALUE",
+        "LAND_VALUE",
+        "BLDG_VALUE",
+        "OUTBUILDING_VALUE",
+        "DEFERMENT"
+      ],
+      "bestLayer": "JustParcels/TaxParcels"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "city-only",
+      "fields": [
+        "Zoning",
+        "DISTRICT",
+        "ZONE_CODE",
+        "ZONE_DESC"
+      ],
+      "bestLayer": "AdditionalLayers/Town of Franklin Zoning + Highlands Zoning_01_2025",
+      "notes": "Cities-first Franklin/Highlands; unincorporated unzoned; parcel ZONE_CODE F*/H* attr hint"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "notes": "County Comp Plan + Highlands 2022 Comp Plan PDF; no FLU FeatureServer"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Franklin",
+      "role": "city-first-zoning",
+      "townshipCode": "12",
+      "townshipDesc": "FRANKLIN CITY",
+      "zoningRest": "https://gis.maconnc.org/arcgis/rest/services/AdditionalLayers/MapServer/24",
+      "zoningField": "Zoning",
+      "zoningCount": 4138,
+      "parcelAttrPrefix": "F",
+      "fluRest": false,
+      "fluPdf": true,
+      "notes": "County seat; ETJ AdditionalLayers/15; Avineon twin /39"
+    },
+    {
+      "name": "Highlands",
+      "role": "city-first-zoning",
+      "townshipCode": "14",
+      "townshipDesc": "HIGHLANDS CITY",
+      "zoningRest": "https://services.arcgis.com/QCc0b3j3pCXrMzys/arcgis/rest/services/Zoning_01_2025/FeatureServer/31",
+      "zoningField": "DISTRICT",
+      "zoningCount": 78,
+      "parcelAttrPrefix": "H",
+      "viewer": "https://highlandsnc.maps.arcgis.com/apps/webappviewer/index.html?id=e6c775ca7d3f425985807a0502282351",
+      "fluRest": false,
+      "fluPdf": true,
+      "compPlanUrl": "https://www.highlandsnc.org/media/546"
+    },
+    {
+      "name": "Unincorporated",
+      "role": "gap",
+      "notes": "No county zoning polygons on public REST (Comp Plan: zoning only in Franklin/Highlands)"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "JustParcels Tax Parcels",
+      "restUrl": "https://gis.maconnc.org/arcgis/rest/services/JustParcels/MapServer/0",
+      "alternateUrls": [
+        "https://gis.maconnc.org/arcgis/rest/services/Cloudpermit/CloudpermitParcels/FeatureServer/0",
+        "https://gis.maconnc.org/arcgis/rest/services/Layers/MapServer/8",
+        "https://gis.maconnc.org/arcgis/rest/services/AvineonWebApp/AvineonWebApp/MapServer/16"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACREAGE",
+      "coverage": "county-wide",
+      "count": 44698,
+      "acres5to150": 6329,
+      "salePricePositive": 25352,
+      "assessedPositive": 43799,
+      "vacantInRange": 3141,
+      "status": "usable",
+      "primary": true,
+      "fieldMap": {
+        "PIN": "parcelId",
+        "ACREAGE": "acreage",
+        "OWNER_NAME": "ownerName",
+        "OWNER_ADDR1": "mailingAddress",
+        "OWNER_ADDR2": "mailingAddress",
+        "CSZ": "mailingAddress",
+        "CITY": "mailingAddress",
+        "STATE": "mailingAddress",
+        "ZIP": "mailingAddress",
+        "PROP_ADDR": "situsAddress",
+        "SALES_PRICE": "lastSale.price",
+        "DATE_RECORDED": "lastSale.date",
+        "DATE_RECORDED_TEXT": "lastSale.date",
+        "VALID_SALE": "lastSale.qualified",
+        "ASSESSED_VALUE": "tax.assessedValue",
+        "LAND_VALUE": "tax.marketValue",
+        "BLDG_VALUE": "tax.marketValue",
+        "OUTBUILDING_VALUE": "tax.marketValue",
+        "ZONE_CODE": "zoning",
+        "ZONE_DESC": "zoning",
+        "TOWNSHIP_CODE": "other",
+        "TOWNSHIP_DESC": "other",
+        "YearBillNumber": "other",
+        "DEED_BK_PG": "deed",
+        "FIRST_GRANTOR_NAME": "lastSale.grantor",
+        "Plat_BK_PG": "other"
+      }
+    },
+    {
+      "role": "sales",
+      "name": "JustParcels Sales",
+      "restUrl": "https://gis.maconnc.org/arcgis/rest/services/JustParcels/MapServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "count": 39955,
+      "salePricePositive": 24801,
+      "status": "usable",
+      "fieldMap": {
+        "PIN": "parcelId",
+        "SalePrice": "lastSale.price",
+        "DeedDate": "lastSale.date",
+        "QualifiedCode": "lastSale.qualified",
+        "GrantorName": "other",
+        "GranteeName": "other",
+        "DeedDateRaw": "lastSale.date",
+        "IsQualified": "lastSale.qualified",
+        "VacantOrImproved": "other",
+        "CACRES": "acreage",
+        "TACRES": "acreage",
+        "DeedBook": "deed",
+        "DeedPage": "deed"
+      }
+    },
+    {
+      "role": "sales",
+      "name": "All_Sales_2020",
+      "restUrl": "https://gis.maconnc.org/arcgis/rest/services/All_Sales_2020/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "count": 6619,
+      "status": "partial",
+      "notes": "2020 snapshot; prefer JustParcels"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "filter": "cntyfips='113'",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "count": 44699,
+      "acres5to150": 6358,
+      "parvalPositive": 43499,
+      "status": "partial",
+      "notes": "No sale price; saledate epoch empty; join parno\u2194PIN"
+    },
+    {
+      "role": "zoning",
+      "name": "Town of Franklin Zoning",
+      "restUrl": "https://gis.maconnc.org/arcgis/rest/services/AdditionalLayers/MapServer/24",
+      "alternateUrls": [
+        "https://gis.maconnc.org/arcgis/rest/services/AvineonWebApp/AvineonWebApp/MapServer/39"
+      ],
+      "layerId": 24,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 4138,
+      "zoningField": "Zoning",
+      "status": "usable",
+      "notes": "Cities-first; codes C1/C2/C3/I1/R1/R2/MICR/NMU/PCD/PRD/TND/S + CZ/SU"
+    },
+    {
+      "role": "zoning",
+      "name": "Town of Highlands Zoning_01_2025",
+      "restUrl": "https://services.arcgis.com/QCc0b3j3pCXrMzys/arcgis/rest/services/Zoning_01_2025/FeatureServer/31",
+      "layerId": 31,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 78,
+      "zoningField": "DISTRICT",
+      "status": "usable",
+      "notes": "Prefer AGOL; B-1..B-4 / R-1..R-3 / GI + CZ variants"
+    },
+    {
+      "role": "other",
+      "name": "Franklin City Limits",
+      "restUrl": "https://gis.maconnc.org/arcgis/rest/services/AdditionalLayers/MapServer/14",
+      "layerId": 14,
+      "geometry": "polygon",
+      "count": 14,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Franklin ETJ",
+      "restUrl": "https://gis.maconnc.org/arcgis/rest/services/AdditionalLayers/MapServer/15",
+      "layerId": 15,
+      "geometry": "polygon",
+      "count": 1,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Highlands City Limits",
+      "restUrl": "https://gis.maconnc.org/arcgis/rest/services/AdditionalLayers/MapServer/16",
+      "layerId": 16,
+      "geometry": "polygon",
+      "count": 1,
+      "status": "usable",
+      "zoningField": "DISTRICT"
+    },
+    {
+      "role": "flu",
+      "name": "County + Highlands Comp Plan PDFs",
+      "restUrl": null,
+      "coverage": "county-wide",
+      "status": "gap",
+      "pdfUrls": [
+        "https://maconnc.org/images/planning/Comprehensive%20Plan%20Final%20as%20approved.pdf",
+        "https://www.highlandsnc.org/media/546"
+      ],
+      "zoningField": "DISTRICT"
+    }
+  ],
+  "portals": {
+    "jurisdictionGis": "https://gis2.maconnc.org/maps/default.htm",
+    "lightmap": "https://gis2.maconnc.org/lightmap/",
+    "downloads": "https://gis2.maconnc.org/lightmap/downloads.aspx",
+    "restRoot": "https://gis.maconnc.org/arcgis/rest/services",
+    "appraisalCard": "https://gis2.maconnc.org/ITSPublic/AppraisalCard.aspx?id={PIN}",
+    "taxBillSearch": "https://gis2.maconnc.org/ITSPublic/TaxBillSearch/Parcel/{PIN}",
+    "taxBillSearchAlt": "https://tax.maconnc.org/ITSPublicMA/TaxBillSearch/Parcel/{PIN}",
+    "ncptsSearch": "https://lrcpwa.ncptscloud.com/macon/parcel-search",
+    "ncptsDetail": "https://lrcpwa.ncptscloud.com/macon/parcel-detail/{PIN}",
+    "highlandsZoningViewer": "https://highlandsnc.maps.arcgis.com/apps/webappviewer/index.html?id=e6c775ca7d3f425985807a0502282351",
+    "countySite": "https://www.maconnc.org/",
+    "compPlanPdf": "https://maconnc.org/images/planning/Comprehensive%20Plan%20Final%20as%20approved.pdf"
+  },
+  "gaps": [
+    "Unincorporated Macon has no county zoning polygons on public REST (Comp Plan: zoning only in Franklin and Highlands)",
+    "No public FLU FeatureServer (county Comp Plan + Highlands 2022 Comp Plan PDF only)",
+    "OneMap has no sale price; saledate epoch empty \u2014 use county SALES_PRICE/DATE_RECORDED",
+    "Cloudpermit FeatureServer parcel count lags JustParcels MapServer",
+    "Legacy gis2 propcards/{PIN}.1.html 404 \u2014 use ITSPublic AppraisalCard PDF",
+    "Utilities / AADT / emails / phones / paid vendors excluded by design"
+  ],
+  "license": "Macon County GIS/Land Records/Tax; Town of Franklin; Town of Highlands; NC OneMap. NCGS 132-10 commercial resale limits; attribute Macon County GIS",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "verifiedLayerCount": 12,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://gis.maconnc.org/arcgis/rest/services/JustParcels/MapServer/0",
+    "parcelIdField": "PIN",
+    "acreageFilter": "ACREAGE >= 5 AND ACREAGE <= 150",
+    "acres5to150Live": 6332,
+    "parcelCountLive": 44701,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='MACON'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MACON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MACON%27&returnCountOnly=true&f=json",
+        "liveStationCount": 338,
+        "stationsWithAADT2022": 180
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Macon'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Macon%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Macon%27&returnCountOnly=true&f=json",
+        "liveStationCount": 334,
+        "stationsWithAADT2025": 191,
+        "stationsWithAADT2024": 188,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "ASSESSED_VALUE",
+        "LAND_VALUE"
+      ],
+      "allTaxFieldsOnLayer": [
+        "ASSESSED_VALUE",
+        "LAND_VALUE",
+        "BLDG_VALUE",
+        "OUTBUILDING_VALUE",
+        "DEFERMENT"
+      ],
+      "liveNonZero": {
+        "ASSESSED_VALUE": 43794,
+        "LAND_VALUE": 43794
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SALES_PRICE"
+      ],
+      "dateFields": [
+        "DATE_RECORDED"
+      ],
+      "livePriceNonZero": {
+        "SALES_PRICE": 25356
+      },
+      "liveDateNonNull": {
+        "DATE_RECORDED": 44389
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNER_NAME"
+      ],
+      "primaryOwnerField": "OWNER_NAME",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNER_NAME) LIKE '% LLC%' OR UPPER(OWNER_NAME) LIKE '% INC%' OR UPPER(OWNER_NAME) LIKE '% LP%' OR UPPER(OWNER_NAME) LIKE '% LLP%' OR UPPER(OWNER_NAME) LIKE '% LTD%' OR UPPER(OWNER_NAME) LIKE '% TRUST%' OR UPPER(OWNER_NAME) LIKE '% CHURCH%' OR UPPER(OWNER_NAME) LIKE '% COMPANY%' OR UPPER(OWNER_NAME) LIKE '% PARTNERSHIP%' OR UPPER(OWNER_NAME) LIKE '% HOLDINGS%' OR UPPER(OWNER_NAME) LIKE '% PROPERTIES%' OR UPPER(OWNER_NAME) LIKE '% CORP%' OR UPPER(OWNER_NAME) LIKE '%,LLC%' OR UPPER(OWNER_NAME) LIKE '%,INC%' OR UPPER(OWNER_NAME) LIKE 'CITY OF %' OR UPPER(OWNER_NAME) LIKE 'COUNTY OF %' OR UPPER(OWNER_NAME) LIKE 'STATE OF %' OR UPPER(OWNER_NAME) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 8822,
+      "liveEntityCount5to150ac": 1285,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://gis2.maconnc.org/ITSPublic/AppraisalCard.aspx?id={PIN}",
+      "testedParcelId": "5595813933",
+      "testedUrl": "https://gis2.maconnc.org/ITSPublic/AppraisalCard.aspx?id=5595813933",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://gis2.maconnc.org/maps/default.htm",
+      "httpStatus": 200,
+      "pageTitle": "Avineon Web Map Template"
+    },
+    "gaps": []
+  }
+}

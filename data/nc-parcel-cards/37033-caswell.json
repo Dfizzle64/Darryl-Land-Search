@@ -1,0 +1,561 @@
+{
+  "state": "NC",
+  "jurisdiction": "Caswell County",
+  "county": "Caswell",
+  "fips": "37033",
+  "cntyfips": "033",
+  "slug": "caswell",
+  "level": "county",
+  "markets": [
+    "Raleigh-Durham",
+    "Greensboro"
+  ],
+  "msa": "RDU / Greensboro shed",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://www.webgis.net/nc/caswell/",
+  "gisDeepLinkTemplate": "?id=Parcels|P_PIN|{P_PIN}",
+  "gisDeepLinkNotes": "WebGIS mailable link from SiteCustom.js. Alias https://www.webgis.net/nc/Caswell/. No PropertyCard.php on this host.",
+  "countyRestRoot": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer",
+  "mappingPageUrl": "https://www.caswellcountync.gov/department-directory/gis-website",
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicCS/AppraisalCard.aspx?id={P_PIN}",
+  "appraiserSearchUrlNotes": "P_PIN == Account (16-digit). 12-digit PIN alone returns empty HTML \u2014 do not use. SiteCustom.js wires identify popup to P_PIN. Verified PDF sample 0106010000120000 \u2192 BERTIE LANCE JR & DONNA JONES, Market 115460, acres 5.57.",
+  "paBasicSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicCS/BasicSearch",
+  "taxBillSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicCS/TaxBillSearch",
+  "taxBillDeepLinkTemplate": "https://www.bttaxpayerportal.com/ITSPublicCS/TaxBillSearch/Parcel/{PIN}",
+  "paDeepLinkKey": "P_PIN",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "Account",
+    "P_PIN",
+    "NewNumber",
+    "TID",
+    "parno",
+    "nparno",
+    "altparno"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/caswell/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/caswell/parcel-detail/{PIN}",
+  "ncptsNotes": "SPA shell only; prefer ITSPublicCS AppraisalCard for PA deep-link",
+  "planningUrl": "https://www.caswellcountync.gov/planning",
+  "municodeUrl": "https://library.municode.com/nc/caswell_county/codes/code_of_ordinances",
+  "udoPdfUrl": "https://www.caswellcountync.gov/_files/ugd/66d4ec_e209de7b0b19440ca9ed8f98c4028220.pdf",
+  "comprehensivePlanPdfUrl": "https://www.caswellcountync.gov/_files/ugd/ddda14_ce9da4d25a0f4c6798ac6e05e25318e5.pdf",
+  "ptrcLdpUrl": "http://www.ptrc.org/caswellldp",
+  "hycoZoningMapPdfUrl": "https://www.caswellcountync.gov/_files/ugd/2463ad_0e4f0caa56ec4919976cbcfc5e0aa86f.pdf",
+  "zoningFaqPdfUrl": "https://www.caswellcountync.gov/_files/ugd/2463ad_44c722d353be40fd97db38e9af48a609.pdf",
+  "yanceyvilleUrl": "https://yanceyvillenc.gov/",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='033'",
+  "oneMapAlternateUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "tranche": 3,
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "Account",
+        "P_PIN",
+        "NewNumber",
+        "TID",
+        "parno",
+        "nparno"
+      ],
+      "bestLayer": "NC/Caswell/MapServer/9",
+      "notes": "PIN (12-digit) for map/NCPTS; P_PIN/Account (16-digit) for AppraisalCard + OneMap parno; nparno=37033_{PIN}"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "NC/Caswell/MapServer/9"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "AV_ACRES",
+        "Calculated",
+        "P_DEEDED_A",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 5921,
+      "bestLayer": "NC/Caswell/MapServer/9"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "N_NAME",
+        "N_NAME2",
+        "ownname"
+      ],
+      "bestLayer": "NC/Caswell/MapServer/9"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "N_HOUSE_NR",
+        "N_STREET",
+        "N_ADDR2",
+        "N_ADDR3",
+        "N_CITY",
+        "N_STATE",
+        "N_ZIP_FIRS"
+      ],
+      "bestLayer": "NC/Caswell/MapServer/9"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "AA_HOUSE_N",
+        "AA_STREET",
+        "AA_CITY",
+        "P_STREET_T",
+        "siteadd"
+      ],
+      "bestLayer": "NC/Caswell/MapServer/9"
+    },
+    "lastSale": {
+      "present": false,
+      "partial": true,
+      "fields": [
+        "P_BOOK",
+        "P_PAGE"
+      ],
+      "bestLayer": "NC/Caswell/MapServer/9",
+      "notes": "Sale price/date REST gap. P_YEAR is tax-status year not sale. Use AppraisalCard / ROD for sale QA."
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "AV_FMV_LAN",
+        "AV_FMV_IMP"
+      ],
+      "bestLayer": "NC/Caswell/MapServer/9",
+      "notes": "Sum land+imp \u2248 AppraisalCard Market Value"
+    },
+    "zoning": {
+      "present": true,
+      "citiesFirst": true,
+      "fields": [
+        "ZONE_",
+        "ZONENAME",
+        "MiltonZoning",
+        "Zone"
+      ],
+      "bestLayer": "City Zoning/21 + Milton/22 + Hyco/10"
+    },
+    "flu": {
+      "present": false,
+      "partial": true,
+      "fields": [],
+      "bestLayer": null,
+      "notes": "Comprehensive Plan PDF + PTRC LDP; no FLU FeatureServer"
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://www.bttaxpayerportal.com/ITSPublicCS/AppraisalCard.aspx?id={P_PIN}",
+      "notes": "TRANCHE-3 required"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Yanceyville",
+      "role": "county seat; city-first zoning",
+      "incorporated": true,
+      "localGis": false,
+      "zoningPrefer": "NC/Caswell/MapServer/21 ZONE_/ZONENAME",
+      "zoningUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/21",
+      "zoningCount": 125,
+      "zoneCodes": [
+        "RR8",
+        "HB",
+        "RA",
+        "R12",
+        "OI",
+        "B1",
+        "M1",
+        "R8",
+        "R-MH"
+      ],
+      "cityLimitsUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/4",
+      "cityLimitsField": "FCODE=YANCEYVILLE",
+      "notes": "Primary city; City Zoning layer is Yanceyville districts"
+    },
+    {
+      "name": "Milton",
+      "role": "city-first zoning",
+      "incorporated": true,
+      "localGis": false,
+      "zoningPrefer": "NC/Caswell/MapServer/22 MiltonZoning",
+      "zoningUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/22",
+      "zoningCount": 11,
+      "zoneCodes": [
+        "R-1",
+        "R-2",
+        "R-2*",
+        "C-1/MU",
+        "O&I"
+      ],
+      "historicDistrictField": "HistoricDistrict",
+      "cityLimitsField": "FCODE=MILTON",
+      "notes": "Separate Milton Zoning layer; HistoricDistrict YES/PARTIAL/NO"
+    },
+    {
+      "name": "Hyco Lake",
+      "role": "special zoning district (not a municipality)",
+      "incorporated": false,
+      "localGis": false,
+      "zoningPrefer": "NC/Caswell/MapServer/10 Zone",
+      "zoningUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/10",
+      "zoningCount": 16,
+      "zoneCodes": [
+        "RR",
+        "RB",
+        "IP"
+      ],
+      "zoningMapPdf": "https://www.caswellcountync.gov/_files/ugd/2463ad_0e4f0caa56ec4919976cbcfc5e0aa86f.pdf",
+      "notes": "County-administered lake area; Planning FAQ lists with Yanceyville/Milton as only zoned areas"
+    }
+  ],
+  "unincorporatedPlaces": [
+    "Providence",
+    "Semora",
+    "Pelham",
+    "Blanch",
+    "Leasburg",
+    "Prospect Hill"
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "NC/Caswell Parcels (PRIMARY CAMA)",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/9",
+      "layerId": 9,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "AV_ACRES",
+      "coverage": "county-wide",
+      "primary": true,
+      "status": "usable",
+      "counts": {
+        "total": 17222,
+        "acres_5_150": 5921,
+        "calculated_5_150": 5639,
+        "fmv_land_gt0": 17122,
+        "fmv_imp_gt0": 11541,
+        "has_owner": 17147
+      },
+      "fieldMap": {
+        "PIN": "parcelId",
+        "Account": "parcelIdAccount",
+        "P_PIN": "parcelIdAccount",
+        "NewNumber": "parcelIdDashed",
+        "TID": "parcelIdAlt",
+        "AV_ACRES": "acreage",
+        "Calculated": "acreage",
+        "P_DEEDED_A": "acreage",
+        "N_NAME": "ownerName",
+        "N_NAME2": "ownerName",
+        "N_HOUSE_NR": "mailingAddress",
+        "N_STREET": "mailingAddress",
+        "N_CITY": "mailingAddress",
+        "N_STATE": "mailingAddress",
+        "N_ZIP_FIRS": "mailingAddress",
+        "AA_HOUSE_N": "situsAddress",
+        "AA_STREET": "situsAddress",
+        "AA_CITY": "situsAddress",
+        "AV_FMV_LAN": "tax.landValue",
+        "AV_FMV_IMP": "tax.improvementValue",
+        "P_BOOK": "deed.book",
+        "P_PAGE": "deed.page",
+        "P_YEAR": "tax.year"
+      },
+      "notes": "PRIMARY wire-first. MaxRecordCount 1000. CRS 102719/2264. No SalePrice/SaleDate. Sample PIN 903100158901 / P_PIN 0106010000120000 \u2248 -79.29, 36.54."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (fallback)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='033'",
+      "primary": false,
+      "status": "partial",
+      "counts": {
+        "total": 17222,
+        "gisacres_5_150": 5921,
+        "ownname": 17222,
+        "parval_gt0": 17124,
+        "saledate": 0,
+        "saledatetx": 0
+      },
+      "fieldMap": {
+        "parno": "parcelIdAccount",
+        "nparno": "parcelIdPrefixed",
+        "altparno": "parcelIdAlt",
+        "ownname": "ownerName",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "siteadd": "situsAddress",
+        "mailadd": "mailingAddress"
+      },
+      "notes": "parno=Account/P_PIN; nparno=37033_{PIN}. No sale. Prefer county /9 for CAMA."
+    },
+    {
+      "role": "zoning",
+      "name": "City Zoning (Yanceyville)",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/21",
+      "layerId": 21,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "municipality": "Yanceyville",
+      "status": "usable",
+      "counts": {
+        "total": 125
+      },
+      "fieldMap": {
+        "ZONE_": "zoning",
+        "ZONENAME": "zoningDescription"
+      },
+      "notes": "Cities-first. Districts RR8/HB/RA/R12/OI/B1/M1/R8/R-MH."
+    },
+    {
+      "role": "zoning",
+      "name": "Milton Zoning",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/22",
+      "layerId": 22,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "municipality": "Milton",
+      "status": "usable",
+      "counts": {
+        "total": 11
+      },
+      "fieldMap": {
+        "MiltonZoning": "zoning",
+        "HistoricDistrict": "other"
+      },
+      "notes": "Cities-first. HistoricDistrict YES/PARTIAL/NO."
+    },
+    {
+      "role": "zoning",
+      "name": "Hyco Lake Zoning",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/10",
+      "layerId": 10,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "special-district",
+      "municipality": "Hyco Lake",
+      "status": "usable",
+      "counts": {
+        "total": 16
+      },
+      "fieldMap": {
+        "Zone": "zoning",
+        "Descriptio": "zoningDescription",
+        "PIN": "parcelId"
+      },
+      "notes": "RR/RB/IP. County lake district \u2014 not a municipality."
+    },
+    {
+      "role": "other",
+      "name": "City Limits",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "municipal",
+      "status": "usable",
+      "counts": {
+        "total": 2
+      },
+      "fieldMap": {
+        "FCODE": "municipality"
+      },
+      "notes": "YANCEYVILLE, MILTON \u2014 routing"
+    },
+    {
+      "role": "other",
+      "name": "Watershed overlays (not base zoning)",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer",
+      "layerIds": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        31
+      ],
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "partial",
+      "status": "partial",
+      "notes": "Haw River, Jordan Lake, Stoney Creek, Dan River Critical/Protected, Watershed \u2014 overlay only"
+    },
+    {
+      "role": "flu",
+      "name": "Caswell Comprehensive Plan / PTRC LDP (PDF)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "gap",
+      "pdfUrl": "https://www.caswellcountync.gov/_files/ugd/ddda14_ce9da4d25a0f4c6798ac6e05e25318e5.pdf",
+      "portalUrl": "http://www.ptrc.org/caswellldp",
+      "notes": "No public FLU FeatureServer"
+    }
+  ],
+  "gaps": [
+    "Sale price and sale date not on public parcel REST (P_YEAR is tax year)",
+    "No countywide base zoning \u2014 only Yanceyville, Milton, Hyco Lake (by design)",
+    "FLU FeatureServer gap \u2014 Comp Plan + PTRC LDP PDF only",
+    "OneMap saledate/saledatetx empty for Caswell",
+    "NCPTS deep-link is SPA shell; prefer ITSPublicCS AppraisalCard",
+    "No phones/emails; no paid vendors; utilities + AADT out of scope"
+  ],
+  "license": "County public GIS / HandP WebGIS; NC OneMap ICDE; attribution as required by sources",
+  "sampleParcel": {
+    "PIN": "903100158901",
+    "P_PIN": "0106010000120000",
+    "Account": "0106010000120000",
+    "NewNumber": "0106.01.00.0012.0000",
+    "owner": "BERTIE LANCE JR & DONNA JONES",
+    "acres": 5.57,
+    "fmv_land": 32122,
+    "fmv_imp": 83338,
+    "market_approx": 115460,
+    "centroid_wgs84": [
+      -79.29,
+      36.54
+    ],
+    "appraisalCardVerified": true
+  },
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 8,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://www.webgis.net/arcgis/rest/services/NC/Caswell/MapServer/9",
+    "parcelIdField": "PIN",
+    "acreageFilter": "AV_ACRES >= 5 AND AV_ACRES <= 150",
+    "acres5to150Live": 5921,
+    "parcelCountLive": 17222,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='CASWELL'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CASWELL%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CASWELL%27&returnCountOnly=true&f=json",
+        "liveStationCount": 244,
+        "stationsWithAADT2022": 75
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Caswell'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Caswell%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Caswell%27&returnCountOnly=true&f=json",
+        "liveStationCount": 242,
+        "stationsWithAADT2025": 155,
+        "stationsWithAADT2024": 153,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "AV_FMV_LAN",
+        "AV_FMV_IMP"
+      ],
+      "allTaxFieldsOnLayer": [
+        "AV_FMV_LAN",
+        "AV_FMV_IMP",
+        "P_YEAR"
+      ],
+      "liveNonZero": {
+        "AV_FMV_LAN": 17122,
+        "AV_FMV_IMP": 11541
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {},
+      "status": "gap",
+      "note": "No sale price/date on REST (P_BOOK/P_PAGE deed refs only; NC OneMap saledatetx empty). ITSPublicCS AppraisalCard PDF has Sales grid (Sale Date / Sale Price)."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "N_NAME",
+        "N_NAME2"
+      ],
+      "primaryOwnerField": "N_NAME",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(N_NAME) LIKE '% LLC%' OR UPPER(N_NAME) LIKE '% INC%' OR UPPER(N_NAME) LIKE '% LP%' OR UPPER(N_NAME) LIKE '% LLP%' OR UPPER(N_NAME) LIKE '% LTD%' OR UPPER(N_NAME) LIKE '% TRUST%' OR UPPER(N_NAME) LIKE '% CHURCH%' OR UPPER(N_NAME) LIKE '% COMPANY%' OR UPPER(N_NAME) LIKE '% PARTNERSHIP%' OR UPPER(N_NAME) LIKE '% HOLDINGS%' OR UPPER(N_NAME) LIKE '% PROPERTIES%' OR UPPER(N_NAME) LIKE '% CORP%' OR UPPER(N_NAME) LIKE '%,LLC%' OR UPPER(N_NAME) LIKE '%,INC%' OR UPPER(N_NAME) LIKE 'CITY OF %' OR UPPER(N_NAME) LIKE 'COUNTY OF %' OR UPPER(N_NAME) LIKE 'STATE OF %' OR UPPER(N_NAME) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 1481,
+      "liveEntityCount5to150ac": 588,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/ITSPublicCS/AppraisalCard.aspx?id={P_PIN}",
+      "testedParcelId": "0106010000150000",
+      "testedUrl": "https://www.bttaxpayerportal.com/ITSPublicCS/AppraisalCard.aspx?id=0106010000150000",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://www.webgis.net/nc/caswell/",
+      "httpStatus": 200,
+      "pageTitle": "Caswell Co WebGIS"
+    },
+    "gaps": [
+      "sale gap"
+    ]
+  }
+}

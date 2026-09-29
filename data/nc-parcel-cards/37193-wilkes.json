@@ -1,0 +1,433 @@
+{
+  "county": "Wilkes",
+  "state": "NC",
+  "msa": "Winston-Salem MSA shed",
+  "fips": "37193",
+  "cntyfips": "193",
+  "slug": "wilkes",
+  "level": "county",
+  "markets": [
+    "Winston-Salem shed"
+  ],
+  "crs_preferred": {
+    "wkid": 32019,
+    "latestWkid": 32019,
+    "name": "NAD 1927 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "County services use 32019 (NAD27) — not NAD83 102719/2264 used by most NC peers. Transform carefully for statewide overlays / OneMap joins.",
+  "viewerLinkTemplate": "https://gis.wilkescounty.net/maps/default.htm?PARCEL_ID={PARCEL_ID}",
+  "viewerLinkTemplates": [
+    "https://gis.wilkescounty.net/maps/default.htm?PARCEL_ID={PARCEL_ID}",
+    "https://gis.wilkescounty.net/maps/default.htm?PIN={PIN}",
+    "https://gis.wilkescounty.net/maps/default.htm",
+    "https://lrcpwa.ncptscloud.com/wilkes/parcel-detail/{PIN}"
+  ],
+  "appraiserSearchUrl": "https://parcelinfo.wilkescounty.net/Datalets/Datalet.aspx?UseSearch=no&pin={PARCEL_ID}",
+  "appraiserSearchUrlNotes": "SearchConfig.js wires Tax/PRC to this template. Verified Datalet for 0702212 = LEATHERWOOD MOUNTAINS PROPERTY OWNERS. Optional jur=097&taxyr=2026 on sidebar links.",
+  "jurisdictionGisUrl": "https://gis.wilkescounty.net/maps/",
+  "joinKeys": [
+    "PARCEL_ID",
+    "PIN",
+    "ACCOUNT",
+    "parno"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PARCEL_ID",
+        "PIN",
+        "ACCOUNT",
+        "parno"
+      ],
+      "bestLayer": "Parcels/MapServer/0",
+      "notes": "PARCEL_ID for Datalet/viewer; PIN for map/NCPTS; OneMap parno often remapped vs live PIN"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Parcels/MapServer/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TOTALACRES",
+        "ACRES",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 14800,
+      "bestLayer": "Parcels/MapServer/0",
+      "notes": "Prefer TOTALACRES over ACRES"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNER1",
+        "ownname"
+      ],
+      "bestLayer": "Parcels/MapServer/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "MAILADD1",
+        "MAILADD2",
+        "CITY",
+        "STATE",
+        "ZIP",
+        "mailadd"
+      ],
+      "bestLayer": "Parcels/MapServer/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "PROPLOCAT",
+        "siteadd"
+      ],
+      "bestLayer": "Parcels/MapServer/0",
+      "notes": "No situs city/zip on parcel; PROPLOCAT sometimes plat/legal text"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SALEPRICE",
+        "SALEDATE",
+        "SALE_VALIDITY",
+        "SALETYPE"
+      ],
+      "bestLayer": "Parcels/MapServer/0",
+      "notes": "OneMap has saledate but no sale price; filter rare >=$10M outliers"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "COSTLANDVA",
+        "COSTBLDGVA",
+        "COSTTOTVA",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Parcels/MapServer/0"
+    },
+    "zoning": {
+      "present": true,
+      "citiesFirst": true,
+      "fields": [
+        "ZoningCode",
+        "ZoneCode",
+        "ZONE",
+        "District"
+      ],
+      "bestLayer": "WebMap2023 Zoning NW/23 + WB/24 + County Zones/26"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [],
+      "bestLayer": "Growth Plan + Wilkesboro/NW FLU PDFs",
+      "caveat": "No county or city FLU FeatureServer"
+    }
+  },
+  "portals": {
+    "jurisdictionGis": "https://gis.wilkescounty.net/maps/",
+    "arcgisRest": "https://gis.wilkescounty.net/arcgis/rest/services",
+    "gisDept": "https://wilkescounty.net/640/GIS",
+    "taxAdmin": "https://wilkescounty.net/226/Tax-Administration",
+    "parcelInfo": "https://parcelinfo.wilkescounty.net/",
+    "datalet": "https://parcelinfo.wilkescounty.net/Datalets/Datalet.aspx?UseSearch=no&pin={PARCEL_ID}",
+    "ncptsSearch": "https://lrcpwa.ncptscloud.com/wilkes/parcel-search",
+    "ncptsDetail": "https://lrcpwa.ncptscloud.com/wilkes/parcel-detail/{PIN}",
+    "openData": "https://data3-wilkescountygis.opendata.arcgis.com/",
+    "planning": "https://wilkescounty.net/258/Planning",
+    "ordinances": "https://wilkescounty.net/261/Ordinances",
+    "growthPlan": "https://wilkescounty.net/260/Wilkes-Growth-Plan",
+    "growthPlanPdf": "https://wilkescounty.net/DocumentCenter/View/2172/Growth-Management-Plan---Final",
+    "wilkesboroCompLupPdf": "https://wilkesboronc.org/images/documents/Planning/AdoptedPlans/Comprehensive-LUP-12.10.12.pdf",
+    "wilkesboroFluPdf": "https://wilkesboronc.org/images/documents/Planning/AdoptedPlans/12-4-07-Future-Land-Use-Roads.pdf",
+    "northWilkesboroFluPdf": "https://www.north-wilkesboro.com/DocumentCenter/View/94/Future-Land-Use-Map-PDF",
+    "registerOfDeeds": "https://wilkescounty.net/268/Register-of-Deeds",
+    "ncOneMap": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  },
+  "municipalities": [
+    {
+      "name": "Wilkesboro",
+      "role": "city-first-zoning",
+      "zoningLayer": "HMWebSite/WebMap2023/MapServer/24",
+      "count": 345,
+      "fluRest": false,
+      "notes": "County seat; Comp LUP + FLU PDF"
+    },
+    {
+      "name": "North Wilkesboro",
+      "role": "city-first-zoning",
+      "zoningLayer": "HMWebSite/WebMap2023/MapServer/23",
+      "count": 149,
+      "fluRest": false,
+      "notes": "FLU Map PDF"
+    },
+    {
+      "name": "Elkin",
+      "role": "gap",
+      "notes": "Mostly Surry; no Wilkes zoning FS — use Surry Elkin zoning for Surry side"
+    },
+    {
+      "name": "Ronda",
+      "role": "city-limits-only",
+      "notes": "No public zoning FS"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Parcels (PRIMARY CAMA + sale)",
+      "restUrl": "https://gis.wilkescounty.net/arcgis/rest/services/Parcels/MapServer/0",
+      "alternateUrls": [
+        "https://gis.wilkescounty.net/arcgis/rest/services/HMWebSite/WebMap2023/MapServer/22",
+        "https://gis.wilkescounty.net/arcgis/rest/services/LandRecords/Parcels/MapServer/0",
+        "https://gis.wilkescounty.net/arcgis/rest/services/Parcels_Data/MapServer/0",
+        "https://gis.wilkescounty.net/arcgis/rest/services/Downloads/ParcelforDownload/FeatureServer/0"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TOTALACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "primary": true,
+      "counts": {
+        "total": 52720,
+        "acres5to150": 14800,
+        "salePriceGt0": 26231,
+        "salePriceIn5to150": 6911,
+        "salePriceUnder10MInBand": 6909,
+        "costTotGt0": 52478,
+        "buildingValue0InRange": 6300,
+        "saleDateNotNull": 49240
+      },
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "PIN": "parcelId",
+        "ACCOUNT": "parcelIdAccount",
+        "TOTALACRES": "acreage",
+        "ACRES": "acreage",
+        "OWNER1": "ownerName",
+        "MAILADD1": "mailingAddress",
+        "MAILADD2": "mailingAddress",
+        "CITY": "mailingAddress",
+        "STATE": "mailingAddress",
+        "ZIP": "mailingAddress",
+        "PROPLOCAT": "situsAddress",
+        "COSTLANDVA": "tax.landValue",
+        "COSTBLDGVA": "tax.improvementValue",
+        "COSTTOTVA": "tax.marketValue",
+        "SALEPRICE": "lastSale.price",
+        "SALEDATE": "lastSale.date",
+        "SALE_VALIDITY": "lastSale.qualified",
+        "SALETYPE": "lastSale.type",
+        "BK": "other",
+        "PG": "other",
+        "BOOK_PAGE": "other",
+        "CLASS": "dorCode",
+        "STATECLASS": "dorCode"
+      },
+      "notes": "PRIMARY wire-first TRANCHE-3. MaxRecordCount 1000. CRS 32019 NAD27. Prefer TOTALACRES."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "partial",
+      "filter": "cntyfips='193'",
+      "counts": {
+        "total": 52847,
+        "acres5to150": 14886,
+        "parvalGt0": 52555,
+        "saledateUsable": 52838,
+        "improvval0InRange": 6339
+      },
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "mcity": "mailingAddress",
+        "mstate": "mailingAddress",
+        "mzip": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "saledate": "lastSale.date",
+        "saledatetx": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "cntyfips": "other"
+      },
+      "notes": "No sale price. parno often remapped vs live county PIN — spatial join preferred."
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning - North Wilkesboro (city-first)",
+      "restUrl": "https://gis.wilkescounty.net/arcgis/rest/services/HMWebSite/WebMap2023/MapServer/23",
+      "alternateUrls": [
+        "https://gis.wilkescounty.net/arcgis/rest/services/Planning/Planning/MapServer/6"
+      ],
+      "layerId": 23,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "counts": {
+        "total": 149
+      },
+      "fieldMap": {
+        "ZoningCode": "zoning",
+        "ZoneDescri": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning - Wilkesboro (city-first)",
+      "restUrl": "https://gis.wilkescounty.net/arcgis/rest/services/HMWebSite/WebMap2023/MapServer/24",
+      "alternateUrls": [
+        "https://gis.wilkescounty.net/arcgis/rest/services/Planning/Planning/MapServer/4"
+      ],
+      "layerId": 24,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "counts": {
+        "total": 345
+      },
+      "fieldMap": {
+        "ZoneCode": "zoning",
+        "ZoneDescri": "other"
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Wilkes County Zones (unincorporated)",
+      "restUrl": "https://gis.wilkescounty.net/arcgis/rest/services/HMWebSite/WebMap2023/MapServer/26",
+      "alternateUrls": [
+        "https://gis.wilkescounty.net/arcgis/rest/services/Planning/Planning/MapServer/3",
+        "https://gis.wilkescounty.net/arcgis/rest/services/Planning/Planning/MapServer/1"
+      ],
+      "layerId": 26,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "counts": {
+        "total": 70,
+        "zoningDistricts": 102
+      },
+      "fieldMap": {
+        "ZONE": "zoning",
+        "ALPHA": "other",
+        "District": "zoning"
+      },
+      "notes": "Sparse vs full county; named ALPHA communities (Moravian Falls, Purlear, …) are not full munis"
+    },
+    {
+      "role": "flu",
+      "name": "FLU PDFs (county + cities)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "multi-jurisdiction",
+      "status": "partial",
+      "documents": [
+        "https://wilkescounty.net/DocumentCenter/View/2172/Growth-Management-Plan---Final",
+        "https://wilkesboronc.org/images/documents/Planning/AdoptedPlans/Comprehensive-LUP-12.10.12.pdf",
+        "https://wilkesboronc.org/images/documents/Planning/AdoptedPlans/12-4-07-Future-Land-Use-Roads.pdf",
+        "https://www.north-wilkesboro.com/DocumentCenter/View/94/Future-Land-Use-Map-PDF"
+      ],
+      "notes": "No FLU FeatureServer on county or city hosts"
+    },
+    {
+      "role": "other",
+      "name": "Municipalities",
+      "restUrl": "https://gis.wilkescounty.net/arcgis/rest/services/HMWebSite/WebMap2023/MapServer/11",
+      "layerId": 11,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "counts": {
+        "total": 4
+      },
+      "fieldMap": {
+        "ALPHA": "municipality"
+      },
+      "notes": "WILKESBORO, NORTH WILKESBORO, ELKIN, RONDA"
+    },
+    {
+      "role": "other",
+      "name": "Extra Territorial Jurisdictions",
+      "restUrl": "https://gis.wilkescounty.net/arcgis/rest/services/HMWebSite/WebMap2023/MapServer/25",
+      "layerId": 25,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-adjacent",
+      "status": "usable",
+      "counts": {
+        "total": 9
+      },
+      "fieldMap": {
+        "ALPHA": "other"
+      },
+      "notes": "NWETJ, WETJ"
+    },
+    {
+      "role": "other",
+      "name": "Reval25ViewFC (reval helper)",
+      "restUrl": "https://gis.wilkescounty.net/arcgis/rest/services/Reval25/Reval25ViewFC/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "partial",
+      "counts": {
+        "total": 50981
+      },
+      "fieldMap": {
+        "PARID": "parcelId",
+        "OWN1": "ownerName",
+        "ACRES": "acreage",
+        "CALCACRES": "acreage",
+        "APRTOT": "tax.marketValue",
+        "PRICE": "lastSale.price",
+        "SALEDT": "lastSale.date"
+      },
+      "notes": "Prefer live Parcels/0 for production"
+    }
+  ],
+  "gaps": [
+    "No FLU FeatureServer — Growth Plan + Wilkesboro/NW FLU PDF only",
+    "Elkin/Ronda lack Wilkes zoning FeatureServers (Elkin mostly Surry)",
+    "OneMap parno often remapped vs live county PIN — spatial join preferred",
+    "CRS 32019 NAD27 uncommon vs NAD83 2264 peers",
+    "No situs city/zip on parcel polygons",
+    "Rare SALEPRICE outliers >=$10M in acreage band (2)"
+  ],
+  "license": "Wilkes County GIS / Tax Administration; attribute county (+ towns/High Country COG for zoning). NCGS 132-10 applies to commercial resale.",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 12,
+  "tranche": 3
+}

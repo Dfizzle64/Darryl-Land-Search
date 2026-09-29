@@ -1,0 +1,395 @@
+{
+  "county": "Haywood",
+  "state": "NC",
+  "msa": "Asheville MSA",
+  "fips": "37087",
+  "cntyfips": "087",
+  "slug": "haywood",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "County services use 102719/2264 throughout.",
+  "viewerLinkTemplate": "https://maps.haywoodcountync.gov/gisweb/default.htm",
+  "viewerLinkTemplates": [
+    "https://maps.haywoodcountync.gov/gisweb/default.htm",
+    "https://community.spatialest.com/nc/haywood/#/property/{ALPHA}",
+    "https://lrcpwa.ncptscloud.com/haywood/parcel-detail/{ALPHA}",
+    "https://taxes.haywoodcountync.gov/ITSPublic/TaxBillSearch"
+  ],
+  "appraiserSearchUrl": "https://taxes.haywoodcountync.gov/ITSPublic/AppraisalCard.aspx?id={ALPHA_NO_DASHES}",
+  "appraiserSearchUrlNotes": "Strip hyphens from ALPHA (7688-23-9094 \u2192 7688239094). Verified PDF for 7688239094 = CATALOOCHEE RANCH PROPERTIES LLC with sale 03/30/2020 @ 2644000.",
+  "jurisdictionGisUrl": "https://maps.haywoodcountync.gov/gisweb/default.htm",
+  "joinKeys": [
+    "ALPHA",
+    "parno",
+    "Acct_Nbr",
+    "ParcelNumberFormatted"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "ALPHA",
+        "parno",
+        "Acct_Nbr"
+      ],
+      "bestLayer": "SmartGov/SmartGovTaxView",
+      "notes": "ALPHA PIN for AppraisalCard (no dashes) / Spatialest / NCPTS; join OneMap parno"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "SmartGov/SmartGovTaxView"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "Calc_Acres",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 7115,
+      "bestLayer": "SmartGov/SmartGovTaxView"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Owner_1+Owner_2",
+        "ownname"
+      ],
+      "bestLayer": "SmartGov/SmartGovTaxView"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Addr_1",
+        "Addr_2",
+        "CSZ",
+        "mailadd"
+      ],
+      "bestLayer": "SmartGov/SmartGovTaxView"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "Prop_Addr",
+        "ParcelZIP",
+        "siteadd"
+      ],
+      "bestLayer": "SmartGov/SmartGovTaxView"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "Sale_Date",
+        "Sale_Date_String",
+        "Sale_Price",
+        "VALID_SALE_CODE"
+      ],
+      "bestLayer": "SmartGov/SmartGovTaxView",
+      "notes": "Open_Data Sale_Price>0 \u2192 28814; OneMap has saledate but no price; Qualified_Sales points 4839 (2018-2020)"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "Mkt_Value",
+        "Assd_Value",
+        "Land_Value",
+        "Bldg_Value",
+        "Defer_Value"
+      ],
+      "bestLayer": "SmartGov/SmartGovTaxView"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "city-only",
+      "fields": [
+        "ZONING",
+        "ZONING_DEF",
+        "MAPNAME"
+      ],
+      "bestLayer": "Land_Records/Open_Data/Zoning",
+      "notes": "Cities-first MAPNAME routing; unincorporated unzoned"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "notes": "Waynesville 2035 FLU PDF; Canton Comp Plan; no FLU FeatureServer"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Waynesville",
+      "role": "city-first-zoning",
+      "mapname": "WAYZON.UC",
+      "zoningCount": 81,
+      "fluRest": false,
+      "fluPdf": true
+    },
+    {
+      "name": "Maggie Valley",
+      "role": "city-first-zoning",
+      "mapname": "MAGGIEZO.GCH",
+      "zoningCount": 32,
+      "fluRest": false
+    },
+    {
+      "name": "Canton",
+      "role": "city-first-zoning",
+      "mapname": "CANTON.GCH",
+      "zoningCount": 15,
+      "fluRest": false,
+      "compPlanUrl": "https://www.cantonnc.com/build-a-better-canton-a-blueprint-for-recovery-renewal/"
+    },
+    {
+      "name": "Clyde",
+      "role": "city-first-zoning",
+      "mapname": "CLYDEZON.GCH",
+      "zoningCount": 8,
+      "fluRest": false
+    },
+    {
+      "name": "Unincorporated",
+      "role": "gap",
+      "notes": "No county zoning REST"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "SmartGov TAX_VIEW_SmartGov",
+      "restUrl": "https://maps.haywoodcountync.gov/arcgis/rest/services/SmartGov/SmartGovTaxView/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Calc_Acres",
+      "coverage": "county-wide",
+      "count": 53187,
+      "acres5to150": 7115,
+      "status": "usable",
+      "primary": true
+    },
+    {
+      "role": "parcels",
+      "name": "Open_Data Parcels",
+      "restUrl": "https://maps.haywoodcountync.gov/arcgis/rest/services/Land_Records/Open_Data/MapServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Calc_Acres",
+      "coverage": "county-wide",
+      "count": 50525,
+      "acres5to150": 6207,
+      "salePricePositive": 28814,
+      "status": "usable",
+      "notes": "MaxRecordCount 100000; count lags SmartGov during transition"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "filter": "cntyfips='087'",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "count": 53178,
+      "acres5to150": 7104,
+      "status": "partial"
+    },
+    {
+      "role": "sales",
+      "name": "Qualified Sales 2018-2020",
+      "restUrl": "https://maps.haywoodcountync.gov/arcgis/rest/services/Land_Records/Qualified_Sales/MapServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "count": 4839,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Municipal Zoning (MAPNAME cities-first)",
+      "restUrl": "https://maps.haywoodcountync.gov/arcgis/rest/services/Land_Records/Open_Data/MapServer/9",
+      "layerId": 9,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 140,
+      "byMunicipality": {
+        "Waynesville": 81,
+        "Maggie Valley": 32,
+        "Canton": 15,
+        "Clyde": 8
+      },
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Municipal Boundaries",
+      "restUrl": "https://maps.haywoodcountync.gov/arcgis/rest/services/Land_Records/Open_Data/MapServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "count": 16,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Waynesville FLU PDF",
+      "restUrl": null,
+      "coverage": "city-only",
+      "status": "gap",
+      "pdfUrl": "https://www.waynesvillenc.gov/sites/default/files/Lettersize_FLU_2020_07_14_ForPackage.pdf"
+    }
+  ],
+  "portals": {
+    "jurisdictionGis": "https://maps.haywoodcountync.gov/gisweb/default.htm",
+    "gisHome": "https://maps.haywoodcountync.gov/",
+    "openDataHub": "https://opendata-hayco.hub.arcgis.com/",
+    "downloads": "https://maps.haywoodcountync.gov/downloads/default.aspx",
+    "restRoot": "https://maps.haywoodcountync.gov/arcgis/rest/services",
+    "spatialest": "https://community.spatialest.com/nc/haywood/",
+    "ncptsSearch": "https://lrcpwa.ncptscloud.com/haywood/parcel-search",
+    "taxBillSearch": "https://taxes.haywoodcountync.gov/ITSPublic/TaxBillSearch",
+    "landRecordsDept": "https://www.haywoodcountync.gov/203/Land-Records-Geographic-Information-Serv"
+  },
+  "gaps": [
+    "Unincorporated Haywood has no county zoning polygons on public REST",
+    "No public FLU FeatureServer (Waynesville/Canton PDF/plan only)",
+    "Open_Data parcel count lags SmartGov/OneMap during Land Records software transition",
+    "OneMap has sale date but no sale price",
+    "Utilities / AADT / emails / phones / paid vendors excluded by design"
+  ],
+  "license": "Haywood County Land Records/GIS; NCGS 132-10 commercial resale limits; attribute Haywood County GIS",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "verifiedLayerCount": 12,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://maps.haywoodcountync.gov/arcgis/rest/services/SmartGov/SmartGovTaxView/FeatureServer/0",
+    "parcelIdField": "ALPHA",
+    "acreageFilter": "Calc_Acres >= 5 AND Calc_Acres <= 150",
+    "acres5to150Live": 5765,
+    "parcelCountLive": 51574,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='HAYWOOD'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27HAYWOOD%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27HAYWOOD%27&returnCountOnly=true&f=json",
+        "liveStationCount": 344,
+        "stationsWithAADT2022": 305
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Haywood'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Haywood%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Haywood%27&returnCountOnly=true&f=json",
+        "liveStationCount": 343,
+        "stationsWithAADT2025": 45,
+        "stationsWithAADT2024": 278,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "Mkt_Value",
+        "Assd_Value"
+      ],
+      "allTaxFieldsOnLayer": [
+        "Mkt_Value",
+        "Assd_Value",
+        "Land_Value",
+        "Bldg_Value",
+        "Defer_Value"
+      ],
+      "liveNonZero": {
+        "Mkt_Value": 44838,
+        "Assd_Value": 44838
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "Sale_Price"
+      ],
+      "dateFields": [
+        "Sale_Date"
+      ],
+      "livePriceNonZero": {
+        "Sale_Price": 26040
+      },
+      "liveDateNonNull": {
+        "Sale_Date": 45326
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Owner_1",
+        "Owner_2"
+      ],
+      "primaryOwnerField": "Owner_1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(Owner_1) LIKE '% LLC%' OR UPPER(Owner_1) LIKE '% INC%' OR UPPER(Owner_1) LIKE '% LP%' OR UPPER(Owner_1) LIKE '% LLP%' OR UPPER(Owner_1) LIKE '% LTD%' OR UPPER(Owner_1) LIKE '% TRUST%' OR UPPER(Owner_1) LIKE '% CHURCH%' OR UPPER(Owner_1) LIKE '% COMPANY%' OR UPPER(Owner_1) LIKE '% PARTNERSHIP%' OR UPPER(Owner_1) LIKE '% HOLDINGS%' OR UPPER(Owner_1) LIKE '% PROPERTIES%' OR UPPER(Owner_1) LIKE '% CORP%' OR UPPER(Owner_1) LIKE '%,LLC%' OR UPPER(Owner_1) LIKE '%,INC%' OR UPPER(Owner_1) LIKE 'CITY OF %' OR UPPER(Owner_1) LIKE 'COUNTY OF %' OR UPPER(Owner_1) LIKE 'STATE OF %' OR UPPER(Owner_1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 5369,
+      "liveEntityCount5to150ac": 748,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://taxes.haywoodcountync.gov/ITSPublic/AppraisalCard.aspx?id={ALPHA}",
+      "testedParcelId": "7695442942",
+      "testedUrl": "https://taxes.haywoodcountync.gov/ITSPublic/AppraisalCard.aspx?id=7695442942",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://maps.haywoodcountync.gov/gisweb/default.htm",
+      "httpStatus": 200,
+      "pageTitle": "Haywood County GIS"
+    },
+    "gaps": []
+  }
+}

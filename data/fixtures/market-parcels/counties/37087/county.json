@@ -1,0 +1,29 @@
+{
+  "name": "Haywood",
+  "fips": "37087",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 5393,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-haywood-parcels-37087",
+  "queryUrl": "https://maps.haywoodcountync.gov/arcgis/rest/services/SmartGov/SmartGovTaxView/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are SmartGov TAX_VIEW_SmartGov (CAMA + polygons) (https://maps.haywoodcountync.gov/arcgis/rest/services/SmartGov/SmartGovTaxView/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 5765 rows; 5393 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 344 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37087/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37087/lookup.json",
+  "sourceCount": 5765,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://taxes.haywoodcountync.gov/ITSPublic/AppraisalCard.aspx?id={ALPHA}",
+  "gisViewerUrl": "https://maps.haywoodcountync.gov/gisweb/default.htm"
+}

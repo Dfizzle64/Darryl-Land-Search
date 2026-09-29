@@ -1,0 +1,417 @@
+state: NC
+jurisdiction: Granville County
+fips: "37077"
+slug: granville
+level: county
+markets: [Raleigh-Durham]
+
+municipalities:
+  - name: Oxford
+    localGis: county AGOL city-first layer OxfordZoning2024 + Oxford Parcel Viewer experience
+    zoningSource: Granville_Static/FeatureServer/45 (Zoning)
+    fluSource: county Granville_FLU/11 (countywide FLU polygons)
+  - name: Butner
+    localGis: county AGOL Butner_Zoning + Butner Parcel Viewer experience
+    zoningSource: Granville_Static/FeatureServer/43 (NewZone)
+    fluSource: county Granville_FLU/11
+  - name: Creedmoor
+    localGis: county AGOL CreedmoorZoning + overlay + Creedmoor Parcel Viewer
+    zoningSource: Granville_Static/FeatureServer/24 (Zoning_Typ); overlay /47
+    fluSource: county Granville_FLU/11
+  - name: Stem
+    localGis: Stem Parcel Viewer experience only — no dedicated zoning FeatureServer
+    zoningSource: gap (GC_ZONING placeholder STEM PLANNING AND ZONING AREA)
+    fluSource: county Granville_FLU/11
+  - name: Stovall
+    localGis: county AGOL Stovall_Zoning + Stovall Parcel Viewer
+    zoningSource: Granville_Static/FeatureServer/50 (NAME)
+    fluSource: county Granville_FLU/11
+
+layers:
+  - role: parcels
+    name: Granville_Service Parcels_Polygon (PRIMARY)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Service/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: Cal_Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelIdPin
+      Parcel: parcelId
+      PRODNO: parcelIdProdno
+      RECN: parcelIdRecn
+      MAPN: mapsheet
+      Cal_Acres: acreage
+      LandUnits: acreageLandUnits
+      LandUnitsType: acreageLandUnitsType
+      OwnerName1: ownerName
+      OwnerName2: ownerName2
+      AddressLine1: mailingAddress.street
+      AddressLine2: mailingAddress.street2
+      AddressLine3: mailingAddress.street3
+      City: mailingAddress.city
+      State: mailingAddress.state
+      Zip: mailingAddress.zip
+      FormattedPropertyAddress: situsAddress
+      LegalDescription: legalDescription
+      DeedDate: lastSale.date
+      DeedBookPage: lastSale.deedBookPage
+      SalePrice: lastSale.price
+      MarketValue: tax.marketValue
+      LandValue: tax.landValue
+      BuildingValue: tax.improvementValue
+      ObxfValue: tax.obxfValue
+      AssessedValue: tax.assessedValue
+      DeferredValue: tax.deferredValue
+      Zoning: zoningStub
+      Township: township
+      TaxCode01: taxCode01
+      PRC: propertyRecordCardCode
+    notes: >
+      PRIMARY verified 2026-09-24: count 34898; Cal_Acres 5–150 → 7186;
+      SalePrice>0 → 20969; FormattedPropertyAddress populated → 34756.
+      CRS 102719/2264. Rich CAMA on polygon: owner, mailing, situs, sale
+      price, market/land/building/assessed/deferred, deed date/book-page.
+      Parcel Zoning attribute is EMPTY on live query — spatial-join city/
+      county zoning layers. PIN hyphenated (e.g. 1928-92-4000); Parcel
+      12-digit (e.g. 192820924000) for ITSPublic deep-link. MaxRecordCount
+      1000 — paginate. Web maps sometimes label Parcels as layer 9 (that
+      id is Townships); authoritative parcels = layer 8. Host org
+      services8…/dT3Tew5pivPd2bWH (owner sandy.woody).
+    status: usable
+
+  - role: other
+    name: AddressPoints (situs / NG911)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Service/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      SITUSADRS: situsAddress
+      Add_Number: situsAddress.number
+      St_Name: situsAddress.street
+      St_PosType: situsAddress.streetType
+      St_PreDir: situsAddress.prefix
+      St_PosDir: situsAddress.suffix
+      Unit_Numbe: situsAddress.unit
+      City: situsCity
+      Zip: situsZip
+      IncMuni: municipality
+      MSAGComm: msagCommunity
+      TOWNSHIP: township
+    notes: >
+      Verified count 30228. Prefer when unit/multi-point situs needed;
+      parcels already carry FormattedPropertyAddress.
+    status: usable
+
+  - role: zoning
+    name: GC_ZONING (county base + muni planning-area stubs)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/26
+    layerId: 26
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECODE: zoning
+      ADMENDMENT: zoningAmendment
+      DATE_ADOPT: zoningDateAdopted
+      DATE_MAPPE: zoningDateMapped
+    notes: >
+      Verified count 177. Districts: AR-40, AR-80, ASE-CZ, HB, I-1, I-2,
+      MHPD, NB, O-I, R-25; plus stubs BUTNER/CREEDMOOR/OXFORD/STEM/STOVALL
+      PLANNING AND ZONING AREA and ZONING CONTROLLED BY THE STATE. Prefer
+      city layers inside those stubs. CRS 2264. Geo-verified AR-40 sample
+      centroid (−78.79, 36.08) in Granville.
+    status: usable
+
+  - role: zoning
+    name: Oxford Zoning 2024 (city-first)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/45
+    layerId: 45
+    geometry: polygon
+    auth: none
+    acreageField: Cal_Acres
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      PIN: parcelIdPin
+      Parcel: parcelId
+      Cal_Acres: acreage
+      OwnerName1: ownerName
+      SalePrice: lastSale.price
+      MarketValu: tax.marketValue
+    notes: >
+      Verified count 6857; Zoning populated → 5434. Districts: CBD, GR10,
+      GR3, GR5, HB, HI, IPD, LI, NB, OI, PUD, RA. Parcel-keyed with CAMA
+      attrs. Geo-verified GR5 sample (−78.59, 36.30) in Oxford. Prefer over
+      GC_ZONING Oxford stub.
+    status: usable
+
+  - role: zoning
+    name: Creedmoor Zoning (city-first)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: Cal_Acres
+    coverage: city-only
+    fieldMap:
+      Zoning_Typ: zoning
+      Cal_Acres: acreage
+      Status: zoningStatus
+    notes: >
+      Verified count 75. Types: AG, C-15, C-56, CIV, CZ, IND, MS, MSP, OSP,
+      R/MST, SFR. Overlay companion: Granville_Static/47 (count 6). Also
+      CreedmoorCityLimitWithETJ /23.
+    status: usable
+
+  - role: zoning
+    name: Butner Zoning (city-first)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/43
+    layerId: 43
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      NewZone: zoning
+      NewZone_1: zoningAlt
+      ACRES: acreage
+      Acreage: acreageAlt
+    notes: >
+      Verified count 228. Districts: CB, CD-LI, CD-OI, CD-HB, CD-HI, CD-RMF,
+      CE, CX, HB, HI, LI, NB, NI, OI, PUD, RMF, RMX, RP, RR, RS, RT, SI.
+      Geo-verified NB sample (−78.74, 36.19). ButnerETJ /41 for ETJ routing.
+    status: usable
+
+  - role: zoning
+    name: Stovall Zoning (city-first)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/50
+    layerId: 50
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      NAME: zoning
+      NAME_ABB: zoningAbbrev
+    notes: >
+      Verified count 42. Districts: Central Commercial, Highway Commercial,
+      Light Industrial, Residential District & Manufactured Homes,
+      Residential Distriict (sic), Residential-Agricultural.
+    status: usable
+
+  - role: flu
+    name: Granville Future Land Use (FLU)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_FLU/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+      ACRES: acreage
+      CO_NAME: countyName
+      Value: fluCodeNum
+    notes: >
+      Verified count 109. Categories: COM, CON-RES, IND, MED-RES, MIX-USE,
+      MXU, PARK, R-COM, R-RES, STATE, SUB-RES, SUBRES, WATER BODY. CRS 2264.
+      Geo-verified SUB-RES centroid (−78.72, 36.10) in Granville. No separate
+      city FLU FeatureServers found — this is the public FLU surface.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='077'. Verified count 34602; gisacres 5–150 → 7161;
+      siteadd populated → 34486; parval>0 → 34511. No sale price on OneMap —
+      use county SalePrice. parno aligns with county Parcel. Alternate host
+      services.gis.nc.gov. MaxRecordCount 5000. Geo-verified sample centroid
+      (−78.56, 36.45) in Granville.
+    status: partial
+
+  - role: other
+    name: City_Limits
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/42
+    layerId: 42
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+    notes: >
+      Verified count 18 multipart features; CITY: BUTNER, CREEDMOOR, OXFORD,
+      STEM, STOVALL. Route zoning joins by CITY.
+    status: usable
+
+  - role: other
+    name: ETJ2025
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/38
+    layerId: 38
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified count 1. Also ButnerETJ /41, CreedmoorCityLimitWithETJ /23,
+      City_of_Oxford /39, ProposedETJExpansion /40 for finer ETJ routing.
+    status: usable
+
+  - role: other
+    name: Voluntary Agricultural Districts (VAD)
+    restUrl: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_VAD/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      VAD parcels overlay; also mirrored Granville_Static/44. Not zoning —
+      use as constraint/overlay only.
+    status: usable
+
+gaps:
+  - Stem — no dedicated public zoning FeatureServer; GC_ZONING only has STEM PLANNING AND ZONING AREA stub
+  - Parcel layer Zoning attribute is empty on live REST — always spatial-join district layers
+  - No independent municipal ArcGIS hosts for Oxford/Butner/Creedmoor/Stem/Stovall — city zoning published on county AGOL
+  - City-specific FLU FeatureServers not found — county Granville_FLU/11 is the public FLU surface
+  - ITSPublic ViewParcel property card is AJAX/POST — durable GET deep-links are RealEstateSearch/Parcel/{Parcel} and TaxBillSearch/Parcel/{Parcel}
+  - Web maps mislabel Parcels as Granville_Service/9 (actually Townships) — use layer 8
+  - MaxRecordCount 1000 on county AGOL layers — paginate
+  - NC OneMap lacks SalePrice — prefer county parcels for lastSale.price
+  - No phones/emails collected; no paid vendors; utilities and AADT out of scope
+
+license: "Granville County public AGOL (sandy.woody / services8…/dT3Tew5pivPd2bWH) + NC OneMap; attribution recommended; not survey grade"
+appraiserSearchUrl: https://tax.granvillecounty.org/ITSPublic/RealEstateSearch
+appraiserDeepLinkTemplate: "https://tax.granvillecounty.org/ITSPublic/RealEstateSearch/Parcel/{Parcel}"
+taxBillDeepLinkTemplate: "https://tax.granvillecounty.org/ITSPublic/TaxBillSearch/Parcel/{Parcel}"
+viewerUrl: https://experience.arcgis.com/experience/9fb947310691479b8a2468d86316e8de
+publicGisUrl: https://www.granvillecounty.org/259/GIS-Geographic-Information-System
+openDataUrl: https://granville-county-granvillecounty.hub.arcgis.com/
+gisRestRoot: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services
+taxDeptUrl: https://www.granvillecounty.org/238/Tax-Administration
+taxBillSearchUrl: https://tax.granvillecounty.org/ITSPublic/TaxBillSearch
+taxDatabaseDownloadsUrl: https://www.granvillecounty.org/898/Tax-Database-Downloads
+planningZoningUrl: https://www.granvillecounty.org/335/Planning-Zoning
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Service/FeatureServer/8
+  parcelIdField: Parcel
+  acreageFilter: Cal_Acres >= 5 AND Cal_Acres <= 150
+  acres5to150Live: 7186
+  parcelCountLive: 34898
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='GRANVILLE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GRANVILLE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GRANVILLE%27&returnCountOnly=true&f=json
+      liveStationCount: 399
+      stationsWithAADT2022: 222
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Granville'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Granville%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Granville%27&returnCountOnly=true&f=json
+      liveStationCount: 397
+      stationsWithAADT2025: 288
+      stationsWithAADT2024: 221
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Granville'
+      stations2024LiveCount: 397
+      stations2024WithAADT2024: 397
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - MarketValue
+    - AssessedValue
+    liveNonZero:
+      MarketValue: 34790
+      AssessedValue: 34790
+    status: ok
+  sale:
+    priceFields:
+    - SalePrice
+    dateFields:
+    - DeedDate
+    livePriceNonZero:
+      SalePrice: 20969
+    liveDateNonNull:
+      DeedDate: 33094
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - OwnerName1
+    - OwnerName2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 1066
+    liveEntityCount5to150acExtended: 1260
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - RICE FAMILY TRUST
+    - RED HILL PLANTATION LLC
+    - AUGUSTA FARMS LLC
+    - AUGUSTA FARMS LLC
+  paDeepLink:
+    template: https://tax.granvillecounty.org/ITSPublic/RealEstateSearch/Parcel/{Parcel}
+    testedParcelId: '183400314774'
+    testedUrl: https://tax.granvillecounty.org/ITSPublic/RealEstateSearch/Parcel/183400314774
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Parcel id found in the response body.
+  gisViewer:
+    url: https://experience.arcgis.com/experience/9fb947310691479b8a2468d86316e8de
+    httpStatus: 200
+    pageTitle: Experience
+  gaps: []

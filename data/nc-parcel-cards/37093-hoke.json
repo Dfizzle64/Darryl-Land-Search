@@ -1,0 +1,354 @@
+{
+  "state": "NC",
+  "jurisdiction": "Hoke County",
+  "county": "Hoke",
+  "fips": "37093",
+  "level": "county",
+  "markets": [
+    "Fayetteville"
+  ],
+  "msa": "Fayetteville",
+  "slug": "hoke",
+  "cntyfips": "093",
+  "crsPreferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://maps.hokecounty.org/maps/",
+  "publicGisUrl": "https://maps.hokecounty.org/maps/",
+  "gisViewerUrl": "https://maps.hokecounty.org/maps/",
+  "viewerDeepLinkTemplate": "https://maps.hokecounty.org/maps/?TWN_PIN={TWN_PIN}",
+  "viewerDeepLinkTemplateAlt": "https://maps.hokecounty.org/maps/default.htm?TWN_PIN={TWN_PIN}",
+  "countyRestRoot": "https://maps.hokecounty.org/server/rest/services",
+  "propertySearchGisUrl": "https://www.hokecounty.net/211/Property-Search---GIS",
+  "taxAdministrationUrl": "https://www.hokecounty.net/209/Taxes",
+  "payBillUrl": "https://www.hokecounty.net/210/Pay-Your-Bill",
+  "appraiserSearchUrl": "https://maps.hokecounty.org/HokeCountyTaxCards/Default.aspx",
+  "paDeepLinkTemplate": "https://maps.hokecounty.org/HokeCountyTaxCards/Default.aspx?Id={TWN_PIN}-",
+  "paDeepLinkTemplatePdf": "https://maps.hokecounty.org/TaxCards/{TWN_PIN}-01.pdf",
+  "paDeepLinkKey": "TWN_PIN",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/hoke/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/hoke/parcel-detail/{TWN_PIN}",
+  "landUsePlanPdfUrl": "https://hokecounty.net/DocumentCenter/View/63/Hoke-County-Land-Use-Plan",
+  "landUsePlanUpdateUrl": "https://planhokecounty.com/",
+  "raefordPlanningUrl": "https://www.raefordcity.org/planning-zoning/",
+  "oneMapFilter": "cntyfips='093'",
+  "parcelIdPreferred": "TWN_PIN",
+  "joinKeys": [
+    "TWN_PIN",
+    "MAP_BLK_LO",
+    "parno"
+  ],
+  "municipalities": [
+    {
+      "name": "Raeford",
+      "role": "city-first-zoning",
+      "zoneValue": "RAEFORD",
+      "zoningCount": 3330,
+      "cityPolygonCount": 3,
+      "planningUrl": "https://www.raefordcity.org/planning-zoning/",
+      "notes": "County seat; ZONE='RAEFORD' stub on county Overlays Zoning; gate with OperationalLayers/12; no separate city zoning FS with district codes"
+    },
+    {
+      "name": "Fort Liberty (Fort Bragg Military Reservation)",
+      "role": "township-federal",
+      "notes": "Overlays Townships NAME; limited private CAMA"
+    },
+    {
+      "name": "Rockfish",
+      "role": "cdp-unincorporated",
+      "notes": "County RA-20 etc.; no separate muni zoning REST"
+    },
+    {
+      "name": "Five Points",
+      "role": "cdp-unincorporated",
+      "notes": "County zoning only"
+    },
+    {
+      "name": "Ashley Heights",
+      "role": "cdp-unincorporated",
+      "notes": "County zoning only"
+    },
+    {
+      "name": "Silver City",
+      "role": "cdp-unincorporated",
+      "notes": "County zoning only"
+    },
+    {
+      "name": "Bowmore",
+      "role": "cdp-unincorporated",
+      "notes": "County zoning only"
+    }
+  ],
+  "zoningInventory": {
+    "RA-20": 11737,
+    "RAEFORD": 3330,
+    "HC": 181,
+    "R-8": 59,
+    "I": 56,
+    "NB": 43,
+    "R-15": 28,
+    "RMH": 22,
+    "RMF": 20,
+    "CZ-NB": 1,
+    "total": 15477
+  },
+  "townships": [
+    "Allendale",
+    "Antioch",
+    "Blue Springs",
+    "Fort Bragg Military Reservation",
+    "McLauchlin",
+    "Quewhiffle",
+    "Raeford",
+    "Stonewall"
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Hoke County AGOL Parcels June2025 (PRIMARY geometry \u2014 Pass 1 fix)",
+      "restUrl": "https://services1.arcgis.com/7LEXuvWjhz6cyraH/arcgis/rest/services/June2025/FeatureServer/1",
+      "alternateUrls": [
+        "https://services1.arcgis.com/7LEXuvWjhz6cyraH/arcgis/rest/services/June2025Map_WFL1/FeatureServer/1",
+        "https://services1.arcgis.com/7LEXuvWjhz6cyraH/arcgis/rest/services/TESTOCTOBER2_WFL1/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TOTAL_ACRE",
+      "coverage": "county-wide",
+      "status": "usable",
+      "primary": true,
+      "counts": {
+        "total": 30121,
+        "twnPinNonEmpty": 30121,
+        "acres5to150": 3743
+      },
+      "fieldMap": {
+        "TWN_PIN": "parcelId",
+        "PIN": "parcelIdAlt",
+        "LABEL": "parcelLabel",
+        "TOWNSHIP": "township",
+        "TOTAL_ACRE": "acreage",
+        "CALCULATED": "acreageCalculated"
+      },
+      "notes": "Rural-OZ Pass 1 (2026-09-28) PRIMARY geometry source. The county server queries are failing. This is the Hoke County GIS public AGOL layer (owner ddudley_HokeCountyNC; data last edited 2025-06-27). No token needed. Count 30121. TWN_PIN is populated on all 30121. TOTAL_ACRE 5\u2013150 \u2192 3743. Sample TWN_PIN 494540001006 \u2248 -79.139, 34.986 (Raeford). Fields: PIN, TOWNSHIP, TWN_PIN, LABEL, CALCULATED, TOTAL_ACRE. NO owner/mailing/tax/deed. OneMap CAMA is also empty for Hoke, so owner/tax is a gap until county Parcels/0 recovers. Alternates: June2025Map_WFL1/1 (same data), TESTOCTOBER2_WFL1/1 (30184, CALCULATED_ACRES).",
+      "verifiedAt": "2026-09-28"
+    },
+    {
+      "role": "parcels",
+      "name": "Parcels (PRIMARY CAMA)",
+      "restUrl": "https://maps.hokecounty.org/server/rest/services/Parcels/MapServer/0",
+      "alternateUrls": [
+        "https://maps.hokecounty.org/server/rest/services/OperationalLayers/MapServer/6"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TOTAL_ACRE",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "TWN_PIN": "parcelId",
+        "MAP_BLK_LO": "parcelIdMap",
+        "LABEL": "parcelLabel",
+        "OWNER_NAME": "ownerName",
+        "OWNER_NA_1": "ownerName2",
+        "MAILING_AD": "mailingAddress.street",
+        "MAILING__1": "mailingAddress.street2",
+        "CITY": "mailingAddress.city",
+        "STATE_OR_C": "mailingAddress.state",
+        "ZIP_CODE": "mailingAddress.zip",
+        "PHY_ADDRES": "situsAddress",
+        "STREET_NUM": "situsAddress.number",
+        "STREET_NAM": "situsAddress.street",
+        "TOTAL_ACRE": "acreage",
+        "CAL_ACRES": "acreageCalculated",
+        "COST_TOTAL": "tax.marketValue",
+        "DEED_DATE": "lastSale.date",
+        "DEED_DATE2": "lastSale.dateText",
+        "DEED_BOOK": "lastSale.deedBook",
+        "DEED_PAGE": "lastSale.deedPage",
+        "CARD_PATH": "paCardPathLocal",
+        "TWNSH": "township",
+        "STATUS": "status"
+      },
+      "verifiedCounts": {
+        "total": 29570,
+        "totalAcre_5_150": 3190,
+        "calAcres_5_150": 3170,
+        "ownerName": 29475,
+        "costTotalGt0": 29469,
+        "deedDateGt0": 29465,
+        "cardPath": 29475,
+        "phyAddress": 29376
+      },
+      "geoChecks": [
+        {
+          "TWN_PIN": "494640001285",
+          "lon": -79.13,
+          "lat": 34.977
+        },
+        {
+          "TWN_PIN": "183990001001",
+          "lon": -79.345,
+          "lat": 34.839
+        }
+      ],
+      "notes": "2026-09-28 live check: every query on maps.hokecounty.org (Parcels/0, OperationalLayers/6, Overlays/4) returns HTTP 400 'Unable to complete operation. Bad login user'. That is a server-side DB-connection fault, not a token wall. Layer f=json still loads. Was PRIMARY; re-promote once queries recover. PRIMARY wire-first. CRS 102719/2264. MaxRecordCount 1000. FeatureServer not enabled. NO SALE_PRICE \u2014 COST_TOTAL is assessed/cost total. Prefer Parcels/0 over OperationalLayers/6.",
+      "status": "blocked",
+      "primary": false
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (geometry fallback)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+        "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "recareano",
+      "coverage": "county-wide",
+      "filter": "cntyfips='093'",
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "nparno": "parcelIdNational",
+        "ownname": "ownerNameEmpty",
+        "mailadd": "mailingAddress.streetEmpty",
+        "siteadd": "situsAddressEmpty",
+        "gisacres": "acreageBroken",
+        "recareano": "acreage",
+        "landval": "tax.landValueEmpty",
+        "improvval": "tax.improvementValueEmpty",
+        "parval": "tax.marketValueEmpty",
+        "saledate": "lastSale.dateEmpty",
+        "cntyfips": "countyFips"
+      },
+      "verifiedCounts": {
+        "total": 30524,
+        "parno": 30524,
+        "recareanoGt0": 30524,
+        "recareano_5_150": 3714,
+        "ownname": 0,
+        "siteadd": 0,
+        "parvalGt0": 0,
+        "gisacresGt0": 0
+      },
+      "notes": "Geometry + parno/recareano only for Hoke. Do not wire CAMA from OneMap. MaxRecordCount 5000.",
+      "status": "partial"
+    },
+    {
+      "role": "zoning",
+      "name": "Overlays Zoning (cities-first ZONE) PRIMARY",
+      "restUrl": "https://maps.hokecounty.org/server/rest/services/Overlays/MapServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "fieldMap": {
+        "ZONE": "zoning"
+      },
+      "verifiedCounts": {
+        "total": 15477
+      },
+      "notes": "Cities-first: ZONE='RAEFORD' (~3330) for City of Raeford; RA-20 (~11737) unincorp primary. Spatial join. Raeford district codes not on REST.",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Raeford City limits (city-first gate)",
+      "restUrl": "https://maps.hokecounty.org/server/rest/services/OperationalLayers/MapServer/12",
+      "alternateUrls": [
+        "https://maps.hokecounty.org/server/rest/services/OperationalLayers/MapServer/11",
+        "https://maps.hokecounty.org/server/rest/services/OperationalLayers/MapServer/9"
+      ],
+      "layerId": 12,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "fieldMap": {
+        "LAYER": "municipality"
+      },
+      "verifiedCounts": {
+        "total": 3
+      },
+      "notes": "LAYER=RAEFORD. Pair with ZONE='RAEFORD'. Limit Line/11; Jurisdiction/9 query flaky.",
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Townships",
+      "restUrl": "https://maps.hokecounty.org/server/rest/services/Overlays/MapServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "fieldMap": {
+        "NAME": "township"
+      },
+      "verifiedCounts": {
+        "total": 8
+      },
+      "notes": "Includes Fort Bragg Military Reservation.",
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Land Use Plan \u2014 PDF only",
+      "restUrl": null,
+      "alternateUrls": [
+        "https://hokecounty.net/DocumentCenter/View/63/Hoke-County-Land-Use-Plan",
+        "https://planhokecounty.com/"
+      ],
+      "layerId": null,
+      "geometry": "none",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "fieldMap": {},
+      "notes": "No public FLU FeatureServer. 2005 LUP PDF (~7 MB) + 2025 update at planhokecounty.com.",
+      "status": "gap"
+    }
+  ],
+  "gaps": [
+    "2026-09-28: county REST maps.hokecounty.org queries are failing ('Bad login user'), which takes out Parcels/0, OperationalLayers/6 and Overlays/4 zoning. Parcels switched to county AGOL June2025/FeatureServer/1 (geometry + TWN_PIN + TOTAL_ACRE only). Owner/tax/deed are unavailable until the county server recovers (OneMap CAMA is empty for Hoke).",
+    "Sale price not on public ArcGIS REST (deed date/book/page only; COST_TOTAL is assessed/cost)",
+    "FLU FeatureServer gap \u2014 Land Use Plan PDF + 2025 update site only",
+    "OneMap CAMA empty for Hoke (ownname/siteadd/parval/saledate/gisacres) \u2014 geometry fallback only",
+    "Raeford city zoning district codes not on REST (ZONE='RAEFORD' catch-all stub)",
+    "Parcels FeatureServer not enabled \u2014 MapServer only; MaxRecordCount 1000",
+    "OperationalLayers/6 Parcels mirror queries sometimes fail \u2014 use Parcels/0",
+    "NCPTS SPA may use internal id; verified PA is Tax Card Viewer/PDF by TWN_PIN",
+    "Utilities / AADT / emails / phones / paid vendors out of scope"
+  ],
+  "license": "Hoke County public GIS (maps.hokecounty.org) + Tax Card Viewer + NC OneMap; attribution as required; ConnectGIS disclaimer \u2014 not survey grade; zoning designations must be verified with Planning staff.",
+  "gisPortalUrl": "https://maps.hokecounty.org/maps/",
+  "viewerLinkTemplate": "https://maps.hokecounty.org/HokeCountyTaxCards/Default.aspx?Id={TWN_PIN}-",
+  "viewerLinkTemplatePdf": "https://maps.hokecounty.org/TaxCards/{TWN_PIN}-01.pdf",
+  "viewerLinkTemplateGis": "https://maps.hokecounty.org/maps/?TWN_PIN={TWN_PIN}",
+  "viewerLinkTemplateNcpts": "https://lrcpwa.ncptscloud.com/hoke/parcel-detail/{TWN_PIN}",
+  "tranche3": {
+    "taxSaleOwner": true,
+    "paDeepLinkWithParcelId": true,
+    "jurisdictionGisUrl": true,
+    "parcelsZoningFlu": true,
+    "notes": "Tax/owner on Parcels COST_TOTAL+OWNER_NAME; deed/sale date DEED_DATE; sale price REST gap; PA Default.aspx?Id={TWN_PIN}- (+ PDF); jurisdiction GIS maps.hokecounty.org/maps/; cities-first ZONE RAEFORD; FLU PDF gap."
+  },
+  "verifiedAt": "2026-09-28",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass1RuralOz": {
+    "date": "2026-09-28",
+    "status": "fixed",
+    "parcelLayer": "https://services1.arcgis.com/7LEXuvWjhz6cyraH/arcgis/rest/services/June2025/FeatureServer/1",
+    "parcelIdField": "TWN_PIN",
+    "acreageField": "TOTAL_ACRE",
+    "count": 30121
+  }
+}

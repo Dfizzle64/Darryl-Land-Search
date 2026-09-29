@@ -1,0 +1,29 @@
+{
+  "name": "Greene",
+  "fips": "37079",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 3557,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-greene-parcels-37079",
+  "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Greene_Service/FeatureServer/4/query",
+  "gaps": [
+    "Parcels are Greene_Service TaxParcels (PRIMARY CAMA) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Greene_Service/FeatureServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3604 rows; 3557 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 259 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37079/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37079/lookup.json",
+  "sourceCount": 3604,
+  "dropped": 6,
+  "tileCount": 5,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://dl.agd.cc/prc/nc/greene/{parcelId}01.pdf",
+  "gisViewerUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=336dd11e889546b7806dded487e3fc57"
+}

@@ -1,0 +1,408 @@
+state: NC
+jurisdiction: Jackson County
+fips: "37099"
+level: county
+markets: [Asheville]
+slug: jackson
+cntyfips: "099"
+
+municipalities:
+  - name: Sylva
+    role: city-first-zoning
+    zoningLayer: Planning/Sylva_Zoning/FeatureServer/3
+    count: 11
+    notes: County seat; overlays + ETJ; no independent FLU REST
+  - name: Dillsboro
+    role: city-first-zoning
+    zoningLayer: Planning/Dillsboro_Zoning/FeatureServer/0
+    count: 9
+  - name: Forest Hills
+    role: city-first-zoning
+    zoningLayer: Planning/Forest_Hills_Zoning_Districts/FeatureServer/0
+    count: 8
+    notes: Village; ETJ polys
+  - name: Webster
+    role: city-first-zoning
+    zoningLayer: Planning/Webster_Zoning_Districts/FeatureServer/0
+    count: 3
+    notes: Energov Jurisdiction count 4 incl ETJ
+  - name: Cullowhee
+    role: county-community-planning-area
+    zoningLayer: Planning/Cullowhee_Zoning_District_Cached/FeatureServer/0
+    count: 8
+    notes: Unincorporated CPA (WCU); Small Area Plan PDF FLU proxy
+  - name: Cashiers
+    role: county-commercial-district
+    zoningLayer: Planning/Cashiers_Commercial_District/FeatureServer/0
+    count: 2
+    notes: Unincorporated commercial core; SAP PDF FLU proxy
+  - name: US-441 Corridor
+    role: county-corridor-zoning
+    zoningLayer: Planning/US_441_Corridor/FeatureServer/0
+    count: 11
+    notes: Gateway corridor; SAP PDF FLU proxy
+  - name: Highlands tip
+    role: gap
+    notes: Cities_Poly only; zoning hosted by Macon County
+  - name: Unincorporated Jackson (other)
+    role: gap
+    notes: Largely unzoned on public REST outside Cullowhee/Cashiers/441/Scotts Creek WQPD
+
+layers:
+  - role: parcels
+    name: Tax_Admin Parcels (CAMA + polygons)
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Parcels/FeatureServer/0
+    alternateUrls:
+      - https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Parcels/MapServer/0
+      - https://gis.jacksonnc.org/jcgis/rest/services/OperationalLayers/MapServer/46
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: AssessedAcres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      No_Dash: parcelIdNoDash
+      CurrOwnerAcct: parcelIdAccount
+      AssessedAcres: acreage
+      CurrentOwner1: ownerName
+      CurrentOwner2: ownerName
+      MailingAddress1: mailingAddress
+      MailingAddress2: mailingAddress
+      MailingCityState: mailingAddress
+      MailingZip: mailingAddress
+      PropAddr: situsAddress
+      PropDesc: legalDescription
+      SaleDate: lastSale.date
+      SalePrice: lastSale.price
+      TotLandValue: tax.marketValue
+      TotBldgValue: tax.marketValue
+      TaxableValue: tax.taxableValue
+      Prc_Url: appraiserSearchUrl
+      Township: other
+      TownCode: other
+      NbrhdName: other
+      FireDist: other
+      TransferringRef: other
+      PlatRef: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 41438; CAST(AssessedAcres AS FLOAT) BETWEEN 5 AND 150 → 6754;
+      SalePrice>0 → 22006; TaxableValue>0 → 39731. CRS 102100/3857. MaxRecordCount 60000.
+      Sample PIN 7572-43-7478 STUDDARD centroid ≈ -83.10, 35.12 (Cashiers/Jackson). Prc_Url embedded.
+    status: usable
+
+  - role: tax
+    name: Tax_Admin Appraisal View (MktValue + VldSale)
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Appraisal/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      CurrentOwner1: ownerName
+      AssessedAcres: acreage
+      MktValue: tax.marketValue
+      TaxableValue: tax.taxableValue
+      TotLandValue: tax.marketValue
+      TotBldgValue: tax.marketValue
+      TotDefValue: tax.taxableValue
+      SaleDate: lastSale.date
+      SalePrice: lastSale.price
+      VldSale: lastSale.qualified
+      PropAddr: situsAddress
+    notes: >
+      Count 41438; MktValue>0 → 40747; VldSale LIKE 'Q%' → 9387. Prefer for market/qualified sale;
+      Parcels preferred for Prc_Url + bulk geometry.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (statewide fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledate: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+    notes: >
+      Filter cntyfips='099'. Count 41375; gisacres 5–150 → 6743. No sale price; prefer county CAMA.
+      MaxRecordCount 5000.
+    status: usable
+
+  - role: zoning
+    name: Sylva Zoning (cities-first)
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Planning/Sylva_Zoning/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      Name: zoning
+    notes: Count 11. Also Overlay /1 and Municipal Limits /0.
+    status: usable
+
+  - role: zoning
+    name: Dillsboro Zoning
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Planning/Dillsboro_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      Name: zoning
+      Jurisdiction: other
+    notes: Count 9.
+    status: usable
+
+  - role: zoning
+    name: Forest Hills Zoning Districts
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Planning/Forest_Hills_Zoning_Districts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      Name: zoning
+      Jurisdiction: other
+    notes: Count 8.
+    status: usable
+
+  - role: zoning
+    name: Webster Zoning Districts
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Planning/Webster_Zoning_Districts/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      Name: zoning
+      Jurisdiction: other
+    notes: Count 3 (Energov Webster Jurisdiction 4 incl ETJ).
+    status: usable
+
+  - role: zoning
+    name: Cullowhee Community Planning Area Zoning
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Planning/Cullowhee_Zoning_District_Cached/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: community-planning-area
+    fieldMap:
+      Name: zoning
+      ZoningArea: other
+      Jurisdiction: other
+    notes: Count 8. County-administered unincorporated CPA.
+    status: usable
+
+  - role: zoning
+    name: Cashiers Commercial District
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Planning/Cashiers_Commercial_District/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: community-planning-area
+    fieldMap:
+      Name: zoning
+      ZoningArea: other
+      Jurisdiction: other
+    notes: Count 2 (Commercial General / Village).
+    status: usable
+
+  - role: zoning
+    name: US-441 Corridor Zoning
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Planning/US_441_Corridor/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: corridor
+    fieldMap:
+      Name: zoning
+      ZoningArea: other
+      Jurisdiction: other
+    notes: Count 11.
+    status: usable
+
+  - role: zoning
+    name: Energov / OperationalLayers Zoning (combined wire)
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Energov/MapServer/6
+    alternateUrls:
+      - https://gis.jacksonnc.org/jcgis/rest/services/OperationalLayers/MapServer/2
+    layerId: 6
+    geometry: polygon
+    auth: none
+    coverage: county-districts-plus-municipal
+    fieldMap:
+      Name: zoning
+      ZoningArea: other
+      Jurisdiction: other
+    notes: >
+      Count 55. Jurisdiction: County 22, Sylva 11, Dillsboro 9, Forest Hills 8, Webster 4, DOT 1.
+      Includes Scotts Creek WQPD. Prefer discrete Planning layers for city-first routing.
+    status: usable
+
+  - role: boundaries
+    name: Cities_Poly / Municipalities
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/GIS/Cities_Poly/FeatureServer/0
+    alternateUrls:
+      - https://gis.jacksonnc.org/jcgis/rest/services/OperationalLayers/MapServer/8
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: municipal
+    notes: Count 9 multipart. CITY_NAME SYLVA/DILLSBORO/FOREST HILLS/WEBSTER/HIGHLANDS tip.
+    status: usable
+
+  - role: boundaries
+    name: ETJ_Cropped
+    restUrl: https://gis.jacksonnc.org/jcgis/rest/services/Planning/ETJ_Cropped/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: municipal-etj
+    notes: Count 3 — Forest Hills, Sylva, Webster.
+    status: usable
+
+  - role: flu
+    name: Small Area Plan / zoning map PDFs (no FeatureServer)
+    restUrl: null
+    geometry: none
+    auth: none
+    coverage: pdf-only
+    notes: >
+      Cashiers SAP 2019 + zoning map; Cullowhee SAP + CPA zoning map; US-441 SAP 2008 + Gateway
+      zoning map; Headwaters District Conservation Plan 2025. No public FLU FeatureServer.
+    status: partial
+
+gaps:
+  - No countywide FLU FeatureServer — Cashiers/Cullowhee/US-441 SAP + zoning-map PDFs only
+  - Unincorporated zoning REST gap outside Cullowhee CPA, Cashiers CD, US-441 corridor, Scotts Creek WQPD
+  - Highlands tip in Cities_Poly but zoning not on Jackson REST (Macon County)
+  - AssessedAcres is string — CAST required for numeric filters
+  - OneMap saledate/price weak — prefer county SaleDate/SalePrice
+  - Spatialest nc/jackson 404
+  - Utilities / AADT / emails / phones / paid vendors intentionally excluded
+
+license: >
+  Jackson County GIS / Land Records / Tax / Planning. Compiled from recorded deeds/plats/public
+  records; not survey quality; County disclaims warranties. Commercial resale subject to NCGS 132-10.
+  Attribute Jackson County GIS (and Sylva / Dillsboro / Forest Hills / Webster where municipal districts used).
+
+appraiserSearchUrl: "https://gis.jacksonnc.org/PRC/PRC/{No_Dash}.pdf"
+jurisdictionGisUrl: https://gis.jacksonnc.org/rpv/
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/jackson/parcel-detail/{PIN}"
+oneMapFilter: "cntyfips='099'"
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Parcels/FeatureServer/0
+  parcelIdField: PIN
+  acreageFilter: CAST(AssessedAcres AS FLOAT) >= 5 AND CAST(AssessedAcres AS FLOAT) <= 150
+  acres5to150Live: 6754
+  parcelCountLive: 41439
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='JACKSON'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27JACKSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27JACKSON%27&returnCountOnly=true&f=json
+      liveStationCount: 269
+      stationsWithAADT2022: 157
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Jackson'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Jackson%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Jackson%27&returnCountOnly=true&f=json
+      liveStationCount: 269
+      stationsWithAADT2025: 181
+      stationsWithAADT2024: 160
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TaxableValue
+    - TotLandValue
+    allTaxFieldsOnLayer:
+    - TotLandValue
+    - TotBldgValue
+    - TaxableValue
+    liveNonZero:
+      TaxableValue: 39730
+      TotLandValue: 40676
+    status: ok
+  sale:
+    priceFields:
+    - SalePrice
+    dateFields:
+    - SaleDate
+    livePriceNonZero:
+      SalePrice: 22013
+    liveDateNonNull:
+      SaleDate: 41126
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - CurrentOwner1
+    - CurrentOwner2
+    primaryOwnerField: CurrentOwner1
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(CurrentOwner1) LIKE '% LLC%' OR UPPER(CurrentOwner1) LIKE '% INC%' OR UPPER(CurrentOwner1) LIKE '% LP%' OR UPPER(CurrentOwner1) LIKE '% LLP%' OR UPPER(CurrentOwner1) LIKE '% LTD%' OR UPPER(CurrentOwner1) LIKE '% TRUST%' OR UPPER(CurrentOwner1) LIKE '% CHURCH%' OR UPPER(CurrentOwner1) LIKE '% COMPANY%' OR UPPER(CurrentOwner1) LIKE '% PARTNERSHIP%' OR UPPER(CurrentOwner1) LIKE '% HOLDINGS%' OR UPPER(CurrentOwner1) LIKE '% PROPERTIES%' OR UPPER(CurrentOwner1) LIKE '% CORP%' OR UPPER(CurrentOwner1) LIKE '%,LLC%' OR UPPER(CurrentOwner1) LIKE '%,INC%' OR UPPER(CurrentOwner1) LIKE 'CITY OF %' OR UPPER(CurrentOwner1) LIKE 'COUNTY OF %' OR UPPER(CurrentOwner1) LIKE 'STATE OF %' OR UPPER(CurrentOwner1) LIKE 'TOWN OF %')
+    liveEntityCountAll: 11590
+    liveEntityCount5to150ac: 1879
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://gis.jacksonnc.org/PRC/PRC/{No_Dash}.pdf
+    testedParcelId: '7650426623'
+    testedUrl: https://gis.jacksonnc.org/PRC/PRC/7650426623.pdf
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: Owner and parcel id verified in the response.
+  gisViewer:
+    url: https://gis.jacksonnc.org/rpv/
+    httpStatus: 200
+    pageTitle: ArcGIS Web Application
+  acreageNote: The acreage field is a string, so filters need CAST(... AS FLOAT).
+  gaps: []

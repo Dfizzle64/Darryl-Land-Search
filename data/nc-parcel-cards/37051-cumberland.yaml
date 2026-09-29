@@ -1,0 +1,373 @@
+state: NC
+jurisdiction: Cumberland County
+fips: "37051"
+level: county
+markets: [Fayetteville]
+slug: cumberland
+cntyfips: "051"
+
+jurisdictionGisUrl: https://gis.co.cumberland.nc.us/DataViewer/
+gisViewerUrl: https://cumberlandgis.maps.arcgis.com/apps/webappviewer/index.html?id=a6ea68995c2349e9a177366288589be7
+gisViewerUrlAlt: https://cumberlandgis.maps.arcgis.com/apps/webappviewer/index.html?id=18540dd767dc4004899d6b31aa6c18f1
+countyRestRoot: https://gis.co.cumberland.nc.us/server/rest/services
+gisDepartmentUrl: https://www.cumberlandcountync.gov/departments/is-technology-group/innovation-and-technology-services/organized/geospatial-information-services/gis
+taxAdministrationUrl: https://www.cumberlandcountync.gov/departments/tax-group/tax
+realEstateGisMappingUrl: https://www.cumberlandcountync.gov/departments/tax-group/tax/real-estate-gis-mapping
+appraiserSearchUrl: https://taxpwa.co.cumberland.nc.us/camapwa/
+viewerLinkTemplate: "https://taxpwa.co.cumberland.nc.us/camapwa/PropertySummary.aspx?REID={REID}"
+viewerLinkTemplateAlt: "https://taxpwa.co.cumberland.nc.us/camapwa/PropertySummary.aspx?PARCELPK={PARCEL_PK}"
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/cumberland/parcel-search
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/cumberland/parcel-detail/{PIN}"
+taxBillSearchUrl: https://taxpwa.co.cumberland.nc.us/publicwebaccess/
+paDeepLinkKey: REID
+paDeepLinkKeyAlt: PARCEL_PK
+parcelIdPreferred: PIN
+joinKeys: [PIN, NAD83_PIN, REID, PARCEL_PK, FEATURE_KEY]
+oneMapFilter: "cntyfips='051'"
+
+layers:
+  - role: parcels
+    name: Tax/Parcels (PRIMARY CAMA)
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/Tax/Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      NAD83_PIN: parcelIdAlt
+      REID: parcelIdPaKey
+      PARCEL_PK: parcelIdPk
+      FEATURE_KEY: parcelFeatureKey
+      ACREAGE: acreage
+      OWNER: ownerName
+      ADDRESS: mailingAddress.street
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP: mailingAddress.zip
+      LOCATION_ADDR: situsAddress
+      PKG_SALE_PRICE: lastSale.price
+      PKG_SALE_DATE: lastSale.date
+      LAND_SALE_PRICE: lastSale.landPrice
+      LAND_SALE_DATE: lastSale.landDate
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      DEED_DATE: lastSale.deedDate
+      TOTAL_PROP_VALUE: tax.marketValue
+      TOTAL_LAND_VALUE_ASSESSED: tax.landValue
+      TOTAL_BLDG_VALUE_ASSESSED: tax.improvementValue
+      TOTAL_OBLDG_VALUE: tax.obxfValue
+      LAND_USE_VALUE: tax.landUseValue
+      USE_VALUE_DEFERRED: tax.useDeferred
+      TOTAL_DEFERRED_VALUE: tax.deferredValue
+      Zoning: zoningStub
+      City_Limits: municipality
+      ETJ: etj
+      YEAR_BUILT: yearBuilt
+      HEATED_AREA: heatedArea
+      NEIGHBORHOOD: neighborhood
+      BLDG_PK: buildingId
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 140670 rows (multi-bldg CAMA — dedupe by
+      PIN/REID/FEATURE_KEY); ACREAGE 5–150 → 8665; TOTAL_BLDG_VALUE_ASSESSED=0/null in band → 4496;
+      PKG_SALE_PRICE>0 in band → 887. CRS 102719/2264. MaxRecordCount 2000 — paginate.
+      Geo-check REID 0414581081000 / PIN 0414-58-1081 ≈ -78.949, 34.981 (Hope Mills).
+      FeatureServer SOE not enabled. MMLayers/7 Parcels mirror.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: recareano
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      recareano: acreage
+      gisacres: acreageBroken
+      saledate: lastSale.date
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+      nparno: nparno
+    notes: >
+      Filter cntyfips='051'. Verified count 140513. parno often blank; gisacres near-zero —
+      prefer recareano or county ACREAGE. Spatial join to Tax/Parcels for PIN. No sale price.
+      Alternate host services.gis.nc.gov. MaxRecordCount 5000.
+    status: usable
+
+  - role: zoning
+    name: Fayetteville Zoning (city-first PRIMARY)
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/Planning/CCZoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZNTYPE: zoning
+      CAMA_CODE: camaCode
+    notes: >
+      PRIMARY city-first Fayetteville. Count 4693. Top SF-10/SF-6/MR-5/CC/LC/SF-15/OI/AR/HI/NC.
+      Mirror MMLayers/17 FayZoning. Prefer over parcel Zoning stub inside city.
+    status: usable
+
+  - role: zoning
+    name: Cumberland County Zoning (county + towns Jurisdiction)
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/Planning/CCZoning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zone_Class: zoning
+      Jurisdiction: municipality
+      CAMA_CODE: camaCode
+      CondU: conditionalUse
+      CASE_NO: caseNumber
+    notes: >
+      Count 2523. Cities-first via Jurisdiction: Hope Mills 189, Spring Lake 137, Eastover 101,
+      Wade 40, Stedman 28, Linden 24, Falcon 23, Godwin 17; blank+COUNTY ~1964 unincorporated.
+      Top Zone_Class RR/C(P)/R40A/R6A/R10/R40/C3/A1. Mirror MMLayers/16 CC_Zoning.
+    status: usable
+
+  - role: zoning
+    name: Overlay Districts
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/Planning/OverlayDists/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zone_Class: overlayZoning
+      Jurisdicti: municipality
+    notes: >
+      Count 12 overlay polygons. Apply on top of base zoning.
+    status: usable
+
+  - role: flu
+    name: CCFutureLandUse2025 (PRIMARY FLU)
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/Planning/CCFutureLandUse2025/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acre
+    coverage: county-wide
+    fieldMap:
+      Land_Use: futureLandUse
+      Plan_Nam_2: fluPlanName
+      Adopt_Date: fluAdoptDate
+      Acre: acreage
+      Flex_Area_Label: flexArea
+    notes: >
+      PRIMARY FLU. Count 738. Land_Use top Suburban Density Residential/Commercial/Low Density/
+      Open Space/Medium Density/Farmland/Rural Density/Industrial/High Density/O&I.
+      Plan areas: Northeast, North Central, South Central, Hope Mills Area, Spring Lake Area,
+      Eastover, Southeast, Stedman, Vander, Bethany. Alternate CCFutureLandUseAll/0 count 870.
+    status: usable
+
+  - role: flu
+    name: CCFutureLandUseAll (2024 merge)
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/Planning/CCFutureLandUseAll/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acre
+    coverage: county-wide
+    fieldMap:
+      Land_Use: futureLandUse
+      Plan_Nam_2: fluPlanName
+    notes: >
+      Count 870 (2024 merge). Prefer 2025 layer when current; keep as fallback.
+    status: usable
+
+  - role: sales
+    name: Tax/ParcelSales (category/year enrichment)
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/Tax/ParcelSales/MapServer
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdPaKey
+      PKG_SALE_PRICE: lastSale.price
+      PKG_SALE_DATE: lastSale.date
+      LAND_SALE_PRICE: lastSale.landPrice
+      LAND_SALE_DATE: lastSale.landDate
+    notes: >
+      Residential/Commercial/Apartment/Vacant Land groups + yearly children (e.g. Vacant Land
+      Sales 2025=1324, 2026=1336). Same CAMA schema as Tax/Parcels. Enrichment only.
+    status: usable
+
+  - role: other
+    name: CityLimits
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/AdminBoundaries/CityLimits/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY_NAME: municipality
+    notes: >
+      Multi-part: Fayetteville, Hope Mills, Spring Lake, Eastover, Wade, Stedman, Falcon,
+      Godwin, Linden. Gate city-first zoning joins.
+    status: usable
+
+  - role: other
+    name: MMLayers AddressPts
+    restUrl: https://gis.co.cumberland.nc.us/server/rest/services/Tax/MMLayers/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Count 138449. Situs join when LOCATION_ADDR thin. Also E911/Addresses folder.
+    status: usable
+
+gaps:
+  - Tax/Parcels FeatureServer SOE not enabled — MapServer only
+  - OneMap parno often blank; gisacres broken — use recareano or county ACREAGE; spatial join for PIN
+  - Multi-building duplicate polygon rows on Tax/Parcels — dedupe by PIN/REID/FEATURE_KEY
+  - No separate Fayetteville city FLU FeatureServer — county area-plan FLU only
+  - ITSPublicDL shared host is Duplin-branded — do not wire for Cumberland
+  - camapwa PropertySummary requires REID or PARCELPK — PIN querystring alone empty
+  - Sale enrichment via ParcelSales category layers; not full multi-transfer API
+
+license: "County GIS disclaimer: assessment/mapping reference; verify deeds/plats/surveyor. Public REST auth none."
+verifiedAt: "2026-09-24"
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3
+tranche3:
+  taxSaleOwner: true
+  paDeepLinkWithParcelId: true
+  jurisdictionGisUrl: true
+  parcelsZoningFlu: true
+  notes: >
+    Tax/sale/owner on Tax/Parcels; PA PropertySummary.aspx?REID={REID}; jurisdiction DataViewer;
+    Fayetteville+town Jurisdiction zoning; CCFutureLandUse2025 FLU.
+
+# ---- PASS 2 full-suite upgrade (NC non-OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  pass1:
+    status: verified
+    parcelPolygonLayer: https://gis.co.cumberland.nc.us/server/rest/services/Tax/Parcels/MapServer/0
+    polygonCountLive: 140666
+    parcelIdField: PIN
+    parcelIdFilled: 140601
+    acreageField: ACREAGE
+    acres5to150Live: 8663
+    sampleCentroidWgs84:
+    - -78.9073
+    - 34.842
+    note: 140,666 rows but 139,383 distinct PIN (multi-REID rows share a PIN polygon).
+  parcelLayer: https://gis.co.cumberland.nc.us/server/rest/services/Tax/Parcels/MapServer/0
+  parcelIdField: PIN
+  acreageFilter: ACREAGE >= 5 AND ACREAGE <= 150
+  acres5to150Live: 8663
+  parcelCountLive: 140666
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='CUMBERLAND'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CUMBERLAND%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CUMBERLAND%27&returnCountOnly=true&f=json
+      liveStationCount: 1113
+      stationsWithAADT2022: 1029
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Cumberland'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Cumberland%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Cumberland%27&returnCountOnly=true&f=json
+      liveStationCount: 1078
+      stationsWithAADT2025: 165
+      stationsWithAADT2024: 979
+      stationsWith2025or2024: 992
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TOTAL_PROP_VALUE
+    - TOTAL_LAND_VALUE_ASSESSED
+    liveNonZero:
+      TOTAL_PROP_VALUE: 134909
+      TOTAL_LAND_VALUE_ASSESSED: 139847
+    status: ok
+  sale:
+    priceFields:
+    - PKG_SALE_PRICE
+    dateFields:
+    - PKG_SALE_DATE
+    livePriceNonZero:
+      PKG_SALE_PRICE: 60871
+    liveDateNonNull:
+      PKG_SALE_DATE: 76972
+    status: ok
+    note: PKG_SALE_DATE is a string.
+  ownerEntity:
+    ownerFields:
+    - OWNER
+    primaryOwnerField: OWNER
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWNER) LIKE '% LLC%' OR UPPER(OWNER) LIKE '% INC%' OR UPPER(OWNER) LIKE '% LP%' OR UPPER(OWNER) LIKE '% LLP%' OR UPPER(OWNER) LIKE '% LTD%' OR UPPER(OWNER) LIKE '% TRUST%' OR UPPER(OWNER) LIKE '% CHURCH%' OR UPPER(OWNER) LIKE '% COMPANY%' OR UPPER(OWNER) LIKE '% PARTNERSHIP%' OR UPPER(OWNER) LIKE '% HOLDINGS%' OR UPPER(OWNER) LIKE '% PROPERTIES%' OR UPPER(OWNER) LIKE '% CORP%' OR UPPER(OWNER) LIKE '%,LLC%' OR UPPER(OWNER) LIKE '%,INC%' OR UPPER(OWNER) LIKE 'CITY OF %' OR UPPER(OWNER) LIKE 'COUNTY OF %' OR UPPER(OWNER) LIKE 'STATE OF %' OR UPPER(OWNER) LIKE 'TOWN OF %')
+    liveEntityCountAll: 24315
+    liveEntityCount5to150ac: 2643
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above.
+  paDeepLink:
+    template: https://taxpwa.co.cumberland.nc.us/camapwa/PropertySummary.aspx?REID={REID}
+    testedParcelId: 0553447758000
+    testedUrl: https://taxpwa.co.cumberland.nc.us/camapwa/PropertySummary.aspx?REID=0553447758000
+    httpStatus: 200
+    contentType: text/html; charset=utf-8
+    contentVerified: true
+    note: Server-rendered CAMA PropertySummary; owner and REID verified.
+  gisViewer:
+    url: https://gis.co.cumberland.nc.us/DataViewer/
+    httpStatus: 200
+    pageTitle: ArcGIS Web Application
+    redirectsTo: https://www.arcgis.com/apps/webappviewer/index.html?id=a6ea68995c2349e9a177366288589be7
+  gaps: []

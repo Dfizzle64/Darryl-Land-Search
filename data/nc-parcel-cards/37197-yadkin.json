@@ -1,0 +1,636 @@
+{
+  "county": "Yadkin",
+  "state": "NC",
+  "slug": "yadkin",
+  "msa": "Winston-Salem MSA",
+  "markets": [
+    "Winston-Salem"
+  ],
+  "fips": "37197",
+  "cntyfips": "197",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://gis.yadkincountync.gov/",
+  "viewerLinkTemplate": "https://gis.yadkincountync.gov/",
+  "agolViewerUrl": "https://yadkincounty.maps.arcgis.com/apps/webappviewer/index.html?id=1762d0186a0749569e53e66fae91eecd",
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicYK/AppraisalCard.aspx?id={PARCEL_NO}/2027",
+  "ncptsUrl": "https://lrcpwa.ncptscloud.com/yadkin/parcel-detail/{PIN}",
+  "taxBillSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicYK/TaxBillSearch",
+  "joinKeys": [
+    "PIN",
+    "PARCEL_NO",
+    "parno",
+    "altparno"
+  ],
+  "tranche": 3,
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "PARCEL_NO",
+        "parno",
+        "altparno"
+      ],
+      "bestLayer": "CountyGISmap/MapServer/1"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "CountyGISmap/MapServer/1"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TOTAL_ACRES",
+        "SUM_LAND_ACRES",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 8175,
+      "approxCountOneMapInRange": 8163,
+      "bestLayer": "CountyGISmap/MapServer/1"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "NAME1+NAME2",
+        "ownname"
+      ],
+      "bestLayer": "CountyGISmap/MapServer/1"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "ADDRESS1",
+        "ADDRESS2",
+        "CITY",
+        "STATE",
+        "ZIP",
+        "mailadd",
+        "mcity",
+        "mstate",
+        "mzip"
+      ],
+      "bestLayer": "CountyGISmap/MapServer/1"
+    },
+    "situsAddress": {
+      "present": true,
+      "partial": true,
+      "joinRequired": true,
+      "fields": [
+        "STREET_ADDRESS",
+        "full_addre+CITY+ZIP",
+        "siteadd"
+      ],
+      "notes": "Street on parcels; city/zip via Addresses points or OneMap",
+      "bestLayer": "CountyGISmap/MapServer/1"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SALES_AMT",
+        "DEED_DATE",
+        "QUALIFIED_CODE"
+      ],
+      "approxWithPrice": 12488,
+      "approxWithPriceInRange": 2961,
+      "oneMapSaleDateCount": 0,
+      "bestLayer": "CountyGISmap/MapServer/1"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "LAND_FMV_CURRENT",
+        "BLDG_FMV_CURRENT",
+        "LAND_ASV_CURRENT",
+        "LAND_LUV_CURRENT",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "notes": "Sum land+bldg FMV for market; no TOTAL_* column",
+      "bestLayer": "CountyGISmap/MapServer/1"
+    },
+    "zoning": {
+      "present": true,
+      "citiesFirst": true,
+      "layers": [
+        "CountyGISmap/MapServer/44 Yadkinville",
+        "CountyGISmap/MapServer/43 Jonesville",
+        "CountyGISmap/MapServer/41 Boonville",
+        "CountyGISmap/MapServer/42 East Bend",
+        "CountyGISmap/MapServer/40 County"
+      ],
+      "router": "CountyGISmap/MapServer/45 Town Limits with ETJ"
+    },
+    "flu": {
+      "present": false,
+      "status": "gap",
+      "pdfUrl": "https://www.yadkincountync.gov/DocumentCenter/View/6126/Future-Land-Use-Map-",
+      "notes": "MapServer/38 is cropland/land-cover \u2014 not FLU"
+    },
+    "appraiserLink": {
+      "present": true,
+      "templates": [
+        "https://www.bttaxpayerportal.com/ITSPublicYK/AppraisalCard.aspx?id={PARCEL_NO}/2027",
+        "https://lrcpwa.ncptscloud.com/yadkin/parcel-detail/{PIN}"
+      ]
+    }
+  },
+  "parcelStats": {
+    "count": 28364,
+    "acres5to150": 8175,
+    "bldgFmv0InBand": 3793,
+    "descriptionVacantInBand": 5079,
+    "salesAmtGt0": 12488,
+    "salesAmtGt0InBand": 2961,
+    "streetAddressNonNull": 28297,
+    "geoCheck": {
+      "pin": "484400879441",
+      "parcelNo": "112756",
+      "lonlatApprox": [
+        -80.861,
+        36.066
+      ]
+    }
+  },
+  "oneMapStats": {
+    "filter": "cntyfips='197'",
+    "count": 28320,
+    "gisacres5to150": 8163,
+    "saledateCount": 0
+  },
+  "municipalities": [
+    {
+      "name": "Town of Yadkinville",
+      "role": "primary",
+      "districtLabels": [
+        "YADKINVILLE",
+        "YADKINVILLE ETJ"
+      ],
+      "zoningLayerId": 44,
+      "zoningPolygons": 88,
+      "zoningCodes": [
+        "CB",
+        "CZ",
+        "HB",
+        "HI",
+        "LI",
+        "NB",
+        "OI",
+        "RH",
+        "RM",
+        "RMH",
+        "RO CD",
+        "RR"
+      ],
+      "hasLocalGis": false,
+      "flu": "gap"
+    },
+    {
+      "name": "Town of Jonesville",
+      "districtLabels": [
+        "JONESVILLE",
+        "JONESVILLE ETJ"
+      ],
+      "zoningLayerId": 43,
+      "zoningPolygons": 2236,
+      "zoningCodes": [
+        "B-1",
+        "B-2",
+        "B-2CU",
+        "B-3",
+        "M-1",
+        "R-10",
+        "R-12",
+        "R-20",
+        "R-MH",
+        "R-MH-A"
+      ],
+      "hasLocalGis": false,
+      "flu": "gap"
+    },
+    {
+      "name": "Town of Boonville",
+      "districtLabels": [
+        "BOONVILLE",
+        "BOONVILLE ETJ"
+      ],
+      "zoningLayerId": 41,
+      "zoningPolygons": 97,
+      "zoningCodes": [
+        "CS",
+        "HC",
+        "M-1",
+        "R-10",
+        "R-15",
+        "RA"
+      ],
+      "hasLocalGis": false,
+      "flu": "gap"
+    },
+    {
+      "name": "Town of East Bend",
+      "districtLabels": [
+        "EAST BEND"
+      ],
+      "zoningLayerId": 42,
+      "zoningPolygons": 50,
+      "zoningCodes": [
+        "CS",
+        "HC",
+        "I",
+        "R1",
+        "R2",
+        "RMF"
+      ],
+      "hasLocalGis": false,
+      "flu": "gap",
+      "notes": "No separate ETJ polygon on Town Limits/45"
+    },
+    {
+      "name": "Unincorporated Yadkin / CDPs",
+      "zoningLayerId": 40,
+      "zoningPolygons": 1248,
+      "zoningCodes": [
+        "AO-1",
+        "CB",
+        "CB-CD",
+        "CP",
+        "HB",
+        "MHP",
+        "MI-1",
+        "MI-2",
+        "RA",
+        "RG",
+        "RG-CD",
+        "RI",
+        "RL",
+        "RR",
+        "TZ"
+      ],
+      "flu": "PDF FLUM only"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "CountyGISmap Parcels (PRIMARY)",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TOTAL_ACRES",
+      "coverage": "county-wide",
+      "featureCount": 28364,
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "status": "usable",
+      "notes": "TRANCHE-3 primary; tax/sale/owner on layer; TAXCARD deep-link"
+    },
+    {
+      "role": "parcels",
+      "name": "tax_view_fc FeatureServer (alternate)",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/BASIC_LOOKUP2/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "crs": {
+        "wkid": 102100,
+        "latestWkid": 3857
+      },
+      "status": "usable",
+      "notes": "Prefer MapServer/1 for 2264 zoning joins"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "filter": "cntyfips='197'",
+      "featureCount": 28320,
+      "coverage": "county-wide",
+      "status": "usable",
+      "notes": "saledate empty; no sale price; land/improve split"
+    },
+    {
+      "role": "zoning",
+      "name": "Yadkinville Zoning (PRIMARY city)",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/44",
+      "layerId": 44,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "featureCount": 88,
+      "zoningFields": [
+        "ZONE_CODE",
+        "ZONE"
+      ],
+      "preferMostLocal": true,
+      "citiesFirstOrder": 1,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Jonesville Zoning",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/43",
+      "layerId": 43,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "featureCount": 2236,
+      "zoningFields": [
+        "ZONING"
+      ],
+      "preferMostLocal": true,
+      "citiesFirstOrder": 2,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Boonville Zoning",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/41",
+      "layerId": 41,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "featureCount": 97,
+      "zoningFields": [
+        "BOONVILLE_",
+        "BOONVILLE1"
+      ],
+      "preferMostLocal": true,
+      "citiesFirstOrder": 3,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "EastBend Zoning",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/42",
+      "layerId": 42,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "featureCount": 50,
+      "zoningFields": [
+        "ZONING_NO",
+        "ZONING_NAM"
+      ],
+      "preferMostLocal": true,
+      "citiesFirstOrder": 4,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning (unincorporated)",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/40",
+      "layerId": 40,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "featureCount": 1248,
+      "zoningFields": [
+        "ZONING",
+        "ZONE_NAME"
+      ],
+      "crs": {
+        "wkid": 102719,
+        "latestWkid": 2264
+      },
+      "status": "usable",
+      "notes": "NCPIN almost empty \u2014 spatial join; exclude munis/ETJs"
+    },
+    {
+      "role": "other",
+      "name": "Town Limits with ETJ",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/45",
+      "layerId": 45,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 11,
+      "status": "usable",
+      "notes": "Jurisdiction routing for zoning layer selection"
+    },
+    {
+      "role": "other",
+      "name": "Addresses",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "auth": "none",
+      "featureCount": 21437,
+      "status": "partial",
+      "notes": "Optional situs city/zip enrichment; no PIN"
+    },
+    {
+      "role": "other",
+      "name": "Land Use cropland (NOT FLU)",
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/38",
+      "layerId": 38,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 42,
+      "status": "wrong-geography",
+      "notes": "Crop/land-cover CLASS_NAME \u2014 do not use as flu"
+    },
+    {
+      "role": "flu",
+      "name": "2023 Future Land Use Map (PDF only)",
+      "restUrl": null,
+      "pdfUrl": "https://www.yadkincountync.gov/DocumentCenter/View/6126/Future-Land-Use-Map-",
+      "compPlanPdfUrl": "https://www.yadkincountync.gov/DocumentCenter/View/5990/Yadkin-County-Comprehensive-Land-Use-Plan-2023-",
+      "geometry": "none",
+      "auth": "none",
+      "status": "gap",
+      "notes": "No public FLU FeatureServer/MapServer verified"
+    }
+  ],
+  "gaps": [
+    "No public Future Land Use REST (biggest schema gap; PDF FLUM/Comp Plan only)",
+    "MapServer Land Use layer 38 is cropland/land-cover not planning FLU",
+    "Situs city/zip missing on parcel polygons (STREET_ADDRESS only)",
+    "No TOTAL market/assessed column on parcels (sum land+bldg FMV)",
+    "County zoning NCPIN join unusable (~3 non-null); spatial join required",
+    "OneMap saledate empty for Yadkin; OneMap has no sale price",
+    "No independent municipal ArcGIS hosts (town zoning on county MapServer only)",
+    "Yadkinville ZONE free-text labels sometimes inconsistent with ZONE_CODE",
+    "MaxRecordCount 1000 on county MapServer \u2014 paginate",
+    "No AADT / utilities / emails / phones / paid vendors collected (out of scope)"
+  ],
+  "wireFirst": [
+    "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/1",
+    "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/44",
+    "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/43",
+    "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/41",
+    "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/42",
+    "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/40",
+    "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/45",
+    "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  ],
+  "paDeepLinks": {
+    "appraisalCard": "https://www.bttaxpayerportal.com/ITSPublicYK/AppraisalCard.aspx?id={PARCEL_NO}/2027",
+    "ncpts": "https://lrcpwa.ncptscloud.com/yadkin/parcel-detail/{PIN}",
+    "taxBillSearch": "https://www.bttaxpayerportal.com/ITSPublicYK/TaxBillSearch",
+    "verified": true
+  },
+  "verifiedLayerCount": 12,
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "biggestGap": "No public Future Land Use FeatureServer/MapServer \u2014 only 2023 FLUM + Comp Plan PDFs; MapServer Land Use is cropland not planning FLU",
+  "pass2": {
+    "label": "PASS2 full-suite upgrade \u2014 rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "aadtScreening": {
+      "source": "NCDOT Traffic Survey Group (public AGOL)",
+      "layer": "NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)",
+      "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "countyField": "COUNTY",
+      "countyValue": "YADKIN",
+      "valueField": "AADT_2022",
+      "valueType": "string (trim; blank = no count that year)",
+      "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27YADKIN%27&returnCountOnly=true&f=json",
+      "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27YADKIN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+      "liveStationCount": 345,
+      "stationsWithAADT2022": 163,
+      "newerYearAvailable": {
+        "available": true,
+        "layer": "NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)",
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "countyField": "County",
+        "countyValue": "Yadkin",
+        "valueField": "AADT_2025",
+        "valueType": "integer (null = no count)",
+        "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Yadkin%27&returnCountOnly=true&f=json",
+        "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Yadkin%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+        "liveStationCount": 343,
+        "stationsWithAADT2025": 221,
+        "stationsWithAADT2024": 210,
+        "segmentsLayer": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide \u2014 spatial filter by county envelope)",
+        "also": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)"
+      },
+      "recommendation": "Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025\u2192AADT_2024\u2192AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title)."
+    },
+    "primaryParcelLayer": {
+      "restUrl": "https://gis.yadkincountync.gov/arcgis/rest/services/CountyGISmap/MapServer/1",
+      "acreageField": "TOTAL_ACRES",
+      "range5to150Where": "TOTAL_ACRES>=5 AND TOTAL_ACRES<=150",
+      "liveTotalParcels": 28364,
+      "liveParcels5to150": 8175
+    },
+    "taxValues": {
+      "status": "ok",
+      "fields": {
+        "LAND_FMV_CURRENT": "tax.landMarketValue",
+        "BLDG_FMV_CURRENT": "tax.improvementMarketValue",
+        "LAND_ASV_CURRENT": "tax.landAssessedValue"
+      },
+      "liveNonZeroCounty": {
+        "LAND_FMV_CURRENT": 28295,
+        "BLDG_FMV_CURRENT": 18382,
+        "LAND_ASV_CURRENT": 28295
+      },
+      "liveNonZero5to150": {
+        "LAND_ASV_CURRENT": 8156
+      },
+      "notes": "LAND_FMV_CURRENT/LAND_ASV_CURRENT integer, BLDG_FMV_CURRENT double. No single total field \u2014 sum land+bldg.",
+      "publicFallback": "https://www.bttaxpayerportal.com/ITSPublicYK/AppraisalCard.aspx?id={PARCEL_NO}/2027"
+    },
+    "saleHistory": {
+      "status": "ok",
+      "priceFields": [
+        "SALES_AMT"
+      ],
+      "dateFields": [
+        "DEED_DATE"
+      ],
+      "livePriceGt0County": {
+        "SALES_AMT": 12488
+      },
+      "livePriceGt0_5to150": {
+        "SALES_AMT": 2962
+      },
+      "liveDateNonNullCounty": {
+        "DEED_DATE": 28120
+      },
+      "notes": "DEED_DATE esriDate; SALES_AMT integer; QUALIFIED_CODE."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "NAME1",
+        "NAME2"
+      ],
+      "primaryOwnerField": "NAME1",
+      "rule": {
+        "apply": "Uppercase + trim NAME1 (optionally also NAME2)",
+        "regex": "(?i)(\\bL\\.?\\s?L\\.?\\s?C\\b|\\bINC\\b|\\bCORP|\\bL\\.?\\s?P\\b|\\bLLP\\b|\\bLLLP\\b|\\bLTD\\b|TRUST|CHURCH|MINISTR|\\bCOMPANY\\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\\bHOA\\b|FOUNDATION|AUTHORITY|\\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\\b|^UNITED STATES|^NORTH CAROLINA\\b|\\bCOUNTY$)",
+        "sqlLikeTokens": [
+          "% LLC%",
+          "%,LLC%",
+          "% L L C%",
+          "% INC",
+          "% INC %",
+          "% INC.%",
+          "%,INC%",
+          "% CORP%",
+          "%CORPORATION%",
+          "% LP",
+          "% LP %",
+          "% L P",
+          "% LLP%",
+          "% LTD%",
+          "%TRUST%",
+          "%CHURCH%",
+          "%MINISTR%",
+          "% COMPANY%",
+          "%PARTNERSHIP%",
+          "%HOLDINGS%",
+          "%PROPERTIES%",
+          "%INVESTMENT%",
+          "%ASSOCIATION%",
+          "%FOUNDATION%",
+          "%AUTHORITY%",
+          "CITY OF %",
+          "COUNTY OF %",
+          "STATE OF %",
+          "TOWN OF %",
+          "% COUNTY",
+          "%BOARD OF EDUCATION%",
+          "UNITED STATES%",
+          "NORTH CAROLINA %",
+          "% DEVELOPMENT%"
+        ],
+        "caveats": "TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); \"% COUNTY\" suffix catches e.g. \"PERSON COUNTY\"; bare \"CO\" and \"ESTATE\" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) \u2014 normalize first."
+      },
+      "liveEntityCount5to150": 859,
+      "liveOwnerNonNull5to150": 8175,
+      "entityQuery": "where=TOTAL_ACRES>=5 AND TOTAL_ACRES<=150 AND (NAME1 LIKE '% LLC%' OR NAME1 LIKE '%,LLC%' OR NAME1 LIKE '% L L C%' OR NAME1 LIKE '% INC' OR NAME1 LIKE '% INC %' OR NAME1 LIKE '% INC.%' OR NAME1 LIKE '%,INC%' OR NAME1 LIKE '% CORP%' OR NAME1 LIKE '%CORPORATION%' OR NAME1 LIKE '% LP' OR NAME1 LIKE '% LP %' OR NAME1 LIKE '% L P' OR NAME1 LIKE '% LLP%' OR NAME1 LIKE '% LTD%' OR NAME1 LIKE '%TRUST%' OR NAME1 LIKE '%CHURCH%' OR NAME1 LIKE '%MINISTR%' OR NAME1 LIKE '% COMPANY%' OR NAME1 LIKE '%PARTNERSHIP%' OR NAME1 LIKE '%HOLDINGS%' OR NAME1 LIKE '%PROPERTIES%' OR NAME1 LIKE '%INVESTMENT%' OR NAME1 LIKE '%ASSOCIATION%' OR NAME1 LIKE '%FOUNDATION%' OR NAME1 LIKE '%AUTHORITY%' OR NAME1 LIKE 'CITY OF %' OR NAME1 LIKE 'COUNTY OF %' OR NAME1 LIKE 'STATE OF %' OR NAME1 LIKE 'TOWN OF %' OR NAME1 LIKE '% COUNTY' OR NAME1 LIKE '%BOARD OF EDUCATION%' OR NAME1 LIKE 'UNITED STATES%' OR NAME1 LIKE 'NORTH CAROLINA %' OR NAME1 LIKE '% DEVELOPMENT%')"
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/ITSPublicYK/AppraisalCard.aspx?id={PARCEL_NO}/2027",
+      "testedUrl": "https://www.bttaxpayerportal.com/ITSPublicYK/AppraisalCard.aspx?id=112756/2027",
+      "httpStatus": 200,
+      "notes": "HTTP 200 returns application/pdf appraisal card; pdftotext confirms owner + parcel 112756. Tax year segment must track current year (2027 in portal now). Alt NCPTS https://lrcpwa.ncptscloud.com/yadkin/parcel-detail/{PIN} (200 shell)."
+    },
+    "jurisdictionGisViewer": {
+      "url": "https://gis.yadkincountync.gov/",
+      "httpStatus": 200,
+      "notes": "Yadkin County GIS"
+    },
+    "gaps": [
+      "AADT_2022 blank at 182 of 345 stations on the 2022 layer (NCDOT counts on a cycle) \u2014 prefer 2025 layer / latest non-blank year",
+      "No multi-transfer sale history on primary layer (last sale only)"
+    ]
+  }
+}

@@ -1,0 +1,390 @@
+state: NC
+jurisdiction: Burke County
+fips: "37023"
+level: county
+markets: [Hickory, Asheville]
+slug: burke
+cntyfips: "023"
+
+municipalities:
+  - name: Morganton
+    role: city-first-zoning
+    etj: MORGANTON
+    parcelCountApprox: 9038
+    hasLocalGis: true
+    zoningPrefer: https://gis.morgantonnc.gov/server/rest/services/Planning/Morganton_Zoning_Latest/MapServer/37
+    zoningAlt: https://gis.morgantonnc.gov/server/rest/services/Planning/Morganton_Zoning_For_LULT/MapServer/46
+    zoningCountyStub: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/9
+    zoningField: District
+    notes: County seat; prefer city native LID/MID/HID/EID/SID/CBD/CU; city REST gis.morgantonnc.gov
+  - name: Valdese
+    role: city-first-zoning
+    etj: VALDESE
+    parcelCountApprox: 2969
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/10
+    zoningField: ZONE_ID
+    zoningCount: 330
+    notes: County-hosted; codes B-1/B-2/M-1/O-I/R-12/R-12A/R-8
+  - name: Drexel
+    role: city-first-zoning
+    etj: DREXEL
+    parcelCountApprox: 1867
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/15
+    zoningField: ZONE_ID
+    zoningCount: 1735
+  - name: Glen Alpine
+    role: city-first-zoning
+    etj: GLEN ALPINE
+    parcelCountApprox: 1286
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/14
+    zoningField: ZONE_ID
+    zoningCount: 97
+  - name: Connelly Springs
+    role: city-first-zoning
+    etj: CONNELLY SPRINGS
+    parcelCountApprox: 1239
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/11
+    zoningField: ZONE_ID
+    zoningCount: 841
+  - name: Hildebran
+    role: city-first-zoning
+    etj: HILDEBRAN
+    parcelCountApprox: 1088
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/12
+    zoningField: ZONE_ID
+    zoningCount: 843
+  - name: Rutherford College
+    role: city-first-zoning
+    etj: RUTHERFORD COLLEGE
+    parcelCountApprox: 1073
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/13
+    zoningField: ZONE_ID
+    zoningCount: 7
+    notes: Thin zoning inventory (7 polys) — gap risk
+  - name: Long View
+    role: city-first-zoning
+    etj: LONGVIEW
+    parcelCountApprox: 451
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/16
+    zoningField: ZONING
+    zoningCount: 282
+    notes: Also extends into Catawba County
+  - name: Rhodhiss
+    role: city-first-zoning
+    etj: RHODHISS
+    parcelCountApprox: 426
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/18
+    zoningField: Zone_ID
+    zoningCount: 663
+    notes: Crosses into Caldwell County
+  - name: Hickory
+    role: city-first-zoning
+    etj: HICKORY
+    parcelCountApprox: 264
+    hasLocalGis: true
+    zoningPrefer: https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Zoning/MapServer/0
+    zoningCountyStub: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/17
+    zoningField: Zoning
+    zoningCount: 1740
+    notes: Prefer Hickory city host; small Burke footprint
+  - name: Unincorporated Burke
+    role: county-zoning
+    etj: BURKE
+    parcelCountApprox: 39339
+    zoningPrefer: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/8
+    zoningField: ZONING
+    zoningCount: 543
+
+layers:
+  - role: parcels
+    name: ProdParcelViewFC CAMA (PRIMARY)
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/ProdParcelViewFC/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdReid
+      PARCEL_PK: parcelIdPk
+      CALCULATED_ACRES: acreage
+      DEEDED_ACRES: acreageDeed
+      PROPERTY_OWNER: ownerName
+      OWNER_MAIL_1: mailingAddress.street
+      OWNER_MAIL_2: mailingAddress.street2
+      OWNER_MAIL_CITY: mailingAddress.city
+      OWNER_MAIL_STATE: mailingAddress.state
+      OWNER_MAIL_ZIP: mailingAddress.zip
+      LOCATION_ADDR: situsAddress
+      PHYADDR_CITY: situsCity
+      PHYADDR_ZIP: situsZip
+      PKG_SALE_DATE: lastSale.date
+      PKG_SALE_PRICE: lastSale.price
+      LAND_SALE_DATE: lastSale.landDate
+      LAND_SALE_PRICE: lastSale.landPrice
+      DEED_DATE: lastSale.deedDate
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      TOTAL_PROP_VALUE: tax.marketValue
+      TOTAL_LAND_VALUE_ASSESSED: tax.landValue
+      TOTAL_BLDG_VALUE_ASSESSED: tax.improvementValue
+      LAND_USE_VALUE: tax.landUseValue
+      ETJ: municipality
+      LAND_CLASS: dorCode
+    notes: >
+      PRIMARY CAMA. Verified 2026-09-24: count 59481; CALCULATED_ACRES 5–150 → 8046;
+      PKG_SALE_PRICE>0 → 25673 (in-range 2079); LAND_SALE_PRICE>0 → 14871;
+      TOTAL_PROP_VALUE>0 → 56914. MapServer only. MaxRecordCount 1000. CRS 102719/2264.
+    status: usable
+
+  - role: parcels
+    name: Parcels_VIEWER_MapImage_v3 FeatureServer
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/Parcels_VIEWER_MapImage_v3/FeatureServer/1
+    alternateUrls:
+      - https://gis.burkenc.org/arcgis/rest/services/Parcels_VIEWER_MapImage_v3/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdReid
+      CALCULATED_ACRES: acreage
+      PROPERTY_OWNER: ownerName
+      OWNER_MAIL_1: mailingAddress.street
+      OWNER_MAIL_CITY: mailingAddress.city
+      OWNER_MAIL_STATE: mailingAddress.state
+      OWNER_MAIL_ZIP: mailingAddress.zip
+      LOCATION_ADDR: situsAddress
+      TOTAL_PROP_VALUE: tax.marketValue
+      DEED_DATE: lastSale.deedDate
+    notes: >
+      Wire-friendly FS. Count 59505; acres 5–150 → 8049. No PKG_SALE_* — join ProdParcelViewFC
+      for sale price / land-bldg split. MaxRecordCount 2000.
+    status: usable
+
+  - role: parcels
+    name: AGOL Tax_Parcels mirror
+    restUrl: https://services3.arcgis.com/axQ4OCSpcxALIQsV/arcgis/rest/services/Tax_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCULATED_ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdReid
+      CALCULATED_ACRES: acreage
+      PROPERTY_OWNER: ownerName
+      TOTAL_PROP_VALUE: tax.marketValue
+    notes: Hosted mirror of VIEWER family. Count 59281; acres 5–150 → 8000. No sale price.
+    status: partial
+
+  - role: parcels
+    name: NC OneMap Parcels
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    filter: "cntyfips='023'"
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdAlt
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      gisacres: acreage
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      parval: tax.marketValue
+      saledate: lastSale.date
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='023'. Count 59374; gisacres 5–150 → 8027; parval>0 → 57167;
+      saledate IS NOT NULL → 0. No sale price. Join parno↔PIN.
+    status: usable
+
+  - role: zoning
+    name: County Zoning (unincorporated)
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    coverage: unincorporated
+    fieldMap:
+      ZONING: zoning
+    notes: Count 543. Codes CON/G-B/GB-C/IND/INDC/L-I/N-B/O-I/PRMC/PRMU/R-1/R-2/R-3/R-MU.
+    status: usable
+
+  - role: zoning
+    name: Morganton Zoning native Query All Base (CITY-FIRST)
+    restUrl: https://gis.morgantonnc.gov/server/rest/services/Planning/Morganton_Zoning_Latest/MapServer/37
+    layerId: 37
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      District: zoning
+    notes: Prefer inside Morganton. Count 73. Codes CBD/CU/EID/HID/LID/MID/SID. ZoningAll /46 for overlays.
+    status: usable
+
+  - role: zoning
+    name: Valdese Zoning
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      GENZONING: zoningGeneral
+    notes: Count 330. County-hosted city-first.
+    status: usable
+
+  - role: zoning
+    name: Connelly Springs Zoning
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+    notes: Count 841.
+    status: usable
+
+  - role: zoning
+    name: Hildebran Zoning
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+    notes: Count 843.
+    status: usable
+
+  - role: zoning
+    name: Rutherford College Zoning
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+    notes: Count 7 — thin/incomplete inventory.
+    status: partial
+
+  - role: zoning
+    name: Glen Alpine Zoning
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+    notes: Count 97.
+    status: usable
+
+  - role: zoning
+    name: Drexel Zoning
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+    notes: Count 1735.
+    status: usable
+
+  - role: zoning
+    name: Longview Zoning
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+    notes: Count 282.
+    status: usable
+
+  - role: zoning
+    name: Hickory Zoning city host (CITY-FIRST)
+    restUrl: https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      Description: zoningDescription
+      General_Zoning: zoningGeneral
+    notes: Prefer for ETJ=HICKORY (~264 Burke parcels). County Aux/17 stub count 1716.
+    status: usable
+
+  - role: zoning
+    name: Rhodhiss Zoning
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      Zone_ID: zoning
+      Zoning: zoningGeneral
+    notes: Count 663.
+    status: usable
+
+  - role: flu
+    name: Future Landuse
+    restUrl: https://gis.burkenc.org/arcgis/rest/services/PublicAccessAux/MapServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      F_LU: flu
+    notes: >
+      Count 1324. Values: General Business, Industrial, Industrial Conditional District 01,
+      Lake James/Rhodhiss, Open Forest, Residential Infill, Residential Low Density,
+      Rural Mixed Low Density. Viewer: burkenc FLU webapp.
+    status: usable
+
+gaps:
+  - taxweb.burkenc.org HTTPS TLS fails — use HTTP for CamaPWA deep-links
+  - ProdParcelViewFC MapServer-only; VIEWER/AGOL FS omit sale price and land/bldg split
+  - Rutherford College zoning only 7 polygons (incomplete)
+  - No independent Valdese/Hildebran/Drexel/etc. city ArcGIS (county Aux is public wire)
+  - OneMap saledate empty for Burke; no OneMap sale price
+  - Utilities and AADT excluded by design
+
+license: "Burke County GIS / Tax; City of Morganton GIS; City of Hickory GIS where used. NCGS 132-10 commercial resale limits."
+appraiserSearchUrl: http://taxweb.burkenc.org/CamaPWA/PropertySummary.aspx?REID={REID}
+appraiserSearchUrlAlt: http://taxweb.burkenc.org/CamaPWA/PropertySummary.aspx?PARCELPK={PARCEL_PK}
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/burke/parcel-search
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/burke/parcel-detail/{PIN}
+jurisdictionGisUrl: https://gis.burkenc.org/
+gisDeepLinkTemplate: https://gis.burkenc.org/default.htm?PIN={PIN}
+taxBillDeepLinkTemplate: https://www.burkenctax.com/#/{PIN}
+countyRestRoot: https://gis.burkenc.org/arcgis/rest/services
+paDeepLinkKey: REID
+paDeepLinkKeyAlt: PARCEL_PK
+parcelIdPreferred: PIN
+joinKeys: [PIN, REID, PARCEL_PK, parno]
+oneMapFilter: "cntyfips='023'"
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher

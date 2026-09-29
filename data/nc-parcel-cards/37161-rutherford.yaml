@@ -1,0 +1,274 @@
+state: NC
+jurisdiction: Rutherford County
+fips: "37161"
+level: county
+markets: [Asheville, Charlotte]
+slug: rutherford
+cntyfips: "161"
+
+municipalities:
+  - name: Forest City
+    role: city-first-zoning
+    zoningLayer: NewLayers/MapServer/22
+    cityFilter: FOREST CITY
+    count: 115
+    etjFilter: ETJ-FORESTCITY
+    etjCount: 29
+    notes: Largest trade center; Comp LUP PDF 2012; no independent city ArcGIS
+  - name: Rutherfordton
+    role: city-first-zoning
+    zoningLayer: NewLayers/MapServer/22
+    cityFilter: RUTHERFORDTON
+    count: 129
+    notes: County seat; UDO districts; Official Zoning Map PDF; no city ArcGIS
+  - name: Spindale
+    role: city-first-zoning
+    zoningLayer: NewLayers/MapServer/22
+    cityFilter: SPINDALE
+    count: 66
+    notes: No independent city GIS / FLU REST
+  - name: Lake Lure
+    role: city-first-zoning
+    zoningLayer: NewLayers/MapServer/22
+    cityFilter: LAKE LURE
+    count: 120
+    notes: Comp Plan maps PDF (FLU); resort zoning; no city ArcGIS FS
+  - name: Ellenboro
+    role: gap
+    notes: City tax district present (~572 parcels); no City Zoning polygons
+  - name: Bostic
+    role: gap
+    notes: City tax district present (~301 parcels); no City Zoning polygons
+  - name: Ruth
+    role: gap
+    notes: City tax district present (~255 parcels); essentially unzoned on REST
+  - name: Chimney Rock Village
+    role: gap
+    notes: City tax district present (~525 parcels); essentially unzoned on REST
+  - name: Unincorporated Rutherford
+    role: gap
+    notes: Parcel Zoning=NONE (~39.9k); no county zoning polygons on public REST
+
+layers:
+  - role: parcels
+    name: Addressing Parcels (CAMA + polygons)
+    restUrl: https://gis.rutherfordcountync.gov/server/rest/services/Addressing/MapServer/2
+    alternateUrls:
+      - https://gis.rutherfordcountync.gov/server/rest/services/EnerGov/EnerGov/FeatureServer/3
+      - https://gis.rutherfordcountync.gov/server/rest/services/EnerGov/EnerGov/MapServer/3
+      - https://gis.rutherfordcountync.gov/server/rest/services/TemplateSite/SearchableLayers/MapServer/1
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      Parcel_Number: parcelId
+      PIN: parcelIdGeopin
+      ParcelID: parcelIdInternal
+      MBL: other
+      Acreage: acreage
+      Deeded_Acreage: acreage
+      Property_Owner: ownerName
+      Owner_Mailing_Address_1: mailingAddress
+      Owner_Mailing_Address_2: mailingAddress
+      Owner_Mailing_Address_3: mailingAddress
+      Owner_Mailing_Address_City: mailingAddress
+      Owner_Mailing_Address_State: mailingAddress
+      Owner_Mailing_Address_Zip: mailingAddress
+      Physical_Address: situsAddress
+      Physical_Address_City: situsCity
+      Physical_Address_Zip: situsZip
+      Sale_Price: lastSale.price
+      Package_Sale_Date: lastSale.date
+      Package_Sale_Price: lastSale.price
+      Land_Sale_Date: lastSale.date
+      Land_Sale_Price: lastSale.price
+      Deed_Date: other
+      Deed_Book: other
+      Deed_Page: other
+      Revenue_Stamp: other
+      Total_Property_Value: tax.marketValue
+      Total_Land_Value_Assessed: tax.marketValue
+      Total_Building_Value_Assessed: tax.marketValue
+      Land_Use_Value: tax.taxableValue
+      Zoning: zoning
+      Planning_Jurisdiction: other
+      City: other
+      Land_Class: dorCode
+      Township: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 57442; Acreage BETWEEN 5 AND 150 → 11199;
+      Sale_Price>0 → 28893 (in-range 4769); Land_Sale_Price>0 → 9859;
+      Package_Sale_Price non-empty/non-zero → 21067; Total_Property_Value>0 → 54346;
+      Property_Owner not null → 57433. CRS 102719/2264. MaxRecordCount 2000.
+      Prefer typed Sale_Price over string Package_Sale_Price. Geo-check Parcel_Number
+      1010256 centroid ≈ -81.82, 35.41 (Rutherford). Parcel_Number is PA/GIS deep-link key.
+    status: usable
+
+  - role: parcels
+    name: EnerGov Parcel (FeatureServer CAMA twin)
+    restUrl: https://gis.rutherfordcountync.gov/server/rest/services/EnerGov/EnerGov/FeatureServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      Parcel_Number: parcelId
+      PIN: parcelIdGeopin
+      Acreage: acreage
+      Property_Owner: ownerName
+      Sale_Price: lastSale.price
+      Package_Sale_Price: lastSale.price
+      Total_Property_Value: tax.marketValue
+      Zoning: zoning
+    notes: >
+      Count 57838 — same attr family as Addressing/2. MaxRecordCount 1000. Prefer Addressing/2
+      unless FeatureServer required.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdGeopin
+      nparno: other
+      ownname: ownerName
+      mailadd: mailingAddress
+      mcity: mailingAddress
+      mstate: mailingAddress
+      mzip: mailingAddress
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Statewide fallback. Filter cntyfips='161' → count 57599. Join parno↔Parcel_Number,
+      altparno↔PIN (verified 1010256 / 1661042179). gisacres 5–150 → 11390; parval>0 → 54929;
+      saledate IS NOT NULL → 0. No sale price. MaxRecordCount 5000.
+    status: partial
+
+  - role: sales
+    name: Possible Sales (points)
+    restUrl: https://gis.rutherfordcountync.gov/server/rest/services/TemplateSite/SearchableLayers/MapServer/3
+    layerId: 3
+    geometry: point
+    auth: none
+    acreageField: Deeded_Acreage
+    coverage: county-wide
+    fieldMap:
+      PARCELNUM: parcelId
+      PRICE: lastSale.price
+      SALE_DATE: lastSale.date
+      SALE_TYPE: lastSale.qualified
+      PHYSICAL_ADDR: situsAddress
+      Deeded_Acreage: acreage
+      Revenue_Stamp: other
+    notes: >
+      Count 17547; PRICE>0 → 17519; Deeded_Acreage 5–150 → 2960. Join PARCELNUM↔Parcel_Number.
+      Secondary sale history; primary sale attrs already on parcel CAMA.
+    status: usable
+
+  - role: zoning
+    name: City Zoning (cities-first)
+    restUrl: https://gis.rutherfordcountync.gov/server/rest/services/NewLayers/MapServer/22
+    alternateUrls:
+      - https://gis.rutherfordcountync.gov/server/rest/services/NewLayersII/MapServer/22
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_CODE: zoning
+      LR_ZONING: zoning
+      CITY: other
+      CO_NAME: other
+      LR_ETJ: other
+      Z_NUM: other
+    notes: >
+      PRIMARY zoning verified 2026-09-24: count 462. By CITY — Rutherfordton 129, Lake Lure 120,
+      Forest City 115, Spindale 66, ETJ-FORESTCITY 29. County disclaimer check-with-town.
+      No Ellenboro/Bostic/Ruth/Chimney Rock polys. Unincorp unzoned. Prefer spatial join /
+      CITY filter; parcel Zoning attr is long descriptive text for same munis.
+    status: usable
+
+  - role: other
+    name: City Limits
+    restUrl: https://gis.rutherfordcountync.gov/server/rest/services/NewLayers/MapServer/3
+    alternateUrls:
+      - https://gis.rutherfordcountync.gov/server/rest/services/Addressing/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      MUNICIPALITY: other
+      TEXT_NAME: other
+      LR_CITY: other
+      ACRES: acreage
+    notes: >
+      Count 17. Distinct — Forest City, Rutherfordton, Spindale, Lake Lure, Ellenboro, Bostic,
+      Ruth, Chimney Rock. Use for city/ETJ routing with zoning spatial join.
+    status: usable
+
+  - role: other
+    name: Forest City And ETJ Area
+    restUrl: https://gis.rutherfordcountync.gov/server/rest/services/EnerGov/EnerGov/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      taxcode: other
+      dist_name: other
+    notes: Count 7 — Forest City tax/ETJ district polygons for routing.
+    status: usable
+
+  - role: flu
+    name: Forest City / Lake Lure FLU (PDF)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      Forest City Comp LUP PDF https://www.townofforestcity.com/sites/default/files/uploads/adopted-comprehensive-lup-10-15-12.pdf;
+      Lake Lure Comp Plan maps https://www.townoflakelure.com/bc-zoning/page/comprehensive-plan-maps-0;
+      Rutherfordton Official Zoning Map PDF (not FLU). No public FLU FeatureServer county- or city-wide.
+    status: gap
+
+gaps:
+  - No public FLU FeatureServer (Forest City / Lake Lure Comp Plan PDFs only)
+  - Unincorporated Rutherford unzoned on public REST (Zoning=NONE ~39.9k)
+  - Ellenboro / Bostic / Ruth / Chimney Rock Village — no City Zoning polygons
+  - City Zoning layer disclaimer — confirm with town
+  - OneMap saledate empty / no sale price — prefer county Sale_Price
+  - Addressing/2 count slightly behind EnerGov/OneMap (~57.4k vs ~57.6–57.8k)
+  - Utilities / AADT / emails / phones / paid vendors excluded by design
+
+license: "Rutherford County GIS / Revenue Administration; NCGS 132-10 commercial resale limits; attribute Rutherford County GIS (+ Forest City/Rutherfordton/Spindale/Lake Lure where used)"
+appraiserSearchUrl: "https://lrcpwa.ncptscloud.com/rutherford/parcel-detail?YearFor=2010&REID={Parcel_Number}"
+appraiserSearchUrlNotes: "County GIS Templates.htm Property Record Card — REID query param is tax Parcel_Number (not GeoPIN). Verified pattern for Parcel_Number 1010256. Alt SPA route parcel-detail/{internalId}; search https://lrcpwa.ncptscloud.com/Rutherford/parcel-search."
+jurisdictionGisUrl: "https://gis.rutherfordcountync.gov/maps/"
+viewerLinkTemplate: "https://gis.rutherfordcountync.gov/maps/default.htm?pin={Parcel_Number}"
+verifiedAt: "2026-09-24"
+verifiedBy: "North Carolina Public Info Researcher"

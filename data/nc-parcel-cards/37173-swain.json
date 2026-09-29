@@ -1,0 +1,408 @@
+{
+  "state": "NC",
+  "jurisdiction": "Swain County",
+  "county": "Swain",
+  "fips": "37173",
+  "cntyfips": "173",
+  "slug": "swain",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "msa": "Asheville / Western NC",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://maps.swaincountync.gov/gis/",
+  "gisDeepLinkTemplate": "https://maps.swaincountync.gov/gis/?pin={ParcelNumber}",
+  "gisDeepLinkNotes": "Avineon viewer config.js: where ParcelNumber = '${value}' via ?pin=",
+  "experienceViewerUrl": "https://experience.arcgis.com/experience/c641ce721fb14364ad02780221db9961",
+  "countyRestRoot": "https://maps.swaincountync.gov/server/rest/services",
+  "agolOrgRoot": "https://services3.arcgis.com/bAaHaqP9BvQhS7eE/arcgis/rest/services",
+  "hubUrl": "https://swain-county-gis-swaincountygis.hub.arcgis.com/",
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicSW/AppraisalCard.aspx?id={PARCEL_ID}",
+  "appraiserSearchUrlNotes": "BI-Tek ITSPublicSW AppraisalCard PDF. id = undashed 12-digit PARCEL_ID/ParcelNumber (e.g. 563500075909). Hyphenated PIN and AccountNumber return HTML shell not PDF. Verified 2026-09-24: DICK HOLDINGS LLC / 149.3700 AC / $295,160 / sale 12/2012 WD $1,615,000 (0408/0523).",
+  "paBasicSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicSW/",
+  "paRealEstateSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicSW/RealEstateSearch",
+  "paTaxBillSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicSW/TaxBillSearch",
+  "paDeepLinkKey": "PARCEL_ID",
+  "parcelIdPreferred": "PARCEL_ID",
+  "joinKeys": [
+    "PARCEL_ID",
+    "ParcelNumber",
+    "altparno",
+    "AccountNumber"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/swain/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/swain/parcel-detail/{PARCEL_ID}",
+  "countyGisPageUrl": "https://www.swaincountync.gov/mapping-and-gis/",
+  "taxOfficeUrl": "https://www.swaincountync.gov/tax-office/",
+  "landUsePageUrl": "https://www.swaincountync.gov/land-use/",
+  "fluPdfUrl": "https://www.swaincountync.gov/download/1994-swain-county-land-use-plan/?wpdmdl=6948",
+  "ncdotCtpUrl": "https://connect.ncdot.gov/projects/planning/Pages/CTP-Details.aspx?study_id=Swain+County",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='173'",
+  "oneMapJoinKey": "altparno",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PARCEL_ID",
+        "ParcelNumber",
+        "altparno",
+        "AccountNumber"
+      ],
+      "bestLayer": "OperationalLayers/4",
+      "notes": "Undashed 12-digit PARCEL_ID for AppraisalCard + NCPTS; OneMap join via altparno (parno empty)"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "OperationalLayers/4"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "LegalLandUnits",
+        "DeedAcreage",
+        "DEED_ACRE",
+        "Acreage",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 2522,
+      "bestLayer": "OperationalLayers/4"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1",
+        "Name2",
+        "Name__1",
+        "Name__2",
+        "ownname"
+      ],
+      "bestLayer": "OperationalLayers/4"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address1",
+        "Address2",
+        "City",
+        "State",
+        "ZipCode"
+      ],
+      "bestLayer": "OperationalLayers/4"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "ParcelAddr",
+        "HouseNumber",
+        "StreetDirection",
+        "StreetName",
+        "StreetType",
+        "siteadd"
+      ],
+      "bestLayer": "OperationalLayers/4"
+    },
+    "lastSale": {
+      "present": "partial",
+      "fields": [
+        "Deed_Date",
+        "DeedBook",
+        "DeedPage"
+      ],
+      "bestLayer": "AGOL Swain_County_Parcels/0 + AppraisalCard PDF",
+      "notes": "No SalePrice on REST. AGOL Deed_Date \u2248 sale date. Price on AppraisalCard sales grid (verified $1,615,000 for sample)."
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "ParcelLandValue",
+        "ParcelBuildingValue",
+        "ParcelObxfValue",
+        "TotalAssessedValue",
+        "TotalMarketValue"
+      ],
+      "bestLayer": "OperationalLayers/4",
+      "approxWithValue": 12655
+    },
+    "zoning": {
+      "present": false,
+      "coverage": "city-limits-only",
+      "fields": [],
+      "bestLayer": "OperationalLayers/5 Bryson City Limits",
+      "notes": "Cities-first Bryson City boundary only; no district REST; UDO in development; unincorporated unzoned"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "notes": "1994 Land Use Plan PDF; NCDOT CTP \u2260 FLU; no FLU FeatureServer"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "OperationalLayers Tax Parcels",
+      "restUrl": "https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "primary": true,
+      "status": "usable",
+      "count": 12669,
+      "acres5to150": 2522,
+      "acreageField": "LegalLandUnits",
+      "parcelIdField": "PARCEL_ID",
+      "parcelIdNote": "PIN is empty on every row, so use PARCEL_ID (undashed 12-digit; PA/NCPTS key).",
+      "acreageFilterNote": "LegalLandUnits is a string: CAST(LegalLandUnits AS FLOAT) BETWEEN 5 AND 150 AND LegalLandType='AC'",
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "ParcelNumber": "parcelId",
+        "AccountNumber": "parcelIdAccount",
+        "LegalLandUnits": "acreage",
+        "DeedAcreage": "acreage",
+        "DEED_ACRE": "acreage",
+        "Name1": "ownerName",
+        "Name2": "ownerName",
+        "Address1": "mailingAddress",
+        "Address2": "mailingAddress",
+        "City": "mailingAddress",
+        "State": "mailingAddress",
+        "ZipCode": "mailingAddress",
+        "HouseNumber": "situsAddress",
+        "StreetDirection": "situsAddress",
+        "StreetName": "situsAddress",
+        "StreetType": "situsAddress",
+        "StreetSuffix": "situsAddress",
+        "ParcelAddr": "situsAddress",
+        "LegalDescription": "legalDescription",
+        "DeedBook": "deed",
+        "DeedPage": "deed",
+        "ParcelLandValue": "tax.marketValue",
+        "ParcelBuildingValue": "tax.marketValue",
+        "ParcelObxfValue": "tax.marketValue",
+        "TotalMarketValue": "tax.marketValue",
+        "TotalAssessedValue": "tax.assessedValue",
+        "ParcelDeferredValue": "tax.taxableValue",
+        "AssessedValue": "tax.assessedValue"
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "ParcelsForDownload",
+      "restUrl": "https://maps.swaincountync.gov/server/rest/services/ParcelsForDownload/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "count": 12704,
+      "acres5to150": 2522
+    },
+    {
+      "role": "parcels",
+      "name": "AGOL Swain_County_Parcels",
+      "restUrl": "https://services3.arcgis.com/bAaHaqP9BvQhS7eE/arcgis/rest/services/Swain_County_Parcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "count": 13551,
+      "acres5to150": 2906,
+      "acreageField": "Acreage",
+      "notes": "Includes Deed_Date; no sale price"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "usable",
+      "filter": "cntyfips='173'",
+      "count": 12704,
+      "acres5to150": 2474,
+      "joinKey": "altparno"
+    },
+    {
+      "role": "zoning",
+      "name": "Bryson City Limits",
+      "restUrl": "https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "status": "partial",
+      "count": 1,
+      "notes": "Boundary only \u2014 no zoning districts"
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use",
+      "restUrl": null,
+      "status": "gap",
+      "notes": "1994 Land Use Plan PDF only"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Bryson City",
+      "role": "city-first-zoning",
+      "incorporated": true,
+      "zoningRest": false,
+      "limitsRest": "https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/5",
+      "notes": "County seat; limits only; zoning/UDO in development"
+    }
+  ],
+  "sampleParcel": {
+    "PARCEL_ID": "563500075909",
+    "ownerName": "DICK HOLDINGS LLC",
+    "acreage": 149.37,
+    "totalAssessedValue": 295160,
+    "deedBookPage": "0408/0523",
+    "lastSalePrice": 1615000,
+    "lastSaleDate": "2012-12",
+    "centroid": [
+      -83.937,
+      35.458
+    ]
+  },
+  "gaps": [
+    "Sale price REST gap \u2014 AppraisalCard PDF only",
+    "Zoning district REST gap \u2014 Bryson City limits only; unincorporated unzoned",
+    "FLU REST gap \u2014 1994 PDF + NCDOT CTP only",
+    "OneMap parno empty \u2014 use altparno",
+    "County MS string tax/acre fields need CAST",
+    "TaxBillSearch/RealEstateSearch /Parcel/{id} 404",
+    "Utilities / AADT / emails / phones / paid vendors excluded"
+  ],
+  "license": "Swain County GIS / Tax Assessor / Mapping; NCGS 132-10; attribute Town of Bryson City for municipal boundary",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/4",
+    "parcelIdField": "PARCEL_ID",
+    "acreageFilter": "CAST(LegalLandUnits AS FLOAT) >= 5 AND CAST(LegalLandUnits AS FLOAT) <= 150 AND LegalLandType='AC'",
+    "acres5to150Live": 2521,
+    "parcelCountLive": 12704,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='SWAIN'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27SWAIN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27SWAIN%27&returnCountOnly=true&f=json",
+        "liveStationCount": 142,
+        "stationsWithAADT2022": 83
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Swain'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Swain%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Swain%27&returnCountOnly=true&f=json",
+        "liveStationCount": 143,
+        "stationsWithAADT2025": 93,
+        "stationsWithAADT2024": 81,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalAssessedValue",
+        "TotalMarketValue"
+      ],
+      "allTaxFieldsOnLayer": [
+        "ParcelLandValue",
+        "ParcelBuildingValue",
+        "ParcelObxfValue",
+        "TotalMarketValue",
+        "TotalAssessedValue",
+        "ParcelDeferredValue",
+        "AssessedValue"
+      ],
+      "liveNonZero": {
+        "TotalAssessedValue": 12655,
+        "TotalMarketValue": 12655
+      },
+      "status": "ok",
+      "note": "Value fields are strings: use CAST(field AS FLOAT) > 0."
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {},
+      "status": "partial",
+      "note": "No sale fields on OperationalLayers/4. AGOL Swain_County_Parcels/0 Deed_Date non-null = 12,316 of 13,551 (live 2026-09-28); price only on ITSPublicSW AppraisalCard PDF."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2"
+      ],
+      "primaryOwnerField": "Name1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(Name1) LIKE '% LLC%' OR UPPER(Name1) LIKE '% INC%' OR UPPER(Name1) LIKE '% LP%' OR UPPER(Name1) LIKE '% LLP%' OR UPPER(Name1) LIKE '% LTD%' OR UPPER(Name1) LIKE '% TRUST%' OR UPPER(Name1) LIKE '% CHURCH%' OR UPPER(Name1) LIKE '% COMPANY%' OR UPPER(Name1) LIKE '% PARTNERSHIP%' OR UPPER(Name1) LIKE '% HOLDINGS%' OR UPPER(Name1) LIKE '% PROPERTIES%' OR UPPER(Name1) LIKE '% CORP%' OR UPPER(Name1) LIKE '%,LLC%' OR UPPER(Name1) LIKE '%,INC%' OR UPPER(Name1) LIKE 'CITY OF %' OR UPPER(Name1) LIKE 'COUNTY OF %' OR UPPER(Name1) LIKE 'STATE OF %' OR UPPER(Name1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 2176,
+      "liveEntityCount5to150ac": 462,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/ITSPublicSW/AppraisalCard.aspx?id={PARCEL_ID}",
+      "testedParcelId": "563600311047",
+      "testedUrl": "https://www.bttaxpayerportal.com/ITSPublicSW/AppraisalCard.aspx?id=563600311047",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://maps.swaincountync.gov/gis/",
+      "httpStatus": 200,
+      "pageTitle": "Swain County, North Carolina GIS"
+    },
+    "acreageNote": "The acreage field is a string, so filters need CAST(... AS FLOAT). Swain also filters LegalLandType='AC'.",
+    "parcelIdNote": "Use PARCEL_ID (12-digit, undashed). PIN is empty on every row.",
+    "gaps": [
+      "sale partial"
+    ]
+  }
+}

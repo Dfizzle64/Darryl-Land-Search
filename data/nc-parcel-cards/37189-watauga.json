@@ -1,0 +1,427 @@
+{
+  "state": "NC",
+  "jurisdiction": "Watauga County",
+  "county": "Watauga",
+  "fips": "37189",
+  "cntyfips": "189",
+  "slug": "watauga",
+  "level": "county",
+  "markets": [
+    "Boone",
+    "Asheville"
+  ],
+  "msa": "Boone / Asheville shed",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://gissvr.watgov.org/maps/",
+  "gisDeepLinkNotes": "Avineon SPA \u2014 PIN querystring not confirmed; use Datalet/NCPTS for parcel deep-link",
+  "countyRestRoot": "https://gissvr.watgov.org/arcgis/rest/services",
+  "taxSearchUrl": "https://gissvr.watgov.org/maps/#1",
+  "legacyMapUrl": "https://tax.watgov.org/WataugaNC/maps/mapadv.aspx",
+  "appraiserSearchUrl": "https://tax.watgov.org/WataugaNC/datalets/datalet.aspx?mode=summary&UseSearch=no&pin={PID}&jur=095&taxyr=2026",
+  "appraiserSearchUrlSales": "https://tax.watgov.org/WataugaNC/datalets/datalet.aspx?mode=sales&UseSearch=no&pin={PID}&jur=095&taxyr=2026",
+  "appraiserSearchUrlNotes": "Patriot/Schneider Datalet; PID unhyphenated; taxyr=2026 verified live (owner/values)",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/watauga/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/watauga/parcel-detail/{PIN}",
+  "paDeepLinkKey": "PID",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "PARCELID",
+    "PID",
+    "TXACCOUNT",
+    "parno",
+    "altparno"
+  ],
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='189'",
+  "booneRestRoot": "https://gisviewer.townofboone.net/arcgis/rest/services",
+  "booneViewerUrl": "https://gisviewer.boonenc.gov/maps/default.htm",
+  "planningUrl": "https://www.wataugacounty.org/App_Pages/Dept/Planning/home.aspx",
+  "comprehensivePlanUrl": "https://www.wataugacounty.org/App_Pages/Dept/Planning/comprehensiveplan.aspx",
+  "comprehensivePlanPdf": "https://www.wataugacounty.org/App_Pages/Dept/Planning/Forms/WataugaCitizenPlan.pdf",
+  "gatewayPlansUrl": "https://www.wataugacounty.org/App_Pages/Dept/Planning/gatewayplan.aspx",
+  "landRecordsUrl": "https://www.wataugacounty.org/App_Pages/Dept/Tax/landrecords.aspx",
+  "hccogRestRoot": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "PARCELID",
+        "PID",
+        "parno",
+        "altparno"
+      ],
+      "bestLayer": "TaxParcels/parcelsdbf",
+      "notes": "PIN for map/OneMap; PID for Datalet PA"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "TaxParcels/parcelsdbf"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TX_ACREAGE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 7413,
+      "bestLayer": "TaxParcels/parcelsdbf"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "TXACCTNAME",
+        "ownname"
+      ],
+      "bestLayer": "TaxParcels/parcelsdbf"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "TXADDRESS",
+        "TXADDRESS2",
+        "TXCITYST",
+        "TXZIP",
+        "mailadd"
+      ],
+      "bestLayer": "TaxParcels/parcelsdbf"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PROPADDRES",
+        "siteadd"
+      ],
+      "approxNonEmpty": 29507,
+      "bestLayer": "TaxParcels/parcelsdbf"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "DATERECORD",
+        "SALEPRICE",
+        "INSTRTYP"
+      ],
+      "salePricePositive": 23593,
+      "salePricePositiveInRange": 2817,
+      "bestLayer": "TaxParcels/parcelsdbf",
+      "notes": "OneMap saledate only (no price)"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TAXTOTAL",
+        "TAXLAND",
+        "TAXBLDG",
+        "APTOTALVAL",
+        "APLANDVAL",
+        "APBLDGVAL",
+        "parval"
+      ],
+      "taxTotalPositive": 46401,
+      "bestLayer": "TaxParcels/parcelsdbf"
+    },
+    "zoning": {
+      "present": true,
+      "citiesFirst": true,
+      "fields": [
+        "ZONE_TYPE",
+        "ZONE",
+        "ALPHA"
+      ],
+      "zoneNonEmptyOnParcels": 12222,
+      "bestLayer": "planning/Zoning_Mobile/5 (Boone) + parcelsdbf ZONE prefixes"
+    },
+    "flu": {
+      "present": false,
+      "partial": true,
+      "bestLayer": "Comp Plan PDF",
+      "caveat": "No public FLU FeatureServer"
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://tax.watgov.org/WataugaNC/datalets/datalet.aspx?mode=summary&UseSearch=no&pin={PID}&jur=095&taxyr=2026"
+    }
+  },
+  "municipalities": {
+    "Boone": {
+      "role": "county seat; city-first zoning",
+      "zonePrefixes": [
+        "BO",
+        "BOM",
+        "BOR",
+        "BOB",
+        "BOOI",
+        "BOU1",
+        "BORA",
+        "BORR",
+        "E2"
+      ],
+      "parcelZoneCountApprox": 5673,
+      "hasLocalGis": true,
+      "zoningPrefer": "https://gisviewer.townofboone.net/arcgis/rest/services/planning/Zoning_Mobile/MapServer/5",
+      "zoningAlt": "https://gisviewer.townofboone.net/arcgis/rest/services/gisviewer/Boone_Zoning/MapServer/12",
+      "zoningCountyMirror": "https://gissvr.watgov.org/arcgis/rest/services/GIS_Map_Search_PRD/MapServer/36",
+      "zoningField": "ZONE_TYPE",
+      "zoningCount": 407,
+      "zoneCodes": [
+        "B3",
+        "R1",
+        "R3",
+        "OI",
+        "B1DI",
+        "R1A",
+        "RA",
+        "B1DC",
+        "B2",
+        "U1",
+        "M1",
+        "R2",
+        "R1C",
+        "B1",
+        "R1S",
+        "R5",
+        "E1",
+        "E2",
+        "E4",
+        "MH",
+        "PD",
+        "R4",
+        "WD"
+      ],
+      "viewerUrl": "https://gisviewer.boonenc.gov/maps/default.htm",
+      "notes": "Prefer town native; E2* = Boone ETJ on parcel ZONE"
+    },
+    "Blowing Rock": {
+      "role": "city-first-zoning",
+      "zonePrefixes": [
+        "BR",
+        "BRR15"
+      ],
+      "parcelZoneCountApprox": 1894,
+      "hasLocalGis": false,
+      "zoningPrefer": "parcelsdbf ZONE BR* attributes",
+      "zoningFringeCaldwell": "https://gis.caldwellcountync.org/arcgis/rest/services/OpenGov/OpenGov/MapServer/11",
+      "zoningFringeCount": 17,
+      "notes": "Straddles Watauga/Caldwell; no Watauga-hosted BR polygon FS"
+    },
+    "Beech Mountain": {
+      "role": "city-first-zoning",
+      "zonePrefixes": [
+        "BM"
+      ],
+      "parcelZoneCountApprox": 4356,
+      "hasLocalGis": "partial",
+      "zoningPrefer": "parcelsdbf ZONE BM-* attributes",
+      "notes": "Also Avery; town zoning map retired \u2014 contact Planning for official zone"
+    },
+    "Seven Devils": {
+      "role": "city-first-zoning",
+      "zonePrefixes": [
+        "SD"
+      ],
+      "parcelZoneCountApprox": 1,
+      "hasLocalGis": false,
+      "townLimits": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/SevenDevils_TownLimits/FeatureServer",
+      "notes": "Thin SD-* attr; also Avery; zoning PDF/ordinance gap"
+    },
+    "Unincorporated": {
+      "role": "county-corridor-zoning",
+      "zonePrefixes": [
+        "FC"
+      ],
+      "parcelZoneCountApprox": 292,
+      "notes": "Foscoe\u2013Grandfather Corridor; Valle Crucis historic/region; large unzoned remainder"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "TaxParcels parcelsdbf",
+      "restUrl": "https://gissvr.watgov.org/arcgis/rest/services/TaxParcels/parcelsdbf/FeatureServer/0",
+      "mapServerUrl": "https://gissvr.watgov.org/arcgis/rest/services/TaxParcels/parcelsdbf/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TX_ACREAGE",
+      "coverage": "county-wide",
+      "status": "usable",
+      "primary": true,
+      "fieldMap": {
+        "PIN": "parcelId",
+        "PARCELID": "parcelId",
+        "PID": "parcelIdAlt",
+        "TX_ACREAGE": "acreage",
+        "TXACCTNAME": "ownerName",
+        "TXADDRESS": "mailingAddress",
+        "TXCITYST": "mailingCityState",
+        "TXZIP": "mailingZip",
+        "PROPADDRES": "situsAddress",
+        "DATERECORD": "lastSale.date",
+        "SALEPRICE": "lastSale.price",
+        "TAXLAND": "tax.landValue",
+        "TAXBLDG": "tax.buildingValue",
+        "TAXTOTAL": "tax.assessedValue",
+        "APLANDVAL": "tax.marketLand",
+        "APBLDGVAL": "tax.marketBuilding",
+        "APTOTALVAL": "tax.marketValue",
+        "ZONE": "zoning",
+        "LANDUSE": "dorCode",
+        "DEEDBOOK": "deed.book",
+        "DEEDPAGE": "deed.page",
+        "TXACCOUNT": "accountId"
+      },
+      "verifiedCount": 47364,
+      "acresInRange5to150": 7413,
+      "salePricePositive": 23593,
+      "salePricePositiveInRange": 2817,
+      "taxTotalPositive": 46401,
+      "zoneNonEmpty": 12222,
+      "maxRecordCount": 1000,
+      "notes": "PRIMARY CAMA \u2014 tax/sale/owner"
+    },
+    {
+      "role": "parcels",
+      "name": "SalesComp Tax Parcels",
+      "restUrl": "https://gissvr.watgov.org/arcgis/rest/services/SalesComp/ParcelSales/MapServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 48002,
+      "notes": "Twin with embedded taxcard URL; prefer parcelsdbf for typed numerics"
+    },
+    {
+      "role": "sales",
+      "name": "Parcel Sales 2020-2021",
+      "restUrl": "https://gissvr.watgov.org/arcgis/rest/services/SalesComp/ParcelSales/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "status": "partial",
+      "verifiedCount": 3592,
+      "notes": "Recent-sales subset \u2014 not full history"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "filter": "cntyfips='189'",
+      "verifiedCount": 47388,
+      "acresInRange5to150": 7474,
+      "parvalPositive": 46591,
+      "saledatePopulated": 47388,
+      "salePriceField": false,
+      "notes": "Fallback; saledate yes, saleprice no \u2014 join parno\u2194PIN"
+    },
+    {
+      "role": "zoning",
+      "name": "Boone Zoning Districts",
+      "restUrl": "https://gisviewer.townofboone.net/arcgis/rest/services/planning/Zoning_Mobile/MapServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "primary": true,
+      "fieldMap": {
+        "ZONE_TYPE": "zoning",
+        "DESCRIPTION": "zoningDescription",
+        "DISTRICT": "jurisdiction"
+      },
+      "verifiedCount": 407,
+      "notes": "PRIMARY Boone zoning"
+    },
+    {
+      "role": "zoning",
+      "name": "Boone_Zoning",
+      "restUrl": "https://gisviewer.townofboone.net/arcgis/rest/services/gisviewer/Boone_Zoning/MapServer/12",
+      "layerId": 12,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "verifiedCount": 407
+    },
+    {
+      "role": "zoning",
+      "name": "County Boone_Zoning mirror",
+      "restUrl": "https://gissvr.watgov.org/arcgis/rest/services/GIS_Map_Search_PRD/MapServer/36",
+      "layerId": 36,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "partial",
+      "verifiedCount": 325,
+      "notes": "Prefer town host"
+    },
+    {
+      "role": "zoning",
+      "name": "Zoned Municipalities",
+      "restUrl": "https://gissvr.watgov.org/arcgis/rest/services/GIS_Map_Search_PRD/MapServer/13",
+      "layerId": 13,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "notes": "Boone/BR/BM/SD limits+ETJ; Valle Crucis; Foscoe Grandfather Corridor districts"
+    },
+    {
+      "role": "zoning",
+      "name": "Parcel ZONE attribute",
+      "restUrl": "https://gissvr.watgov.org/arcgis/rest/services/TaxParcels/parcelsdbf/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "partial",
+      "status": "usable",
+      "zoneNonEmpty": 12222,
+      "notes": "Muni-prefixed codes; Boone polygons win inside town"
+    },
+    {
+      "role": "flu",
+      "name": "2025 Comprehensive Plan / Citizen Plan",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "gap",
+      "pdfUrl": "https://www.wataugacounty.org/App_Pages/Dept/Planning/Forms/WataugaCitizenPlan.pdf",
+      "notes": "PDF only; Gateway corridor strategy PDFs exist \u2014 no FLU FeatureServer"
+    }
+  ],
+  "gaps": [
+    "No public FLU FeatureServer (Comp Plan PDF gap)",
+    "Blowing Rock / Beech Mountain / Seven Devils lack Watauga-hosted zoning polygons",
+    "Seven Devils SD-* parcel attribution nearly empty",
+    "~35k parcels blank ZONE (unzoned unincorporated outside corridors)",
+    "OneMap saledate without saleprice",
+    "Avineon GIS PIN deep-link unconfirmed (SPA)"
+  ],
+  "license": "Watauga County Tax/GIS; Town of Boone GIS; High Country COG where used. Tax/reference only \u2014 not a survey. NCGS 132-10.",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 12,
+  "tranche3": {
+    "taxSaleOwner": true,
+    "paDeepLinkWithParcelId": true,
+    "jurisdictionGisUrl": true
+  }
+}

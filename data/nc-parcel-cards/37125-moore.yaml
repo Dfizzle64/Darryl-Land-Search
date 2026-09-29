@@ -1,0 +1,351 @@
+state: NC
+jurisdiction: Moore County
+fips: "37125"
+level: county
+markets: [Fayetteville, Southern Pines]
+slug: moore
+cntyfips: "125"
+
+jurisdictionGisUrl: https://experience.arcgis.com/experience/372f89e6fdcb4bd5af38256a9744ed14/
+appraiserSearchUrl: https://www.bttaxpayerportal.com/ITSPublicMO
+viewerLinkTemplate: "https://www.bttaxpayerportal.com/ITSPublicMO/AppraisalCard.aspx?id={PARID}"
+viewerLinkTemplateAlt: "https://lrcpwa.ncptscloud.com/moore/parcel-detail/{PARID}"
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/moore/parcel-detail/{PARID}"
+paDeepLinkKey: PARID
+paDeepLinkKeyAlt: PIN
+parcelIdPreferred: PARID
+joinKeys: [PARID, PIN, parno]
+oneMapFilter: "cntyfips='125'"
+
+layers:
+  - role: parcels
+    name: Tax/Tax_Layers Parcels (PRIMARY CAMA)
+    restUrl: https://gis.moorecountync.gov/server/rest/services/Tax/Tax_Layers/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TAX_ACRES
+    coverage: county-wide
+    fieldMap:
+      PARID: parcelId
+      PIN: parcelIdAlt
+      TAX_ACRES: acreage
+      NAME: ownerName
+      NAME2: ownerName2
+      ADDRESS: mailingAddress.street
+      ADDRESS2: mailingAddress.street2
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP: mailingAddress.zip
+      RECENT_SALE_PRICE: lastSale.price
+      VALID_SALESDT: lastSale.date
+      TRANSDATE: lastSale.transferDate
+      STAMP_VAL: lastSale.stampValue
+      DEED_BOOK: lastSale.deedBook
+      DEED_PAGE: lastSale.deedPage
+      TOTAL_VAL: tax.marketValue
+      LANDVALUE: tax.landValue
+      BUILD_VAL: tax.improvementValue
+      TAXJURIS: taxJurisdiction
+      TOWNSHIP: township
+      NBHD: neighborhood
+      LAND_STAT: landStatus
+      CLASS: dorCode
+      YEARBUILT: yearBuilt
+      PROP_DESC: legalDescription
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 76926; TAX_ACRES 5–150 → 12639; BUILD_VAL=0/null
+      in band → 5859; RECENT_SALE_PRICE>0 in band → 2864. CRS 102719/2264. MaxRecordCount 2000 —
+      paginate. No situs on polygons — join Address FS or OneMap. OpenData/taxparcels token-required
+      (499). Geo-check PARID 00030993 PIN 858111658222 ≈ -79.377, 35.165 (SP); PARID 00000001 PIN
+      865100369836 ≈ -79.490, 35.443. MapServer twin Tax/Tax_Layers/MapServer/0.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback + situs)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='125'. Verified count 76657; gisacres 5–150 → 12412. No sale price. Alternate
+      host services.gis.nc.gov. PIN↔parno verified (865100369836). Prefer for situs.
+    status: usable
+
+  - role: zoning
+    name: City Zoning (cities-first PRIMARY)
+    restUrl: https://gis.moorecountync.gov/server/rest/services/Planning/Planning_Intranet/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      JR: zoningJurisdiction
+      LABEL: zoningLabel
+    notes: >
+      Cities-first PRIMARY. Count 1949. Filter JR=SP/PH/AB/CG/WP/PB/FF/TT/VA/CA/RB/CN. Public query
+      despite Intranet name. Gate with Municipality/ETJ/TAXJURIS. SP 832, AB 410, PH 250, WP 108, CG
+      100, RB 96, VA 50, PB 42, FF 35, CA 16, TT 9, CN 1.
+    status: usable
+
+  - role: zoning
+    name: Moore County Zoning (unincorporated)
+    restUrl: https://gis.moorecountync.gov/server/rest/services/Planning/Planning_Public/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZCODE: zoning
+    notes: >
+      County districts count 639. Tops B-1/RA-40/RA-20/B-2/RA/RA-2/I. Ignore ZCODE values that are
+      muni names (SO PINES, PINEHURST, …) — use City Zoning there. Twin Planning_Intranet/1.
+    status: usable
+
+  - role: zoning
+    name: Pinehurst Official Zoning (Village AGOL)
+    restUrl: https://services7.arcgis.com/WOKJvFrknOcT2chj/arcgis/rest/services/Official_Zoning_2023/FeatureServer/26
+    layerId: 26
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZCODE: zoning
+      COND_USE: conditionalUse
+      Ordinance: ordinance
+    notes: >
+      Village-first supplement for Pinehurst. Count 376. Tops R10/R30/R20/R MF/RD. Prefer over county
+      JR=PH when conflict. Viewer webappviewer id f04abae59ea144e5bb5ee78e776c6a2d.
+    status: usable
+
+  - role: flu
+    name: Future Land Use (county)
+    restUrl: https://gis.moorecountync.gov/server/rest/services/Planning/Planning_Public/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Class: flu
+      DateUpdate: fluUpdated
+    notes: >
+      Count 692. Class includes zoning-like codes plus OPEN SPACE, WATER BODY, GAME LANDS, FEDERAL
+      MILITARY LANDS. No city FLU FS verified for SP/PH/AB/CG.
+    status: usable
+
+  - role: sales
+    name: Valid_Sales_By_Year
+    restUrl: https://gis.moorecountync.gov/server/rest/services/Tax/Valid_Sales_By_Year/MapServer
+    layerId: null
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARID: parcelId
+      RECENT_SALEDT: lastSale.date
+      RECENT_SALE_PRICE: lastSale.price
+      TAXJURIS: taxJurisdiction
+      CITY_CODE: cityCode
+      BUILD_VAL: tax.improvementValue
+      LANDVALUE: tax.landValue
+    notes: >
+      Year layers: 2026(/5)=2036, 2025(/6)=2878, 2024(/7)=2617, … through 2012 & Before(/19).
+      Enrichment beyond parcel last-sale. Property Sales Experience viewer.
+    status: usable
+
+  - role: other
+    name: Municipality
+    restUrl: https://gis.moorecountync.gov/server/rest/services/General/Jurisdiction/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: municipality
+      CCODE: municipalityCode
+    notes: >
+      Count 111. Gate city zoning. Codes SP/PH/AB/CG/WP/PB/FF/TT/VA/CA/RB/CN.
+    status: usable
+
+  - role: other
+    name: ETJ
+    restUrl: https://gis.moorecountync.gov/server/rest/services/General/Jurisdiction/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY: etjMunicipality
+      CCODE: etjCode
+    notes: >
+      Count 104. Route ETJ parcels to matching City Zoning JR.
+    status: usable
+
+  - role: other
+    name: Address points (situs join)
+    restUrl: https://gis.moorecountync.gov/server/rest/services/General/Default/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      L_FullAddress: situsAddress
+      FullName: situsStreet
+      Post_Comm: situsCity
+      Post_Code: situsZip
+      CITY: situsMunicipality
+    notes: >
+      Count 70704. Spatial join onto parcels for situs (parcel layer has none).
+    status: usable
+
+gaps:
+  - Parcel situs not on Tax_Layers — join Address points or OneMap siteadd.
+  - "OpenData/taxparcels and OpenData/zoning require token (499) — not publicly wireable; use Tax_Layers + Planning_*."
+  - ITSPublicMO RealEstateSearch returns config 500 at verify — use AppraisalCard PDF + TaxBillSearch + NCPTS.
+  - iCare legacy portal showed maintenance at verify — do not rely as primary PA.
+  - City-specific FLU FeatureServers not verified for Southern Pines / Pinehurst / Aberdeen / Carthage — county FLU only.
+  - County ZCODE includes muni-name placeholder polygons — ignore; use City Zoning JR filter.
+  - Sale history is last-sale on parcels plus Valid_Sales_By_Year layers — not full deed chain.
+  - Candor edge only — prefer Montgomery County card for Candor proper.
+
+license: "County GIS disclaimer: assessment/mapping reference only; verify with deeds/plats/surveyor. Public REST auth: none (except OpenData token folder)."
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+tranche: 3
+suite: [parcels, zoning, flu, tax, sales, owner]
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.moorecountync.gov/server/rest/services/Tax/Tax_Layers/FeatureServer/0
+  parcelIdField: PARID
+  acreageFilter: TAX_ACRES >= 5 AND TAX_ACRES <= 150
+  acres5to150Live: 12640
+  parcelCountLive: 76935
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='MOORE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MOORE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MOORE%27&returnCountOnly=true&f=json
+      liveStationCount: 642
+      stationsWithAADT2022: 335
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Moore'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Moore%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Moore%27&returnCountOnly=true&f=json
+      liveStationCount: 637
+      stationsWithAADT2025: 174
+      stationsWithAADT2024: 356
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TOTAL_VAL
+    - LANDVALUE
+    allTaxFieldsOnLayer:
+    - TOTAL_VAL
+    - LANDVALUE
+    - BUILD_VAL
+    - TAXJURIS
+    liveNonZero:
+      TOTAL_VAL: 76682
+      LANDVALUE: 76662
+    status: ok
+  sale:
+    priceFields:
+    - RECENT_SALE_PRICE
+    - STAMP_VAL
+    dateFields:
+    - VALID_SALESDT
+    - TRANSDATE
+    livePriceNonZero:
+      RECENT_SALE_PRICE: 29172
+      STAMP_VAL: 37383
+    liveDateNonNull:
+      VALID_SALESDT: 22382
+      TRANSDATE: 76730
+    status: ok
+    note: RECENT_SALE_PRICE / VALID_SALESDT are qualified-sale fields; TRANSDATE is the last transfer date on nearly every row.
+  ownerEntity:
+    ownerFields:
+    - NAME
+    - NAME2
+    primaryOwnerField: NAME
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(NAME) LIKE '% LLC%' OR UPPER(NAME) LIKE '% INC%' OR UPPER(NAME) LIKE '% LP%' OR UPPER(NAME) LIKE '% LLP%' OR UPPER(NAME) LIKE '% LTD%' OR UPPER(NAME) LIKE '% TRUST%' OR UPPER(NAME) LIKE '% CHURCH%' OR UPPER(NAME) LIKE '% COMPANY%' OR UPPER(NAME) LIKE '% PARTNERSHIP%' OR UPPER(NAME) LIKE '% HOLDINGS%' OR UPPER(NAME) LIKE '% PROPERTIES%' OR UPPER(NAME) LIKE '% CORP%' OR UPPER(NAME) LIKE '%,LLC%' OR UPPER(NAME) LIKE '%,INC%' OR UPPER(NAME) LIKE 'CITY OF %' OR UPPER(NAME) LIKE 'COUNTY OF %' OR UPPER(NAME) LIKE 'STATE OF %' OR UPPER(NAME) LIKE 'TOWN OF %')
+    liveEntityCountAll: 12398
+    liveEntityCount5to150ac: 1990
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://www.bttaxpayerportal.com/ITSPublicMO/AppraisalCard.aspx?id={PARID}
+    testedParcelId: '00000006701'
+    testedUrl: https://www.bttaxpayerportal.com/ITSPublicMO/AppraisalCard.aspx?id=00000006701
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: Owner and parcel id verified in the response.
+  gisViewer:
+    url: https://experience.arcgis.com/experience/372f89e6fdcb4bd5af38256a9744ed14/
+    httpStatus: 200
+    pageTitle: Experience
+    arcgisItem:
+      access: public
+      title: Moore County Public Interactive Viewer
+      type: Web Experience
+      err: null
+  gaps: []

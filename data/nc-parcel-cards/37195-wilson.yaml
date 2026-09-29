@@ -1,0 +1,449 @@
+state: NC
+jurisdiction: Wilson County
+fips: "37195"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: Tax/Taxparcels (PRIMARY CAMA)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Tax/Taxparcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      ParcelNumber: parcelIdAlt
+      GISPIN: parcelIdGis
+      OwnerID: parcelIdPaKey
+      Name1: ownerName
+      Name2: ownerName2
+      Name3: ownerName3
+      TaxpayerAddress1: mailingAddress.street
+      TaxpayerAddress2: mailingAddress.street2
+      TaxpayerCity: mailingAddress.city
+      State: mailingAddress.state
+      ZIPCode: mailingAddress.zip
+      PhysicalStreetAddress: situsAddress
+      PhysLcStreetNumber: situs.number
+      PhysLcStrNumberSuffix: situs.numberSuffix
+      PhysLcStrDirection: situs.streetDir
+      PhysLcStreetName: situs.street
+      PhysLcStrType: situs.streetType
+      PhysLcDirSuffix: situs.streetDirSuffix
+      PhysLcUnitNumber: situs.unit
+      CityCodeDesc: situsCity
+      CACRES: acreage
+      DeedAcres: acreageDeed
+      MapAcres: acreageMap
+      SalesAmount: lastSale.price
+      DateSold: lastSale.dateYmd
+      SaleDate: lastSale.date
+      QualifyCode: lastSale.qualified
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      TotalFMVCurrent: tax.marketValue
+      LandFMVCur: tax.landValue
+      ImproveFMVCur: tax.improvementValue
+      TotalASVCurrent: tax.assessedValue
+      LandASVCur: tax.landAssessed
+      ImproveASVCur: tax.improvementAssessed
+      TaxableValue: tax.taxableValue
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 43549; CACRES 5–150 → 6144;
+      ImproveFMVCur=0/null in band → 3213; SalesAmount>0 in band → 1798;
+      QualifyCode='A' in band → 867. CRS 102719/2264. MaxRecordCount 2000 — paginate.
+      Rich CAMA on polygon: owner, mailing, situs, FMV/ASV land+improve, last sale + qualify,
+      PIN/ParcelNumber/OwnerID. DateSold is YYYYMMDD int; SaleDate is epoch date.
+      OwnerID (= ParcelNumber with '.' removed) keys DevNet wEdge deep-link.
+      City mirror (same CAMA attrs): https://gis.wilsonnc.org/services/rest/services/publiclayers/Parcels/FeatureServer/0
+      (maxRecordCount 200000). Geo-verify sample centroids ~-78.13/35.61 (Wilson).
+      Alternate MapServer geometry: Tax/Parcels/MapServer/0; Base_Layers/Parcels/MapServer/1.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (fallback)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='195'. Verified count 43308; gisacres 5–150 → 6143;
+      improvval=0/null → 10256. No sale price. parno ≈ county ParcelNumber.
+      Alternate host: https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+      MaxRecordCount 2000.
+    status: usable
+
+  - role: sales
+    name: Tax/Three_Year_Sales_Beta
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Tax/Three_Year_Sales_Beta/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CACRES
+    coverage: sample
+    fieldMap:
+      PIN: parcelId
+      ParcelNumber: parcelIdAlt
+      OwnerID: parcelIdPaKey
+      Name1: ownerName
+      SalesAmount: lastSale.price
+      DateSold: lastSale.dateYmd
+      SalesTableSalePrice: lastSale.priceTable
+      SalesTableSaleDate: lastSale.dateTable
+      SalesTableQualificationCode: lastSale.qualified
+      QualifyCode: lastSale.qualifiedParcel
+      CACRES: acreage
+      PhysicalStreetAddress: situsAddress
+    notes: >
+      Verified count 7673 — three-year sales subset with SalesTable* transfer fields.
+      Prefer parcel SalesAmount/DateSold/QualifyCode for last sale; this layer for recent window.
+      Companion MapServer: Tax/Three_Year_Sales/MapServer/0.
+    status: usable
+
+  - role: zoning
+    name: City of Wilson Zoning (CITY-FIRST)
+    restUrl: https://gis.wilsonnc.org/services/rest/services/publiclayers/Zoning/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CURRENTZONE: zoning
+      ZONENAME: zoningName
+      OLDZONE: zoningPrior
+      PREVZONE: zoningPrevious
+      CDZONE: zoningCd
+      CLASS: zoningClass
+    notes: >
+      CITY-FIRST inside City of Wilson. Verified 984 polys. CURRENTZONE codes include
+      GC, OS, RMX, GR6, RA, SR6, LI, NC, SR4, ICD, NMX, UR, HC, HI, MHR, CCMX, IMX.
+      Mirror on county Planning Application FS/40 (same 984). Conditional Use FS/0 companion.
+      CRS 102719/2264. MaxRecordCount 2000.
+    status: usable
+
+  - role: zoning
+    name: County Zoning (unincorporated)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/County_Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      PIN: parcelId
+      PREVIOUSZONE: zoningPrior
+      DATE_ADOPTED: zoningAdopted
+      REZONE_NUM: zoningCase
+    notes: >
+      Unincorporated / county zoning primary. Verified 12528 polys. Dominant AR (~10162),
+      plus R20MH, R20, B1, R15MH, M1, M2, R15S, R30, OI and -CD variants.
+      Mirror: Planning/Wilson_County_Planning_Application/FeatureServer/41.
+      Pair with Municipal Boundaries + city/town layers for cities-first routing.
+    status: usable
+
+  - role: zoning
+    name: Lucama Zoning (town)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/33
+    layerId: 33
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONES: zoning
+    notes: "Town of Lucama — verified 31. Codes CH, R-15, LI, R-7, RA-20, CD, R-10, R-10MH. City-first inside Lucama."
+    status: usable
+
+  - role: zoning
+    name: Black Creek Zoning (town)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/32
+    layerId: 32
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONES: zoning
+    notes: "Town of Black Creek — verified 13. Codes R-10, MH, R-15, RA, CD, LI, CH."
+    status: usable
+
+  - role: zoning
+    name: Stantonsburg Zoning (town)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/37
+    layerId: 37
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONES: zoning
+    notes: "Town of Stantonsburg — verified 15. Codes RA, C, RS, RH, RMH, LI."
+    status: usable
+
+  - role: zoning
+    name: Sims Zoning (town)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/35
+    layerId: 35
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING_TYP: zoning
+    notes: "Town of Sims — verified 12. Codes H I, H C, R-15, R-10, RA, L I, C D."
+    status: usable
+
+  - role: zoning
+    name: Saratoga Zoning (town)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/34
+    layerId: 34
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+    notes: "Town of Saratoga — verified 20. Codes RA, GB, R-15, R-10, LI."
+    status: usable
+
+  - role: zoning
+    name: Sharpsburg Zoning (town)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/36
+    layerId: 36
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CODE: zoning
+      OLD_CODE: zoningPrior
+    notes: >
+      Town of Sharpsburg (Wilson tip; also Nash/Edgecombe) — verified 32.
+      Codes R-6M, B-1, RA-30, MHP, R-10, R-12. Clip to Wilson with Municipal Boundaries.
+    status: usable
+
+  - role: flu
+    name: City of Wilson FutureLandUse_2043 (CITY-FIRST)
+    restUrl: https://gis.wilsonnc.org/services/rest/services/publiclayers/FutureLandUse_2043/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CGF_CA: flu
+    notes: >
+      CITY-FIRST FLU inside City of Wilson. Verified 93. CGF_CA values: MEDIUM HIGH
+      RESIDENTIAL, LOW DENSITY RESIDENTIAL, MIXED USE COMMERCIAL, INDUSTRIAL,
+      INFRASTRUCTURE, INSTITUTIONAL, DOWNTOWN. Companion overlay
+      FutureLandUseOverlay_2043 FS/0 (26 project polys — PROJECTTYPE/STATUS, not FLU class).
+    status: usable
+
+  - role: flu
+    name: Future Land Use Plan 2045 (county)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/43
+    layerId: 43
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU_v3: flu
+    notes: >
+      Countywide coarse FLU — verified only 6 multipart polygons: Agriculture / Rural,
+      Conservation, Employment Center, Municipal Center, Reserved Growth Area,
+      Rural Commercial Crossroad. Use city FLU 2043 inside Wilson; this layer for
+      unincorporated / town context. Not a fine-grained parcel FLU.
+    status: partial
+
+  - role: other
+    name: Municipal Boundaries
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/Wilson_County_Planning_Application/FeatureServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Name: municipality
+    notes: >
+      Verified 9: CITY OF WILSON, ELM CITY, LUCAMA, BLACK CREEK, STANTONSBURG,
+      SIMS, SARATOGA, SHARPSBURG, KENLY. Mirror Base_Layers/Municipal_Boundaries/MapServer/0.
+      City of Wilson also publishes publiclayers/CityLimits + CityLimits_CityETJ_Dissolved
+      and communitymaps Jurisdictions (layer 41) with ETJ labels.
+    status: usable
+
+  - role: other
+    name: Extra Territorial Jurisdiction
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Planning/ETJ/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: Verified 9 ETJ polys. Mirror Planning Application FS/20. Pair with City Limits for planning-jurisdiction routing.
+    status: usable
+
+  - role: other
+    name: Master Addresses (situs join)
+    restUrl: https://gis.wilson-co.com/arcgis/rest/services/Base_Layers/Master_Addresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ADDRESS: situsAddress
+      STNUM: situs.number
+      PREDIR: situs.streetDir
+      STNAME: situs.street
+      SUFFIX: situs.streetType
+      POSTDIR: situs.streetDirSuffix
+      APTNUM: situs.unit
+      CITYST: situsCity
+      ZIPCODE: situsZip
+      CITY: municipality
+      IN_CITY: inCityFlag
+    notes: >
+      Verified 53140 points. Join when parcel PhysicalStreetAddress sparse.
+      City mirror: publiclayers/MasterAddresses FS/0 (same count).
+    status: usable
+
+gaps:
+  - Elm City — no public town zoning FeatureServer found; use County Zoning + Municipal Boundaries Name='ELM CITY' / CityCodeDesc='Elm City'
+  - Kenly / Bailey / Macclesfield / Middlesex / Walstonburg / Rocky Mount / Fountain / Fremont tips appear in CityCodeDesc but zoning lives primarily in Johnston/Nash/Edgecombe/Wayne cards
+  - County FLU Plan 2045 is only 6 coarse polygons — not parcel-grain; town FLU beyond City of Wilson not published as public REST
+  - No multi-decade sales history beyond last sale on parcel + Three_Year_Sales (~7.6k)
+  - DateSold is YYYYMMDD integer — cast for date filters; SaleDate epoch available
+  - Some CityCodeDesc blank for unincorporated (~17.2k) plus null (~610)
+  - No paid vendor data; no phones/emails collected; no AADT/utilities dig
+
+license: "Wilson County + City of Wilson public GIS; NC OneMap; NCGS disclaimer; attribution recommended; no paid vendors"
+appraiserSearchUrl: https://wilsonnc.devnetwedge.com/
+viewerLinkTemplate: "https://wilsonnc.devnetwedge.com/parcel/view/{OwnerID}"
+viewerLinkTemplateAlt: "https://wilsonnc.devnetwedge.com/parcel/view/{ParcelNumberNoDecimal}"
+propertyReportUrl: "https://gis.wilson-co.com/maps/assets/wilson/PropertyReport.html?PIN={PIN}"
+gisViewerUrl: https://gis.wilson-co.com/maps
+publicGisUrl: https://gis.wilson-co.com/maps
+gisDepartmentUrl: https://www.wilsoncountync.gov/departments/technology-services/gis-services
+cityGisViewerUrl: https://gis.wilsonnc.org/communitymaps/
+countyRestRoot: https://gis.wilson-co.com/arcgis/rest/services
+cityRestRoot: https://gis.wilsonnc.org/services/rest/services
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.wilson-co.com/arcgis/rest/services/Tax/Taxparcels/FeatureServer/0
+  parcelIdField: OwnerID
+  acreageFilter: CACRES >= 5 AND CACRES <= 150
+  acres5to150Live: 6144
+  parcelCountLive: 43549
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='WILSON'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WILSON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WILSON%27&returnCountOnly=true&f=json
+      liveStationCount: 606
+      stationsWithAADT2022: 316
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Wilson'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wilson%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wilson%27&returnCountOnly=true&f=json
+      liveStationCount: 606
+      stationsWithAADT2025: 378
+      stationsWithAADT2024: 324
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Wilson'
+      stations2024LiveCount: 605
+      stations2024WithAADT2024: 605
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TotalFMVCurrent
+    - TotalASVCurrent
+    - TaxableValue
+    liveNonZero:
+      TotalFMVCurrent: 42705
+      TotalASVCurrent: 40890
+      TaxableValue: 40890
+    status: ok
+  sale:
+    priceFields:
+    - SalesAmount
+    dateFields:
+    - SaleDate
+    livePriceNonZero:
+      SalesAmount: 23083
+    liveDateNonNull:
+      SaleDate: 42548
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - Name1
+    - Name2
+    - Name3
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 1806
+    liveEntityCount5to150acExtended: 1909
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - J HOLLAND HOLDING LLC
+    - J HOLLAND HOLDING LLC
+    - J HOLLAND HOLDING LLC
+    - JLLDC LLC
+  paDeepLink:
+    template: https://wilsonnc.devnetwedge.com/parcel/view/{OwnerID}
+    testedParcelId: '3637665541000'
+    testedUrl: https://wilsonnc.devnetwedge.com/parcel/view/3637665541000
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Parcel id found in the response body.
+  gisViewer:
+    url: https://gis.wilson-co.com/maps
+    httpStatus: 200
+    pageTitle: Wilson County, North Carolina GIS
+  gaps: []

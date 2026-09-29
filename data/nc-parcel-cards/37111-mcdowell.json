@@ -1,0 +1,430 @@
+{
+  "county": "McDowell",
+  "state": "NC",
+  "msa": "Asheville shed",
+  "fips": "37111",
+  "cntyfips": "111",
+  "slug": "mcdowell",
+  "level": "county",
+  "markets": [
+    "Asheville"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "WebGIS NC/McDowell MapServer and Marion AGOL OfficialZoningDistricts use 102719/2264.",
+  "viewerLinkTemplate": "https://www.webgis.net/nc/McDowell/",
+  "viewerLinkTemplates": [
+    "https://www.webgis.net/nc/McDowell/",
+    "https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id={PIN}",
+    "https://lrcpwa.ncptscloud.com/mcdowell/parcel-detail/{PIN}",
+    "https://lrcpwa.ncptscloud.com/mcdowell/parcel-search",
+    "https://marion.maps.arcgis.com/home/index.html"
+  ],
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id={PIN}",
+  "appraiserSearchUrlNotes": "ITSPublicMD AppraisalCard id={PIN} (12-digit). WebGIS identify popup embeds same URL. RealEstateSearch/Parcel/{PIN} returns 404. NCPTS alt parcel-detail/{PIN}.",
+  "jurisdictionGisUrl": "https://www.webgis.net/nc/McDowell/",
+  "joinKeys": [
+    "PIN",
+    "ParcelNumber",
+    "AccountNumber",
+    "parno",
+    "altparno",
+    "MDFormattedFirst13"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "ParcelNumber",
+        "AccountNumber",
+        "parno",
+        "altparno",
+        "MDFormattedFirst13"
+      ],
+      "bestLayer": "NC/McDowell/MapServer/2",
+      "notes": "PIN for AppraisalCard / OneMap parno join; AccountNumber for tax account"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "NC/McDowell/MapServer/2"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "Shape.STArea()/43560",
+        "gisacres",
+        "CALCULATED_ACREAGE",
+        "TOTAL_ACREAGE"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 5638,
+      "bestLayer": "NC/McDowell/MapServer/2 (shape) or OneMap",
+      "notes": "CALCULATED_ACREAGE null on ~26519 parcels \u2014 prefer shape acres or OneMap gisacres (both 5\u2013150 \u2192 5638)"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1",
+        "Name2",
+        "ownname"
+      ],
+      "bestLayer": "NC/McDowell/MapServer/2"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address1",
+        "Address2",
+        "City",
+        "State",
+        "ZipCode",
+        "mailadd"
+      ],
+      "bestLayer": "NC/McDowell/MapServer/2"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "HouseNumber",
+        "StreetName",
+        "StreetType",
+        "siteadd"
+      ],
+      "bestLayer": "NC/McDowell/MapServer/2",
+      "notes": "Compose situs; often thinner than mailing"
+    },
+    "lastSale": {
+      "present": "partial",
+      "fields": [
+        "SaleYear1",
+        "SaleMonth1",
+        "SaleDay1",
+        "DeedDate",
+        "saledatetx"
+      ],
+      "bestLayer": "NC/McDowell/MapServer/2",
+      "notes": "Sale date strong (SaleYear1>0 \u2192 32912); SalePrice REST gap \u2014 PA AppraisalCard for price"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue",
+        "ParcelLandValue",
+        "ParcelBuildingValue",
+        "ParcelObxfValue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "NC/McDowell/MapServer/2"
+    },
+    "zoning": {
+      "present": true,
+      "coverage": "city-first-partial",
+      "fields": [
+        "ZONE_ID",
+        "District_N",
+        "Zoning",
+        "CityCode"
+      ],
+      "bestLayer": "OfficialZoningDistricts/FeatureServer/0",
+      "notes": "Marion city-first; county Zoning/236 limited (669); Old Fort REST gap; most unincorp unzoned"
+    },
+    "flu": {
+      "present": false,
+      "coverage": "pdf-only",
+      "fields": [],
+      "bestLayer": null,
+      "notes": "County Land Use Plan PDFs on mcdowellnc.gov/county/plans \u2014 no FLU FeatureServer"
+    },
+    "appraiserSearchUrl": {
+      "present": true,
+      "template": "https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id={PIN}",
+      "notes": "TRANCHE-3 PA deep-link with parcel ID"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Marion",
+      "role": "city-first-zoning",
+      "cityCode": "C1",
+      "parcelCountApprox": 3637,
+      "zoningRest": "https://services3.arcgis.com/q5DjgI77eZ9vJ4mD/arcgis/rest/services/OfficialZoningDistricts/FeatureServer/0",
+      "zoningCount": 168,
+      "ownGis": true,
+      "fluRest": false,
+      "notes": "Prefer OfficialZoningDistricts; Current_Zoning_WFL1 PIN join ~3956; county MapServer/7 mirror"
+    },
+    {
+      "name": "Old Fort",
+      "role": "gap",
+      "cityCode": "C2",
+      "parcelCountApprox": 619,
+      "zoningRest": null,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Boundary MapServer/230 only; zoning REST gap \u2014 townofoldfort.org"
+    },
+    {
+      "name": "Unincorporated McDowell",
+      "role": "partial",
+      "cityCode": null,
+      "parcelCountApprox": 29234,
+      "zoningRest": "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/236",
+      "zoningCount": 669,
+      "ownGis": true,
+      "fluRest": false,
+      "notes": "Limited county Zoning districts; most land unzoned on REST; FLU PDF"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "NC/McDowell Parcels (CAMA + polygons)",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/2",
+      "alternateUrls": [
+        "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/4",
+        "https://services3.arcgis.com/q5DjgI77eZ9vJ4mD/arcgis/rest/services/City_Tax_Parcel/FeatureServer/0"
+      ],
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CALCULATED_ACREAGE",
+      "coverage": "county-wide",
+      "count": 33500,
+      "acresInRange5to150": 5638,
+      "acresInRangeNote": "Shape.STArea()/43560; CALCULATED_ACREAGE 5-150 = 1789 only",
+      "salePricePresent": false,
+      "saleDatePresent": true,
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "filter": "cntyfips='111'",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "count": 33449,
+      "acresInRange5to150": 5638,
+      "salePricePresent": false,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "City of Marion OfficialZoningDistricts",
+      "restUrl": "https://services3.arcgis.com/q5DjgI77eZ9vJ4mD/arcgis/rest/services/OfficialZoningDistricts/FeatureServer/0",
+      "alternateUrls": [
+        "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/7",
+        "https://services3.arcgis.com/q5DjgI77eZ9vJ4mD/arcgis/rest/services/Current_Zoning_WFL1/FeatureServer/0"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "count": 168,
+      "zoneField": "ZONE_ID",
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "McDowell Co Zoning",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/236",
+      "layerId": 236,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "count": 669,
+      "zoneField": "Zoning",
+      "status": "partial"
+    },
+    {
+      "role": "other",
+      "name": "Municipal Boundaries",
+      "restUrl": "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/5",
+      "alternateUrls": [
+        "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/230",
+        "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/229"
+      ],
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "McDowell County Land Use Plan (PDF)",
+      "restUrl": null,
+      "pdfUrls": [
+        "https://mcdowellnc.gov/county/plans/McDowell%20County%20Land%20Use%20Plan-2.pdf",
+        "https://mcdowellnc.gov/county/plans/McDowellCountyadoptedplan11-18-24.pdf"
+      ],
+      "geometry": "none",
+      "coverage": "county-wide",
+      "status": "gap"
+    }
+  ],
+  "portals": {
+    "jurisdictionGisUrl": "https://www.webgis.net/nc/McDowell/",
+    "arcgisRestRoot": "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer",
+    "countySite": "https://mcdowellnc.gov/",
+    "planning": "https://mcdowellnc.gov/departments/planning",
+    "plansFlu": "https://mcdowellnc.gov/county/plans",
+    "paAppraisalCard": "https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id={PIN}",
+    "paSearch": "https://www.bttaxpayerportal.com/ITSPublicMD/RealEstateSearch",
+    "ncptsSearch": "https://lrcpwa.ncptscloud.com/mcdowell/parcel-search",
+    "ncptsDetail": "https://lrcpwa.ncptscloud.com/mcdowell/parcel-detail/{PIN}",
+    "catalisTax": "https://mcdowellnctax.com/",
+    "marionAgol": "https://marion.maps.arcgis.com/home/index.html",
+    "marionZoningApp": "https://marion.maps.arcgis.com/apps/Viewer/index.html?appid=9493de66cb89495eb0bc30803f9789",
+    "oldFort": "https://townofoldfort.org/",
+    "ncOneMap": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  },
+  "gaps": [
+    "Sale price not on public REST (sale date/deed only)",
+    "CALCULATED_ACREAGE null on ~79% of parcels \u2014 use shape acres or OneMap gisacres",
+    "County Zoning only 669 polys \u2014 most unincorporated unzoned on REST",
+    "Old Fort zoning REST gap",
+    "FLU PDF-only \u2014 no FeatureServer",
+    "OneMap saledate epoch empty",
+    "MapServer-only parcels (no FeatureServer twin)",
+    "Utilities / AADT / emails / phones / paid vendors excluded by design"
+  ],
+  "license": "McDowell County GIS / Land Records / Tax Administration (HandP WebGIS); City of Marion GIS; NC OneMap; NCGS 132-10 commercial resale limits",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "tranche": 3,
+  "verifiedLayerCount": 10,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://www.webgis.net/arcgis/rest/services/NC/McDowell/MapServer/2",
+    "parcelIdField": "PIN",
+    "acreageFilter": "CALCULATED_ACREAGE >= 5 AND CALCULATED_ACREAGE <= 150",
+    "acres5to150Live": 1789,
+    "parcelCountLive": 33500,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='MCDOWELL'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MCDOWELL%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27MCDOWELL%27&returnCountOnly=true&f=json",
+        "liveStationCount": 317,
+        "stationsWithAADT2022": 208
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='McDowell'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27McDowell%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27McDowell%27&returnCountOnly=true&f=json",
+        "liveStationCount": 318,
+        "stationsWithAADT2025": 196,
+        "stationsWithAADT2024": 155,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue"
+      ],
+      "allTaxFieldsOnLayer": [
+        "TotalMarketValue",
+        "TotalAssessedValue",
+        "ParcelLandValue",
+        "ParcelBuildingValue",
+        "ParcelObxfValue"
+      ],
+      "liveNonZero": {
+        "TotalMarketValue": 33112,
+        "TotalAssessedValue": 33112
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [
+        "DeedDate",
+        "SaleYear1"
+      ],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {
+        "DeedDate": 32912,
+        "SaleYear1": 32912
+      },
+      "status": "partial",
+      "note": "Price not on REST; ITSPublicMD AppraisalCard PDF has SALES DATA grid (BOOK/PAGE/MO/YR/SALES PRICE)."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2"
+      ],
+      "primaryOwnerField": "Name1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(Name1) LIKE '% LLC%' OR UPPER(Name1) LIKE '% INC%' OR UPPER(Name1) LIKE '% LP%' OR UPPER(Name1) LIKE '% LLP%' OR UPPER(Name1) LIKE '% LTD%' OR UPPER(Name1) LIKE '% TRUST%' OR UPPER(Name1) LIKE '% CHURCH%' OR UPPER(Name1) LIKE '% COMPANY%' OR UPPER(Name1) LIKE '% PARTNERSHIP%' OR UPPER(Name1) LIKE '% HOLDINGS%' OR UPPER(Name1) LIKE '% PROPERTIES%' OR UPPER(Name1) LIKE '% CORP%' OR UPPER(Name1) LIKE '%,LLC%' OR UPPER(Name1) LIKE '%,INC%' OR UPPER(Name1) LIKE 'CITY OF %' OR UPPER(Name1) LIKE 'COUNTY OF %' OR UPPER(Name1) LIKE 'STATE OF %' OR UPPER(Name1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 4391,
+      "liveEntityCount5to150ac": 284,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id={PIN}",
+      "testedParcelId": "068600758106",
+      "testedUrl": "https://www.bttaxpayerportal.com/ITSPublicMD/AppraisalCard.aspx?id=068600758106",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://www.webgis.net/nc/McDowell/",
+      "httpStatus": 200,
+      "pageTitle": "McDowell County NC WebGIS"
+    },
+    "gaps": [
+      "sale partial"
+    ]
+  }
+}

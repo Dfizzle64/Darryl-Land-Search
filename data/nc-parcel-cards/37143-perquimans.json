@@ -1,0 +1,485 @@
+{
+  "state": "NC",
+  "jurisdiction": "Perquimans County",
+  "county": "Perquimans",
+  "fips": "37143",
+  "cntyfips": "143",
+  "slug": "perquimans",
+  "level": "county",
+  "markets": [
+    "Outer Banks",
+    "Eastern NC"
+  ],
+  "msa": "Outer Banks / Eastern NC",
+  "crs_preferred": {
+    "wkid": 3359,
+    "latestWkid": 3404,
+    "name": "NAD 1983 (2011) StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "http://perquimans.agdmaps.com/",
+  "jurisdictionGisUrlAlt": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=559506e85ee046a194333eb12e80710f",
+  "appraiserSearchUrl": "https://www.perquimanscountync.com/search?for={parcel_id}",
+  "appraiserSearchUrlNotes": "County property search deep-link with map/parcel id (field parcel_id). Field PRC on Perquimans_Service/2 already stores full URL. Verified HTTP 200 for parcel_id 2-D085-F097-SH (returns owner/tax summary + link to /prc/{opaqueId}). /prc/{n} uses opaque internal id \u2014 not constructible from parcel_id alone. dl.agd.cc/prc/nc/perquimans and apps.agdmaps.com/print/nc/perquimans both 404.",
+  "paDeepLinkKey": "parcel_id",
+  "parcelIdPreferred": "parcel_id",
+  "joinKeys": [
+    "parcel_id",
+    "pin",
+    "parno",
+    "altparno",
+    "ACCT"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/Perquimans/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/Perquimans/parcel-detail?reid={pin}",
+  "ncptsDeepLinkPathTemplate": "https://lrcpwa.ncptscloud.com/Perquimans/parcel-detail/{pin}",
+  "ncptsDeepLinkAltTemplate": "https://lrcpwa.ncptscloud.com/Perquimans/parcel-detail?reid={parcel_id}",
+  "taxPayUrl": "http://perquimans.webtaxpay.com/",
+  "taxOnlineUrl": "https://www.perquimanscountync.com/",
+  "registerOfDeedsUrl": "https://www.perquimanscountync.gov/register-of-deeds",
+  "gisDeptUrl": "https://www.perquimanscountync.gov/property-cards-and-gistax-maps",
+  "planningZoningUrl": "https://www.perquimanscountync.gov/planning-and-zoning",
+  "countyRestRoot": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='143'",
+  "deqLupPdfUrl": "https://www.deq.nc.gov/documents/pdf/land-use-plans/perquimanshertwinf-certlupamend2-030518-combined/download",
+  "deqLupHubUrl": "https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/perquimans-county",
+  "deqImplementReportUrl": "https://www.deq.nc.gov/documents/pdf/land-use-plans/implementation-reports/perqimplementreport-030818/download",
+  "countyPlanningHubUrl": "https://www.perquimanscountync.gov/planning-and-zoning",
+  "hertfordPlanningUrl": "https://townofhertfordnc.com/planning_and_zoning",
+  "hertfordZoningMapPdfUrl": "https://townofhertfordnc.com/vertical/sites/%7B143CFF3A-672B-44D4-B23C-E6364EF3CC86%7D/uploads/Zoning_Map(1).pdf",
+  "hertfordZoningOrdinanceArticle3PdfUrl": "https://townofhertfordnc.com/vertical/sites/%7B143CFF3A-672B-44D4-B23C-E6364EF3CC86%7D/uploads/Article-3-Zoning-Ord.pdf",
+  "hertfordUseDistrictListPdfUrl": "https://townofhertfordnc.com/vertical/sites/%7B143CFF3A-672B-44D4-B23C-E6364EF3CC86%7D/uploads/Use_District_List.pdf",
+  "hertfordZoningOrdinancesHubUrl": "https://townofhertfordnc.com/index.asp?DE=33161E70-D28B-4EA4-A26F-A05DE3DA87FF&SEC=38436A8D-77D3-4C75-B1CA-DCE512D081EC",
+  "rejectLayers": [
+    {
+      "name": "AGD PRC nc/perquimans",
+      "url": "https://dl.agd.cc/prc/nc/perquimans/",
+      "reason": "HTTP 404 \u2014 use www.perquimanscountync.com/search?for={parcel_id} (field PRC)"
+    },
+    {
+      "name": "AGD print nc/perquimans",
+      "url": "http://apps.agdmaps.com/print/nc/perquimans/",
+      "reason": "HTTP 404 \u2014 use perquimans.agdmaps.com / webappviewer Parcel App"
+    },
+    {
+      "name": "Experience 268c396eb28b445b9a188e2097429c5d",
+      "url": "https://experience.arcgis.com/experience/268c396eb28b445b9a188e2097429c5d",
+      "reason": "NC OneMap statewide parcels viewer \u2014 not Perquimans jurisdiction GIS"
+    },
+    {
+      "name": "Perquimans_Water_Utilities",
+      "url": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Water_Utilities/FeatureServer",
+      "reason": "Utilities intentionally out of scope"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Hertford",
+      "role": "city-first-zoning",
+      "cityCode": "Hertford",
+      "notes": "County seat; PRIMARY city-first via Town Zoning Map PDF + ordinance (districts RA/R10/R8/R6/TR/C1\u2013C6/O/1/M1). No town zoning FeatureServer. County PERQ_ZONING includes Hertford ETJ carve-out polygon (~4,700 ac) \u2014 not a district code. Joint CAMA LUP with county/Winfall."
+    },
+    {
+      "name": "Winfall",
+      "role": "city-first-zoning",
+      "cityCode": "Winfall",
+      "notes": "Incorporated town; PERQ_ZONING has Winfall Town Limits carve-out (3 polys, ~1,482 ac). No public Winfall zoning FeatureServer found 2026-09-24; confirm against town/county planning. Joint CAMA LUP."
+    }
+  ],
+  "townships": [
+    "Belvidere",
+    "Parkville",
+    "Hertford",
+    "New Hope",
+    "Bethel"
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Perquimans_Service Parcels_2017 (PRIMARY county AGOL CAMA + PRC)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/2",
+      "alternateUrls": [
+        "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/15"
+      ],
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "dacre",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "parcel_id": "parcelId",
+        "pin": "parcelIdAlt",
+        "ACCT": "accountNumber",
+        "NAME": "ownerName",
+        "ADDRESS_1": "mailingAddress.street",
+        "ADDRESS_2": "mailingAddress.cityStateZip",
+        "ADDRESS_3": "mailingAddress.line3",
+        "dacre": "acreage",
+        "DEED_ACRE": "acreageDeed",
+        "TAX_VAL": "tax.taxableValue",
+        "LAND_USE_V": "tax.landUseValue",
+        "DATE_SOLD": "lastSale.date",
+        "DEED_BK_1": "deed.book",
+        "DEED_PG_1": "deed.page",
+        "TOWNSHIP": "township",
+        "PRC": "appraiserDeepLink",
+        "desc_": "legalDescription"
+      },
+      "status": "usable",
+      "maxRecordCount": 1000,
+      "verifiedCounts": {
+        "total": 15071,
+        "dacre_5_150": 2912,
+        "shapeAcres_5_150": 3008,
+        "TAX_VAL_nonempty": 14874,
+        "NAME_nonempty": 14904,
+        "DATE_SOLD_nonempty": 14904,
+        "DATE_SOLD_not_000000": 14142,
+        "PRC_nonnull": 15071
+      },
+      "notes": "PRIMARY wire-first (web map Parcels layer). Name Parcels_2017 is legacy \u2014 live CAMA (~15,071). TAX_VAL is string on /2, numeric double on twin /15 Parcels_append. ADDRESS_* are mailing (not situs). DATE_SOLD is MMYYYY with trailing period (e.g. 082022.=Aug 2022; 000000.=none) \u2014 no SALE_PRICE field. PRC embeds property-search URL. MaxRecordCount 1000 \u2014 paginate. Geo-check parcel_id 3-0068-00009 pin 7826-64-4372 dacre 19.37 centroid \u2248 -76.541, 36.102 (Hertford township). Auth: none (public)."
+    },
+    {
+      "role": "parcels",
+      "name": "Perquimans_Service Parcels_append (twin; numeric TAX_VAL)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/15",
+      "layerId": 15,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "dacre",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "parcel_id": "parcelId",
+        "pin": "parcelIdAlt",
+        "ACCT": "accountNumber",
+        "NAME": "ownerName",
+        "ADDRESS_1": "mailingAddress.street",
+        "ADDRESS_2": "mailingAddress.cityStateZip",
+        "TAX_VAL": "tax.taxableValue",
+        "dacre": "acreage",
+        "DEED_ACRE": "acreageDeed",
+        "DATE_SOLD": "lastSale.date",
+        "TOWNSHIP": "township"
+      },
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 15071,
+        "dacre_5_150": 2912,
+        "DEED_ACRE_5_150": 2859,
+        "TAX_VAL_gt0": 14874,
+        "NAME_nonempty": 14904
+      },
+      "notes": "Same parcel set as /2; prefer /2 for PRC deep-link. TAX_VAL is numeric here. No SALE_PRICE."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (statewide REST fallback)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='143'",
+      "fieldMap": {
+        "parno": "parcelIdAlt",
+        "altparno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "saledatetx": "lastSale.dateText"
+      },
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 15019,
+        "gisacres_5_150": 3005,
+        "shapeAcres_5_150": 3000,
+        "ownname_nonempty": 14830,
+        "parval_gt0": 14800,
+        "landval_gt0": 1929,
+        "saledate_nonnull": 0,
+        "saledatetx_nonempty": 13695,
+        "siteadd_nonempty": 0
+      },
+      "notes": "Join parno=pin / altparno=parcel_id. saledate empty; saledatetx is MMYYYY-ish text (often missing leading zero, e.g. 82022) or year-only \u2014 not a sale price. siteadd empty. Prefer county layer for PRC/DATE_SOLD/dacre. MaxRecordCount 5000."
+    },
+    {
+      "role": "zoning",
+      "name": "PERQ_ZONING (countywide + muni carve-outs)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/4",
+      "layerId": 4,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "zone": "zoning",
+        "zone_des": "zoningDescription",
+        "subdiv_nam": "subdivision"
+      },
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 108,
+        "byZone": {
+          "RA-43": 24,
+          "CR": 21,
+          "RA-25": 19,
+          "RA": 18,
+          "RA-15": 5,
+          "CH": 5,
+          "CZD": 4,
+          "Winfall Town Limits": 3,
+          "RA-32": 2,
+          "HA": 2,
+          "CN": 2,
+          "Hertford ETJ": 1,
+          "IH": 1,
+          "IL": 1
+        }
+      },
+      "notes": "County base zoning for unincorporated areas (RA/RA-15/25/32/43, CH/CN/CR, HA, IH/IL, CZD). Hertford ETJ and Winfall Town Limits are jurisdiction carve-outs \u2014 route those polys to town zoning PDFs/ordinances (cities-first), not county district codes."
+    },
+    {
+      "role": "zoning",
+      "name": "Town of Hertford Zoning Map + Ordinance (cities-first PRIMARY; PDF)",
+      "restUrl": null,
+      "documents": [
+        "https://townofhertfordnc.com/vertical/sites/%7B143CFF3A-672B-44D4-B23C-E6364EF3CC86%7D/uploads/Zoning_Map(1).pdf",
+        "https://townofhertfordnc.com/vertical/sites/%7B143CFF3A-672B-44D4-B23C-E6364EF3CC86%7D/uploads/Use_District_List.pdf",
+        "https://townofhertfordnc.com/vertical/sites/%7B143CFF3A-672B-44D4-B23C-E6364EF3CC86%7D/uploads/Article-3-Zoning-Ord.pdf"
+      ],
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "partial",
+      "notes": "No public Hertford zoning FeatureServer found 2026-09-24. Districts from Use District List: RA, R10, R8, R6, TR, C1\u2013C6, O/1, M1. Applies in town limits + ETJ (Art. 3). Spatial-route via PERQ_ZONING Hertford ETJ carve-out + address/muni."
+    },
+    {
+      "role": "zoning",
+      "name": "WTOD_and_HCOD_Ovrly_Dists (overlay; CTCOD in data)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/3",
+      "layerId": 3,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "fieldMap": {
+        "ZONE": "zoningOverlay",
+        "ZONE_DES": "zoningOverlayDescription"
+      },
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 2
+      },
+      "notes": "Layer name implies WTOD/HCOD but live features are ZONE=CTCOD (Communications Tower Corridor Overlay District) \u00d72 \u2014 overlay only, not base zoning."
+    },
+    {
+      "role": "other",
+      "name": "ConditionalUsePermits / SpecialUsePermits",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/5",
+      "alternateUrls": [
+        "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/14"
+      ],
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 63
+      },
+      "notes": "SUP/CUP overlays keyed by parcel_id/pin; not base zoning."
+    },
+    {
+      "role": "other",
+      "name": "Townships_from_NCOneMap",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/8",
+      "layerId": 8,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "NAME": "township"
+      },
+      "status": "usable",
+      "notes": "Belvidere / Parkville / Hertford / New Hope / Bethel \u2014 municipality router aid; not city limits."
+    },
+    {
+      "role": "other",
+      "name": "SiteAddressPoints_NextGen (situs labels)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/10",
+      "layerId": 10,
+      "geometry": "point",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "label": "situsAddress",
+        "post_comm": "situsCity",
+        "post_code": "situsZip",
+        "inc_muni": "incorporatedMunicipality"
+      },
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 9658
+      },
+      "notes": "Use for situs join (parcel layer ADDRESS_* is mailing). Layer also contains callingnumber/person \u2014 phones intentionally out of scope; do not harvest."
+    },
+    {
+      "role": "flu",
+      "name": "Joint CAMA Land Use Plan (Perquimans\u2013Hertford\u2013Winfall) PDF",
+      "restUrl": null,
+      "documents": [
+        "https://www.deq.nc.gov/documents/pdf/land-use-plans/perquimanshertwinf-certlupamend2-030518-combined/download",
+        "https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/perquimans-county",
+        "https://www.perquimanscountync.gov/planning-and-zoning"
+      ],
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "gap",
+      "notes": "2016 Joint CAMA LUP Update recertified 3-5-2018 (DEQ PDF HTTP 200, ~33.6 MB). No public labeled FLU FeatureServer found 2026-09-24."
+    }
+  ],
+  "gaps": [
+    "Sale price REST gap \u2014 no SALE_PRICE/SALEPRICE on county AGOL or OneMap; DATE_SOLD / saledatetx are month-year text only",
+    "Situs address not on parcel layer (ADDRESS_* = mailing); join SiteAddressPoints_NextGen label or property-card Location",
+    "Town of Hertford zoning FeatureServer gap (PDF map + ordinance only)",
+    "Town of Winfall zoning FeatureServer gap (limits carve-out only on PERQ_ZONING)",
+    "FLU FeatureServer gap (joint CAMA LUP PDF only)",
+    "AGD PRC PDF path and AGD print map both 404 for perquimans",
+    "Experience Builder 268c\u2026 is statewide OneMap \u2014 not county jurisdiction GIS",
+    "Parcel layer name Parcels_2017 is legacy naming; content is current CAMA",
+    "Utilities / AADT / emails / phones / paid vendors intentionally out of scope"
+  ],
+  "license": "County/AGD public AGOL FeatureServer + NC OneMap; attribution required. Property card site subject to county disclaimer.",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "pass1": {
+      "status": "verified",
+      "parcelPolygonLayer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/2",
+      "polygonCountLive": 15071,
+      "parcelIdField": "parcel_id",
+      "parcelIdFilled": 15059,
+      "acreageField": "dacre",
+      "acres5to150Live": 2912,
+      "sampleCentroidWgs84": [
+        -76.5222,
+        36.1033
+      ]
+    },
+    "parcelLayer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/2",
+    "parcelIdField": "parcel_id",
+    "acreageFilter": "dacre >= 5 AND dacre <= 150",
+    "acres5to150Live": 2912,
+    "parcelCountLive": 15071,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='PERQUIMANS'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27PERQUIMANS%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27PERQUIMANS%27&returnCountOnly=true&f=json",
+        "liveStationCount": 151,
+        "stationsWithAADT2022": 80
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Perquimans'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Perquimans%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Perquimans%27&returnCountOnly=true&f=json",
+        "liveStationCount": 149,
+        "stationsWithAADT2025": 86,
+        "stationsWithAADT2024": 74,
+        "stationsWith2025or2024": 142,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TAX_VAL"
+      ],
+      "liveNonZero": {
+        "TAX_VAL": 14874
+      },
+      "status": "ok",
+      "note": "TAX_VAL is a string: CAST(TAX_VAL AS FLOAT) > 0."
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [
+        "DATE_SOLD"
+      ],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {
+        "DATE_SOLD": 14904
+      },
+      "status": "partial",
+      "note": "DATE_SOLD (string) on layer; no price on REST or on the county search summary page. Price only via the property card linked from that page ([View Property Card] /prc/{opaque id})."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "NAME"
+      ],
+      "primaryOwnerField": "NAME",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(NAME) LIKE '% LLC%' OR UPPER(NAME) LIKE '% INC%' OR UPPER(NAME) LIKE '% LP%' OR UPPER(NAME) LIKE '% LLP%' OR UPPER(NAME) LIKE '% LTD%' OR UPPER(NAME) LIKE '% TRUST%' OR UPPER(NAME) LIKE '% CHURCH%' OR UPPER(NAME) LIKE '% COMPANY%' OR UPPER(NAME) LIKE '% PARTNERSHIP%' OR UPPER(NAME) LIKE '% HOLDINGS%' OR UPPER(NAME) LIKE '% PROPERTIES%' OR UPPER(NAME) LIKE '% CORP%' OR UPPER(NAME) LIKE '%,LLC%' OR UPPER(NAME) LIKE '%,INC%' OR UPPER(NAME) LIKE 'CITY OF %' OR UPPER(NAME) LIKE 'COUNTY OF %' OR UPPER(NAME) LIKE 'STATE OF %' OR UPPER(NAME) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 1527,
+      "liveEntityCount5to150ac": 276,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://www.perquimanscountync.com/search?for={parcel_id}",
+      "testedParcelId": "2-0085-0005I",
+      "testedUrl": "https://www.perquimanscountync.com/search?for=2-0085-0005I",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=utf-8",
+      "contentVerified": true,
+      "note": "County search page returns an owner/value summary with the map number; the summary shows Taxable Value $0 for a parcel with land and building value."
+    },
+    "gisViewer": {
+      "url": "http://perquimans.agdmaps.com/",
+      "httpStatus": 200,
+      "pageTitle": "ArcGIS Web Application",
+      "redirectsTo": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=559506e85ee046a194333eb12e80710f"
+    },
+    "gaps": [
+      "sale partial"
+    ]
+  }
+}

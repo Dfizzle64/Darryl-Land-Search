@@ -1,0 +1,391 @@
+{
+  "state": "NC",
+  "jurisdiction": "Martin County",
+  "county": "Martin",
+  "fips": "37117",
+  "cntyfips": "117",
+  "slug": "martin",
+  "level": "county",
+  "markets": [
+    "Eastern NC",
+    "Greenville"
+  ],
+  "msa": "Eastern NC / Greenville shed",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://gis.martincountyncgov.com/",
+  "publicGisUrl": "https://gis.martincountyncgov.com/",
+  "gisViewerUrl": "https://gis.martincountyncgov.com/",
+  "gisDeepLinkTemplate": "https://gis.martincountyncgov.com/?pin={PARCEL_ID}",
+  "gisDeepLinkNotes": "Viewer config options.queryStringParameters pin uses PIN15 (not on ParcelPolygon) \u2014 fragile. Prefer AppraisalCard / PropertyRecordCards.",
+  "countyRestRoot": "https://gis.martincountyncgov.com/server/rest/services",
+  "taxAssessorUrl": "https://www.martincountync.gov/departments/tax_assessor/real_property.php",
+  "taxAssessorIndexUrl": "https://www.martincountync.gov/departments/tax_assessor/index.php",
+  "gisDownloadsUrl": "https://www.martincountync.gov/departments/tax_assessor/gis_downloads.php",
+  "parcelsShapefileUrl": "https://gis.martincountyncgov.com/DataDownloads/Parcels.zip",
+  "cityLimitsShapefileUrl": "https://gis.martincountyncgov.com/DataDownloads/CityLimits.zip",
+  "appraiserSearchUrl": "https://bttaxpayerportal.com/itspublicmt/AppraisalCard.aspx?id={PARCEL_ID}",
+  "appraiserSearchUrlNotes": "PRIMARY PA deep-link from SearchConfig.js detailTools. PARCEL_ID e.g. 0300695 \u2192 HTTP 200 PDF. Case-insensitive path ITSPublicMT also 200.",
+  "paDeepLinkTemplate": "https://bttaxpayerportal.com/itspublicmt/AppraisalCard.aspx?id={PARCEL_ID}",
+  "paDeepLinkKey": "PARCEL_ID",
+  "paBasicSearchUrl": "https://bttaxpayerportal.com/itspublicmt/BasicSearch",
+  "taxBillSearchUrl": "https://bttaxpayerportal.com/itspublicmt/TaxBillSearch",
+  "propertyRecordCardsUrl": "https://gis.martincountyncgov.com/PropertyRecordCards/default.aspx?ID={PARCEL_ID}",
+  "propertyCardPdfTemplate": "https://gis.martincountyncgov.com/PropertyCards/{PARCEL_ID}-01.pdf",
+  "taxCollectorSearchUrl": "https://tax.martincountyncgov.com/taxSearch",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/martin/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/martin/parcel-detail/{PARCEL_ID}",
+  "ncptsNotes": "SPA shell HTTP 200; prefer ITSPublicMT AppraisalCard for PA deep-link",
+  "parcelIdPreferred": "PARCEL_ID",
+  "joinKeys": [
+    "PARCEL_ID",
+    "MAP_BLOCK_LOT",
+    "PPN_2",
+    "parno",
+    "altparno"
+  ],
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='117'",
+  "oneMapAlternateUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "comprehensivePlanPdfUrl": "https://cms9files.revize.com/martincountync/Document%20Center/Government/Comprehensive%20Plan/ComprehensivePlan13.pdf",
+  "fluMapPdfUrl": "https://connect.ncdot.gov/projects/planning/TPBCTP/Martin%20County/Future%20Land%20Use%202017_0830.pdf",
+  "williamstonCompPlanExecPdfUrl": "http://cms4files.revize.com/townofwilliamston/Williamston_CompPlan_ExecutiveSummary.pdf",
+  "robersonvilleZoningMapPdfUrl": "https://robersonville.org/Robersonville_Zoning_Map_11-25-19.pdf",
+  "robersonvillePlanningUrl": "https://robersonville.org/town_services/planning/index.php",
+  "udoPdfUrl": "https://www.martincountync.gov/Unified%20Development%20Ordinance.pdf",
+  "edcPermittingUrl": "https://martincountyedc.com/permitting/",
+  "townsDirectoryUrl": "https://www.martincountync.gov/how_do_i/find_martin_county_towns.php",
+  "tranche": 3,
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PARCEL_ID",
+        "MAP_BLOCK_LOT",
+        "PPN_2",
+        "parno"
+      ],
+      "bestLayer": "TaxParcels/FeatureServer/0",
+      "notes": "PARCEL_ID preferred (e.g. 0300695); MAP_BLOCK_LOT PIN-like; OneMap parno=PARCEL_ID"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "TaxParcels/FeatureServer/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "ACRES",
+        "TOTAL_ACRES",
+        "DEEDACRES",
+        "gisacres",
+        "Shape__Area"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 3588,
+      "bestLayer": "TaxParcels/FeatureServer/0"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNER_NAME_1",
+        "OWNER_NAME_2",
+        "ownname"
+      ],
+      "bestLayer": "TaxParcels/FeatureServer/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "MAILING_ADDRESS",
+        "CITY",
+        "STATE",
+        "ZIP_CODE"
+      ],
+      "bestLayer": "TaxParcels/FeatureServer/0",
+      "notes": "CITY is mailing city \u2014 not situs municipality"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PROPERTY_LOCATION",
+        "siteadd"
+      ],
+      "bestLayer": "TaxParcels/FeatureServer/0"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SALE_PRICE",
+        "SALE_DATE2",
+        "SALE_DATE",
+        "saledatetx"
+      ],
+      "bestLayer": "TaxParcels/FeatureServer/0",
+      "notes": "SALE_PRICE>0 \u2192 6057; SALE_DATE2 typed date prefer; SALE_DATE YYYYMMDD; OneMap saledate null"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "CURRENT_TOTAL_VALUE",
+        "parval"
+      ],
+      "bestLayer": "TaxParcels/FeatureServer/0",
+      "notes": "Total only on county; OneMap landval/improvval empty"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "ZONE"
+      ],
+      "bestLayer": "ParcelMapSQLExpress/FeatureServer/5",
+      "coverage": "Williamston city-first; Robersonville PDF; Hamilton+others+unincorp gap"
+    },
+    "flu": {
+      "present": false,
+      "fields": [],
+      "notes": "Comp Plan 2013 + NCDOT FLU 2017 PDFs only \u2014 no FeatureServer"
+    },
+    "appraiserSearchUrl": {
+      "present": true,
+      "template": "https://bttaxpayerportal.com/itspublicmt/AppraisalCard.aspx?id={PARCEL_ID}",
+      "key": "PARCEL_ID"
+    },
+    "jurisdictionGisUrl": {
+      "present": true,
+      "url": "https://gis.martincountyncgov.com/"
+    }
+  },
+  "municipalities": [
+    {
+      "name": "Williamston",
+      "role": "county-seat",
+      "zoning": "ParcelMapSQLExpress/5 ZONE",
+      "zoningStatus": "usable",
+      "etj": "WILLIAMSTON ETJ FS/7"
+    },
+    {
+      "name": "Robersonville",
+      "role": "town",
+      "zoning": "PDF only",
+      "zoningStatus": "partial",
+      "zoningPdf": "https://robersonville.org/Robersonville_Zoning_Map_11-25-19.pdf"
+    },
+    {
+      "name": "Hamilton",
+      "role": "town",
+      "zoning": "ordinance only (EDC)",
+      "zoningStatus": "gap",
+      "etj": "HAMILTON ETJ FS/8"
+    },
+    {
+      "name": "Jamesville",
+      "role": "town",
+      "zoning": "unzoned",
+      "zoningStatus": "gap"
+    },
+    {
+      "name": "Oak City",
+      "role": "town",
+      "zoning": "unzoned",
+      "zoningStatus": "gap"
+    },
+    {
+      "name": "Bear Grass",
+      "role": "town",
+      "zoning": "unzoned",
+      "zoningStatus": "gap"
+    },
+    {
+      "name": "Everetts",
+      "role": "town",
+      "zoning": "unzoned",
+      "zoningStatus": "gap"
+    },
+    {
+      "name": "Hassell",
+      "role": "town",
+      "zoning": "unzoned",
+      "zoningStatus": "gap"
+    },
+    {
+      "name": "Parmele",
+      "role": "town",
+      "zoning": "unzoned",
+      "zoningStatus": "gap"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "TaxParcels (PRIMARY)",
+      "restUrl": "https://gis.martincountyncgov.com/server/rest/services/TaxParcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "MAP_BLOCK_LOT": "parcelIdPin",
+        "PPN_2": "parcelIdAlt",
+        "OWNER_NAME_1": "ownerName",
+        "OWNER_NAME_2": "ownerName2",
+        "MAILING_ADDRESS": "mailingAddress.street",
+        "CITY": "mailingAddress.city",
+        "STATE": "mailingAddress.state",
+        "ZIP_CODE": "mailingAddress.zip",
+        "PROPERTY_LOCATION": "situsAddress",
+        "ACRES": "acreage",
+        "TOTAL_ACRES": "acreageReported",
+        "DEEDACRES": "acreageDeed",
+        "SALE_PRICE": "lastSale.price",
+        "SALE_DATE2": "lastSale.date",
+        "SALE_DATE": "lastSale.dateYyyymmdd",
+        "CURRENT_TOTAL_VALUE": "tax.marketValue",
+        "DEED_BOOK": "lastSale.deedBook",
+        "DEED_PAGE": "lastSale.deedPage",
+        "LAST_UPDATE": "recordUpdatedYyyymmdd",
+        "TOWNSHIP_NAME": "township",
+        "DISTRICT_NO": "taxDistrict"
+      },
+      "notes": "PRIMARY wire-first verified 2026-09-24: count 17048; ACRES 5\u2013150 \u2192 3588; TOTAL_ACRES 5\u2013150 \u2192 3606; SALE_PRICE>0 \u2192 6057; sale+band \u2192 971; SALE_DATE2 \u2192 6186; CURRENT_TOTAL_VALUE>0 \u2192 16917; owner/situs \u2192 16919. CRS 102719/2264. MaxRecordCount 1000 \u2014 paginate. Sample PARCEL_ID 0300695 / MBL 5772-94-6258. Geo \u2248 -77.05, 35.71. Auth: none.",
+      "status": "usable",
+      "verifiedCount": 17048
+    },
+    {
+      "role": "parcels",
+      "name": "ParcelMapSQLExpress / ParcelPolygon (twin)",
+      "restUrl": "https://gis.martincountyncgov.com/server/rest/services/ParcelMapSQLExpress/FeatureServer/22",
+      "layerId": 22,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "MAP_BLOCK_LOT": "parcelIdPin",
+        "OWNER_NAME_1": "ownerName",
+        "PROPERTY_LOCATION": "situsAddress",
+        "ACRES": "acreage",
+        "SALE_PRICE": "lastSale.price",
+        "SALE_DATE2": "lastSale.date",
+        "CURRENT_TOTAL_VALUE": "tax.marketValue"
+      },
+      "notes": "Same 17048 footprint/schema as TaxParcels/0. Used by CountyMapViewer identify + Property Record Card button.",
+      "status": "usable",
+      "verifiedCount": 17048
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (fallback)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "saledatetx": "lastSale.dateText",
+        "saledate": "lastSale.date"
+      },
+      "notes": "Filter cntyfips='117'. Verified count 17415; gisacres 5\u2013150 \u2192 3647; parval>0 \u2192 17290; saledatetx 17415; saledate 0; landval/improvval all 0. parno\u2194PARCEL_ID. No sale price. MaxRecordCount 5000.",
+      "status": "usable",
+      "verifiedCount": 17415,
+      "filter": "cntyfips='117'"
+    },
+    {
+      "role": "zoning",
+      "name": "ZONING Williamston (city-first PRIMARY)",
+      "restUrl": "https://gis.martincountyncgov.com/server/rest/services/ParcelMapSQLExpress/FeatureServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "fieldMap": {
+        "ZONE": "zoning"
+      },
+      "notes": "65 district polys; CH 11, O&I 9, M1 6, R15 6, R8 5, M2 5, R20-AO 4, \u2026. Spatial-join Williamston limits/ETJ. Robersonville/Hamilton not included.",
+      "status": "usable",
+      "verifiedCount": 65,
+      "municipality": "Williamston"
+    },
+    {
+      "role": "zoning",
+      "name": "Robersonville Zoning Map (PDF)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "city-only",
+      "fieldMap": {},
+      "notes": "https://robersonville.org/Robersonville_Zoning_Map_11-25-19.pdf HTTP 200. No FeatureServer.",
+      "status": "partial",
+      "pdfUrl": "https://robersonville.org/Robersonville_Zoning_Map_11-25-19.pdf",
+      "municipality": "Robersonville"
+    },
+    {
+      "role": "boundaries",
+      "name": "City Limits + ETJ",
+      "restUrl": "https://gis.martincountyncgov.com/server/rest/services/ParcelMapSQLExpress/FeatureServer/6",
+      "layerId": 6,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "NAME": "municipality"
+      },
+      "notes": "16 polys: WILLIAMSTON(6)+AREA A+ORD, ROBERSONVILLE, JAMESVILLE, OAK CITY, BEAR GRASS, EVERETTS, HASSELL, HAMILTON, PARMELE. ETJ FS/7 Williamston, FS/8 Hamilton.",
+      "status": "usable",
+      "verifiedCount": 16,
+      "relatedLayers": [
+        "https://gis.martincountyncgov.com/server/rest/services/ParcelMapSQLExpress/FeatureServer/7",
+        "https://gis.martincountyncgov.com/server/rest/services/ParcelMapSQLExpress/FeatureServer/8"
+      ]
+    },
+    {
+      "role": "flu",
+      "name": "Future Land Use (PDF gap)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {},
+      "notes": "Comp Plan 2013 + NCDOT FLU 2017 PDF. No public FLU FeatureServer.",
+      "status": "gap",
+      "pdfUrls": [
+        "https://cms9files.revize.com/martincountync/Document%20Center/Government/Comprehensive%20Plan/ComprehensivePlan13.pdf",
+        "https://connect.ncdot.gov/projects/planning/TPBCTP/Martin%20County/Future%20Land%20Use%202017_0830.pdf"
+      ]
+    }
+  ],
+  "gaps": [
+    "No public zoning FeatureServer for Robersonville (PDF only) or Hamilton (ordinance only)",
+    "Bear Grass, Everetts, Hassell, Jamesville, Oak City, Parmele unzoned; unincorporated Martin has no countywide base zoning",
+    "FLU FeatureServer gap (Comp Plan 2013 + NCDOT FLU 2017 + Williamston Comp Plan PDFs only)",
+    "County parcels lack land/improvement value split (CURRENT_TOTAL_VALUE only); OneMap landval/improvval empty for cntyfips='117'",
+    "OneMap saledate date field null \u2014 use county SALE_DATE2/SALE_DATE or OneMap saledatetx",
+    "Parcel CITY is mailing city \u2014 situs municipality requires City Limits/ETJ spatial join",
+    "GIS viewer ?pin= deep-link config references missing PIN15 field \u2014 fragile",
+    "Utilities / AADT / emails / phones / paid vendors intentionally out of scope"
+  ],
+  "license": "County public GIS / open REST; attribution to Martin County NC GIS / Tax Assessor",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verificationNotes": "TaxParcels/0 count/acres/sale/tax/owner + geo sample; ParcelPolygon twin 17048; OneMap cntyfips='117' counts + saledatetx + parno join; ZONING 65 + districts; City Limits 9 munis / ETJ 2; ITSPublicMT AppraisalCard + PropertyCards PDF + NCPTS + GIS viewer + Comp Plan/FLU/Robersonville PDF 200; DataDownloads Parcels.zip 200"
+}

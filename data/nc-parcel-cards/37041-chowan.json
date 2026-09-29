@@ -1,0 +1,457 @@
+{
+  "state": "NC",
+  "jurisdiction": "Chowan County",
+  "county": "Chowan",
+  "fips": "37041",
+  "cntyfips": "041",
+  "slug": "chowan",
+  "level": "county",
+  "markets": [
+    "Eastern NC"
+  ],
+  "msa": "Eastern NC",
+  "crs_preferred": {
+    "wkid": 3359,
+    "latestWkid": 3404,
+    "name": "NAD 1983 (2011) StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=dc1c3a48141744c1a123bcad4e5cef50",
+  "jurisdictionGisUrlAlt": "http://www.chowancountygis.com/",
+  "jurisdictionGisUrlExperience": "https://experience.arcgis.com/experience/c156654f7d4b4a0fa8a240c6f09fe3b8",
+  "appraiserSearchUrl": "http://taxonline.chowancountync.email/itspubliccw/AppraisalCard.aspx?id={PIN}",
+  "appraiserSearchUrlNotes": "ITS AppraisalCard PDF deep-link with parcel PIN. Field PRC on Chowan_Feature_Service/0 already stores full URL. Verified HTTP 200 application/pdf for PIN 791500844573. dl.agd.cc/prc/nc/chowan 404 \u2014 do not use AGD PRC path.",
+  "paDeepLinkKey": "PIN",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "parno",
+    "ACCT_NUM"
+  ],
+  "agdPrintUrlTemplate": "http://apps.agdmaps.com/print/nc/chowan/index.html?PIN={PIN}",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/Chowan/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/Chowan/parcel-detail?reid={PIN}",
+  "ncptsDeepLinkPathTemplate": "https://lrcpwa.ncptscloud.com/Chowan/parcel-detail/{PIN}",
+  "taxPayUrl": "https://www.govpayments.com/nc_chowan/search",
+  "taxOnlineUrl": "http://taxonline.chowancountync.email/itsnet/RealEstate.aspx",
+  "registerOfDeedsUrl": "https://us4.courthousecomputersystems.com/ChowanNC/",
+  "gisDeptUrl": "https://www.chowancounty-nc.gov/land-records",
+  "countyRestRoot": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='041'",
+  "countyLupPdfUrl": "https://www.chowancounty-nc.gov/vertical/sites/%7B10E82D50-AAE0-43D7-A98A-42E82683885E%7D/uploads/Chowan-Edenton_LUP_Updated_10-25-18_Plan_and_Appendices_11-19-2018.pdf",
+  "deqLupPdfUrl": "https://files.nc.gov/ncdeq/Coastal%20Management/documents/PDF/Land%20Use%20Plans/ChowanEdentonLUPCertified_111518.pdf",
+  "deqLupHubUrl": "https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/chowan-county",
+  "countyZoningOrdinanceUrl": "https://www.chowancounty-nc.gov/index.asp?SEC=%7B60CC2A8D-8C91-4266-A092-8206C3D8F31A%7D&Type=B_BASIC",
+  "countyZoningArticle4PdfUrl": "https://www.chowancounty-nc.gov/vertical/sites/%7B10E82D50-AAE0-43D7-A98A-42E82683885E%7D/uploads/Article_4_Zoning_Districts_and_Zoning_Map.pdf",
+  "edentonUdoHubUrl": "https://www.townofedenton.com/planning-department/page/unified-development-ordinance",
+  "rejectLayers": [
+    {
+      "name": "AGD PRC nc/chowan",
+      "url": "https://dl.agd.cc/prc/nc/chowan/",
+      "reason": "HTTP 404 \u2014 use taxonline itspubliccw/AppraisalCard.aspx?id={PIN} instead"
+    },
+    {
+      "name": "Landuse ALPHA-only",
+      "url": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/13",
+      "reason": "ALPHA C/W only \u2014 not usable labeled FLU; use 2018 CAMA LUP PDF"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Edenton",
+      "role": "city-first-zoning",
+      "cityCode": "EDENTON",
+      "notes": "County seat; only incorporated muni; City_Limit ALPHA=EDENTON; Edenton_Zoning FS/16 PRIMARY (R-5/R-10/R-14/R-20/CH/CD/CN/IW/MA/SC/RA + CU-*); joint CAMA LUP with county; UDO hub on townofedenton.com"
+    },
+    {
+      "name": "Tyner",
+      "role": "unincorporated-cdp",
+      "cityCode": null,
+      "notes": "Unincorporated CDP; mailing city common; under County_Zoning / county Development Codes \u2014 not a separate zoning jurisdiction"
+    },
+    {
+      "name": "Hobbsville",
+      "role": "unincorporated-cdp",
+      "cityCode": null,
+      "notes": "Unincorporated CDP; under County_Zoning / county Development Codes"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Chowan_Feature_Service Parcels_Polygon (PRIMARY county AGOL CAMA + SALE_PRICE)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/0",
+      "alternateUrls": [
+        "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/23"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "PIN": "parcelId",
+        "PIN_1": "parcelIdAlt",
+        "ACCT_NUM": "accountNumber",
+        "OWNER1": "ownerName",
+        "OWNER2": "ownerName2",
+        "MAILADDRESS1": "mailingAddress.street",
+        "MAILADDRESS2": "mailingAddress.street2",
+        "MAILCITY": "mailingAddress.city",
+        "MAILSTATE": "mailingAddress.state",
+        "MAILZIPCODE": "mailingAddress.zip",
+        "SITUS_ADDR": "situsAddress",
+        "ACRES": "acreage",
+        "LAND_VAL": "tax.landValue",
+        "BLDG_VAL": "tax.improvementValue",
+        "DEF_VAL": "tax.deferredValue",
+        "TOT_VAL": "tax.totalValue",
+        "OBXF_VAL": "tax.obxfValue",
+        "SALE_PRICE": "lastSale.price",
+        "SALE_DT": "lastSale.dateYyyymmdd",
+        "DATE_REC": "lastSale.date",
+        "DEED_BK_PG": "lastSale.deedBookPage",
+        "ZONING_CDE": "zoning",
+        "PRC": "appraiserDeepLink",
+        "Print_": "agdPrintUrl",
+        "TWP_NAME": "township",
+        "TAXCDE": "taxCode",
+        "SUBDIVISION": "subdivision",
+        "PROP_DESC": "legalDescription"
+      },
+      "notes": "PRIMARY wire-first. Verified 2026-09-24: count 12888; PIN\u2260OUTSIDE 12768; ACRES 5\u2013150 \u2192 2153; Shape acres 5\u2013150 \u2192 2109; OWNER1 12736; SALE_PRICE>0 6581; sale+band 763; ZONING_CDE nonempty 12553; PRC 12788; LAND_VAL>0 1 (tax REST scrubbed). Filter PIN <> OUTSIDE. MAILCITY is mailing city \u2014 situs muni via City_Limit spatial join. Geo sample PIN 688700852910 A1 centroid ~-76.673, 36.135. MaxRecordCount 2000. CRS 3359/3404.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 12888,
+        "pin_real": 12768,
+        "acres_5_150": 2153,
+        "shape_acres_5_150": 2109,
+        "owner_nonnull": 12736,
+        "sale_price_gt0": 6581,
+        "sale_in_5_150": 763,
+        "zoning_cde_nonempty": 12553,
+        "prc_nonnull": 12788,
+        "landval_gt0": 1,
+        "totval_gt0": 1
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (cntyfips='041')",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "recareano",
+      "coverage": "county-wide",
+      "filter": "cntyfips='041'",
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "siteadd": "situsAddress",
+        "gisacres": "acreageBroken",
+        "recareano": "acreage",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "parval": "tax.marketValue",
+        "saledate": "lastSale.date",
+        "saledatetx": "lastSale.dateText"
+      },
+      "notes": "Statewide fallback. Verified 2026-09-24: count 25690 (inflated vs county); parno\u2260OUTSIDE 25650; ownname nonempty 25438; recareano 5\u2013150 \u2192 4302; Shape acres 5\u2013150 \u2192 4244; saledatetx usable 25400; gisacres/parval/landval all 0. Join parno=PIN. Prefer county layer for SALE_PRICE/ZONING_CDE/PRC/ACRES.",
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 25690,
+        "pin_real": 25650,
+        "recareano_5_150": 4302,
+        "shape_acres_5_150": 4244,
+        "ownname_nonempty": 25438,
+        "saledatetx_usable": 25400,
+        "gisacres_gt0": 0,
+        "parval_gt0": 0,
+        "landval_gt0": 0
+      }
+    },
+    {
+      "role": "sales",
+      "name": "Chowan2021Sales (supplemental 2021 vintage)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan2021Sales/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide sample-year",
+      "fieldMap": {
+        "PIN": "parcelId",
+        "ParcelNumb": "parcelIdAlt",
+        "SalePrice": "lastSale.price",
+        "SaleYear": "lastSale.year"
+      },
+      "notes": "603 features all SalePrice>0; 2021 vintage supplemental join. Prefer parcel-layer SALE_PRICE for current.",
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 603,
+        "saleprice_gt0": 603
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Edenton_Zoning (cities-first PRIMARY)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/16",
+      "layerId": 16,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "fieldMap": {
+        "ZONE": "zoning",
+        "LABEL": "zoningLabel"
+      },
+      "notes": "420 polys. Districts R-5/R-10/R-14/R-20/CH/CD/CN/IW/MA/SC/RA + CU-*. Cities-first PRIMARY for Edenton corporate (+ETJ coverage as published).",
+      "status": "usable",
+      "supportingDocs": [
+        "https://www.townofedenton.com/planning-department/page/unified-development-ordinance"
+      ],
+      "verifiedCounts": {
+        "total": 420
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "County_Zoning (unincorporated + county districts)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/15",
+      "layerId": 15,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide excl. Edenton core",
+      "fieldMap": {
+        "ZONE": "zoning",
+        "LABEL": "zoningLabel"
+      },
+      "notes": "77 polys. A-1/R-25/R-5/R-15/I-1/I-2/B-1/RMH-25/CN/R-10/R-40 + CU-*. Pair with parcel ZONING_CDE attribute.",
+      "status": "usable",
+      "supportingDocs": [
+        "https://www.chowancounty-nc.gov/vertical/sites/%7B10E82D50-AAE0-43D7-A98A-42E82683885E%7D/uploads/Article_4_Zoning_Districts_and_Zoning_Map.pdf",
+        "https://www.chowancounty-nc.gov/index.asp?SEC=%7B60CC2A8D-8C91-4266-A092-8206C3D8F31A%7D&Type=B_BASIC"
+      ],
+      "verifiedCounts": {
+        "total": 77
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Parcel ZONING_CDE attribute (county-wide attr mirror)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "ZONING_CDE": "zoning",
+        "PIN": "parcelId"
+      },
+      "notes": "~12553 non-empty. Top A1/R15/R5/R25/R10/R20/R14/RA/CH/IW/CD. Spatial-join City_Limit to choose Edenton vs county district stack.",
+      "status": "usable",
+      "verifiedCounts": {
+        "zoning_cde_nonempty": 12553
+      }
+    },
+    {
+      "role": "flu",
+      "name": "Chowan\u2013Edenton CAMA LUP 2018 (PDF gap)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county + Edenton joint",
+      "notes": "No public labeled FLU FeatureServer. Use 2018 joint CAMA LUP PDF (county upload + DEQ mirror). Landuse FS/13 ALPHA-only rejected as labeled FLU.",
+      "status": "gap",
+      "supportingDocs": [
+        "https://www.chowancounty-nc.gov/vertical/sites/%7B10E82D50-AAE0-43D7-A98A-42E82683885E%7D/uploads/Chowan-Edenton_LUP_Updated_10-25-18_Plan_and_Appendices_11-19-2018.pdf",
+        "https://files.nc.gov/ncdeq/Coastal%20Management/documents/PDF/Land%20Use%20Plans/ChowanEdentonLUPCertified_111518.pdf",
+        "https://www.deq.nc.gov/about/divisions/coastal-management/coastal-management-land-use-planning/certified-lups/chowan-county"
+      ]
+    },
+    {
+      "role": "other",
+      "name": "City_Limit_Polygon (muni router)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "municipal",
+      "fieldMap": {
+        "ALPHA": "municipality"
+      },
+      "notes": "1 city poly ALPHA=EDENTON for cities-first router. Verified 2026-09-24.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 1
+      }
+    },
+    {
+      "role": "other",
+      "name": "VAD_PARCELS (overlay)",
+      "restUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/28",
+      "layerId": 28,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide overlay",
+      "notes": "VAD overlay only \u2014 not municipal base zoning. 219 features.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 219
+      }
+    }
+  ],
+  "gaps": [
+    "Tax REST value scrub \u2014 LAND_VAL/BLDG_VAL/TOT_VAL fields exist but nearly all 0 on public AGOL and OneMap; use AppraisalCard PDF for live tax",
+    "OneMap cntyfips='041' count inflated (~25.7k vs county ~12.8k); gisacres/parval/landval all 0 \u2014 use recareano/Shape__Area or prefer county ACRES",
+    "FLU FeatureServer gap \u2014 2018 Chowan\u2013Edenton CAMA LUP PDF only; Landuse/13 ALPHA C/W unusable as labeled FLU",
+    "Only one incorporated municipality (Edenton); Tyner/Hobbsville are unincorporated CDPs under county zoning",
+    "MAILCITY is mailing city \u2014 situs municipality requires City_Limit spatial join",
+    "Courthouse Computer Systems ROD portal may 403 from some egress IPs (URL still canonical)",
+    "dl.agd.cc/prc/nc/chowan 404 \u2014 use ITS AppraisalCard PDF",
+    "Chowan2021Sales is 2021-vintage supplemental only",
+    "Utilities / AADT / emails / phones / paid vendors intentionally out of scope"
+  ],
+  "license": "County public GIS / AGOL; attribution recommended",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Chowan_Feature_Service/FeatureServer/0",
+    "parcelIdField": "PIN",
+    "acreageFilter": "ACRES >= 5 AND ACRES <= 150",
+    "acres5to150Live": 2153,
+    "parcelCountLive": 12888,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='CHOWAN'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CHOWAN%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CHOWAN%27&returnCountOnly=true&f=json",
+        "liveStationCount": 170,
+        "stationsWithAADT2022": 96
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Chowan'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Chowan%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Chowan%27&returnCountOnly=true&f=json",
+        "liveStationCount": 165,
+        "stationsWithAADT2025": 112,
+        "stationsWithAADT2024": 108,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TOT_VAL",
+        "LAND_VAL"
+      ],
+      "allTaxFieldsOnLayer": [
+        "LAND_VAL",
+        "BLDG_VAL",
+        "DEF_VAL",
+        "TOT_VAL",
+        "OBXF_VAL",
+        "TAXCDE"
+      ],
+      "liveNonZero": {
+        "TOT_VAL": 1,
+        "LAND_VAL": 1
+      },
+      "status": "scrubbed",
+      "fallback": {
+        "source": "PA AppraisalCard PDF (values present, Tax Year 2026 card verified for PIN 791500625865)",
+        "note": "REST TOT_VAL/LAND_VAL/BLDG_VAL are 0 on all but 1 of 12,888 rows (TAXYEAR=2027 roll, values blanked); NC OneMap parval>0 for cntyfips=041 is also 0 of 25,690."
+      }
+    },
+    "sale": {
+      "priceFields": [
+        "SALE_PRICE"
+      ],
+      "dateFields": [
+        "SALE_DT",
+        "DATE_REC"
+      ],
+      "livePriceNonZero": {
+        "SALE_PRICE": 6581
+      },
+      "liveDateNonNull": {
+        "SALE_DT": 12717,
+        "DATE_REC": 12717
+      },
+      "status": "ok",
+      "note": "SALE_DT is an integer yyyymmdd; DATE_REC is a date string."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNER1",
+        "OWNER2"
+      ],
+      "primaryOwnerField": "OWNER1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNER1) LIKE '% LLC%' OR UPPER(OWNER1) LIKE '% INC%' OR UPPER(OWNER1) LIKE '% LP%' OR UPPER(OWNER1) LIKE '% LLP%' OR UPPER(OWNER1) LIKE '% LTD%' OR UPPER(OWNER1) LIKE '% TRUST%' OR UPPER(OWNER1) LIKE '% CHURCH%' OR UPPER(OWNER1) LIKE '% COMPANY%' OR UPPER(OWNER1) LIKE '% PARTNERSHIP%' OR UPPER(OWNER1) LIKE '% HOLDINGS%' OR UPPER(OWNER1) LIKE '% PROPERTIES%' OR UPPER(OWNER1) LIKE '% CORP%' OR UPPER(OWNER1) LIKE '%,LLC%' OR UPPER(OWNER1) LIKE '%,INC%' OR UPPER(OWNER1) LIKE 'CITY OF %' OR UPPER(OWNER1) LIKE 'COUNTY OF %' OR UPPER(OWNER1) LIKE 'STATE OF %' OR UPPER(OWNER1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 1449,
+      "liveEntityCount5to150ac": 334,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "http://taxonline.chowancountync.email/itspubliccw/AppraisalCard.aspx?id={PIN}",
+      "testedParcelId": "791500625865",
+      "testedUrl": "http://taxonline.chowancountync.email/itspubliccw/AppraisalCard.aspx?id=791500625865",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "200 application/pdf. Owner HOBBS, WENDELL LYNN, parcel id and Tax Year 2026 values verified in the PDF text (http; confirmed on retry)."
+    },
+    "gisViewer": {
+      "url": "https://agdonline.maps.arcgis.com/apps/webappviewer/index.html?id=dc1c3a48141744c1a123bcad4e5cef50",
+      "httpStatus": 200,
+      "pageTitle": "ArcGIS Web Application",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Chowan_Web_Application",
+        "type": "Web Mapping Application",
+        "err": null
+      }
+    },
+    "gaps": [
+      "tax scrubbed"
+    ]
+  }
+}

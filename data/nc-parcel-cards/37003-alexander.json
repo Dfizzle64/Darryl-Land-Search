@@ -1,0 +1,618 @@
+{
+  "state": "NC",
+  "jurisdiction": "Alexander County",
+  "county": "Alexander",
+  "fips": "37003",
+  "cntyfips": "003",
+  "slug": "alexander",
+  "level": "county",
+  "markets": [
+    "Hickory"
+  ],
+  "msa": "Hickory-Lenoir-Morganton MSA",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://maps.alexandercountync.gov/maps/",
+  "gisDeepLinkTemplate": "https://maps.alexandercountync.gov/maps/?pin={PARCELID}",
+  "gisDeepLinkTemplateAlt": "https://maps.alexandercountync.gov/maps/default.htm?pin={PARCELID}",
+  "countyRestRoot": "https://maps.alexandercountync.gov/arcgis/rest/services",
+  "gisDepartmentUrl": "https://alexandercountync.gov/departments/gis/",
+  "planningUrl": "https://alexandercountync.gov/departments/planning/",
+  "appraiserSearchUrl": "https://maps.alexandercountync.gov/PRC/{PARCELID}.html",
+  "appraiserSearchUrlNotes": "PARCELID is zero-padded 7-digit string (PROPERTY integer). Viewer SearchConfig Tax Card \u2192 PRC/${PARCELID}.html. Verified 0000076 \u2192 V&J ENTERPRISES LLC, SALES PRICE 78,000.",
+  "paDeepLinkKey": "PARCELID",
+  "parcelIdPreferred": "PIN",
+  "joinKeys": [
+    "PIN",
+    "PARCELID",
+    "PROPERTY",
+    "ACCOUNT",
+    "parno",
+    "altparno"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/alexander/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/alexander/parcel-detail/{PIN}",
+  "smartGovParcelsUrl": "https://co-alexander-nc.smartgovcommunity.com/Parcels/ParcelHome",
+  "taylorsvilleUrl": "https://www.taylorsvillenc.com/",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='003'",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "PARCELID",
+        "PROPERTY",
+        "ACCOUNT",
+        "parno"
+      ],
+      "bestLayer": "Website_map/Parcels/26",
+      "notes": "PARCELID (7-digit zero-pad) for PRC + viewer ?pin=; PIN (10-digit) for OneMap/NCPTS"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Website_map/Parcels/26"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALCULATED_ACREAGE",
+        "DEEDED_ACREAGE",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 7303,
+      "bestLayer": "Website_map/Parcels/26"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OWNER_NAME1",
+        "OWNER_NAME2",
+        "OWNER_NAME3",
+        "ownname"
+      ],
+      "bestLayer": "Website_map/Parcels/26"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "MAILING_ADDRESS",
+        "MAILING_CITY",
+        "MAILING_STATE",
+        "MAILING_ZIP_CODE"
+      ],
+      "bestLayer": "Website_map/Parcels/26"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PHYSICAL_ADDRESS",
+        "PHYSICAL_HOUSE",
+        "PHYSICAL_STREET_NAME",
+        "siteadd"
+      ],
+      "bestLayer": "Website_map/Parcels/26"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "DATE_SOLD",
+        "SALES_PRICE"
+      ],
+      "bestLayer": "Website_map/Parcels/26",
+      "notes": "DATE_SOLD is YYYYMMDD double; year Sales layers BoundaryLayers/0\u20133 for recent comps"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "MARKET_VALUE",
+        "ASSESED_VALUE",
+        "LAND_VALUE",
+        "STRUCTURE_VALUE",
+        "OTHER_VALUE"
+      ],
+      "bestLayer": "Website_map/Parcels/26",
+      "notes": "ASSESED_VALUE spelling (one S) on source"
+    },
+    "zoning": {
+      "present": true,
+      "citiesFirst": true,
+      "fields": [
+        "ProposedZoning"
+      ],
+      "bestLayer": "Website_map/Zoning/72 (+ Downtown/Biz Corridor overlays inside Taylorsville)"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "FLU_Classification",
+        "MERGE_SRC"
+      ],
+      "bestLayer": "Website_map/Zoning/72 FLU_Classification (prefer) + Overlay/Future Land Use/30",
+      "caveat": "Overlay/30 MERGE_SRC inventory skewed (~1029 Conservation of 1064); prefer parcel FLU_Classification"
+    }
+  },
+  "municipalities": {
+    "Taylorsville": {
+      "role": "county seat; city-first zoning overlays",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": "Website_map/MapServer/72 ProposedZoning spatially filtered by City Limits TYPE='CITYLIMIT'",
+      "overlays": [
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/73",
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/74",
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Overlay/MapServer/26"
+      ],
+      "overlayCounts": {
+        "Downtown": 97,
+        "BusinessCorridor": 112,
+        "Historic": 1
+      },
+      "cityLimitsUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/29",
+      "notes": "Only incorporated municipality. No independent town ArcGIS \u2014 county ProposedZoning + Downtown/Business Corridor/Historic overlays. ETJ polys present (TYPE='ETJ')."
+    },
+    "Bethlehem": {
+      "role": "CDP; unincorporated",
+      "incorporated": false,
+      "zoningPrefer": "county ProposedZoning",
+      "notes": "Census CDP \u2014 no municipal zoning REST"
+    },
+    "Hiddenite": {
+      "role": "CDP; unincorporated",
+      "incorporated": false,
+      "zoningPrefer": "county ProposedZoning",
+      "notes": "Census CDP \u2014 no municipal zoning REST"
+    },
+    "Stony Point": {
+      "role": "CDP; unincorporated",
+      "incorporated": false,
+      "zoningPrefer": "county ProposedZoning",
+      "notes": "Census CDP \u2014 no municipal zoning REST"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Website_map Parcels (PRIMARY CAMA)",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/26",
+      "alternateUrls": [
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Parcels/MapServer/0"
+      ],
+      "layerId": 26,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CALCULATED_ACREAGE",
+      "coverage": "county-wide",
+      "status": "usable",
+      "primary": true,
+      "counts": {
+        "total": 26977,
+        "acres5to150": 7303,
+        "salesPriceGt0": 6411,
+        "salesPriceGt0InRange": 1144,
+        "marketValueGt0": 25420
+      },
+      "fieldMap": {
+        "PIN": "parcelId",
+        "PARCELID": "parcelIdAlt",
+        "PROPERTY": "parcelIdInt",
+        "ACCOUNT": "parcelIdAccount",
+        "CALCULATED_ACREAGE": "acreage",
+        "DEEDED_ACREAGE": "acreage",
+        "OWNER_NAME1": "ownerName",
+        "OWNER_NAME2": "ownerName",
+        "OWNER_NAME3": "ownerName",
+        "MAILING_ADDRESS": "mailingAddress",
+        "MAILING_CITY": "mailingAddress",
+        "MAILING_STATE": "mailingAddress",
+        "MAILING_ZIP_CODE": "mailingAddress",
+        "PHYSICAL_ADDRESS": "situsAddress",
+        "DATE_SOLD": "lastSale.date",
+        "SALES_PRICE": "lastSale.price",
+        "MARKET_VALUE": "tax.marketValue",
+        "ASSESED_VALUE": "tax.assessedValue",
+        "LAND_VALUE": "tax.landValue",
+        "STRUCTURE_VALUE": "tax.improvementValue",
+        "OTHER_VALUE": "tax.otherValue",
+        "DEED_BOOK": "other",
+        "DEED_PAGE": "other",
+        "DEED_YEAR": "other"
+      },
+      "notes": "PRIMARY wire-first. MaxRecordCount 1000 \u2014 paginate. CRS 102719/2264. Sample PIN 3787978905 / PARCELID 0000076 centroid \u2248 -81.06, 35.87 (Alexander). DATE_SOLD is YYYYMMDD numeric."
+    },
+    {
+      "role": "parcels",
+      "name": "Tax Map and Lot",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/19",
+      "alternateUrls": [
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Zoning_Website_map/MapServer/4"
+      ],
+      "layerId": 19,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CALCULATED_ACREAGE",
+      "coverage": "county-wide",
+      "status": "usable",
+      "counts": {
+        "total": 25405
+      },
+      "fieldMap": {
+        "PIN_#": "parcelId",
+        "PARCEL#": "parcelIdInt",
+        "ACCOUNT#": "parcelIdAccount",
+        "OWNER_NAME1": "ownerName",
+        "PHYSICAL_ADDRESS": "situsAddress",
+        "DATE_SOLD": "lastSale.date",
+        "SALES_PRICE": "lastSale.price",
+        "MARKET_VALUE": "tax.marketValue",
+        "ASSESED_VALUE": "tax.assessedValue"
+      },
+      "notes": "CAMA twin with # field names; count slightly lower than Parcels/26. Prefer /26."
+    },
+    {
+      "role": "sales",
+      "name": "BoundaryLayers year Sales by Parcel",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/BoundaryLayers/MapServer",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "yearLayers": [
+        {
+          "id": 0,
+          "name": "2026 Sales by Parcel",
+          "count": 70
+        },
+        {
+          "id": 1,
+          "name": "2025 Sales by Parcel",
+          "count": 491
+        },
+        {
+          "id": 2,
+          "name": "2024 Sales by Parcel",
+          "count": 450
+        },
+        {
+          "id": 3,
+          "name": "2023 Sales by Parcel",
+          "count": 447
+        }
+      ],
+      "fieldMap": {
+        "PIN": "parcelId",
+        "PARCEL": "parcelIdInt",
+        "DATE_SOLD": "lastSale.date",
+        "SALES_PRIC": "lastSale.price",
+        "MARKET_VAL": "tax.marketValue"
+      },
+      "notes": "Truncated shapefile field names on some years. Website_map/28 is 2022 Sales by Parcel (607). Prefer parcel DATE_SOLD/SALES_PRICE for last sale; year layers for comps."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "partial",
+      "filter": "cntyfips='003'",
+      "counts": {
+        "total": 25265,
+        "acres5to150": 5990,
+        "saledateNotNull": 0
+      },
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "mcity": "mailingAddress",
+        "mstate": "mailingAddress",
+        "mzip": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "saledatetx": "lastSale.date",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "cntyfips": "other"
+      },
+      "notes": "Statewide fallback. Join parno\u2194PIN (verified 3787978905). saledate epoch empty; use saledatetx. No sale price. Prefer county CALCULATED_ACREAGE/CAMA values."
+    },
+    {
+      "role": "zoning",
+      "name": "Website_map Zoning (ProposedZoning + FLU_Classification)",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/72",
+      "alternateUrls": [
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Zoning_Website_map/MapServer/5",
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Overlay/MapServer/27"
+      ],
+      "layerId": 72,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "citiesFirst": true,
+      "counts": {
+        "total": 25074,
+        "byProposedZoning": {
+          "R2R": 8103,
+          "R2": 6082,
+          "R1": 5375,
+          "R3": 3020,
+          "WR": 1030,
+          "MU": 607,
+          "OI": 502,
+          "I": 194,
+          "RC": 78,
+          "CC": 78,
+          "R1-CD": 4,
+          "null": 1
+        },
+        "byFluClassification": {
+          "RTA": 10917,
+          "RAA": 7032,
+          "USA": 6854,
+          "IND": 48,
+          "0": 20,
+          "null": 203
+        }
+      },
+      "fieldMap": {
+        "PIN": "parcelId",
+        "PARCEL": "parcelIdInt",
+        "ProposedZoning": "zoning",
+        "FLU_Classification": "flu",
+        "CALCULATED_ACREAGE": "acreage",
+        "OWNER_NAME1": "ownerName",
+        "DATE_SOLD": "lastSale.date",
+        "SALES_PRICE": "lastSale.price",
+        "MARKET_VALUE": "tax.marketValue"
+      },
+      "notes": "Parcel-polygons with zoning + FLU attributes (also carries CAMA). Cities-first: inside Taylorsville City Limits apply Downtown/Business Corridor overlays on top of ProposedZoning. District codes R1/R1-CD/R2/R2R/R3/RC/CC/MU/OI/WR/I."
+    },
+    {
+      "role": "zoning",
+      "name": "Taylorsville Downtown Overlay",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/73",
+      "alternateUrls": [
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Overlay/MapServer/25"
+      ],
+      "layerId": 73,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "counts": {
+        "total": 97
+      },
+      "notes": "City-first overlay inside Taylorsville."
+    },
+    {
+      "role": "zoning",
+      "name": "Taylorsville Business Corridor Overlay",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/74",
+      "alternateUrls": [
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Overlay/MapServer/24"
+      ],
+      "layerId": 74,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "counts": {
+        "total": 112
+      },
+      "notes": "City-first overlay inside Taylorsville."
+    },
+    {
+      "role": "zoning",
+      "name": "Historic Overlay District",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Overlay/MapServer/26",
+      "layerId": 26,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "counts": {
+        "total": 1
+      },
+      "notes": "Thin historic district polygon."
+    },
+    {
+      "role": "flu",
+      "name": "Overlay Future Land Use",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Overlay/MapServer/30",
+      "layerId": 30,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "partial",
+      "counts": {
+        "total": 1064,
+        "byMergeSrc": {
+          "Conservation": 1029,
+          "Community Service Center": 17,
+          "Industrial": 11,
+          "Urban Services Area": 4,
+          "Rural Transition Area": 2,
+          "Rural Agricultural Area": 1
+        }
+      },
+      "fieldMap": {
+        "MERGE_SRC": "flu"
+      },
+      "notes": "Comp Plan FLU polygons on GIS (planning site points here). MERGE_SRC counts heavily Conservation \u2014 treat as coarse; prefer parcel FLU_Classification (USA/RTA/RAA/IND) on Zoning/72."
+    },
+    {
+      "role": "boundaries",
+      "name": "City Limits (Taylorsville + ETJ)",
+      "restUrl": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/29",
+      "alternateUrls": [
+        "https://maps.alexandercountync.gov/arcgis/rest/services/Zoning_Website_map/MapServer/3"
+      ],
+      "layerId": 29,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "municipal",
+      "status": "usable",
+      "counts": {
+        "total": 39,
+        "CITYLIMIT": 34,
+        "ETJ": 5
+      },
+      "fieldMap": {
+        "CITY_NAME": "other",
+        "TYPE": "other",
+        "ACRES": "acreage"
+      },
+      "notes": "CITY_NAME=TAYLORSVILLE only. Use TYPE filter for city-first routing."
+    }
+  ],
+  "gaps": [
+    "No independent Taylorsville (or CDP) ArcGIS zoning FeatureServer \u2014 county ProposedZoning + overlays only",
+    "Overlay/30 Future Land Use MERGE_SRC inventory skewed (~1029/1064 Conservation) \u2014 prefer parcel FLU_Classification",
+    "OneMap saledate epoch empty for cntyfips='003' (saledatetx text only; no sale price)",
+    "County website planning/GIS HTML often 403 from datacenter egress \u2014 REST + maps viewer + PRC verified live",
+    "Utilities / AADT / emails / phones / paid vendors intentionally excluded"
+  ],
+  "license": "Alexander County GIS; compiled from recorded deeds/plats/public records; not survey quality; commercial resale subject to NCGS 132-10. Attribute Alexander County GIS.",
+  "tranche": 3,
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 12,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://maps.alexandercountync.gov/arcgis/rest/services/Website_map/MapServer/26",
+    "parcelIdField": "PIN",
+    "acreageFilter": "CALCULATED_ACREAGE >= 5 AND CALCULATED_ACREAGE <= 150",
+    "acres5to150Live": 7305,
+    "parcelCountLive": 26980,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='ALEXANDER'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ALEXANDER%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ALEXANDER%27&returnCountOnly=true&f=json",
+        "liveStationCount": 291,
+        "stationsWithAADT2022": 146
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Alexander'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Alexander%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Alexander%27&returnCountOnly=true&f=json",
+        "liveStationCount": 286,
+        "stationsWithAADT2025": 161,
+        "stationsWithAADT2024": 169,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "MARKET_VALUE",
+        "ASSESED_VALUE"
+      ],
+      "allTaxFieldsOnLayer": [
+        "MARKET_VALUE",
+        "ASSESED_VALUE",
+        "LAND_VALUE",
+        "STRUCTURE_VALUE",
+        "OTHER_VALUE"
+      ],
+      "liveNonZero": {
+        "MARKET_VALUE": 25423,
+        "ASSESED_VALUE": 25423
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SALES_PRICE"
+      ],
+      "dateFields": [
+        "DATE_SOLD"
+      ],
+      "livePriceNonZero": {
+        "SALES_PRICE": 6412
+      },
+      "liveDateNonNull": {
+        "DATE_SOLD": 25419
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OWNER_NAME1",
+        "OWNER_NAME2",
+        "OWNER_NAME3"
+      ],
+      "primaryOwnerField": "OWNER_NAME1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(OWNER_NAME1) LIKE '% LLC%' OR UPPER(OWNER_NAME1) LIKE '% INC%' OR UPPER(OWNER_NAME1) LIKE '% LP%' OR UPPER(OWNER_NAME1) LIKE '% LLP%' OR UPPER(OWNER_NAME1) LIKE '% LTD%' OR UPPER(OWNER_NAME1) LIKE '% TRUST%' OR UPPER(OWNER_NAME1) LIKE '% CHURCH%' OR UPPER(OWNER_NAME1) LIKE '% COMPANY%' OR UPPER(OWNER_NAME1) LIKE '% PARTNERSHIP%' OR UPPER(OWNER_NAME1) LIKE '% HOLDINGS%' OR UPPER(OWNER_NAME1) LIKE '% PROPERTIES%' OR UPPER(OWNER_NAME1) LIKE '% CORP%' OR UPPER(OWNER_NAME1) LIKE '%,LLC%' OR UPPER(OWNER_NAME1) LIKE '%,INC%' OR UPPER(OWNER_NAME1) LIKE 'CITY OF %' OR UPPER(OWNER_NAME1) LIKE 'COUNTY OF %' OR UPPER(OWNER_NAME1) LIKE 'STATE OF %' OR UPPER(OWNER_NAME1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 1686,
+      "liveEntityCount5to150ac": 406,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "https://maps.alexandercountync.gov/PRC/{PARCELID}.html",
+      "testedParcelId": "0000953",
+      "testedUrl": "https://maps.alexandercountync.gov/PRC/0000953.html",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Static PRC HTML; id and owner verified."
+    },
+    "gisViewer": {
+      "url": "https://maps.alexandercountync.gov/maps/",
+      "httpStatus": 200,
+      "pageTitle": "Alexander County, North Carolina GIS"
+    },
+    "sampleQueryForm": "resultRecordCount is rejected unless orderByFields is set (the layer has no OID). Use &orderByFields=PIN&resultRecordCount=N, or an unpaged where query (capped at 1000 rows, exceededTransferLimit=true). Count queries work normally.",
+    "gaps": []
+  }
+}

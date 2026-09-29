@@ -1,0 +1,666 @@
+{
+  "county": "Granville",
+  "state": "NC",
+  "msa": "Raleigh-Durham",
+  "fips": "37077",
+  "cntyfips": "077",
+  "slug": "granville",
+  "level": "county",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://experience.arcgis.com/experience/9fb947310691479b8a2468d86316e8de",
+  "publicGisUrl": "https://www.granvillecounty.org/259/GIS-Geographic-Information-System",
+  "appraiserSearchUrl": "https://tax.granvillecounty.org/ITSPublic/RealEstateSearch",
+  "appraiserDeepLinkTemplate": "https://tax.granvillecounty.org/ITSPublic/RealEstateSearch/Parcel/{Parcel}",
+  "taxBillDeepLinkTemplate": "https://tax.granvillecounty.org/ITSPublic/TaxBillSearch/Parcel/{Parcel}",
+  "taxDeptUrl": "https://www.granvillecounty.org/238/Tax-Administration",
+  "openDataUrl": "https://granville-county-granvillecounty.hub.arcgis.com/",
+  "gisRestRoot": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services",
+  "joinKeys": [
+    "Parcel",
+    "PIN",
+    "parno",
+    "PRODNO",
+    "RECN"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "Parcel",
+        "PIN",
+        "parno",
+        "PRODNO",
+        "RECN"
+      ],
+      "bestLayer": "Granville_Service/Parcels_Polygon",
+      "caveat": "Parcel (12-digit) for ITSPublic deep-link; PIN hyphenated; OneMap parno≈Parcel"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Granville_Service/Parcels_Polygon"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "Cal_Acres",
+        "LandUnits",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 7186,
+      "approxCountGisacres": 7161,
+      "bestLayer": "Granville_Service/Parcels_Polygon"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "OwnerName1",
+        "OwnerName2",
+        "ownname"
+      ],
+      "bestLayer": "Granville_Service/Parcels_Polygon"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "AddressLine1",
+        "AddressLine2",
+        "AddressLine3",
+        "City",
+        "State",
+        "Zip",
+        "mailadd"
+      ],
+      "bestLayer": "Granville_Service/Parcels_Polygon"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "FormattedPropertyAddress",
+        "SITUSADRS",
+        "siteadd"
+      ],
+      "bestLayer": "Granville_Service/Parcels_Polygon",
+      "caveat": "Situs on parcel polygons; optional AddressPoints FS/0"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SalePrice",
+        "DeedDate",
+        "DeedBookPage"
+      ],
+      "bestLayer": "Granville_Service/Parcels_Polygon",
+      "approxCountWithPrice": 20969,
+      "caveat": "OneMap lacks sale price; ITSPublic ViewParcel is POST-only"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "MarketValue",
+        "LandValue",
+        "BuildingValue",
+        "ObxfValue",
+        "AssessedValue",
+        "DeferredValue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Granville_Service/Parcels_Polygon"
+    },
+    "zoning": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "ZONECODE",
+        "Zoning",
+        "Zoning_Typ",
+        "NewZone",
+        "NAME"
+      ],
+      "bestLayer": "per municipality on Granville_Static + GC_ZONING for unincorporated",
+      "split": "Oxford / Butner / Creedmoor / Stovall city-first; Stem gap; GC_ZONING unincorporated",
+      "caveat": "Parcel.Zoning attribute empty — spatial join required"
+    },
+    "flu": {
+      "present": true,
+      "fields": [
+        "FLU"
+      ],
+      "bestLayer": "Granville_FLU/11",
+      "caveat": "Countywide FLU only; no city-specific FLU FS found"
+    },
+    "appraiserLink": {
+      "present": true,
+      "template": "https://tax.granvillecounty.org/ITSPublic/RealEstateSearch/Parcel/{Parcel}",
+      "idField": "Parcel"
+    }
+  },
+  "portals": [
+    {
+      "name": "Granville Hub / Experience GIS map",
+      "url": "https://experience.arcgis.com/experience/9fb947310691479b8a2468d86316e8de",
+      "notes": "Primary public interactive map"
+    },
+    {
+      "name": "County GIS department page",
+      "url": "https://www.granvillecounty.org/259/GIS-Geographic-Information-System",
+      "notes": "Official GIS landing + hub link"
+    },
+    {
+      "name": "Granville County GIS Hub",
+      "url": "https://granville-county-granvillecounty.hub.arcgis.com/",
+      "notes": "AGOL Hub site"
+    },
+    {
+      "name": "County AGOL REST root",
+      "url": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services",
+      "notes": "Granville_Service, Granville_Static, Granville_FLU"
+    },
+    {
+      "name": "ITSPublic Real Estate Search (PA)",
+      "url": "https://tax.granvillecounty.org/ITSPublic/RealEstateSearch",
+      "notes": "Deep link /Parcel/{Parcel}"
+    },
+    {
+      "name": "ITSPublic Tax Bill Search",
+      "url": "https://tax.granvillecounty.org/ITSPublic/TaxBillSearch",
+      "notes": "Deep link /Parcel/{Parcel}"
+    },
+    {
+      "name": "Tax Administration",
+      "url": "https://www.granvillecounty.org/238/Tax-Administration"
+    },
+    {
+      "name": "Tax Database Downloads (CSV)",
+      "url": "https://www.granvillecounty.org/898/Tax-Database-Downloads"
+    },
+    {
+      "name": "Planning & Zoning",
+      "url": "https://www.granvillecounty.org/335/Planning-Zoning"
+    },
+    {
+      "name": "NC OneMap Parcels",
+      "url": "https://www.nconemap.gov",
+      "notes": "cntyfips='077'"
+    },
+    {
+      "name": "Oxford Parcel Viewer",
+      "url": "https://experience.arcgis.com/experience/d5d8aecdb37a4cf88b7c099da4dddc48/"
+    },
+    {
+      "name": "Butner Parcel Viewer",
+      "url": "https://experience.arcgis.com/experience/1b0f98b11f154ee5bc1549a7843c88c1/"
+    },
+    {
+      "name": "Creedmoor Parcel Viewer",
+      "url": "https://experience.arcgis.com/experience/d3de1ad2e6364e25a58ceb13ece7ba50/"
+    },
+    {
+      "name": "Stem Parcel Viewer",
+      "url": "https://experience.arcgis.com/experience/eda7708857ec462386a391bfe098a3ce/"
+    },
+    {
+      "name": "Stovall Parcel Viewer",
+      "url": "https://experience.arcgis.com/experience/507ef71cd0d44571b1fbd486d55739eb/"
+    },
+    {
+      "name": "Planning and Zoning web app",
+      "url": "https://granvillecounty.maps.arcgis.com/apps/webappviewer/index.html?id=badbfc05611d4bea954520ffb5401ff2"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Granville_Service Parcels_Polygon (PRIMARY)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Service/FeatureServer/8",
+      "layerId": 8,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Cal_Acres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 34898,
+      "acres5to150": 7186,
+      "fieldMap": {
+        "PIN": "parcelIdPin",
+        "Parcel": "parcelId",
+        "PRODNO": "parcelIdProdno",
+        "RECN": "parcelIdRecn",
+        "MAPN": "mapsheet",
+        "Cal_Acres": "acreage",
+        "LandUnits": "acreageLandUnits",
+        "LandUnitsType": "acreageLandUnitsType",
+        "OwnerName1": "ownerName",
+        "OwnerName2": "ownerName2",
+        "AddressLine1": "mailingAddress.street",
+        "AddressLine2": "mailingAddress.street2",
+        "AddressLine3": "mailingAddress.street3",
+        "City": "mailingAddress.city",
+        "State": "mailingAddress.state",
+        "Zip": "mailingAddress.zip",
+        "FormattedPropertyAddress": "situsAddress",
+        "LegalDescription": "legalDescription",
+        "DeedDate": "lastSale.date",
+        "DeedBookPage": "lastSale.deedBookPage",
+        "SalePrice": "lastSale.price",
+        "MarketValue": "tax.marketValue",
+        "LandValue": "tax.landValue",
+        "BuildingValue": "tax.improvementValue",
+        "ObxfValue": "tax.obxfValue",
+        "AssessedValue": "tax.assessedValue",
+        "DeferredValue": "tax.deferredValue",
+        "Zoning": "zoningStub",
+        "Township": "township",
+        "TaxCode01": "taxCode01",
+        "PRC": "propertyRecordCardCode"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "PRIMARY verified 2026-09-24: count 34898; Cal_Acres 5–150 → 7186; SalePrice>0 → 20969; situs on polygon. Parcel.Zoning empty — spatial-join zoning layers. Deep-link id = Parcel."
+    },
+    {
+      "role": "other",
+      "name": "AddressPoints (situs / NG911)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Service/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 30228,
+      "fieldMap": {
+        "SITUSADRS": "situsAddress",
+        "Add_Number": "situsAddress.number",
+        "St_Name": "situsAddress.street",
+        "St_PosType": "situsAddress.streetType",
+        "St_PreDir": "situsAddress.prefix",
+        "St_PosDir": "situsAddress.suffix",
+        "Unit_Numbe": "situsAddress.unit",
+        "City": "situsCity",
+        "Zip": "situsZip",
+        "IncMuni": "municipality",
+        "MSAGComm": "msagCommunity",
+        "TOWNSHIP": "township"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Verified count 30228."
+    },
+    {
+      "role": "zoning",
+      "name": "GC_ZONING (county base + muni planning-area stubs)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/26",
+      "layerId": 26,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 177,
+      "fieldMap": {
+        "ZONECODE": "zoning",
+        "ADMENDMENT": "zoningAmendment",
+        "DATE_ADOPT": "zoningDateAdopted",
+        "DATE_MAPPE": "zoningDateMapped"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Count 177. AR-40/AR-80/etc + muni planning-area stubs."
+    },
+    {
+      "role": "zoning",
+      "name": "Oxford Zoning 2024 (city-first)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/45",
+      "layerId": 45,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Cal_Acres",
+      "coverage": "city-only",
+      "status": "usable",
+      "verifiedCount": 6857,
+      "fieldMap": {
+        "Zoning": "zoning",
+        "PIN": "parcelIdPin",
+        "Parcel": "parcelId",
+        "Cal_Acres": "acreage",
+        "OwnerName1": "ownerName",
+        "SalePrice": "lastSale.price",
+        "MarketValu": "tax.marketValue"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Count 6857; Zoning populated 5434. Districts CBD/GR*/HB/HI/IPD/LI/NB/OI/PUD/RA."
+    },
+    {
+      "role": "zoning",
+      "name": "Creedmoor Zoning (city-first)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/24",
+      "layerId": 24,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Cal_Acres",
+      "coverage": "city-only",
+      "status": "usable",
+      "verifiedCount": 75,
+      "fieldMap": {
+        "Zoning_Typ": "zoning",
+        "Cal_Acres": "acreage",
+        "Status": "zoningStatus"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Count 75. Overlay /47 count 6."
+    },
+    {
+      "role": "zoning",
+      "name": "Butner Zoning (city-first)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/43",
+      "layerId": 43,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES",
+      "coverage": "city-only",
+      "status": "usable",
+      "verifiedCount": 228,
+      "fieldMap": {
+        "NewZone": "zoning",
+        "NewZone_1": "zoningAlt",
+        "ACRES": "acreage",
+        "Acreage": "acreageAlt"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Count 228. NewZone districts CB/RR/RS/etc."
+    },
+    {
+      "role": "zoning",
+      "name": "Stovall Zoning (city-first)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/50",
+      "layerId": 50,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "city-only",
+      "status": "usable",
+      "verifiedCount": 42,
+      "fieldMap": {
+        "NAME": "zoning",
+        "NAME_ABB": "zoningAbbrev"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Count 42."
+    },
+    {
+      "role": "flu",
+      "name": "Granville Future Land Use (FLU)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_FLU/FeatureServer/11",
+      "layerId": 11,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "ACRES",
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 109,
+      "fieldMap": {
+        "FLU": "flu",
+        "ACRES": "acreage",
+        "CO_NAME": "countyName",
+        "Value": "fluCodeNum"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Count 109. Countywide FLU; no city-specific FLU FS."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "partial",
+      "verifiedCount": 34602,
+      "acres5to150": 7161,
+      "fieldMap": {
+        "parno": "parcelId",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "mstate": "mailingAddress.state",
+        "mzip": "mailingAddress.zip",
+        "siteadd": "situsAddress",
+        "scity": "situsCity",
+        "gisacres": "acreage",
+        "saledate": "lastSale.date",
+        "saledatetx": "lastSale.dateText",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "cntyfips": "countyFips"
+      },
+      "crs": "WGS84 query / source county 2264",
+      "maxRecordCount": 5000,
+      "notes": "cntyfips='077'. No sale price — use county SalePrice."
+    },
+    {
+      "role": "other",
+      "name": "City_Limits",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/42",
+      "layerId": 42,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 18,
+      "fieldMap": {
+        "CITY": "municipality"
+      },
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "BUTNER, CREEDMOOR, OXFORD, STEM, STOVALL."
+    },
+    {
+      "role": "other",
+      "name": "ETJ2025",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Static/FeatureServer/38",
+      "layerId": 38,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": 1,
+      "fieldMap": {},
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Also ButnerETJ /41, Creedmoor /23, Oxford /39."
+    },
+    {
+      "role": "other",
+      "name": "Voluntary Agricultural Districts (VAD)",
+      "restUrl": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_VAD/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": null,
+      "coverage": "county-wide",
+      "status": "usable",
+      "verifiedCount": null,
+      "fieldMap": {},
+      "crs": "102719/2264",
+      "maxRecordCount": 1000,
+      "notes": "Overlay only; mirrored Static/44."
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Oxford",
+      "localGis": "county AGOL OxfordZoning2024 + Oxford Parcel Viewer",
+      "zoningSource": "Granville_Static/45",
+      "fluSource": "Granville_FLU/11"
+    },
+    {
+      "name": "Butner",
+      "localGis": "county AGOL Butner_Zoning + Butner Parcel Viewer",
+      "zoningSource": "Granville_Static/43",
+      "fluSource": "Granville_FLU/11"
+    },
+    {
+      "name": "Creedmoor",
+      "localGis": "county AGOL CreedmoorZoning + overlay + Creedmoor Parcel Viewer",
+      "zoningSource": "Granville_Static/24 (+/47)",
+      "fluSource": "Granville_FLU/11"
+    },
+    {
+      "name": "Stem",
+      "localGis": "Stem Parcel Viewer only",
+      "zoningSource": "gap (GC_ZONING stub)",
+      "fluSource": "Granville_FLU/11"
+    },
+    {
+      "name": "Stovall",
+      "localGis": "county AGOL Stovall_Zoning + Stovall Parcel Viewer",
+      "zoningSource": "Granville_Static/50",
+      "fluSource": "Granville_FLU/11"
+    }
+  ],
+  "gaps": [
+    "Stem — no dedicated public zoning FeatureServer; GC_ZONING only has STEM PLANNING AND ZONING AREA stub",
+    "Parcel layer Zoning attribute is empty on live REST — always spatial-join district layers",
+    "No independent municipal ArcGIS hosts — city zoning published on county AGOL",
+    "City-specific FLU FeatureServers not found — county Granville_FLU/11 is the public FLU surface",
+    "ITSPublic ViewParcel property card is AJAX/POST — durable GET deep-links are RealEstateSearch/Parcel/{Parcel} and TaxBillSearch/Parcel/{Parcel}",
+    "Web maps mislabel Parcels as Granville_Service/9 (actually Townships) — use layer 8",
+    "MaxRecordCount 1000 on county AGOL layers — paginate",
+    "NC OneMap lacks SalePrice — prefer county parcels for lastSale.price",
+    "No phones/emails collected; no paid vendors; utilities and AADT out of scope"
+  ],
+  "license": "Granville County public AGOL (sandy.woody / services8…/dT3Tew5pivPd2bWH) + NC OneMap; attribution recommended; not survey grade",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services8.arcgis.com/dT3Tew5pivPd2bWH/arcgis/rest/services/Granville_Service/FeatureServer/8",
+    "parcelIdField": "Parcel",
+    "acreageFilter": "Cal_Acres >= 5 AND Cal_Acres <= 150",
+    "acres5to150Live": 7186,
+    "parcelCountLive": 34898,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='GRANVILLE'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GRANVILLE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GRANVILLE%27&returnCountOnly=true&f=json",
+        "liveStationCount": 399,
+        "stationsWithAADT2022": 222
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Granville'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Granville%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Granville%27&returnCountOnly=true&f=json",
+        "liveStationCount": 397,
+        "stationsWithAADT2025": 288,
+        "stationsWithAADT2024": 221,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Granville'",
+        "stations2024LiveCount": 397,
+        "stations2024WithAADT2024": 397,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "MarketValue",
+        "AssessedValue"
+      ],
+      "liveNonZero": {
+        "MarketValue": 34790,
+        "AssessedValue": 34790
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SalePrice"
+      ],
+      "dateFields": [
+        "DeedDate"
+      ],
+      "livePriceNonZero": {
+        "SalePrice": 20969
+      },
+      "liveDateNonNull": {
+        "DeedDate": 33094
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "OwnerName1",
+        "OwnerName2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 1066,
+      "liveEntityCount5to150acExtended": 1260,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "RICE FAMILY TRUST",
+        "RED HILL PLANTATION LLC",
+        "AUGUSTA FARMS LLC",
+        "AUGUSTA FARMS LLC"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://tax.granvillecounty.org/ITSPublic/RealEstateSearch/Parcel/{Parcel}",
+      "testedParcelId": "183400314774",
+      "testedUrl": "https://tax.granvillecounty.org/ITSPublic/RealEstateSearch/Parcel/183400314774",
+      "httpStatus": 200,
+      "contentType": "text/html",
+      "contentVerified": true,
+      "note": "Parcel id found in the response body."
+    },
+    "gisViewer": {
+      "url": "https://experience.arcgis.com/experience/9fb947310691479b8a2468d86316e8de",
+      "httpStatus": 200,
+      "pageTitle": "Experience"
+    },
+    "gaps": []
+  }
+}

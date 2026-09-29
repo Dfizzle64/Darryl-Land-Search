@@ -1,0 +1,1135 @@
+{
+  "county": "Brunswick",
+  "state": "NC",
+  "msa": "Wilmington MSA",
+  "fips": "37019",
+  "cntyfips": "019",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://experience.arcgis.com/experience/0201d27723244840aea67c9f85892953",
+  "viewerLegacyUrl": "https://www.arcgis.com/apps/webappviewer/index.html?id=6df283e1aa634006baeedf6daac40d38",
+  "appraiserSearchUrl": "https://tax.brunsco.net/ITSNet/BasicSearch.aspx",
+  "appraisalCardTemplate": "https://tax.brunsco.net/ITSNet/AppraisalCard.aspx?parcel={ParcelNumber}",
+  "salesSearchUrl": "https://tax.brunsco.net/ITSNet/Sales.aspx",
+  "realEstateSearchUrl": "https://tax.brunsco.net/ITSNet/RealEstate.aspx",
+  "openDataUrl": "https://data-brunsco.opendata.arcgis.com/",
+  "joinKeys": [
+    "ParcelNumber",
+    "PIN",
+    "PARNO",
+    "parno",
+    "ALTPARNO",
+    "altparno"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "ParcelNumber",
+        "PIN",
+        "PARNO",
+        "parno",
+        "ALTPARNO",
+        "altparno"
+      ],
+      "bestLayer": "SeamlessParcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "SeamlessParcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CALCAC",
+        "DeedAcreage",
+        "GISACRES",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 7610,
+      "approxCountTaxParcels": 7549,
+      "approxCountOneMap": 7020,
+      "approxCountNc1mapCounty": 7575,
+      "bestLayer": "SeamlessParcels"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1+Name2",
+        "OWNNAME",
+        "ownname"
+      ],
+      "bestLayer": "SeamlessParcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address1",
+        "Address2",
+        "Address3",
+        "City",
+        "State",
+        "ZipCode",
+        "MAILADD",
+        "mailadd"
+      ],
+      "bestLayer": "SeamlessParcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "HouseNumber+StreetName+StreetType",
+        "SITEADD",
+        "siteadd",
+        "ST_ADDR"
+      ],
+      "bestLayer": "SeamlessParcels",
+      "caveat": "Compose from HouseNumber/StreetName/StreetType; strip leading zeros on HouseNumber. Addresses points lack parcel id."
+    },
+    "lastSale": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "DeedDate",
+        "DeedBook",
+        "DeedPage"
+      ],
+      "bestLayer": "SeamlessParcels",
+      "caveat": "No sale price on public REST; OneMap/NC1MAP saledate empty; use Sales.aspx HTML for price search"
+    },
+    "taxValues": {
+      "present": true,
+      "joinRequired": true,
+      "fields": [
+        "PARVAL",
+        "LANDVAL",
+        "IMPROVVAL",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "NC1MAP_SEAMLESSPARCELS",
+      "caveat": "Not on SeamlessParcels/TaxParcels — join PARNO=ParcelNumber (CNTYFIPS='37019') or OneMap cntyfips='019'"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "Zoning",
+        "ZCODE"
+      ],
+      "bestLayer": "MuniZoning (per municipality) / SeamlessParcels.Zoning attr",
+      "split": "19 municipalities on MuniZoning + unincorporated CO-* on Layers/Zoning"
+    },
+    "flu": {
+      "present": true,
+      "partial": false,
+      "fields": [
+        "FLU",
+        "LAND_USE"
+      ],
+      "bestLayer": "FutureLandUse/MapServer/0",
+      "caveat": "Countywide; no separate municipal FLU REST found"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://experience.arcgis.com/experience/0201d27723244840aea67c9f85892953",
+      "taxSearch": "https://tax.brunsco.net/ITSNet/BasicSearch.aspx",
+      "appraisalCard": "https://tax.brunsco.net/ITSNet/AppraisalCard.aspx?parcel={ParcelNumber}",
+      "keyField": "ParcelNumber"
+    }
+  },
+  "portals": [
+    {
+      "name": "GIS Data Viewer (Experience)",
+      "url": "https://experience.arcgis.com/experience/0201d27723244840aea67c9f85892953",
+      "notes": "Primary interactive parcels/zoning viewer"
+    },
+    {
+      "name": "GIS Data Viewer (legacy WAB)",
+      "url": "https://www.arcgis.com/apps/webappviewer/index.html?id=6df283e1aa634006baeedf6daac40d38",
+      "notes": "Older Web AppBuilder viewer"
+    },
+    {
+      "name": "Open GIS Data Portal",
+      "url": "https://data-brunsco.opendata.arcgis.com/",
+      "notes": "Downloadable GIS datasets"
+    },
+    {
+      "name": "GIS home",
+      "url": "https://gis.brunswickcountync.gov/",
+      "notes": "County GIS landing"
+    },
+    {
+      "name": "Data Download",
+      "url": "https://www.brunswickcountync.gov/321/Data-Download",
+      "notes": "Shapefile downloads + open data link"
+    },
+    {
+      "name": "County ArcGIS REST",
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services",
+      "notes": "TaxParcels, SeamlessParcels, MuniZoning, FutureLandUse, NC1MAP"
+    },
+    {
+      "name": "Tax Basic Search",
+      "url": "https://tax.brunsco.net/ITSNet/BasicSearch.aspx",
+      "notes": "Assessor search"
+    },
+    {
+      "name": "Tax Real Estate Search",
+      "url": "https://tax.brunsco.net/ITSNet/RealEstate.aspx",
+      "notes": "Real estate inquiry"
+    },
+    {
+      "name": "Tax Sales Search",
+      "url": "https://tax.brunsco.net/ITSNet/Sales.aspx",
+      "notes": "HTML sales search — not REST"
+    },
+    {
+      "name": "Town of Leland maps",
+      "url": "https://www.townofleland.com/planning-inspections/online-maps-and-gis",
+      "notes": "Town AGOL viewers; zoning also on county MuniZoning/8"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Bald Head Island",
+      "typeCode": "BHI",
+      "zoning": [
+        {
+          "name": "Bald Head Island Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/0",
+          "layerId": 0,
+          "field": "ZCODE",
+          "featureCount": 91,
+          "sampleZcode": "BH-PD-3C",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/0 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='BHI' (and 'BHIX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Belville",
+      "typeCode": "BEL",
+      "zoning": [
+        {
+          "name": "Belville Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/1",
+          "layerId": 1,
+          "field": "ZCODE",
+          "featureCount": 928,
+          "sampleZcode": "BE-R10",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/1 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='BEL' (and 'BELX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Boiling Spring Lakes",
+      "typeCode": "BSL",
+      "zoning": [
+        {
+          "name": "Boiling Spring Lakes Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/2",
+          "layerId": 2,
+          "field": "ZCODE",
+          "featureCount": 431,
+          "sampleZcode": "BS-R-2",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/2 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='BSL' (and 'BSLX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Bolivia",
+      "typeCode": "BOL",
+      "zoning": [
+        {
+          "name": "Bolivia Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/3",
+          "layerId": 3,
+          "field": "ZCODE",
+          "featureCount": 56,
+          "sampleZcode": "BO-R-15",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/3 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='BOL' (and 'BOLX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Calabash",
+      "typeCode": "CAL",
+      "zoning": [
+        {
+          "name": "Calabash Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/4",
+          "layerId": 4,
+          "field": "ZCODE",
+          "featureCount": 222,
+          "sampleZcode": "CA-PUD",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/4 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='CAL' (and 'CALX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Carolina Shores",
+      "typeCode": "CSH",
+      "zoning": [
+        {
+          "name": "Carolina Shores Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/5",
+          "layerId": 5,
+          "field": "ZCODE",
+          "featureCount": 71,
+          "sampleZcode": "CS-R6",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/5 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='CSH' (and 'CSHX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Caswell Beach",
+      "typeCode": "CWB",
+      "zoning": [
+        {
+          "name": "Caswell Beach Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/6",
+          "layerId": 6,
+          "field": "ZCODE",
+          "featureCount": 71,
+          "sampleZcode": "CB-R20-MF",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/6 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='CWB' (and 'CWBX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Holden Beach",
+      "typeCode": "HLB",
+      "zoning": [
+        {
+          "name": "Holden Beach Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/7",
+          "layerId": 7,
+          "field": "ZCODE",
+          "featureCount": 130,
+          "sampleZcode": "HB-R-1",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/7 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='HLB' (and 'HLBX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Leland",
+      "typeCode": "LEL",
+      "zoning": [
+        {
+          "name": "Leland Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/8",
+          "layerId": 8,
+          "field": "ZCODE",
+          "featureCount": 1362,
+          "sampleZcode": "LE-R-6",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/8 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='LEL' (and 'LELX' ETJ when present). Parcel Zoning attr is fallback.",
+      "townMaps": "https://www.townofleland.com/planning-inspections/online-maps-and-gis"
+    },
+    {
+      "name": "Navassa",
+      "typeCode": "NAV",
+      "zoning": [
+        {
+          "name": "Navassa Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/9",
+          "layerId": 9,
+          "field": "ZCODE",
+          "featureCount": 296,
+          "sampleZcode": "NA-R-15",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/9 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='NAV' (and 'NAVX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Northwest",
+      "typeCode": "NRW",
+      "zoning": [
+        {
+          "name": "Northwest Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/10",
+          "layerId": 10,
+          "field": "ZCODE",
+          "featureCount": 22,
+          "sampleZcode": "NW-CI",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/10 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='NRW' (and 'NRWX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Oak Island",
+      "typeCode": "OIB",
+      "zoning": [
+        {
+          "name": "Oak Island Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/11",
+          "layerId": 11,
+          "field": "ZCODE",
+          "featureCount": 716,
+          "sampleZcode": "OK-CB",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/11 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='OIB' (and 'OIBX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Ocean Isle Beach",
+      "typeCode": "OAK",
+      "zoning": [
+        {
+          "name": "Ocean Isle Beach Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/12",
+          "layerId": 12,
+          "field": "ZCODE",
+          "featureCount": 104,
+          "sampleZcode": "OI-R-1",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/12 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='OAK' (and 'OAKX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Sandy Creek",
+      "typeCode": "SCR",
+      "zoning": [
+        {
+          "name": "Sandy Creek Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/13",
+          "layerId": 13,
+          "field": "ZCODE",
+          "featureCount": 17,
+          "sampleZcode": "SC-R1",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/13 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='SCR' (and 'SCRX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Shallotte",
+      "typeCode": "SHL",
+      "zoning": [
+        {
+          "name": "Shallotte Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/14",
+          "layerId": 14,
+          "field": "ZCODE",
+          "featureCount": 595,
+          "sampleZcode": "SH-B-2",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/14 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='SHL' (and 'SHLX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Southport",
+      "typeCode": "SPT",
+      "zoning": [
+        {
+          "name": "Southport Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/15",
+          "layerId": 15,
+          "field": "ZCODE",
+          "featureCount": 442,
+          "sampleZcode": "SP-BD",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/15 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='SPT' (and 'SPTX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "St. James",
+      "typeCode": "STJ",
+      "zoning": [
+        {
+          "name": "St. James Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/16",
+          "layerId": 16,
+          "field": "ZCODE",
+          "featureCount": 392,
+          "sampleZcode": "SJ-EPUD",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/16 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='STJ' (and 'STJX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Sunset Beach",
+      "typeCode": "SUN",
+      "zoning": [
+        {
+          "name": "Sunset Beach Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/17",
+          "layerId": 17,
+          "field": "ZCODE",
+          "featureCount": 320,
+          "sampleZcode": "SB-MR-3",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/17 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='SUN' (and 'SUNX' ETJ when present). Parcel Zoning attr is fallback."
+    },
+    {
+      "name": "Varnamtown",
+      "typeCode": "VAR",
+      "zoning": [
+        {
+          "name": "Varnamtown Zoning",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/18",
+          "layerId": 18,
+          "field": "ZCODE",
+          "featureCount": 10,
+          "sampleZcode": "VA-",
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "flu": [
+        {
+          "name": "County FutureLandUse",
+          "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+          "fields": [
+            "FLU",
+            "LAND_USE"
+          ],
+          "notes": "Countywide; no separate municipal FLU REST"
+        }
+      ],
+      "joinNotes": "Most-local: MuniZoning/18 + county SeamlessParcels spatial join in 2264. Route via Municipalities.TYPE='VAR' (and 'VARX' ETJ when present). Parcel Zoning attr is fallback."
+    }
+  ],
+  "layers": [
+    {
+      "purpose": [
+        "parcels",
+        "ownership",
+        "zoning",
+        "other"
+      ],
+      "name": "SeamlessParcels",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/SeamlessParcels/FeatureServer/0",
+      "alternateUrls": [
+        "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/SeamlessParcels/MapServer/0"
+      ],
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CALCAC",
+      "coverage": "county-wide",
+      "featureCount": 174258,
+      "acreageRangeCount_5_150": 7610,
+      "wkid": 102719,
+      "latestWkid": 2264,
+      "maxRecordCount": 2000,
+      "fieldMap": {
+        "ParcelNumber": "parcelId",
+        "PIN": "parcelIdAlt",
+        "CALCAC": "acreage",
+        "DeedAcreage": "acreageDeed",
+        "Name1": "ownerName",
+        "Name2": "ownerName2",
+        "Address1": "mailingAddress.street",
+        "City": "mailingAddress.city",
+        "State": "mailingAddress.state",
+        "ZipCode": "mailingAddress.zip",
+        "HouseNumber": "situsAddress.number",
+        "StreetName": "situsAddress.street",
+        "StreetType": "situsAddress.streetType",
+        "Zoning": "zoning",
+        "DeedDate": "lastSale.date",
+        "TaxCard": "appraiserSearchUrl",
+        "UseCode": "dorCode"
+      },
+      "status": "usable",
+      "primary": true,
+      "notes": "PRIMARY wire-first. Has TaxCard. No tax values — join NC1MAP. No sale price."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "ownership",
+        "zoning"
+      ],
+      "name": "TaxParcels",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/TaxParcels/FeatureServer/0",
+      "alternateUrls": [
+        "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/TaxParcels/MapServer/0"
+      ],
+      "geometry": "polygon",
+      "featureCount": 172636,
+      "acreageRangeCount_5_150": 7549,
+      "status": "usable",
+      "notes": "Same CAMA family as Seamless; no TaxCard field — use AppraisalCard template."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "ownership",
+        "other"
+      ],
+      "name": "DataViewerLive Parcels",
+      "id": 26,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Mapping/DataViewerLive/MapServer/26",
+      "geometry": "polygon",
+      "featureCount": 165508,
+      "status": "usable",
+      "notes": "Viewer backend with TaxCard; prefer SeamlessParcels for extract."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "situs"
+      ],
+      "name": "NC1MAP_SEAMLESSPARCELS",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/NC1MAP_SEAMLESSPARCELS/FeatureServer/0",
+      "geometry": "polygon",
+      "featureCount": 174071,
+      "acreageRangeCount_5_150": 7575,
+      "filter": "CNTYFIPS='37019'",
+      "joinKey": "PARNO=ParcelNumber",
+      "fieldMap": {
+        "PARNO": "parcelId",
+        "ALTPARNO": "parcelIdAlt",
+        "OWNNAME": "ownerName",
+        "MAILADD": "mailingAddress.street",
+        "SITEADD": "situsAddress",
+        "GISACRES": "acreage",
+        "PARVAL": "tax.marketValue",
+        "LANDVAL": "tax.landValue",
+        "IMPROVVAL": "tax.improvementValue"
+      },
+      "status": "usable",
+      "notes": "PRIMARY tax-value join. CNTYFIPS is 37019 (5-digit). Sale dates empty."
+    },
+    {
+      "purpose": [
+        "parcels",
+        "tax",
+        "ownership",
+        "situs"
+      ],
+      "name": "NC OneMap Parcels (polys)",
+      "id": 1,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "geometry": "polygon",
+      "featureCount": 151753,
+      "acreageRangeCount_5_150": 7020,
+      "filter": "cntyfips='019'",
+      "maxRecordCount": 5000,
+      "status": "usable",
+      "notes": "Statewide fallback. saledate empty for Brunswick."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "Zoning (unified)",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/Zoning/MapServer/0",
+      "alternateUrls": [
+        "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Mapping/AllZoning/MapServer/0",
+        "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Mapping/DataViewerLive/MapServer/37"
+      ],
+      "geometry": "polygon",
+      "featureCount": 11505,
+      "fieldMap": {
+        "ZCODE": "zoning",
+        "CaseNum": "zoningCase"
+      },
+      "status": "usable",
+      "notes": "Prefixed ZCODE (CO-/LE-/SH-/…). Prefer MuniZoning for most-local."
+    },
+    {
+      "purpose": [
+        "zoning"
+      ],
+      "name": "parcelZonings",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/parcelZonings/FeatureServer/0",
+      "geometry": "polygon",
+      "featureCount": 166875,
+      "fieldMap": {
+        "PARCEL_ID": "parcelId",
+        "ZCODE": "zoning"
+      },
+      "status": "usable",
+      "notes": "Attribute join on ParcelNumber; multi-zone ZCODE possible."
+    },
+    {
+      "purpose": [
+        "flu"
+      ],
+      "name": "FutureLandUse",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+      "geometry": "polygon",
+      "featureCount": 65856,
+      "fieldMap": {
+        "FLU": "flu",
+        "LAND_USE": "fluCurrentUse",
+        "PIN": "parcelIdAlt"
+      },
+      "status": "usable",
+      "notes": "Countywide FLU. LDR/MDR/HDR/COMMERCIAL/MIXED USE/CONSERVATION/…"
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "Municipalities",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/Municipalities/FeatureServer/0",
+      "geometry": "polygon",
+      "featureCount": 26,
+      "fieldMap": {
+        "TYPE": "municipalityCode",
+        "STATUS": "municipalityStatus"
+      },
+      "status": "usable",
+      "notes": "CITY + ETJ rings; TYPE codes route MuniZoning."
+    },
+    {
+      "purpose": [
+        "other"
+      ],
+      "name": "Addresses",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/Addresses/FeatureServer/0",
+      "geometry": "point",
+      "featureCount": 164535,
+      "status": "partial",
+      "notes": "No parcel id — spatial join. Prefer parcel situs fields."
+    },
+    {
+      "purpose": [
+        "parcels"
+      ],
+      "name": "Parcelpoly",
+      "id": 0,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/Parcelpoly/FeatureServer/0",
+      "geometry": "polygon",
+      "featureCount": 168927,
+      "acreageRangeCount_5_150": 7663,
+      "status": "partial",
+      "notes": "Geometry + PIN/CALCAC only — prefer SeamlessParcels."
+    },
+    {
+      "purpose": [
+        "parcels"
+      ],
+      "name": "ParcelHistory Parcels2025",
+      "id": 21,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/ParcelHistory/FeatureServer/21",
+      "geometry": "polygon",
+      "status": "partial",
+      "notes": "Annual geometry archive; lean schema."
+    }
+  ],
+  "gaps": [
+    "No lastSale.price on public ArcGIS REST — DeedDate only; OneMap/NC1MAP saledate empty; Sales.aspx is HTML",
+    "Tax market values not on SeamlessParcels/TaxParcels — join NC1MAP_SEAMLESSPARCELS (CNTYFIPS='37019') or OneMap (cntyfips='019')",
+    "Addresses points lack parcel id — spatial join only",
+    "No separate municipal FLU FeatureServers — use county FutureLandUse",
+    "DV2 Municipal FLU (~6405) has TOTALMARKE but is not countywide tax",
+    "MaxRecordCount 2000 on county layers — paginate",
+    "Owner phones/emails not collected; no paid vendor data"
+  ],
+  "wireFirst": [
+    {
+      "order": 1,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/SeamlessParcels/FeatureServer/0",
+      "role": "parcels+owner+mailing+situs+zoningAttr+TaxCard",
+      "filter": "CALCAC BETWEEN 5 AND 150"
+    },
+    {
+      "order": 2,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/NC1MAP_SEAMLESSPARCELS/FeatureServer/0",
+      "role": "tax values join",
+      "filter": "CNTYFIPS='37019'",
+      "joinKey": "PARNO=ParcelNumber"
+    },
+    {
+      "order": 3,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/MuniZoning/MapServer/{id}",
+      "role": "most-local zoning polygons",
+      "join": "spatial 2264 routed by Municipalities.TYPE"
+    },
+    {
+      "order": 4,
+      "url": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/FutureLandUse/MapServer/0",
+      "role": "FLU",
+      "join": "spatial or PIN"
+    },
+    {
+      "order": 5,
+      "url": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "role": "statewide fallback",
+      "filter": "cntyfips='019'"
+    }
+  ],
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "Grok Bot GIS researcher",
+  "verifiedLayerCount": 35,
+  "biggestGap": "No lastSale.price on public ArcGIS REST (DeedDate only; tax Sales.aspx is HTML; OneMap sale dates empty for Brunswick)",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/SeamlessParcels/FeatureServer/0",
+    "parcelIdField": "ParcelNumber",
+    "acreageFilter": "CALCAC >= 5 AND CALCAC <= 150",
+    "acres5to150Live": 7610,
+    "parcelCountLive": 174258,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='BRUNSWICK'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27BRUNSWICK%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27BRUNSWICK%27&returnCountOnly=true&f=json",
+        "liveStationCount": 380,
+        "stationsWithAADT2022": 99
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Brunswick'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Brunswick%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Brunswick%27&returnCountOnly=true&f=json",
+        "liveStationCount": 373,
+        "stationsWithAADT2025": 239,
+        "stationsWithAADT2024": 188,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "stations2024CountyFilter": "County='Brunswick'",
+        "stations2024LiveCount": 378,
+        "stations2024WithAADT2024": 378,
+        "stations2024Note": "AADT_2024 string field populated on every station in this release",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "PARVAL",
+        "LANDVAL",
+        "IMPROVVAL"
+      ],
+      "liveNonZero": {
+        "PARVAL": 171020
+      },
+      "status": "ok-alt-layer",
+      "note": "SeamlessParcels has no value fields. Use county-host NC1MAP_SEAMLESSPARCELS FS/0 (PARVAL/LANDVAL/IMPROVVAL; join PARNO/ALTPARNO→ParcelNumber/PIN).",
+      "altLayer": "https://bcgis.brunswickcountync.gov/arcgis/rest/services/Layers/NC1MAP_SEAMLESSPARCELS/FeatureServer/0",
+      "altLive": {
+        "total": 174071,
+        "PARVAL_gt0": 171020
+      }
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [
+        "DeedDate"
+      ],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {
+        "DeedDate": 172003
+      },
+      "status": "partial-date-only",
+      "note": "DeedDate (string) on SeamlessParcels; no sale price on any public REST layer; NC1MAP SALEDATE empty. Price/date via AppraisalCard PDF 'SALES DATA' section (see paDeepLink)."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1",
+        "Name2"
+      ],
+      "rule": "Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).",
+      "regex": "\\b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "regexExtended": "\\b(LLC|L\\s?L\\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\\b|\\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\\s+OF\\b|\\bOF\\s+(EDUCATION|TRANSPORTATION)\\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\\b",
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "liveEntityCount5to150ac": 2899,
+      "liveEntityCount5to150acExtended": 3140,
+      "countNote": "Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.",
+      "sampleMatches": [
+        "VILLAGE POINTE HOLDINGS LLC",
+        "RIVER OF LIFE BAPTIST OF SUNSET BCH NC INC",
+        "OCEAN RIDGE PLANTATION GOLF INC",
+        "HAWTHORNE MIDWAY OCEAN ISLE LLC"
+      ]
+    },
+    "paDeepLink": {
+      "template": "https://tax.brunsco.net/ITSNet/AppraisalCard.aspx?id={ParcelNumber}",
+      "testedParcelId": "15600067",
+      "testedUrl": "https://tax.brunsco.net/ITSNet/AppraisalCard.aspx?id=15600067",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "contentVerified": true,
+      "note": "FIX: existing card template ?parcel= returns HTTP 500 ('Object reference not set'); ?id= returns 200 application/pdf appraisal card with parcel ID + SALES DATA. Existing appraiserSearchUrl ITSNet/BasicSearch.aspx now 404 — search home is https://tax.brunsco.net/ITSNet/ (200)."
+    },
+    "gisViewer": {
+      "url": "https://experience.arcgis.com/experience/0201d27723244840aea67c9f85892953",
+      "httpStatus": 200,
+      "pageTitle": "Experience"
+    },
+    "gaps": [
+      "No sale price on public REST (PA PDF only)",
+      "Tax values on companion NC1MAP_SEAMLESSPARCELS layer, not SeamlessParcels",
+      "Card-level appraisalCardTemplate (?parcel=) returns HTTP 500 — use ?id=; ITSNet/BasicSearch.aspx 404 (use /ITSNet/)"
+    ]
+  }
+}

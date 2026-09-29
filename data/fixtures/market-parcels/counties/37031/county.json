@@ -1,0 +1,29 @@
+{
+  "name": "Carteret",
+  "fips": "37031",
+  "state": "North Carolina",
+  "markets": [
+    "Wilmington"
+  ],
+  "featureCount": 3283,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-carteret-parcels-37031",
+  "queryUrl": "https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/Parceldata/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Layers/Parceldata (PRIMARY CAMA) (https://arcgisweb.carteretcountync.gov/arcgis/rest/services/Layers/Parceldata/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 3466 rows; 3283 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 207 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37031/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37031/lookup.json",
+  "sourceCount": 3466,
+  "dropped": 1,
+  "tileCount": 12,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://bttaxpayerportal.com/ITSPublicCE/AppraisalCard.aspx?id={parcelId}",
+  "gisViewerUrl": "https://arcgisweb.carteretcountync.gov/maps/"
+}

@@ -1,0 +1,483 @@
+state: NC
+jurisdiction: Cleveland County
+fips: "37045"
+level: county
+markets: [Charlotte]
+
+# PRIMARY — wire first for county-wide site search (CAMA + polygons)
+layers:
+  - role: parcels
+    name: Basemap Parcels (CAMA + polygons)
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Basemap/Basemap/FeatureServer/2
+    alternateUrls:
+      - https://gis.clevelandcounty.com/arcgis/rest/services/Basemap/Basemap/MapServer/2
+      - https://gis.clevelandcounty.com/arcgis/rest/services/Basemap/Parcels/MapServer/0
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Calculated_Acres
+    coverage: county-wide
+    fieldMap:
+      GIS_PIN: parcelId
+      GIS_PID: parcelIdAccount
+      COUNTY_PID: parcelIdAccount
+      LOCATE_PID: parcelIdAccount
+      GIS_Calculated_Acres: acreage
+      GIS_Deeded_Acres: acreage
+      COUNTY_ACRES: acreage
+      COUNTY_OWNER_1: ownerName
+      COUNTY_OWNER_2: ownerName
+      GIS_Owner1: ownerName
+      GIS_Owner2: ownerName
+      COUNTY_MAILING_ADDRESS: mailingAddress
+      COUNTY_CITY: mailingAddress
+      COUNTY_STATE: mailingAddress
+      COUNTY_ZIP: mailingAddress
+      COUNTY_ADDRESS: situsAddress
+      LOCATE_ADDRESS: situsAddress
+      COUNTY_LAND_VALUE: tax.marketValue
+      COUNTY_BUILDING_VALUE: tax.marketValue
+      COUNTY_TOTAL_VALUE: tax.marketValue
+      COUNTY_NBRHD: other
+      COUNTY_T_DIST: other
+      COUNTY_TAX_YEAR: other
+      GIS_DeedBook_Page: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 70189; GIS_Calculated_Acres BETWEEN 5 AND 150 → 14154;
+      COUNTY_TOTAL_VALUE>0 → 69677; COUNTY_OWNER_1 not null → 69689. CRS 102719/2264.
+      MaxRecordCount 2000. Prefer COUNTY_* CAMA fields over GIS_Owner* when both present.
+      No last-sale price/date on parcel layer — join Tax/Vacant_ImprovedLot_Sales by Parcel_Number=COUNTY_PID.
+      Same attrs on Basemap/Parcels/MapServer/0 (ParcelsAtt). Geo-check sample centroid ≈ -81.43, 35.25 (Cleveland).
+    status: usable
+
+  - role: parcels
+    name: Tax Parcel Area (geometry + GIS owner/PIN)
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Tax/Tax/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Calculated_Acres
+    coverage: county-wide
+    fieldMap:
+      GIS_PIN: parcelId
+      GIS_PID: parcelIdAccount
+      GIS_Calculated_Acres: acreage
+      GIS_Deeded_Acres: acreage
+      GIS_Owner1: ownerName
+      GIS_Owner2: ownerName
+    notes: >
+      Count 60300 — closer to NC OneMap (~59964) than Basemap/2 (70189). Lacks COUNTY_* tax/mailing
+      CAMA attrs; prefer Basemap/Basemap/FeatureServer/2 for land-search attributes.
+    status: partial
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelIdAccount
+      nparno: other
+      ownname: ownerName
+      mailadd: mailingAddress
+      mcity: mailingAddress
+      mstate: mailingAddress
+      mzip: mailingAddress
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Statewide fallback. Filter cntyfips='045' → count 59964. Join parno ↔ COUNTY_PID / GIS_PID
+      (verified parno='10011' matches county). gisacres is 0.0 for Cleveland samples — do NOT use
+      OneMap for acreage filters; use county GIS_Calculated_Acres. No sale price. MaxRecordCount 5000.
+    status: partial
+
+  - role: sales
+    name: Vacant Lot Sales
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Tax/Vacant_ImprovedLot_Sales/MapServer/0
+    alternateUrls:
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/19
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_Number: parcelIdAccount
+      Sales_Amount: lastSale.price
+      DateSold: lastSale.date
+      DateSold_YYYYMMDD: lastSale.date
+      Acres: acreage
+      Deed_Book: other
+      Deed_Page: other
+      Tax_Year: other
+    notes: >
+      Count 2765; Sales_Amount>0 → 2759. Join Parcel_Number → COUNTY_PID on Basemap parcels.
+      Not a full sales history — published vacant-lot sale set for valuation (Tax_Year samples 2024).
+    status: usable
+
+  - role: sales
+    name: Improved Lot Sales
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Tax/Vacant_ImprovedLot_Sales/MapServer/1
+    alternateUrls:
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/18
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: Sum_LND_Acres
+    coverage: county-wide
+    fieldMap:
+      Parcel_Number: parcelIdAccount
+      Sales_Amount: lastSale.price
+      DateSold: lastSale.date
+      DateSold_YYYYMMDD: lastSale.date
+      Sum_LND_Acres: acreage
+      Tax_Year: other
+    notes: >
+      Count 6481; Sales_Amount>0 → 6475. Join Parcel_Number → COUNTY_PID. Improved (structure) sales set.
+    status: usable
+
+  # --- Municipal / county zoning (city-first; spatial join to parcels) ---
+  - role: zoning
+    name: Shelby Zoning (county host — prefer inside Shelby)
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/6
+    alternateUrls:
+      - https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/MapServer/6
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/34
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoneType: zoning
+      Municipality: other
+    notes: >
+      City-first for Shelby. Count 1371 (Municipality mostly 'City of Shelby'). CRS 2264.
+      No independent public Shelby FeatureServer — city GIS hub is staff-internal only.
+      Sample districts: R10, R6, GB, R20, R8, RO, LI, GB2, NB, CB, CPD, GI (+ -CU/-CZ variants).
+    status: usable
+
+  - role: zoning
+    name: Kings Mountain Zoning (county host — prefer inside KM)
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/5
+    alternateUrls:
+      - https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/MapServer/5
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/33
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoneType: zoning
+      ZoneType_Code: zoning
+      ZoneType_Desc: zoning
+      Municipality: other
+    notes: >
+      City-first for Kings Mountain (Cleveland-side). Count 7888; Municipality='City of Kings Mountain'.
+      KM also extends into Gaston County — use Gaston card for Gaston-side parcels.
+      Sample: SR, SU, AU, RU, LI, SC, RC, HI, CB, MU, PD (+ SU-* overlays).
+    status: usable
+
+  - role: zoning
+    name: Boiling Springs Zoning (county host)
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/9
+    alternateUrls:
+      - https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/MapServer/9
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/31
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoneType: zoning
+      ZoneType_Code: zoning
+      ZoneType_Desc: zoning
+      Municipality: other
+    notes: >
+      Count 241; Municipality='City of Boiling Springs'. Sample: R15, B-1, R20, R-10, M-1, I-1, B-2.
+      Overlay: webgis NC/Cleveland/MapServer/25 (Boiling Springs Overlay Districts, count 1).
+    status: usable
+
+  - role: zoning
+    name: Cleveland County Zoning (unincorporated)
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/0
+    alternateUrls:
+      - https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/MapServer/0
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/32
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZoneType: zoning
+      ZoneType_Code: zoning
+      ZoneType_Desc: zoning
+      Municipality: other
+    notes: >
+      Unincorporated county zoning. Count 370 (Municipality mostly 'Cleveland County'; 2 KM stray).
+      Sample: RR, R, RU, NB, GB-CU, RA, LI, RM, HI (+ -CU). Use only outside city zoning footprints.
+    status: usable
+
+  - role: zoning
+    name: Town Jurisdiction Zoning stubs
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/40
+    alternateUrls:
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/28
+    layerId: 40
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoneType: zoning
+      ZoneType_Code: zoning
+      Municipality: other
+    notes: >
+      Count 7 — one polygon each for Casar, Fallston, Kingstown, Lattimore, Patterson Springs,
+      Polkville, Waco with ZoneType_Code='N/A'. Not usable district codes; treat as gap for those towns.
+      Other small places (Grover, Belwood, Earl, Lawndale, Mooresboro) appear on Jurisdiction polygons
+      but lack published zoning district layers — fall back to county Zoning/0 spatial join.
+    status: gap
+
+  - role: zoning
+    name: Zoning overlays (Highway Corridor / Airport)
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/22
+    alternateUrls:
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/27
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Overlay stack (not base zoning): Highway Corridor count 27; Airport Overlay District count 893
+      (webgis MapServer/27). Apply after city/county base ZoneType spatial join.
+    status: partial
+
+  - role: flu
+    name: Original Land Use Plan (county FLU)
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/LandUse/FeatureServer/0
+    alternateUrls:
+      - https://gis.clevelandcounty.com/arcgis/rest/services/Planning/LandUse/MapServer/0
+      - https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/37
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      USE_: flu
+      CODE: other
+    notes: >
+      County conceptual FLU. Count 28. USE_ values: PRIMARY GROWTH AREA, SECONDARY GROWTH AREA,
+      RURAL PRESERVATION, AIRPORT COMPATIBILITY, TOWNS AND CITIES (24 town polygons). Not parcel-level
+      future land-use classes — coarse growth-management districts.
+    status: usable
+
+  - role: flu
+    name: Boiling Springs Land Use Plan
+    restUrl: https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/30
+    layerId: 30
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Future: flu
+    notes: >
+      City-first FLU for Boiling Springs. Count 70. Field Future: Commercial, High Density Residential,
+      Institutional, Low Density Residential, Open Space and Farmland Preservation, etc.
+      No equivalent public FLU FeatureServer found for Shelby or Kings Mountain.
+    status: usable
+
+  - role: other
+    name: Jurisdiction polygons
+    restUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Basemap/Basemap/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: other
+      MUNCODE: other
+      Area_SqMi: other
+    notes: >
+      City/ETJ/county footprints for city-first routing. Includes SHELBY, SHELBY-ETJ, KINGS MOUNTAIN,
+      KINGS MOUNTAIN-ETJ, BOILING SPRINGS (+ETJ), GROVER, BELWOOD, CASAR, EARL, FALLSTON, KINGSTOWN,
+      LATTIMORE, LAWNDALE, MOORESBORO, PATTERSON SPRINGS, POLKVILLE, WACO, CLEVELAND COUNTY.
+      Belmont is NOT present (Belmont is Gaston County — see 37071-gaston card).
+    status: usable
+
+municipalities:
+  - name: Unincorporated Cleveland
+    zoningRestUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/0
+    zoningField: ZoneType
+    join: spatial to Basemap Parcels/2 (CRS 2264); exclude city zoning footprints first
+  - name: Shelby
+    zoningRestUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/6
+    zoningField: ZoneType
+    join: spatial Shelby Zoning (1371) ∩ county parcels; prefer over county Zoning/0 inside city/ETJ
+    notes: No public city-native ArcGIS; cityofshelby.com GIS page links staff-only Hub
+  - name: Kings Mountain
+    zoningRestUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/5
+    zoningField: ZoneType
+    join: spatial KM Zoning (7888) ∩ Cleveland parcels; Gaston-side KM → Gaston card (37071)
+    notes: Straddles Cleveland/Gaston — Cleveland card covers Cleveland FIPS only
+  - name: Boiling Springs
+    zoningRestUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/9
+    fluRestUrl: https://www.webgis.net/arcgis/rest/services/NC/Cleveland/MapServer/30
+    zoningField: ZoneType
+    fluField: Future
+    join: spatial BS Zoning (241) + BS Land Use Plan (70)
+  - name: Grover
+    zoningRestUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/0
+    zoningField: ZoneType
+    join: no town-specific ZoneType layer — use county Zoning/0 + Jurisdiction NAME='GROVER'
+    notes: Zoning district REST gap for Grover
+  - name: Small towns (Casar, Fallston, Kingstown, Lattimore, Patterson Springs, Polkville, Waco)
+    zoningRestUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/40
+    zoningField: ZoneType_Code
+    join: layer 40 stubs are N/A — fall back to county Zoning/0
+    notes: status gap for district codes
+  - name: Belwood / Earl / Lawndale / Mooresboro
+    zoningRestUrl: https://gis.clevelandcounty.com/arcgis/rest/services/Planning/Zoning/FeatureServer/0
+    zoningField: ZoneType
+    join: Jurisdiction footprint only; no town ZoneType layer published
+  - name: Belmont tip
+    zoningRestUrl: null
+    join: n/a — Belmont is Gaston County (37071), not Cleveland; no Belmont polygon in Cleveland Jurisdiction
+    notes: User tip clarified as out-of-county
+
+gaps:
+  - No last-sale price/date on primary parcel REST — join Vacant/Improved Lot Sales by COUNTY_PID (partial sale sets, not full history)
+  - NC OneMap gisacres is 0 for Cleveland (cntyfips='045') — acreage filters must use county GIS_Calculated_Acres
+  - Basemap parcel count 70189 vs Tax Parcel Area 60300 vs OneMap 59964 — prefer Basemap for CAMA; reconcile IDs carefully
+  - Small-town zoning district codes missing (Town Jurisdiction stubs N/A; Grover/Belwood/Earl/Lawndale/Mooresboro no ZoneType layer)
+  - No public Shelby or Kings Mountain native FLU FeatureServer — only county Original_LandUsePlan + Boiling Springs Future
+  - Zoning_AGOL FeatureServer/1 is ordinance-edit scratch (count 1) — not production zoning
+  - No independent public city ArcGIS for Shelby/KM/Boiling Springs — county Planning/Zoning host is authoritative
+  - WebGIS viewer querystring (?pid= / ?PIN=) loads map shell; reliable PA deep-link is PropertyCard.php?pid=
+  - Owner phones/emails not collected (public REST has none)
+  - Utilities / AADT excluded by card rules
+
+license: "Cleveland County GIS; attribution required; independent verification recommended; NCGS 132-10 commercial resale limits"
+appraiserSearchUrl: https://www.webgis.net/nc/Cleveland/PropertyCard.php?pid={COUNTY_PID}
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+verifiedLayerCount: 14
+viewerUrl: https://www.webgis.net/nc/Cleveland/
+appraiserDeepLinkTemplate: https://www.webgis.net/nc/Cleveland/PropertyCard.php?pid={COUNTY_PID}
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.clevelandcounty.com/arcgis/rest/services/Basemap/Basemap/FeatureServer/2
+  parcelIdField: COUNTY_PID
+  acreageFilter: GIS_Calculated_Acres >= 5 AND GIS_Calculated_Acres <= 150
+  acres5to150Live: 14154
+  parcelCountLive: 70189
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='CLEVELAND'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CLEVELAND%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CLEVELAND%27&returnCountOnly=true&f=json
+      liveStationCount: 716
+      stationsWithAADT2022: 299
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Cleveland'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Cleveland%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Cleveland%27&returnCountOnly=true&f=json
+      liveStationCount: 737
+      stationsWithAADT2025: 460
+      stationsWithAADT2024: 398
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Cleveland'
+      stations2024LiveCount: 719
+      stations2024WithAADT2024: 719
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - COUNTY_TOTAL_VALUE
+    - COUNTY_LAND_VALUE
+    liveNonZero:
+      COUNTY_TOTAL_VALUE: 69677
+      COUNTY_LAND_VALUE: 69618
+    status: ok
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: partial
+    note: 'No sale fields on Basemap/2 parcels. Sale subset polygons: Tax/Vacant_ImprovedLot_Sales MapServer/0 (vacant) + /1 (improved), fields Sales_Amount, DateSold, Parcel_Number(=COUNTY_PID). OneMap saledate empty for 045. Full history → PropertyCard.php.'
+    supplementalSource:
+      vacantLot:
+        url: https://gis.clevelandcounty.com/arcgis/rest/services/Tax/Vacant_ImprovedLot_Sales/MapServer/0
+        rows: 2765
+        price_gt0: 2759
+      improvedLot:
+        url: https://gis.clevelandcounty.com/arcgis/rest/services/Tax/Vacant_ImprovedLot_Sales/MapServer/1
+        rows: 6481
+        price_gt0: 6475
+  ownerEntity:
+    ownerFields:
+    - COUNTY_OWNER_1
+    - COUNTY_OWNER_2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 2022
+    liveEntityCount5to150acExtended: 2486
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - WALTERS JOY HARRIS T | BROWNING REBECCA LYNN TRUSTEE
+    - 'AUTOMOTIVE RECOVERY | ATTN: REAL ESTATE DEPT'
+    - 'AUTOMOTIVE RECOVERY | ATTN: REAL ESTATE DEPT'
+    - 'AUTOMOTIVE RECOVERY | ATTN: REAL ESTATE DEPT'
+  paDeepLink:
+    template: https://www.webgis.net/nc/Cleveland/PropertyCard.php?pid={COUNTY_PID}
+    testedParcelId: '42589'
+    testedUrl: https://www.webgis.net/nc/Cleveland/PropertyCard.php?pid=42589
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Parcel id found in the response body.
+  gisViewer:
+    url: https://www.webgis.net/nc/Cleveland/
+    httpStatus: 200
+    pageTitle: Cleveland County NC WebGIS
+  gaps:
+  - No sale price/date on parcel layer — only vacant/improved lot sales subset layers + PropertyCard

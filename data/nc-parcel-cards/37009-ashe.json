@@ -1,0 +1,500 @@
+{
+  "state": "NC",
+  "jurisdiction": "Ashe County",
+  "county": "Ashe",
+  "fips": "37009",
+  "cntyfips": "009",
+  "slug": "ashe",
+  "level": "county",
+  "markets": [
+    "Boone",
+    "Asheville"
+  ],
+  "msa": "Boone / Asheville shed",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://gis.ashecountygov.com/maps/",
+  "gisDeepLinkTemplate": "https://gis.ashecountygov.com/maps/?pin={ParcelNumber}",
+  "gisDeepLinkNotes": "config.js queryStringParameters: variable pin \u2192 ParcelNumber = '${value}' on Web_Map_2026 Parcels",
+  "countyRestRoot": "https://gis.ashecountygov.com/arcgis/rest/services",
+  "openDataHubUrl": "https://ashe-county-gis-data-acgt.hub.arcgis.com/",
+  "appraiserSearchUrl": "https://gis.ashecountygov.com/ITSPublic/AppraisalCard.aspx?id={ParcelNumber}",
+  "appraiserSearchUrlNotes": "Templates.htm Property Record Card \u2192 ITSPublic/appraisalcard.aspx?id=${ParcelNumber}. Verified 012090918722 \u2192 BAKER JEFFREY E & NANCY A PDF; GPIN/ID NO 01365293.",
+  "paBasicSearchUrl": "https://gis.ashecountygov.com/ITSPublic/",
+  "taxBillHandlerUrl": "https://gis.ashecountygov.com/maps/assets/Ashe/TaxBillHandler.ashx?id={ParcelNumber}",
+  "paDeepLinkKey": "ParcelNumber",
+  "parcelIdPreferred": "ParcelNumber",
+  "joinKeys": [
+    "ParcelNumber",
+    "GPIN",
+    "parno",
+    "altparno"
+  ],
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/ashe/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/ashe/parcel-detail/{ParcelNumber}",
+  "taxPortalUrl": "https://ashecountytax.com/",
+  "comprehensivePlanPdf": "https://nmcdn.io/e186d21f8c7946a19faed23c3da2f0da/9daed2ecce2a4df2845caa12db947e3d/files/Ashe-County-Comprehensive-Plan-2022_Final.pdf",
+  "jeffersonUrl": "https://www.townofjefferson.org/",
+  "jeffersonZoningOrdinancePdf": "https://www.townofjefferson.org/docs/Zoning1.pdf",
+  "westJeffersonUrl": "https://townofwjnc.com/",
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='009'",
+  "hccogRestRoot": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services",
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "ParcelNumber",
+        "GPIN",
+        "parno",
+        "altparno"
+      ],
+      "bestLayer": "OpenData/TaxParcel/0",
+      "notes": "ParcelNumber (12-digit) for AppraisalCard + viewer ?pin= + NCPTS; GPIN \u2194 OneMap altparno"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "OpenData/TaxParcel/0"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TotalCalculatedAcres",
+        "LegalLandUnits",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 9061,
+      "bestLayer": "OpenData/TaxParcel/0"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1",
+        "ownname"
+      ],
+      "bestLayer": "OpenData/TaxParcel/0"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address1",
+        "Address2",
+        "Address3",
+        "City",
+        "State",
+        "ZipCode"
+      ],
+      "bestLayer": "OpenData/TaxParcel/0"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "ParcelPropertyAddress",
+        "siteadd"
+      ],
+      "bestLayer": "OpenData/TaxParcel/0"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SalePrice",
+        "SaleYear",
+        "DeedDate"
+      ],
+      "bestLayer": "OpenData/TaxParcel/0",
+      "notes": "rp_sale table (~31083 SalePrice>0) for multi-sale history + QualifiedCode"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue",
+        "ParcelLandValue",
+        "ParcelBuildingValue",
+        "ParcelObxfValue",
+        "ParcelDeferredValue",
+        "PriorTotalValue"
+      ],
+      "bestLayer": "OpenData/TaxParcel/0"
+    },
+    "zoning": {
+      "present": true,
+      "citiesFirst": true,
+      "fields": [
+        "Zoning_Lab",
+        "Zone_Code",
+        "ZoneCode"
+      ],
+      "bestLayer": "AsheED_Zoning FS 0/1/2 (Jefferson / WJ / WJ-ETJ)"
+    },
+    "flu": {
+      "present": false,
+      "partial": true,
+      "bestLayer": null,
+      "caveat": "Comp Plan 2022 PDF only \u2014 no public FLU FeatureServer"
+    }
+  },
+  "municipalities": {
+    "Jefferson": {
+      "role": "county seat; city-first zoning",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": "AsheED_Zoning/FeatureServer/0 Zoning_Lab",
+      "zoningUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/0",
+      "zoningCount": 6,
+      "zoneCodes": [
+        "D-B",
+        "H-B",
+        "M-1",
+        "R-A10",
+        "R-A15",
+        "R-A8"
+      ],
+      "cityLimitsUrl": "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/25",
+      "cityLimitsParcelCount": 907,
+      "notes": "Official district polygons via HCCOG AsheED_Zoning; town zoning ordinance PDF on townofjefferson.org"
+    },
+    "West Jefferson": {
+      "role": "city-first zoning + ETJ",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": "AsheED_Zoning/1 town limits + /2 ETJ; WJZon secondary",
+      "zoningUrls": [
+        "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/1",
+        "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/2"
+      ],
+      "zoningCounts": {
+        "townLimits": 250,
+        "etj": 1970
+      },
+      "zoneCodesTown": [
+        "C-S",
+        "H-C",
+        "M-1",
+        "M-1 C",
+        "M-H",
+        "N-S",
+        "R-15",
+        "R-7",
+        "R-A"
+      ],
+      "zoneCodesEtj": [
+        "C-S",
+        "H-C",
+        "M-1",
+        "M-H",
+        "R-15",
+        "R-7",
+        "R-A"
+      ],
+      "alternateZoningUrl": "https://services1.arcgis.com/Wz3RgwtkgJCGuhMd/arcgis/rest/services/WJZon/FeatureServer/0",
+      "alternateZoningCount": 2208,
+      "cityLimitsUrl": "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/27",
+      "cityLimitsParcelCount": 1257,
+      "etjBoundaryUrl": "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/28",
+      "etjBoundaryCount": 36,
+      "notes": "Primary commercial center; ETJ zoned on AsheED_Zoning/2"
+    },
+    "Lansing": {
+      "role": "incorporated; zoning REST gap",
+      "incorporated": true,
+      "hasLocalGis": false,
+      "zoningPrefer": null,
+      "cityLimitsUrl": "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/26",
+      "cityLimitsParcelCount": 141,
+      "townLimitsUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/Lansing_Town_Limits/FeatureServer/0",
+      "townLimitsCount": 1,
+      "notes": "Town limits only \u2014 no public zoning FeatureServer found"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "OpenData TaxParcel (PRIMARY CAMA)",
+      "restUrl": "https://gis.ashecountygov.com/arcgis/rest/services/OpenData/TaxParcel/MapServer/0",
+      "alternateUrls": [
+        "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/16",
+        "https://gis.ashecountygov.com/arcgis/rest/services/Parcels/MapServer/0"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TotalCalculatedAcres",
+      "coverage": "county-wide",
+      "status": "usable",
+      "primary": true,
+      "counts": {
+        "total": 38839,
+        "acres5to150": 9061,
+        "salesPriceGt0": 18077,
+        "salesPriceGt0InRange": 3505,
+        "marketValueGt0": 38420
+      },
+      "fieldMap": {
+        "ParcelNumber": "parcelId",
+        "GPIN": "parcelIdAlt",
+        "TotalCalculatedAcres": "acreage",
+        "LegalLandUnits": "acreage",
+        "StatedArea": "acreage",
+        "Name1": "ownerName",
+        "Address1": "mailingAddress",
+        "Address2": "mailingAddress",
+        "Address3": "mailingAddress",
+        "City": "mailingAddress",
+        "State": "mailingAddress",
+        "ZipCode": "mailingAddress",
+        "ParcelPropertyAddress": "situsAddress",
+        "SalePrice": "lastSale.price",
+        "SaleYear": "lastSale.date",
+        "DeedDate": "lastSale.date",
+        "TotalMarketValue": "tax.marketValue",
+        "TotalAssessedValue": "tax.assessedValue",
+        "ParcelLandValue": "tax.landValue",
+        "ParcelBuildingValue": "tax.improvementValue",
+        "ParcelObxfValue": "tax.otherValue",
+        "ParcelDeferredValue": "tax.deferredValue",
+        "DeedBook": "other",
+        "DeedPage": "other",
+        "PlatBook": "other",
+        "PLATPAGE": "other"
+      },
+      "notes": "PRIMARY wire-first. MaxRecordCount 30000. CRS 102719/2264. Sample ParcelNumber 012090918722 / GPIN 01365293 centroid \u2248 -81.38, 36.48 (Ashe)."
+    },
+    {
+      "role": "parcels",
+      "name": "Web_Map_2026 Parcels (viewer twin)",
+      "restUrl": "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/16",
+      "layerId": 16,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "LegalLandUnits",
+      "coverage": "county-wide",
+      "status": "usable",
+      "counts": {
+        "total": 38842
+      },
+      "fieldMap": {
+        "ParcelNumber": "parcelId",
+        "GPIN": "parcelIdAlt",
+        "LegalLandUnits": "acreage",
+        "Name1": "ownerName",
+        "ParcelPropertyAddress": "situsAddress",
+        "SalePrice": "lastSale.price",
+        "SaleYear": "lastSale.date",
+        "TotalMarketValue": "tax.marketValue",
+        "TotalAssessedValue": "tax.assessedValue"
+      },
+      "notes": "Viewer operational layer (LayerConfig). No TotalCalculatedAcres on schema \u2014 prefer OpenData for GIS acres."
+    },
+    {
+      "role": "sales",
+      "name": "Parcels rp_sale table",
+      "restUrl": "https://gis.ashecountygov.com/arcgis/rest/services/Parcels/MapServer/1",
+      "alternateUrls": [
+        "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/37"
+      ],
+      "layerId": 1,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "usable",
+      "counts": {
+        "salesPriceGt0": 31083
+      },
+      "fieldMap": {
+        "ParcelNumber": "parcelId",
+        "SalePrice": "lastSale.price",
+        "DeedDate": "lastSale.date",
+        "DeedDateRaw": "lastSale.date",
+        "SaleYear": "lastSale.date",
+        "SaleMonth": "lastSale.date",
+        "QualifiedCode": "lastSale.qualified",
+        "IsQualified": "lastSale.qualified",
+        "GrantorName": "other",
+        "GranteeName": "other",
+        "VacantOrImproved": "other"
+      },
+      "notes": "Multi-sale history + qualification. Parcel layer already has last SalePrice/SaleYear."
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "status": "partial",
+      "filter": "cntyfips='009'",
+      "counts": {
+        "total": 38836,
+        "acres5to150": 8996,
+        "ownerNonEmpty": 38682,
+        "saledateNotNull": 0
+      },
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress",
+        "mcity": "mailingAddress",
+        "mstate": "mailingAddress",
+        "mzip": "mailingAddress",
+        "siteadd": "situsAddress",
+        "gisacres": "acreage",
+        "parval": "tax.marketValue",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "saledatetx": "lastSale.date"
+      },
+      "notes": "No sale price. saledate epoch empty; saledatetx year text only. Prefer county TaxParcel for sale price + TotalCalculatedAcres."
+    },
+    {
+      "role": "zoning",
+      "name": "AsheED_Zoning \u2014 Town of Jefferson",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "municipality": "Jefferson",
+      "counts": {
+        "total": 6
+      },
+      "fieldMap": {
+        "Zoning_Lab": "zoning",
+        "Zone_Descr": "zoning"
+      },
+      "notes": "District polygons (not parcel-based). Codes: D-B, H-B, M-1, R-A10, R-A15, R-A8."
+    },
+    {
+      "role": "zoning",
+      "name": "AsheED_Zoning \u2014 West Jefferson Town Limits",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "usable",
+      "citiesFirst": true,
+      "municipality": "West Jefferson",
+      "counts": {
+        "total": 250
+      },
+      "fieldMap": {
+        "Zone_Code": "zoning",
+        "Zone_Descr": "zoning",
+        "Acreage": "acreage"
+      },
+      "notes": "Town-limits zoning. Codes include C-S, H-C, M-1, M-1 C, M-H, N-S, R-15, R-7, R-A."
+    },
+    {
+      "role": "zoning",
+      "name": "AsheED_Zoning \u2014 West Jefferson ETJ",
+      "restUrl": "https://services1.arcgis.com/vj28eVZMB2OMIUh5/arcgis/rest/services/AsheED_Zoning/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "etj",
+      "status": "usable",
+      "citiesFirst": true,
+      "municipality": "West Jefferson",
+      "counts": {
+        "total": 1970
+      },
+      "fieldMap": {
+        "ZoneCode": "zoning",
+        "Zone": "zoning",
+        "Acreage": "acreage",
+        "PreviousZone": "other"
+      },
+      "notes": "ETJ zoning polygons. Codes: C-S, H-C, M-1, M-H, R-15, R-7, R-A."
+    },
+    {
+      "role": "zoning",
+      "name": "WJZon (West Jefferson alternate)",
+      "restUrl": "https://services1.arcgis.com/Wz3RgwtkgJCGuhMd/arcgis/rest/services/WJZon/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "status": "partial",
+      "municipality": "West Jefferson",
+      "counts": {
+        "total": 2208
+      },
+      "fieldMap": {
+        "ZONING": "zoning",
+        "ZONE_DESC": "zoning",
+        "TAXPIN": "parcelId",
+        "PARCEL_NO": "parcelIdAlt"
+      },
+      "notes": "Parcel-attributed WJ zoning mirror \u2014 prefer AsheED_Zoning district polygons."
+    },
+    {
+      "role": "other",
+      "name": "Web_Map_2026 CityLimits (muni routing)",
+      "restUrl": "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/25",
+      "alternateUrls": [
+        "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/26",
+        "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/27",
+        "https://gis.ashecountygov.com/arcgis/rest/services/Web_Map_2026/MapServer/28"
+      ],
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "municipal",
+      "status": "usable",
+      "counts": {
+        "jeffersonParcels": 907,
+        "lansingParcels": 141,
+        "westJeffersonParcels": 1257,
+        "westJeffersonEtj": 36
+      },
+      "fieldMap": {
+        "ParcelID": "parcelId",
+        "ParcelNumb": "parcelId",
+        "CityCode": "other",
+        "CityDescri": "other"
+      },
+      "notes": "25/26/27 are parcel-clipped city membership layers; 28 WJ ETJ is boundary polys."
+    },
+    {
+      "role": "flu",
+      "name": "Ashe County Comprehensive Plan 2022 (PDF)",
+      "restUrl": null,
+      "geometry": "none",
+      "auth": "none",
+      "coverage": "county-wide",
+      "status": "gap",
+      "documentUrl": "https://nmcdn.io/e186d21f8c7946a19faed23c3da2f0da/9daed2ecce2a4df2845caa12db947e3d/files/Ashe-County-Comprehensive-Plan-2022_Final.pdf",
+      "notes": "No public FLU FeatureServer. Unincorporated land use is ordinance-based (flood/watershed/subdivision/etc.), not cadastral zoning."
+    }
+  ],
+  "gaps": [
+    "FLU REST gap \u2014 Comp Plan 2022 PDF only; no county FLU FeatureServer",
+    "Unincorporated Ashe has no countywide zoning REST (ordinance-based land-use only); cities-first Jefferson/WJ (+ WJ ETJ)",
+    "Lansing zoning REST gap \u2014 town limits only",
+    "OneMap saledate empty for cntyfips='009'; no sale price on OneMap \u2014 use TaxParcel SalePrice",
+    "Web_Map_2026/16 lacks TotalCalculatedAcres \u2014 prefer OpenData TaxParcel",
+    "County website HTML (ashecountygov.com) often 403 from datacenter egress \u2014 REST + maps + AppraisalCard verified live",
+    "Utilities / AADT / emails / phones / paid vendors intentionally excluded"
+  ],
+  "license": "Ashe County GIS / Tax Administration; Town of Jefferson; Town of West Jefferson; High Country COG (AsheED_Zoning). Not survey quality. Commercial resale subject to NCGS 132-10.",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 12,
+  "tranche": 3
+}

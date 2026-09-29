@@ -1,0 +1,218 @@
+state: NC
+jurisdiction: Richmond County
+fips: "37153"
+level: county
+markets: [Fayetteville, Charlotte]
+slug: richmond
+cntyfips: "153"
+
+municipalities:
+  - name: Rockingham
+    role: gap
+    zoningLayer: null
+    notes: County seat; City Limits + City_ETJ; ~4559 address pts (Inc_Muni); municipal zoning REST gap (city administers zoning per building-permit checklist)
+  - name: Hamlet
+    role: gap
+    zoningLayer: null
+    notes: City Limits + City_ETJ; ~3012 address pts; municipal zoning REST gap
+  - name: Ellerbe
+    role: gap
+    zoningLayer: null
+    notes: City Limits; ~554 address pts; zoning REST gap
+  - name: Hoffman
+    role: gap
+    zoningLayer: null
+    notes: City Limits; ~306 address pts; zoning REST gap
+  - name: Dobbins Heights
+    role: gap
+    zoningLayer: null
+    notes: City Limits; ~567 address pts; zoning REST gap
+  - name: Norman
+    role: gap
+    zoningLayer: null
+    notes: City Limits; ~100 address pts; zoning REST gap
+  - name: Unincorporated Richmond
+    role: county-zoning
+    zoningLayer: GISWebsite/ParcelViewer/MapServer/14
+    count: 69
+    notes: County Zoning DistrictCode A-R/C-C/C-R/H-C/H-I/L-I/R-R/V-R; ~17487 County Inc_Muni addresses
+
+layers:
+  - role: parcels
+    name: GISWebsite/ParcelViewer Parcels (CAMA + polygons)
+    restUrl: https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/12
+    alternateUrls:
+      - https://gis3.richmondnc.com/arcgis/rest/services/Public/RichmondParcelViewer/MapServer/12
+      - https://gis3.richmondnc.com/arcgis/rest/services/Parcel_Viewer_2023_4/MapServer
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: CalculatedAcres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Name: ownerName
+      MailingAddress: mailingAddress
+      City: mailingAddress
+      State: mailingAddress
+      ZipCode: mailingAddress
+      CalculatedAcres: acreage
+      AssessedAcreage: acreage
+      SaleDate: lastSale.date
+      DeedBook: other
+      DeedPage: other
+      TaxValue: tax.marketValue
+      LandValue: tax.marketValue
+      BuildingValue: tax.marketValue
+      FireDistrict: other
+      Township: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 32662; CalculatedAcres 5–150 → 5403;
+      TaxValue>0 → 32605; BuildingValue>0 → 17402; building 0/null in band → 3552;
+      SaleDate not null → 32302. CRS 102100/3857. MaxRecordCount 2000 — paginate.
+      No SalePrice on REST — AppraisalCard PDF for price. Geo-check PIN 747416748126 ≈ -79.74/34.97.
+      Legacy gis3 twin TLS fragile from some egress — prefer gis.richmondnc.com.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      mcity: mailingAddress
+      mstate: mailingAddress
+      mzip: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Filter cntyfips='153'. Count 32625; gisacres 5–150 → 5392; parval>0 → 32556;
+      saledate epoch empty; saledatetx populated; siteadd empty. No sale price.
+      Join parno↔PIN. sourceagnt=Richmond County GIS.
+    status: usable
+
+  - role: zoning
+    name: County Zoning
+    restUrl: https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/14
+    alternateUrls:
+      - https://gis.richmondnc.com/server/rest/services/ParcelviewerShield/MapServer/13
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      DistrictCode: zoning
+      DistrictName: zoning
+      Jurisdiction: other
+    notes: >
+      Unincorporated PRIMARY verified 2026-09-24: count 69. Codes A-R, C-C, C-R, H-C, H-I, L-I, R-R, V-R.
+      Do not collect PhoneNumber. Municipal zoning inside Rockingham/Hamlet/Ellerbe/Hoffman/Norman/Dobbins Heights = REST gap.
+    status: partial
+
+  - role: zoning
+    name: Highway Commercial Overlay Zoning District
+    restUrl: https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: Overlay count 10 — spatial flag only; thin attributes.
+    status: partial
+
+  - role: other
+    name: City Limits
+    restUrl: https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      NAME: other
+      ACRES: acreage
+    notes: >
+      Count 14 (multi-part). NAME Rockingham, Hamlet, Ellerbe, Hoffman, Norman, Dobbins Heights.
+      Route which zoning path applies (county vs muni-gap).
+    status: usable
+
+  - role: other
+    name: City_ETJ
+    restUrl: https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      JURISDICTION: other
+    notes: Count 8 — City of Rockingham / City of Hamlet ETJ.
+    status: usable
+
+  - role: other
+    name: AddressPoints (situs join)
+    restUrl: https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/3
+    layerId: 3
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PARCELNUM: parcelId
+      FullAddress: situsAddress
+      Post_Comm: situsCity
+      Post_Code: situsZip
+      Inc_Muni: other
+    notes: >
+      Count 26585; PARCELNUM non-null → 25644. Join PARCELNUM=PIN for situs.
+      EXCLUDE PHONE/AREACODE fields — no phones collected.
+    status: usable
+
+  - role: flu
+    name: Richmond County Strategic Land Use Plan (PDF)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      FLU PDF only — https://www.richmondnc.com/DocumentCenter/View/6377 (adopted 2022).
+      UDO https://www.richmondnc.com/DocumentCenter/View/7580/RICHMOND-COUNTY-UDO .
+      No public FLU FeatureServer.
+    status: gap
+
+gaps:
+  - Sale price not on public REST (SaleDate only) — PA AppraisalCard PDF for price QA
+  - Municipal zoning REST gap for Rockingham, Hamlet, Ellerbe, Hoffman, Norman, Dobbins Heights
+  - FLU PDF-only — no FeatureServer
+  - Parcel polygon layer lacks situs — join AddressPoints PARCELNUM=PIN
+  - OneMap siteadd empty; saledate epoch null — use saledatetx / county SaleDate
+  - Legacy gis3.richmondnc.com TLS unreliable from some research networks
+  - NCPTS richmond tenant IsValidTenant=false — do not wire as primary PA
+  - RealEstateSearch/Parcel/{PIN} GET returns 404 — use AppraisalCard.aspx?id={PIN}
+  - Utilities / AADT / emails / phones / paid vendors excluded by design
+
+license: "Richmond County GIS / Tax / Land Records; NC OneMap; NCGS 132-10 commercial resale limits; attribute Richmond County GIS (+ NC OneMap where used)"
+appraiserSearchUrl: "https://gis.richmondnc.com/ITSPublic/AppraisalCard.aspx?id={PIN}"
+appraiserSearchUrlNotes: "ITSPublic AppraisalCard id={PIN} (12-digit). Verified HTTP 200 application/pdf for PIN 747416748126 (owner/situs/deed sale $89,000/tax). TaxBillSearch/Parcel/{PIN} prefills ParcelNumber. RealEstateSearch/Parcel/{PIN} 404 — ViewParcel is AJAX POST only."
+jurisdictionGisUrl: "https://gis.richmondnc.com/maps/"
+viewerLinkTemplate: "https://gis.richmondnc.com/maps/"
+verifiedAt: "2026-09-24"
+verifiedBy: "North Carolina Public Info Researcher"

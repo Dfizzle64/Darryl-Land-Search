@@ -1,0 +1,643 @@
+{
+  "county": "Davie",
+  "state": "NC",
+  "msa": "Winston-Salem MSA",
+  "fips": "37059",
+  "cntyfips": "059",
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "viewerLinkTemplate": "https://gis.daviecountync.gov/portal/apps/webappviewer/index.html?id=94e9a343877d455db96a5bea6f2e8ca3",
+  "appraiserSearchUrl": "https://maps.daviecountync.gov/itsnet/BasicSearch.aspx",
+  "realEstateSearchUrl": "https://maps.daviecountync.gov/itsnet/RealEstate.aspx",
+  "joinKeys": [
+    "NCPIN",
+    "AccountNumber",
+    "COUNTYID",
+    "parno"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "NCPIN",
+        "AccountNumber",
+        "COUNTYID",
+        "ParcelID",
+        "parno"
+      ],
+      "bestLayer": "Parcels/FeatureServer/7"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Parcels/FeatureServer/7"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "TOTAL_ACRES",
+        "ASSESSED_ACRES",
+        "DEEDED_ACRES",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 5786,
+      "approxCountAssessedInRange": 6041,
+      "bestLayer": "Parcels/FeatureServer/7"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name1+Name2",
+        "ownname"
+      ],
+      "bestLayer": "Parcels/FeatureServer/7"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address1",
+        "Address2",
+        "Address3",
+        "City",
+        "State",
+        "ZipCode",
+        "mailadd"
+      ],
+      "bestLayer": "Parcels/FeatureServer/7"
+    },
+    "situsAddress": {
+      "present": true,
+      "joinRequired": false,
+      "fields": [
+        "HouseNumber+StreetDirection+StreetName+StreetType+StreetSuffix+UnitNumber",
+        "siteadd",
+        "ADDR"
+      ],
+      "bestLayer": "Parcels/FeatureServer/7",
+      "caveat": "Compose from components (~23381 StreetName non-null); Address points lack PIN"
+    },
+    "lastSale": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "SaleYear",
+        "SaleMonth",
+        "saleyear",
+        "salemonth"
+      ],
+      "bestLayer": "Parcel_Sales/FeatureServer/0",
+      "caveat": "Date only on REST (~25635 with SaleYear>0); NO SalePrice on public ArcGIS; OneMap saledate empty for Davie; ITS BasicSearch has Sales Date & Price HTML UI"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue",
+        "ParcelLandValue",
+        "ParcelBuildingValue",
+        "ParcelObxfValue",
+        "ParcelDeferredValue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Parcels/FeatureServer/7"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "ZONING",
+        "JURISDICTION"
+      ],
+      "bestLayer": "Zoning_and_Development/FeatureServer/0",
+      "split": "DAVIE COUNTY unincorporated vs MOCKSVILLE / BERMUDA RUN / COOLEEMEE on same layer"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "code_use",
+        "CODE_USE",
+        "LANDUSECODE"
+      ],
+      "bestLayer": "Hosted/county_landuse + Mocksville Land Use Code",
+      "caveat": "County + Mocksville only; Bermuda Run / Cooleemee FLU gap"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://gis.daviecountync.gov/portal/apps/webappviewer/index.html?id=94e9a343877d455db96a5bea6f2e8ca3",
+      "taxSearch": "https://maps.daviecountync.gov/itsnet/BasicSearch.aspx",
+      "realEstate": "https://maps.daviecountync.gov/itsnet/RealEstate.aspx",
+      "keyField": "NCPIN"
+    }
+  },
+  "portals": [
+    {
+      "name": "Tax Parcel Viewer",
+      "url": "https://gis.daviecountync.gov/portal/apps/webappviewer/index.html?id=94e9a343877d455db96a5bea6f2e8ca3",
+      "notes": "Primary interactive parcel viewer"
+    },
+    {
+      "name": "County ArcGIS REST",
+      "url": "https://gis.daviecountync.gov/server/rest/services",
+      "notes": "Parcels, Parcel_Sales, Zoning_and_Development, Addresses, Hosted"
+    },
+    {
+      "name": "County GIS Portal",
+      "url": "https://gis.daviecountync.gov/portal/home/",
+      "notes": "ArcGIS Enterprise portal"
+    },
+    {
+      "name": "County GIS department",
+      "url": "https://www.daviecountync.gov/322/GIS",
+      "notes": "Viewer apps + shapefile/fgdb downloads"
+    },
+    {
+      "name": "ITS Real Estate Search",
+      "url": "https://maps.daviecountync.gov/itsnet/RealEstate.aspx",
+      "notes": "Assessor real estate search"
+    },
+    {
+      "name": "ITS Basic Search",
+      "url": "https://maps.daviecountync.gov/itsnet/BasicSearch.aspx",
+      "notes": "Includes Sales Date & Price HTML search + PRC links"
+    },
+    {
+      "name": "Bermuda Run Growth Management / Landuse app",
+      "url": "https://gis.daviecountync.gov/portal/apps/webappviewer/index.html?id=0dd067cad1ee488385988a0f78d519ba",
+      "notes": "Town viewer; no separate FLU FeatureServer found"
+    },
+    {
+      "name": "Town of Mocksville",
+      "url": "https://www.mocksvillenc.gov/",
+      "notes": "No independent ArcGIS REST; zoning/FLU on county host"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer; filter cntyfips=059"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Town of Mocksville",
+      "districtLabel": "MOCKSVILLE",
+      "cityCode": "02",
+      "parcelCountApprox": 3092,
+      "zoning": [
+        {
+          "name": "County Zoning_and_Development (MOCKSVILLE)",
+          "url": "https://gis.daviecountync.gov/server/rest/services/Zoning_and_Development/FeatureServer/0",
+          "field": "ZONING",
+          "filter": "JURISDICTION='MOCKSVILLE'",
+          "featureCount": 322,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "sampleCodes": [
+            "CB",
+            "CI",
+            "FP",
+            "GI",
+            "GR",
+            "HC",
+            "NC",
+            "NR",
+            "OSR",
+            "TC",
+            "TND",
+            "S-P"
+          ]
+        }
+      ],
+      "flu": [
+        {
+          "name": "Mocksville Land Use Code",
+          "url": "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/51",
+          "fields": [
+            "LANDUSECODE"
+          ],
+          "featureCount": 39,
+          "wkid": 102719,
+          "latestWkid": 2264
+        }
+      ],
+      "independentGis": null,
+      "joinNotes": "Spatial join county Parcels/7 to zoning/FLU in 2264; ETJ on WebTemplate2026/38. Most local public REST is county-hosted (no city ArcGIS)."
+    },
+    {
+      "name": "Town of Bermuda Run",
+      "districtLabel": "BERMUDA RUN",
+      "cityCode": "03",
+      "parcelCountApprox": 1804,
+      "zoning": [
+        {
+          "name": "County Zoning_and_Development (BERMUDA RUN)",
+          "url": "https://gis.daviecountync.gov/server/rest/services/Zoning_and_Development/FeatureServer/0",
+          "field": "ZONING",
+          "filter": "JURISDICTION='BERMUDA RUN'",
+          "featureCount": 20,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "sampleCodes": [
+            "CM",
+            "CR",
+            "GB",
+            "OS",
+            "RM",
+            "VM"
+          ]
+        }
+      ],
+      "flu": [],
+      "fluGap": true,
+      "viewerOptional": "https://gis.daviecountync.gov/portal/apps/webappviewer/index.html?id=0dd067cad1ee488385988a0f78d519ba",
+      "independentGis": null,
+      "joinNotes": "Zoning spatial join to Parcels/7; FLU = gap (no dedicated FeatureServer)."
+    },
+    {
+      "name": "Town of Cooleemee",
+      "districtLabel": "COOLEEMEE",
+      "cityCode": "01",
+      "parcelCountApprox": 541,
+      "zoning": [
+        {
+          "name": "County Zoning_and_Development (COOLEEMEE)",
+          "url": "https://gis.daviecountync.gov/server/rest/services/Zoning_and_Development/FeatureServer/0",
+          "field": "ZONING",
+          "filter": "JURISDICTION='COOLEEMEE'",
+          "featureCount": 11,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "sampleCodes": [
+            "C-S",
+            "HB",
+            "L-I",
+            "OI",
+            "R-MH",
+            "RS"
+          ]
+        }
+      ],
+      "flu": [],
+      "fluGap": true,
+      "independentGis": null,
+      "joinNotes": "Zoning spatial join to Parcels/7; FLU = gap (county TOWN stub only)."
+    },
+    {
+      "name": "Unincorporated Davie County",
+      "districtLabel": "DAVIE COUNTY",
+      "cityCode": null,
+      "parcelCountApprox": 21241,
+      "zoning": [
+        {
+          "name": "County Zoning_and_Development (DAVIE COUNTY)",
+          "url": "https://gis.daviecountync.gov/server/rest/services/Zoning_and_Development/FeatureServer/0",
+          "field": "ZONING",
+          "filter": "JURISDICTION='DAVIE COUNTY'",
+          "featureCount": 807,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "sampleCodes": [
+            "R-A",
+            "R-20",
+            "R-12",
+            "R-8",
+            "H-B",
+            "H-B-CD",
+            "GI",
+            "GI-CD",
+            "H-I",
+            "N-B",
+            "R-M",
+            "C-S",
+            "S-P"
+          ]
+        }
+      ],
+      "flu": [
+        {
+          "name": "Hosted county_landuse",
+          "url": "https://gis.daviecountync.gov/server/rest/services/Hosted/county_landuse/FeatureServer/2",
+          "fields": [
+            "code_use"
+          ],
+          "featureCount": 105,
+          "wkid": 102719,
+          "latestWkid": 2264,
+          "notes": "Exclude or reinterpret CODE TOWN inside municipalities"
+        }
+      ],
+      "independentGis": null,
+      "joinNotes": "CDPs (Advance, Farmington, etc.) use county zoning/FLU \u2014 not separate munis."
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Parcels BITEK CAMA (PRIMARY)",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/Parcels/FeatureServer/7",
+      "layerId": 7,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "TOTAL_ACRES",
+      "coverage": "county-wide",
+      "featureCount": 26678,
+      "acreage5to150Count": 5786,
+      "status": "usable",
+      "wireFirst": true
+    },
+    {
+      "role": "sales",
+      "name": "Parcel_Sales",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/Parcel_Sales/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 26680,
+      "saleYearNonNull": 25635,
+      "salePricePresent": false,
+      "status": "partial"
+    },
+    {
+      "role": "parcels",
+      "name": "WebTemplate2026 Parcels",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/26",
+      "layerId": 26,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 26680,
+      "salePricePresent": false,
+      "status": "partial"
+    },
+    {
+      "role": "parcels",
+      "name": "parcel_polygons",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/parcel_polygons/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 27221,
+      "status": "usable"
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "filter": "cntyfips='059'",
+      "featureCount": 26424,
+      "acreage5to150Count": 5780,
+      "status": "usable"
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning_and_Development",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/Zoning_and_Development/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 1160,
+      "byJurisdiction": {
+        "DAVIE COUNTY": 807,
+        "MOCKSVILLE": 322,
+        "BERMUDA RUN": 20,
+        "COOLEEMEE": 11
+      },
+      "status": "usable",
+      "notes": "Prefer FeatureServer; MapServer query not supported"
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning Overlay",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/Zoning_Overlay/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 15,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Hosted county_landuse",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/Hosted/county_landuse/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 105,
+      "status": "usable"
+    },
+    {
+      "role": "flu",
+      "name": "Mocksville Land Use Code",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/51",
+      "layerId": 51,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 39,
+      "coverage": "city-only",
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Municipal City Limits",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/Municipal_City_Limits/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 4,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Address Points",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/Addresses/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "point",
+      "auth": "none",
+      "featureCount": 22742,
+      "status": "usable",
+      "notes": "No PIN \u2014 spatial only"
+    },
+    {
+      "role": "other",
+      "name": "ETJ",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/WebTemplate2026/WebTemplate2026/MapServer/38",
+      "layerId": 38,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 3,
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Growth Management",
+      "restUrl": "https://gis.daviecountync.gov/server/rest/services/Hosted/growth_management/FeatureServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "auth": "none",
+      "featureCount": 17,
+      "status": "usable",
+      "notes": "Primary/Secondary/Rural/Municipal categories \u2014 not detailed FLU"
+    }
+  ],
+  "wireFirst": [
+    "https://gis.daviecountync.gov/server/rest/services/Parcels/FeatureServer/7",
+    "https://gis.daviecountync.gov/server/rest/services/Parcel_Sales/FeatureServer/0",
+    "https://gis.daviecountync.gov/server/rest/services/Zoning_and_Development/FeatureServer/0",
+    "https://gis.daviecountync.gov/server/rest/services/Hosted/county_landuse/FeatureServer/2",
+    "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  ],
+  "gaps": [
+    "No SalePrice on public ArcGIS REST (ITS Basic Search Sales Date & Price is HTML-only)",
+    "OneMap Davie saledate empty (count 0); no statewide sale price",
+    "Bermuda Run and Cooleemee \u2014 no dedicated public FLU FeatureServer",
+    "Zoning MapServer query not supported \u2014 use FeatureServer/0",
+    "Address points lack PIN join key",
+    "Rare NCPIN stubs (ROAD / short / null) \u2014 filter",
+    "MortgageHolder / MortgageLoanNumber on Parcels/7 \u2014 do not collect",
+    "Last-sale year/month only; no multi-transfer price history FeatureServer",
+    "MaxRecordCount 2000 on county layers \u2014 paginate",
+    "No independent municipal ArcGIS hosts; no paid vendor data; no phones/emails"
+  ],
+  "license": "Davie County GIS public REST + downloads; attribution expected",
+  "verifiedAt": "2026-09-23",
+  "verifiedBy": "GIS Research Executor",
+  "verifiedLayerCount": 13,
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (NC non-OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "pass1": {
+      "status": "verified",
+      "parcelPolygonLayer": "https://gis.daviecountync.gov/server/rest/services/Parcels/FeatureServer/7",
+      "polygonCountLive": 26678,
+      "parcelIdField": "NCPIN",
+      "parcelIdFilled": 26678,
+      "acreageField": "TOTAL_ACRES",
+      "acres5to150Live": 5786,
+      "sampleCentroidWgs84": [
+        -80.7073,
+        35.8547
+      ]
+    },
+    "parcelLayer": "https://gis.daviecountync.gov/server/rest/services/Parcels/FeatureServer/7",
+    "parcelIdField": "NCPIN",
+    "acreageFilter": "TOTAL_ACRES >= 5 AND TOTAL_ACRES <= 150",
+    "acres5to150Live": 5786,
+    "parcelCountLive": 26678,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='DAVIE'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DAVIE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27DAVIE%27&returnCountOnly=true&f=json",
+        "liveStationCount": 307,
+        "stationsWithAADT2022": 199
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Davie'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Davie%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Davie%27&returnCountOnly=true&f=json",
+        "liveStationCount": 303,
+        "stationsWithAADT2025": 191,
+        "stationsWithAADT2024": 196,
+        "stationsWith2025or2024": 296,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Use NCDOT_2025 layer 1: AADT_2025, falling back to AADT_2024 then AADT_2022, whichever is filled first. The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalMarketValue",
+        "TotalAssessedValue"
+      ],
+      "liveNonZero": {
+        "TotalMarketValue": 26668,
+        "TotalAssessedValue": 26668
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [],
+      "dateFields": [],
+      "livePriceNonZero": {},
+      "liveDateNonNull": {},
+      "status": "partial",
+      "note": "No sale fields on Parcels/7. Parcel_Sales/FeatureServer/0 (and WebTemplate2026/MapServer/26) saleyear non-null 25,644 of 26,680 (year + month only, live 2026-09-28). Price on ITS Sales.aspx / BasicSearch.aspx (ASP.NET POST forms, no GET deep link)."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name1"
+      ],
+      "primaryOwnerField": "Name1",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(Name1) LIKE '% LLC%' OR UPPER(Name1) LIKE '% INC%' OR UPPER(Name1) LIKE '% LP%' OR UPPER(Name1) LIKE '% LLP%' OR UPPER(Name1) LIKE '% LTD%' OR UPPER(Name1) LIKE '% TRUST%' OR UPPER(Name1) LIKE '% CHURCH%' OR UPPER(Name1) LIKE '% COMPANY%' OR UPPER(Name1) LIKE '% PARTNERSHIP%' OR UPPER(Name1) LIKE '% HOLDINGS%' OR UPPER(Name1) LIKE '% PROPERTIES%' OR UPPER(Name1) LIKE '% CORP%' OR UPPER(Name1) LIKE '%,LLC%' OR UPPER(Name1) LIKE '%,INC%' OR UPPER(Name1) LIKE 'CITY OF %' OR UPPER(Name1) LIKE 'COUNTY OF %' OR UPPER(Name1) LIKE 'STATE OF %' OR UPPER(Name1) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 3414,
+      "liveEntityCount5to150ac": 714,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes), so it runs slightly high, together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": null,
+      "testedParcelId": "5841133331",
+      "testedUrl": "https://maps.daviecountync.gov/itsnet/AppraisalCard.aspx?id=5841133331",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=utf-8",
+      "contentVerified": false,
+      "note": "No GET deep link: AppraisalCard.aspx?id= returns 200 with an empty form for NCPIN, AccountNumber, COUNTYID and ParcelID; RealEstateDetail.aspx is 404. The ITS search (RealEstate.aspx / BasicSearch.aspx) is an ASP.NET WebForms POST with __VIEWSTATE. LSB: link to the search page, or submit a POST.",
+      "searchUrl": "https://maps.daviecountync.gov/itsnet/RealEstate.aspx",
+      "needsPost": true
+    },
+    "gisViewer": {
+      "url": "https://gis.daviecountync.gov/portal/apps/webappviewer/index.html?id=94e9a343877d455db96a5bea6f2e8ca3",
+      "httpStatus": 200,
+      "pageTitle": "ArcGIS Web Application",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Tax Parcel Viewer",
+        "type": "Web Mapping Application"
+      }
+    },
+    "gaps": [
+      "sale partial",
+      "PA deep link needs POST (no GET template)"
+    ]
+  }
+}

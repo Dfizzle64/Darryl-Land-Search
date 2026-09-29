@@ -1,0 +1,520 @@
+state: NC
+jurisdiction: Chatham County
+fips: "37037"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: LandReference Parcels / CamaParcels (PRIMARY)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandReference/MapServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: gross_current_acres
+    coverage: county-wide
+    fieldMap:
+      parcel_number: parcelId
+      parcel_number_short: parcelIdShort
+      alternate_parcel_number: parcelIdPin
+      map_number: mapNumber
+      gross_current_acres: acreage
+      current_owners: ownerName
+      jan1_owners: ownerNameJan1
+      address1: mailingAddress.street
+      address2: mailingAddress.street2
+      csz: mailingAddress.cityStateZip
+      physical_street_address: situsAddress
+      community_name: situsCity
+      current_book: lastSale.deedBook
+      current_page: lastSale.deedPage
+      grantor_1: lastSale.grantor
+      grantor_2: lastSale.grantor2
+      sale_instrument: lastSale.instrument
+      sale_description: lastSale.instrumentDesc
+      land_use: dorCode
+      zoning: zoning
+      township_code: townshipCode
+      township_name: township
+      py_tax_code: taxDistrictCode
+      tax_district_desc: taxDistrict
+      py_use_code: useCode
+      jan1_land_FMV: tax.landValue
+      jan1_bldg_FMV: tax.improvementValue
+      jan1_total_FMV: tax.marketValue
+      jan1_land_ASV: tax.landAssessed
+      jan1_bldg_ASV: tax.improvementAssessed
+      jan1_total_ASV: tax.assessedValue
+      jan1_puv_deferred: tax.puvDeferred
+      current_puv_deferred: tax.puvDeferredCurrent
+      parcel_year: taxYear
+      parcel_status: parcelStatus
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 49387;
+      gross_current_acres 5–150 → 13943; jan1_bldg_FMV=0/null in range → 5446;
+      jan1_total_FMV>0 in range → 13903. CRS 102719/2264. MaxRecordCount 100000
+      on LandReference (opendataagol CamaParcels twin MaxRecordCount 2000 — same
+      schema/count). MapServer only — FeatureServer SOE not installed. Rich CAMA
+      on polygons: owner, mailing (address1/2+csz), situs (physical_street_address
+      + community_name), land/bldg FMV+ASV split, zoning attr, tax district, land_use.
+      No sale PRICE on parcel polygons — join PropertySales table on parcel_number.
+      Open-data twin: opendataagol/.../Cadastral/Chatham_CamaParcels/MapServer/0.
+      Geo-check sample parcel_number=0081218 centroid ≈ -79.109, 35.717 (Pittsboro).
+      Do NOT dig WaterUtilityType/Sanitary* (out of scope utilities).
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      altparno: parcelIdPin
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-24: cntyfips='037' count 48850; gisacres 5–150 → 13253;
+      improvval=0/null in range → 5308. Join: parno = county parcel_number;
+      altparno = alternate_parcel_number (PIN). Geo-check centroids in Chatham
+      (~35.57–35.94 N, 78.90–79.55 W). MaxRecordCount 5000. Alternate host
+      services.gis.nc.gov. No sale price on OneMap. Fallback when county host flaky.
+    status: usable
+
+  - role: sales
+    name: Cadastral PropertySales (DEVNET Sales table)
+    restUrl: https://gisservices.chathamcountync.gov/opendataagol/rest/services/Cadastral/Chatham_PropertySales/MapServer/0
+    layerId: 0
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      parcel_Number: parcelId
+      date_of_sale: lastSale.date
+      sale_year: lastSale.year
+      gross_selling_price: lastSale.priceGross
+      net_selling_price: lastSale.price
+      valid_sale_flag: lastSale.qualified
+      sale_validity: lastSale.validity
+      vacant_land_yn: lastSale.vacant
+      grantor: lastSale.grantor
+      grantee: lastSale.grantee
+      book: lastSale.deedBook
+      page: lastSale.deedPage
+      instrument_number: lastSale.instrument
+      stamps: lastSale.stamps
+    notes: >
+      Table (no geometry) — join to parcels on parcel_Number = parcel_number.
+      Verified count 26656; net_selling_price>0 → 14282; valid_sale_flag='Y' → 11280.
+      PRIMARY source for sale price/date/qualified. Parcel polygons only carry
+      instrument/description/grantor/deed book-page. EmptyFC layer 1 ignore.
+    status: usable
+
+  - role: zoning
+    name: Pittsboro Zoning (CITY-FIRST)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/23
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: city-only
+    fieldMap:
+      ZoningClassification: zoning
+      ConditionalUse: zoningConditional
+      Comments: zoningNotes
+      Acreage: zoningAcres
+    notes: >
+      CITY-FIRST for Town of Pittsboro + Pittsboro ETJ. Verified count 24 district
+      polygons (merged). Classes include R-A / R-A-2 / R-A-5, R-10/12/12M/15, PDD,
+      MUPD, C-1/C-2/C-4, O-I, M-1/M-2, MR, CMUC-CZ (+ CU/CZ variants). Twin:
+      opendataagol LandUsePlanning/Chatham_PittsboroZoning/MapServer/0. Prefer over
+      County Zoning inside Pittsboro/ETJ; parcel zoning attr often PIETJ;* codes.
+      No separate pittsboronc.gov GIS host — county publishes city zoning.
+    status: usable
+
+  - role: zoning
+    name: Siler City Zoning (CITY-FIRST)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/22
+    layerId: 22
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: city-only
+    fieldMap:
+      ZoningClassification: zoning
+      ConditionalUse: zoningConditional
+      Comments: zoningNotes
+      Acreage: zoningAcres
+    notes: >
+      CITY-FIRST for Town of Siler City + Siler City ETJ. Verified count 22.
+      Classes: A-R, R-3/6/10/20, R-MH, O-I, B-1, C-C, G-C, H-C, H-I, L-I.
+      Twin: Chatham_SilerCityZoning/MapServer/0. Parcel zoning attr often *;SCETJ.
+      No silercity.org public GIS REST — county hosts.
+    status: usable
+
+  - role: zoning
+    name: Goldston Zoning (CITY-FIRST)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/24
+    layerId: 24
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: city-only
+    fieldMap:
+      ZoningClassification: zoning
+      Comments: zoningNotes
+      Acreage: zoningAcres
+    notes: >
+      CITY-FIRST for Town of Goldston. Verified count 8. Classes: R-1, R-15, C-1,
+      CB-1, O&I, IL, IH, CD-R-1. Small town (~262 CITY tax-district parcels).
+    status: usable
+
+  - role: zoning
+    name: Cary Zoning — Chatham portion (CITY-FIRST tip)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/21
+    layerId: 21
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: city-only
+    fieldMap:
+      ZoningClassification: zoning
+      ConditionalUse: zoningConditional
+      OldZoning: zoningPrevious
+      Acreage: zoningAcres
+    notes: >
+      Chatham-side Cary annexation tip. Verified count 7 (R12, R8, TR, R40, PDDMajor,
+      RR). Cary CITY tax district ~2516 parcels. Prefer Wake/Cary card for Cary core;
+      use this + Cary Joint Land Use for Chatham-side edge.
+    status: usable
+
+  - role: zoning
+    name: Apex Zoning — Chatham portion (CITY-FIRST tip)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/30
+    layerId: 30
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZoningClassification: zoning
+      Comments: zoningNotes
+    notes: >
+      Chatham-side Apex tip only. Verified count 2 (LI-CZ, PC-CZ). Apex CITY tax
+      district ~23 parcels. Prefer Wake/Apex card for Apex core.
+    status: partial
+
+  - role: zoning
+    name: County Zoning (unincorporated PRIMARY)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/25
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      ZoningClassification: zoning
+      Comments: zoningNotes
+      Acreage: zoningAcres
+      SquareMiles: zoningSqMi
+    notes: >
+      Unincorporated + ETJ boundary stubs. Verified count 555. Top classes: IND-L 69,
+      IND-H 67, R-1 66, B-1 64, NB 63, CU-B-1 35, + CD-/CU-/CUD- conditional districts,
+      OI, MH-NC, RB, R-5/R-2. Twin: Chatham_CountyZoning/MapServer/0. Inside Pittsboro/
+      Siler City/Goldston prefer city zoning layers; parcel zoning attr remains useful
+      county-wide routing aid (R-1 ~27.6k parcels).
+    status: usable
+
+  - role: flu
+    name: Pittsboro Future Land Use Features (CITY-FIRST)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/37
+    layerId: 37
+    geometry: polygon
+    auth: none
+    acreageField: Area_Acres
+    coverage: city-only
+    fieldMap:
+      FLU_Class: flu
+      FLU_Class_Type: fluLabel
+      Area_Acres: fluAcres
+    notes: >
+      CITY-FIRST Pittsboro FLU. Verified count 111. Classes: TND/Res Infill 22, RES 21,
+      OSCON 21, EMU 18, MUAC 12, RCD 8, DTS 5, EMU/TND 2, TC 2. Parent group
+      Pittsboro Future Land Use Framework (35) also has Natural Resources Conservation
+      Target Areas (36, n=102) and Managed Areas (38, n=86).
+    status: usable
+
+  - role: flu
+    name: Siler City Future Land Use Framework (CITY-FIRST)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/57
+    layerId: 57
+    geometry: polygon
+    auth: none
+    acreageField: Acres_Calc
+    coverage: city-only
+    fieldMap:
+      FLU: flu
+      Acres_Calc: fluAcres
+    notes: >
+      CITY-FIRST Siler City FLU. Verified count 11. Categories: Rural, Suburban,
+      Medium-High Density, Industrial, Conservation/Open Space, Neighborhood Center,
+      Community Mixed-Use Center, Commercial Corridor, Infill Development,
+      Downtown Core, Downtown Support.
+    status: usable
+
+  - role: flu
+    name: County Future Land Use Framework (thematic group)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Group layer — query leaf Feature Layers: Centers/12 (33), Compact Residential/13 (1),
+      Employment Centers/14 (7), Parks and Protected Land/15 (1), Conservation/16 (12),
+      Agriculture/17 (3), ETJ's/18 (2), Rural/19 (1), Compact Communities/26 (2).
+      Open-data mirror: LandUsePlanning/Chatham_FutureLandUseFramework/MapServer.
+      NOT a single countywide FLU-code polygon coverage — thematic plan frameworks.
+      Viewer: Future Land Use Experience Builder
+      https://experience.arcgis.com/experience/291c078dc958401ab4ad972c85743ff8
+    status: partial
+
+  - role: flu
+    name: Chatham-Cary Joint Land Use Plan
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: >
+      Group — leafs: Rural Buffer Zone/8, Joint Land Use Density Types/9 (119,
+      LandUseDensity), Mixed Use Node/10 (1, LANDUSECODE/LANDUSEDESC). Use for
+      Cary-Chatham joint planning area edge.
+    status: usable
+
+  - role: flu
+    name: Moncure Future Land Use Framework (thematic group)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/39
+    layerId: 39
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap: {}
+    notes: >
+      Group for Plan Moncure area — leaf thematic polygons (Neighborhood Residential,
+      Village/Community/Employment Centers, Conservation, Agriculture And Woodlands,
+      Rural, Triangle Innovation Megasite, etc.). Not a single FLU-code field layer.
+    status: partial
+
+  - role: other
+    name: Extra-Territorial Jurisdictions (ETJ)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/3
+    layerId: 3
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      NAME: etjName
+      ACRES: etjAcres
+    notes: >
+      Verified 2: SILER CITY ETJ (~43.1k ac), PITTSBORO ETJ (~29.5k ac). Route
+      planning authority with city zoning layers + parcel zoning attr (PIETJ/SCETJ).
+    status: usable
+
+  - role: other
+    name: Municipal Boundaries
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandReference/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      MUNITYP: municipalityType
+      LOCALFIPS: municipalityFips
+      COUNTY: countyName
+    notes: >
+      Verified 5: Pittsboro, Siler City, Goldston, Cary, Apex (all COUNTY=Chatham).
+    status: usable
+
+  - role: other
+    name: Address Points
+    restUrl: https://gisservices.chathamcountync.gov/opendataagol/rest/services/Addressing/Chatham_AddressPoints/MapServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FullAddress: situsAddress
+      AddressNumber: situs.number
+      StreetPrefix: situs.prefix
+      StreetName: situs.street
+      StreetType: situs.streetType
+      StreetSuffix: situs.suffix
+      UnitNumber: situs.unit
+      PostalCommunity: situsCity
+      ZipCode: situsZip
+      NeighborhoodCommunity: neighborhood
+    notes: >
+      Verified count 50475. Prefer when unit/multi-point situs needed; parcels
+      already carry physical_street_address + community_name.
+    status: usable
+
+  - role: other
+    name: Federal Opportunity Zones (county TIGER extract)
+    restUrl: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandUsePlanning/MapServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      GEOID: ozTractGeoid
+      TRACTCE: tractCode
+      NAMELSAD: tractName
+    notes: >
+      Verified count 3 tracts (county-hosted TIGER extract). Prefer national OZ 2.0 /
+      rural-eligible tract join for product wiring — do not invent per-county OZ polys.
+      Stamp join note only.
+    status: partial
+
+gaps:
+  - No sale PRICE on parcel polygons — join Cadastral/Chatham_PropertySales table (parcel_Number) for price/date/qualified
+  - Zoning district layers are merged polygons (Pittsboro 24 / Siler City 22 / County 555) — parcel zoning attr is denser for routing; spatial join still preferred for official district geometry
+  - County Future Land Use Framework is thematic multi-layer group, not a single countywide FLU-code coverage
+  - No dedicated public city GIS hosts for Pittsboro / Siler City / Goldston — county LandUsePlanning layers ARE the city zoning REST
+  - Cary / Apex tips only on county host — prefer Wake cards for those city cores
+  - Apex Zoning only 2 annexation polygons (partial)
+  - FeatureServer SOE not installed on gisservices — query MapServer endpoints
+  - Comper (nc-chatham-citizen.comper.info) is a commercial appraisal tool — excluded (no paid vendors)
+  - Do not dig utilities / AADT / phones / emails
+license: "Chatham County public GIS / open data; attribution recommended; NCGS disclaimer; no paid vendors"
+appraiserSearchUrl: https://lrcpwa.ncptscloud.com/chatham/parcel-search
+viewerLinkTemplate: "https://lrcpwa.ncptscloud.com/chatham/parcel-detail/{parcel_number}"
+viewerLinkTemplateAlt: "https://lrcpwa.ncptscloud.com/chatham/parcel-detail/{parcelId}"
+gisViewerUrl: https://gisservices.chathamcountync.gov/landinformation/
+publicGisUrl: https://gisservices.chathamcountync.gov/landinformation/
+gisDepartmentUrl: https://www.chathamcountync.gov/government/departments-programs-i-z/tax-administration/gis-mapping-division
+fluViewerUrl: https://experience.arcgis.com/experience/291c078dc958401ab4ad972c85743ff8
+chatViewUrl: https://experience.arcgis.com/experience/757490e2e49b4b90a128eeb8241005ae
+openDataUrl: https://opendata-chathamncgis.opendata.arcgis.com/
+legacyGisViewerUrl: https://chathamncgis.maps.arcgis.com/apps/webappviewer/index.html?id=f694f711114b47a5bee18d595cc22727
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gisservices.chathamcountync.gov/webapps/rest/services/DedicatedDatasets/LandReference/MapServer/17
+  parcelIdField: parcel_number
+  acreageFilter: gross_current_acres >= 5 AND gross_current_acres <= 150
+  acres5to150Live: 13943
+  parcelCountLive: 49387
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='CHATHAM'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CHATHAM%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CHATHAM%27&returnCountOnly=true&f=json
+      liveStationCount: 422
+      stationsWithAADT2022: 236
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Chatham'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Chatham%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Chatham%27&returnCountOnly=true&f=json
+      liveStationCount: 426
+      stationsWithAADT2025: 247
+      stationsWithAADT2024: 254
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Chatham'
+      stations2024LiveCount: 421
+      stations2024WithAADT2024: 421
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - jan1_total_FMV
+    - jan1_total_ASV
+    liveNonZero:
+      jan1_total_FMV: 48662
+      jan1_total_ASV: 46618
+    status: ok
+  sale:
+    priceFields: []
+    dateFields: []
+    livePriceNonZero: {}
+    liveDateNonNull: {}
+    status: ok-separate-table
+    note: Parcels carry only deed/grantor; price+date on Cadastral/Chatham_PropertySales MapServer/0 (join parcel_Number=parcel_number; multi-transfer history).
+    supplementalSource:
+      url: https://gisservices.chathamcountync.gov/opendataagol/rest/services/Cadastral/Chatham_PropertySales/MapServer/0
+      rows: 26710
+      net_selling_price_gt0: 14320
+      date_of_sale_nonnull: 26693
+  ownerEntity:
+    ownerFields:
+    - current_owners
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 2234
+    liveEntityCount5to150acExtended: 3242
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - 130 OF CHATHAM LLC,
+    - WILLIAMS F L & D S, FAMILY LTD PARTNERSHIP
+    - MARGUS PROPERTIES LLC,
+    - RIPLEY, SUSAN B TRUSTEE;DREGALLA , VERNE TRUSTEE
+  paDeepLink:
+    template: https://lrcpwa.ncptscloud.com/chatham/parcel-detail/{parcel_number}
+    testedParcelId: '0010604'
+    testedUrl: https://lrcpwa.ncptscloud.com/chatham/parcel-detail/0010604
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: false
+    note: NCPTS PWA returns HTTP 200 SPA shell for any path; parcel resolves client-side. Headless Chrome render from box showed app-level '404 Page Not Found' even for /{tenant}/parcel-search, so resolution is UNVERIFIED (may be headless/network gating). Manual browser check recommended.
+  gisViewer:
+    url: https://gisservices.chathamcountync.gov/landinformation/
+    httpStatus: 200
+    pageTitle: Chatham County Tax & Land Information
+  gaps:
+  - Sale price in separate PropertySales table (join)
+  - PA link is NCPTS SPA only — parcel resolution unverified

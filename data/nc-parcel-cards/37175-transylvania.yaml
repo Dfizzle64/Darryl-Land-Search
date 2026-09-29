@@ -1,0 +1,330 @@
+state: NC
+jurisdiction: Transylvania County
+fips: "37175"
+level: county
+markets: [Asheville]
+slug: transylvania
+cntyfips: "175"
+
+municipalities:
+  - name: Brevard
+    role: city-first-zoning
+    zoningLayer: Zoning_Districts/FeatureServer/200
+    zoningCount: 129
+    fluLayer: FutureLandUse_CLUP2030/FeatureServer/800
+    fluCount: 79
+    viewerUrl: https://map.viewprogis.com/ecp/brevard-nc
+    notes: County seat; District_Code CD/CMX/DMX/GI/GR4/GR8/IC/NMX/PGX/RMX; Building Brevard 2030 CLUP
+  - name: Rosman
+    role: gap
+    zoningLayer: null
+    limitsLayer: Rosman_Town_Limits/FeatureServer/0
+    notes: Town limits only; municipal zoning REST gap
+  - name: Pisgah Forest
+    role: county-hosted-zoning
+    zoningLayer: Pisgah_Forest_Zoning/FeatureServer
+    openUseCount: 329
+    corridorMixedUseCount: 99
+    notes: Unincorporated CDP; zone = layer membership (parcel subsets)
+  - name: Unincorporated Transylvania
+    role: partial
+    zoningLayer: null
+    notes: Mostly unzoned on public REST; sparse legacy parcel ZONING attr (~3801)
+
+layers:
+  - role: parcels
+    name: Parcels (CAMA + polygons)
+    restUrl: https://gis.transylvaniacounty.org/server/rest/services/Parcels/FeatureServer/2
+    alternateUrls:
+      - https://gis.transylvaniacounty.org/server/rest/services/Parcels/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      ACCOUNT_NO: parcelIdAccount
+      ACRES: acreage
+      OWNER_NAME: ownerName
+      ADDRESS_1: mailingAddress
+      ADDRESS_2: mailingAddress
+      ADDRESS_3: mailingAddress
+      CITY: mailingAddress
+      STATE: mailingAddress
+      ZIP_CODE: mailingAddress
+      LEGAL_ADDR: situsAddress
+      SALE_DATE: lastSale.date
+      SALE_PRICE: lastSale.price
+      SALE_QUALI: lastSale.qualified
+      SALE_INST: lastSale.instrument
+      LAND_VALUE: tax.marketValue
+      ASSESSED_V: tax.assessedValue
+      BUILDING_V: tax.marketValue
+      XFOB_VALUE: tax.marketValue
+      ZONING: zoning
+      DEED_BK: other
+      PAGE: other
+    notes: >
+      PRIMARY verified 2026-09-24: count 31781; ACRES 5–150 → 5188;
+      SALE_PRICE>0 → 11666; ASSESSED_V>0 → 31648; OWNER_NAME not null → 31664.
+      CRS 102719/2264. MaxRecordCount 2000 — paginate. Auth none.
+      Geo-check PIN 7499-35-0631-000 Hood ≈ -83.03/35.05. SALE_DATE is YYYYMM text.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Filter cntyfips='175'. Count 31755; gisacres 5–150 → 5179; parval>0 → 31555;
+      saledatetx populated. No sale price. Join parno↔PIN.
+    status: usable
+
+  - role: zoning
+    name: City of Brevard Zoning_Districts
+    restUrl: https://services7.arcgis.com/qkz4LIZAMHN41UKn/ArcGIS/rest/services/Zoning_Districts/FeatureServer/200
+    alternateUrls:
+      - https://gis.transylvaniacounty.org/server/rest/services/Brevard_Zoning_Districts/MapServer/0
+    layerId: 200
+    geometry: polygon
+    auth: none
+    acreageField: Area_Acres
+    coverage: city-only
+    fieldMap:
+      District_Code: zoning
+      District: zoning
+      Area_Acres: acreage
+    notes: >
+      Cities-first PRIMARY. Count 129. Codes CD/CMX/DMX/GI/GR4/GR8/IC/NMX/PGX/RMX.
+      ViewPro https://map.viewprogis.com/ecp/brevard-nc. Prefer AGOL over county MS/0 (95).
+    status: usable
+
+  - role: zoning
+    name: Pisgah Forest OpenUse
+    restUrl: https://gis.transylvaniacounty.org/server/rest/services/Pisgah_Forest_Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: community-only
+    fieldMap:
+      PIN: parcelId
+      ZONING: zoning
+    notes: Parcel-subset Open Use district; count 329; full CAMA attrs on features
+    status: usable
+
+  - role: zoning
+    name: Pisgah Forest CorridorMixedUse
+    restUrl: https://gis.transylvaniacounty.org/server/rest/services/Pisgah_Forest_Zoning/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    coverage: community-only
+    fieldMap:
+      PIN: parcelId
+    notes: Parcel-subset Corridor Mixed Use; count 99
+    status: usable
+
+  - role: flu
+    name: Brevard FutureLandUse_CLUP2030
+    restUrl: https://services7.arcgis.com/qkz4LIZAMHN41UKn/arcgis/rest/services/FutureLandUse_CLUP2030/FeatureServer/800
+    layerId: 800
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      FLU: flu
+      Character_Description: flu
+      ApplicableZoningDistricts: zoning
+    notes: >
+      Count 79. Building Brevard 2030 character areas (Downtown, Urban Corridor,
+      Traditional Neighborhood, Activity Centers, Conservation, Pisgah Gateway, OI/SD).
+      County/Rosman FLU REST gap.
+    status: usable
+
+  - role: other
+    name: Addresses (situs points)
+    restUrl: https://gis.transylvaniacounty.org/server/rest/services/Addresses/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      FULLADDR: situsAddress
+      PARCELNUM: parcelId
+      POSTALCOM: situsCity
+      POSTALZIP: situsZip
+      Inc_Muni: other
+    notes: Count 28147. Situs supplement; exclude PHONE/AREACODE. PARCELNUM≈PIN digits join approximate.
+    status: usable
+
+  - role: other
+    name: Brevard City Limits
+    restUrl: https://gis.transylvaniacounty.org/server/rest/services/Brevard_City_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap: {}
+    notes: count 1; route city-first zoning/FLU
+    status: usable
+
+  - role: other
+    name: City of Brevard ETJ
+    restUrl: https://gis.transylvaniacounty.org/server/rest/services/City_of_Brevard_ETJ/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-etj
+    fieldMap: {}
+    notes: count 1
+    status: usable
+
+  - role: other
+    name: Rosman Town Limits
+    restUrl: https://gis.transylvaniacounty.org/server/rest/services/Rosman_Town_Limits/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap: {}
+    notes: count 1; zoning REST gap inside
+    status: usable
+
+gaps:
+  - Rosman municipal zoning REST gap (limits only)
+  - Unincorporated zoning mostly absent (Pisgah Forest exception; sparse legacy parcel ZONING ~3801)
+  - County / Rosman FLU FeatureServer gap
+  - AppraisalCard requires internal idP — not PIN-wireable from REST (use NCPTS {PIN})
+  - LEGAL_ADDR often lot/road description rather than clean street situs
+  - SALE_DATE is YYYYMM text string
+
+license: >
+  Transylvania County GIS / Tax Administration; City of Brevard Planning for municipal
+  zoning/FLU. Attribute sources. NCGS 132-10 commercial resale. Not survey quality.
+
+appraiserSearchUrl: "https://lrcpwa.ncptscloud.com/transylvania/parcel-detail/{PIN}"
+jurisdictionGisUrl: "https://gis.transylvaniacounty.org/portal/apps/webappviewer/index.html?id=072e71230d03460898f502e66961d5cf"
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.transylvaniacounty.org/server/rest/services/Parcels/FeatureServer/2
+  parcelIdField: PIN
+  acreageFilter: ACRES >= 5 AND ACRES <= 150
+  acres5to150Live: 5188
+  parcelCountLive: 31781
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='TRANSYLVANIA'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27TRANSYLVANIA%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27TRANSYLVANIA%27&returnCountOnly=true&f=json
+      liveStationCount: 225
+      stationsWithAADT2022: 154
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Transylvania'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Transylvania%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Transylvania%27&returnCountOnly=true&f=json
+      liveStationCount: 224
+      stationsWithAADT2025: 122
+      stationsWithAADT2024: 151
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - ASSESSED_V
+    - LAND_VALUE
+    allTaxFieldsOnLayer:
+    - LAND_VALUE
+    - ASSESSED_V
+    - BUILDING_V
+    - XFOB_VALUE
+    liveNonZero:
+      ASSESSED_V: 31648
+      LAND_VALUE: 31584
+    status: ok
+  sale:
+    priceFields:
+    - SALE_PRICE
+    dateFields:
+    - SALE_DATE
+    livePriceNonZero:
+      SALE_PRICE: 11664
+    liveDateNonNull:
+      SALE_DATE: 28115
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - OWNER_NAME
+    primaryOwnerField: OWNER_NAME
+    rule: 'Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.'
+    regex: \b(LLC|L\.L\.C\.?|INC\.?|CORP(ORATION)?|LP|L\.P\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    tokens:
+    - LLC
+    - INC
+    - LP
+    - LLP
+    - LTD
+    - TRUST
+    - CHURCH
+    - COMPANY
+    - PARTNERSHIP
+    - HOLDINGS
+    - PROPERTIES
+    - CORP/CORPORATION
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    sqlApproxWhere: (UPPER(OWNER_NAME) LIKE '% LLC%' OR UPPER(OWNER_NAME) LIKE '% INC%' OR UPPER(OWNER_NAME) LIKE '% LP%' OR UPPER(OWNER_NAME) LIKE '% LLP%' OR UPPER(OWNER_NAME) LIKE '% LTD%' OR UPPER(OWNER_NAME) LIKE '% TRUST%' OR UPPER(OWNER_NAME) LIKE '% CHURCH%' OR UPPER(OWNER_NAME) LIKE '% COMPANY%' OR UPPER(OWNER_NAME) LIKE '% PARTNERSHIP%' OR UPPER(OWNER_NAME) LIKE '% HOLDINGS%' OR UPPER(OWNER_NAME) LIKE '% PROPERTIES%' OR UPPER(OWNER_NAME) LIKE '% CORP%' OR UPPER(OWNER_NAME) LIKE '%,LLC%' OR UPPER(OWNER_NAME) LIKE '%,INC%' OR UPPER(OWNER_NAME) LIKE 'CITY OF %' OR UPPER(OWNER_NAME) LIKE 'COUNTY OF %' OR UPPER(OWNER_NAME) LIKE 'STATE OF %' OR UPPER(OWNER_NAME) LIKE 'TOWN OF %')
+    liveEntityCountAll: 6024
+    liveEntityCount5to150ac: 1420
+    countNote: The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above.
+  paDeepLink:
+    template: https://lrcpwa.ncptscloud.com/transylvania/parcel-detail/{PIN}
+    testedParcelId: 7489-89-5451-000
+    testedUrl: https://lrcpwa.ncptscloud.com/transylvania/parcel-detail/7489-89-5451-000
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: false
+    note: 'NCPTS SPA shell (200, 496 B, client-rendered): parcel content cannot be checked server-side.'
+  gisViewer:
+    url: https://gis.transylvaniacounty.org/portal/apps/webappviewer/index.html?id=072e71230d03460898f502e66961d5cf
+    httpStatus: 200
+    pageTitle: ArcGIS Web Application
+    arcgisItem:
+      access: public
+      title: Tax & Land Records
+      type: Web Mapping Application
+      err: null
+  gaps: []

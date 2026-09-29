@@ -1,0 +1,484 @@
+state: NC
+jurisdiction: Wayne County
+fips: "37191"
+level: county
+markets: [Raleigh-Durham]
+
+layers:
+  - role: parcels
+    name: TaxParcels Property Lines (PRIMARY)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Parcels/FeatureServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdAccount
+      GIS_Acres: acreage
+      LegalLandUnits: acreageDeed
+      LegalLandType: acreageDeedUnit
+      Name1: ownerName1
+      Name2: ownerName2
+      Address1: mailingAddress.street
+      Address2: mailingAddress.street2
+      Address3: mailingAddress.street3
+      City: mailingAddress.city
+      State: mailingAddress.state
+      ZipCode: mailingAddress.zip
+      PropertyAddress: situsAddress
+      LegalDescription: legalDescription
+      SalePrice: lastSale.price
+      SaleYear: lastSale.year
+      SaleMonth: lastSale.month
+      DeedDate: lastSale.deedDate
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      TotalMarketValue: tax.marketValue
+      TotalAssessedValue: tax.assessedValue
+      ParcelLandValue: tax.landValue
+      ParcelBuildingValue: tax.improvementValue
+      ParcelObxfValue: tax.obxfValue
+      PropUse: dorCode
+      UseModel: landUseModel
+      VacantImproved: vacantOrImproved
+      AYB: yearBuilt
+      Neighborhood: neighborhood
+      TownshipCode: township
+      FireDistrictDescription: fireDistrict
+    notes: >
+      PRIMARY wire-first verified 2026-09-24: count 70919;
+      GIS_Acres 5–150 → 9822; LegalLandUnits AC 5–150 → 10210;
+      ParcelBuildingValue=0/null in 5–150 → 6982; SalePrice>0 in 5–150 → 3866;
+      VacantImproved V 17538 / I 52423. CRS 102719/2264. MaxRecordCount 2000 — paginate.
+      Rich CAMA on polygons: situs PropertyAddress, mailing parts, land/bldg split, last sale.
+      Geo-check PIN 3508590179 / REID 0067479 ≈ -77.977, 35.364 (Goldsboro).
+      Prefer over Goldsboro Parcels VIEW (richer + higher count). PIN joins OneMap parno.
+    status: usable
+
+  - role: parcels
+    name: Goldsboro Parcels VIEW (alternate countywide)
+    restUrl: https://gis.goldsboronc.gov/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_Acres
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      REID: parcelIdAccount
+      OWNERNAME: ownerName
+      OWNERADDR1: mailingAddress.street
+      OWNERADDR2: mailingAddress.street2
+      OWNERCITY: mailingAddress.city
+      OWNERST: mailingAddress.state
+      OWNERZIP: mailingAddress.zip
+      PROPADDRESS: situsAddress
+      CITY: municipality
+      SALEPRICE: lastSale.price
+      YRSALE: lastSale.year
+      DEEDREF: lastSale.deedRef
+      LANDVALUE: tax.landValue
+      BLDGVALUE: tax.improvementValue
+      TOTVALUE: tax.marketValue
+      OBXFVALUE: tax.obxfValue
+      DEFVALUE: tax.deferredValue
+      GIS_Acres: acreage
+      ACREAGE: acreageTruncated
+      TOWNSHIP: township
+      Neighborhood: neighborhood
+      LEGALDESC: legalDescription
+    notes: >
+      City of Goldsboro hosts Wayne County parcels. Verified count 69076;
+      GIS_Acres 5–150 → 9711; BLDGVALUE=0 in range → 7233; SALEPRICE>0 countywide → 38838.
+      CITY codes: Goldsboro 15303, Mount Olive 2769, Fremont 981, Walnut Creek 647,
+      Pikeville 449, Eureka 193, Seven Springs 142, 00/null unincorp ~48600.
+      ACREAGE is integer (truncated) — prefer GIS_Acres. YRSALE often 2-digit string.
+      MaxRecordCount 4000. MapServer mirror available. Alternate when AGOL flaky.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: >
+      Verified 2026-09-24: cntyfips='191' count 70711; gisacres 5–150 → 15180;
+      improvval=0/null in range → 4004. Has situs on polys. No sale price.
+      MaxRecordCount 5000. Alternate host services.gis.nc.gov.
+      Acreage band differs from county GIS_Acres — prefer county LegalLandUnits/GIS_Acres for site search.
+    status: usable
+
+  - role: other
+    name: Address Points (situs join)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Address_Points/FeatureServer/132
+    layerId: 132
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      FULL_ADD: situsAddress
+      ADD_NUM: situs.number
+      ADD_PRE: situs.prefix
+      ADD_NAME: situs.street
+      ADD_TYPE: situs.streetType
+      ADD_SUF: situs.suffix
+      ADD_UNIT: situs.unit
+      CITY: situsCity
+      INC_MUNI: municipality
+      UNINC_COMM: unincorporatedCommunity
+      ZIPCODE: situsZip
+      LATITUDE: centroidLat
+      LONGITUDE: centroidLon
+    notes: >
+      Verified count 71876. Join on PIN → TaxParcels. Prefer over Goldsboro
+      Planning/Addresses FS/0 (26350 — Goldsboro-heavy incomplete).
+    status: usable
+
+  - role: zoning
+    name: Goldsboro Zoning (city-first PRIMARY for Goldsboro)
+    restUrl: https://gis.goldsboronc.gov/arcgis/rest/services/Planning/Zoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CURRENT_ZONING: zoning
+      OVERLAY_ZONE: zoningOverlay
+      OVERLAY_ZONE_2: zoningOverlay2
+      CASE_NUMBER: zoningCase
+      ORDINANCE: zoningOrdinance
+      STATUS: zoningStatus
+      ACTION: zoningAction
+      EFFECTIVE_DATE: zoningDate
+    notes: >
+      City-first. Verified count 3379. CRS 2264. Extent nested in county (Goldsboro).
+      AGOL mirror Goldsboro_Zoning/43 count 3360. Codes include R-*/RM-*, CBD, GB, HB,
+      NB, O&I*, I-1/2/5, PUD, AB, AG, SC. Prefer over county stack inside Goldsboro.
+    status: usable
+
+  - role: zoning
+    name: Goldsboro Zoning (AGOL mirror)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Goldsboro_Zoning/FeatureServer/43
+    layerId: 43
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CURRENT_ZONING: zoning
+      OVERLAY_ZONE: zoningOverlay
+      OVERLAY_ZONE_2: zoningOverlay2
+      CASE_NUMBER: zoningCase
+      ORDINANCE: zoningOrdinance
+      STATUS: zoningStatus
+    notes: >
+      Mirror of city Planning/Zoning. Verified count 3360. Use when goldsboronc.gov flaky.
+    status: usable
+
+  - role: zoning
+    name: Mount Olive Zoning (city-first)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Mount_Olive_Zoning/FeatureServer/44
+    layerId: 44
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      NAME: zoningLabel
+      ACRES: zoningAcres
+      NOISEREDUC: noiseOverlay
+      LASTACTION: zoningDate
+    notes: >
+      City-first. Verified count 315. Codes: A, AR, C-1/2/3, I-1/2, O&I, R-6/8/10/15/20, UC.
+      No dedicated town GIS host — county AGOL publishes Mount Olive zoning.
+    status: usable
+
+  - role: zoning
+    name: Fremont Zoning (city-first)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Fremont_Zoning/FeatureServer/42
+    layerId: 42
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      NAME: zoningLabel
+      ACRES: zoningAcres
+      NOISEREDUC: noiseOverlay
+      NOTES: zoningNotes
+    notes: >
+      City-first. Verified count 138. Codes: GB, HB, LI, MH, R6/10/15, RA.
+    status: usable
+
+  - role: zoning
+    name: Pikeville Zoning (city-first)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Pikeville_Zoning/FeatureServer/45
+    layerId: 45
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      NAME: zoningLabel
+      ACRES: zoningAcres
+      NOISEREDUC: noiseOverlay
+    notes: >
+      City-first. Verified count 94. Codes: B, CS, I, R5/6/8, RA20.
+    status: usable
+
+  - role: zoning
+    name: Eureka Zoning (city-first)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Eureka_Zoning/FeatureServer/41
+    layerId: 41
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      ZONE_ID: zoning
+      ACRES: zoningAcres
+    notes: >
+      City-first. Verified count 50. ZONE_ID codes: C-1, I-1, R-12, R-20A.
+    status: usable
+
+  - role: zoning
+    name: Wayne County Zoning (unincorporated PRIMARY)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Wayne_County_Zoning/FeatureServer/130
+    layerId: 130
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONE: zoning
+      Z_NAME: zoningLabel
+      DESCRIPTION: zoningDefinition
+      ORDINANCE: zoningOrdinance
+      NOISEREDUC: noiseOverlay
+      ALLOWED: zoningAllowed
+      LOT_AREA: zoningLotArea
+      WIDTH: zoningWidth
+      FRONT: zoningFront
+      REAR: zoningRear
+      SIDE: zoningSide
+    notes: >
+      PRIMARY unincorporated zoning. Verified count 1198. Codes: AA, AI, AIRPORT, CA, CS,
+      HEAVY-IND, IH, LIGHT-IND, OH, R-10, R-15, RA-20, RA-30, Unzoned, VILLAGE-DIST.
+      Inside munis prefer city-first layers. Do NOT prefer EnerGov_Zoning/0 (53 stub).
+    status: usable
+
+  - role: flu
+    name: Goldsboro Proposed Land Use (FLU)
+    restUrl: https://gis.goldsboronc.gov/arcgis/rest/services/Planning/Proposed_Land_Use/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      LANDUSEDESC: flu
+      LANDUSECODE: fluCode
+      LASTUPDATE: fluDate
+    notes: >
+      Goldsboro planning-area FLU only. Verified count 2989. Classes: Conservation 628,
+      MDR 548, HDR 465, RR_Ag 373, Commercial 224, Industrial 210, LDR 177, MU 117,
+      OI 107, MU DT 102, MU 2 37, Military 1. No countywide / Mount Olive FLU REST found.
+    status: usable
+
+  - role: other
+    name: City Limits (AGOL)
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/City_Limits/FeatureServer/115
+    layerId: 115
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITY_CODE: municipalityCode
+      SOURCETHM: municipality
+    notes: >
+      Verified count 7: EUR Eureka, FRE Fremont, MTO Mount Olive, PIK Pikeville,
+      SSP Seven Springs, WAL Walnut Creek, GLB Goldsboro. Router for city-first zoning.
+    status: usable
+
+  - role: other
+    name: Municipal Boundaries (Goldsboro host)
+    restUrl: https://gis.goldsboronc.gov/arcgis/rest/services/Municipal_Boundaries/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: MUNIAREA
+    coverage: county-wide
+    fieldMap:
+      NAME: municipality
+      MUNITYP: municipalityType
+      MUNIAREA: municipalityAcres
+      LOCALFIPS: localFips
+    notes: >
+      Multi-part Goldsboro + Seven Springs, Eureka, Fremont, Pikeville, Walnut Creek,
+      Mount Olive. Use with AGOL City_Limits for routing.
+    status: usable
+
+  - role: other
+    name: ETJ Boundary
+    restUrl: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Extra_Territorial_Jurisdiction/FeatureServer/113
+    layerId: 113
+    geometry: polygon
+    auth: none
+    acreageField: ACRE
+    coverage: county-wide
+    fieldMap:
+      ETJ_OWNER: etjName
+      ACRE: etjAcres
+    notes: >
+      Verified count 7 rows: FREMONT, EUREKA, MOUNT OLIVE, GOLDSBORO (multi), PIKEVILLE.
+      Route planning authority with city zoning / county zoning.
+    status: usable
+
+gaps:
+  - No countywide FLU — Goldsboro Proposed_Land_Use only
+  - No zoning REST for Seven Springs or Walnut Creek
+  - No dedicated city GIS hosts for Mount Olive / Fremont / Pikeville / Eureka — county AGOL publishes their zoning
+  - NCPTS parcel-detail is SPA-routed (internal parcelId); TaxBillSearch/Parcel/{PIN} is durable GET deep-link
+  - ITSNet full property card is POST/session-oriented
+  - OneMap vs county GIS_Acres 5–150 band differs (~15.2k vs ~9.8k) — prefer county LegalLandUnits/GIS_Acres
+  - Goldsboro Planning/Addresses incomplete vs county Address Points
+  - PARCEL2 on gis.goldsboronc.gov is token-gated — do not wire
+  - services1.arcgis.com/b6rkZNtCd6Mx2gvB Wayne_County_Parcel_Shape_File is Wayne County MI — wrong geography
+  - EnerGov_Zoning FS/0 is 53-feature stub — prefer Wayne_County_Zoning/130
+  - Last-sale only; no multi-transfer sales history REST
+  - MaxRecordCount 2000 (AGOL) / 4000 (Goldsboro Parcels) — paginate
+  - No phones/emails; no AADT/utilities; no paid vendors
+license: "Wayne County + City of Goldsboro public GIS; NCGS-style PA disclaimers; attribution required; no paid vendors"
+appraiserSearchUrl: https://realestate.waynegov.com/ITSPublic/
+viewerLinkTemplate: "https://realestate.waynegov.com/ITSPublic/TaxBillSearch/Parcel/{PIN}"
+viewerLinkTemplateAlt: "https://lrcpwa.ncptscloud.com/wayne/parcel-detail/{parcelId}"
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/wayne/parcel-search
+camaSearchUrl: https://realestate.waynegov.com/ITSNet/
+gisViewerUrl: https://experience.arcgis.com/experience/d01a6a5741ae41a2b4f0d3c8f61afa12
+publicGisUrl: https://experience.arcgis.com/experience/d01a6a5741ae41a2b4f0d3c8f61afa12
+jurisdictionGisUrl: https://experience.arcgis.com/experience/d01a6a5741ae41a2b4f0d3c8f61afa12
+gisDepartmentUrl: https://wayne-county-gis-waynecountync.hub.arcgis.com/
+zoningMapUrl: https://waynecountync.maps.arcgis.com/apps/webappviewer/index.html?id=14282090708a4a3e9e674d294aab9778
+goldsboroHubUrl: https://nc-goldsboro.hub.arcgis.com/
+countyRestRoot: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services
+goldsboroRestRoot: https://gis.goldsboronc.gov/arcgis/rest/services
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services5.arcgis.com/q2nSlChj7QgGTANO/arcgis/rest/services/Parcels/FeatureServer/14
+  parcelIdField: PIN
+  acreageFilter: GIS_Acres >= 5 AND GIS_Acres <= 150
+  acres5to150Live: 9822
+  parcelCountLive: 70926
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='WAYNE'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WAYNE%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WAYNE%27&returnCountOnly=true&f=json
+      liveStationCount: 787
+      stationsWithAADT2022: 649
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Wayne'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wayne%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Wayne%27&returnCountOnly=true&f=json
+      liveStationCount: 790
+      stationsWithAADT2025: 215
+      stationsWithAADT2024: 641
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Wayne'
+      stations2024LiveCount: 783
+      stations2024WithAADT2024: 783
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TotalMarketValue
+    - TotalAssessedValue
+    liveNonZero:
+      TotalMarketValue: 68390
+      TotalAssessedValue: 68390
+    status: ok
+  sale:
+    priceFields:
+    - SalePrice
+    dateFields:
+    - DeedDate
+    livePriceNonZero:
+      SalePrice: 40836
+    liveDateNonNull:
+      DeedDate: 69961
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - Name1
+    - Name2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 2410
+    liveEntityCount5to150acExtended: 2778
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - TRS OF WAYNE COMMUNITY COLLEGE
+    - PEPSI BOTTLING VENTURES LLC
+    - EWT 48 LLC
+    - AMPLE STORAGE GOLDSBORO LLC
+  paDeepLink:
+    template: https://realestate.waynegov.com/ITSPublic/TaxBillSearch/Parcel/{PIN}
+    testedParcelId: '2533752649'
+    testedUrl: https://realestate.waynegov.com/ITSPublic/TaxBillSearch/Parcel/2533752649
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Parcel id found in the response body.
+  gisViewer:
+    url: https://experience.arcgis.com/experience/d01a6a5741ae41a2b4f0d3c8f61afa12
+    httpStatus: 200
+    pageTitle: Experience
+  gaps: []

@@ -1,0 +1,269 @@
+state: NC
+jurisdiction: Craven County
+fips: "37049"
+level: county
+markets: ["New Bern/Eastern NC"]
+slug: craven
+
+municipalities:
+  - name: New Bern
+    role: city-first-zoning
+    pacity: NEW BERN
+    notes: County seat; ~17964 parcels; Dev_Services/Zoning FS/0 PRIMARY (~261)
+  - name: Havelock
+    role: city-first-zoning
+    pacity: HAVELOCK
+    notes: ~4984 parcels; mMaps/Planning/5 Havelock Zoning PRIMARY (373)
+  - name: Trent Woods
+    role: city-limits-only
+    pacity: TRENT WOODS
+    notes: ~2204; no public zoning FS
+  - name: River Bend
+    role: city-limits-only
+    pacity: RIVER BEND
+    notes: ~1756; ETJ present; no public zoning FS
+  - name: Vanceboro
+    role: city-limits-only
+    pacity: VANCEBORO
+    notes: ~648; no public zoning FS
+  - name: Bridgeton
+    role: city-limits-only
+    pacity: BRIDGETON
+    notes: ~402; no public zoning FS
+  - name: Dover
+    role: city-limits-only
+    pacity: DOVER
+    notes: ~381; no public zoning FS
+  - name: Cove City
+    role: city-limits-only
+    pacity: COVE CITY
+    notes: ~343; no public zoning FS
+
+layers:
+  - role: parcels
+    name: JustParcels Parcels (PRIMARY county ArcGIS CAMA + sale price)
+    restUrl: https://gis.cravencountync.gov/arcgis/rest/services/JustParcels/MapServer/0
+    alternateUrls:
+      - https://gis.cravencountync.gov/arcgis/rest/services/mMaps/Property/MapServer/19
+      - https://gis.cravencountync.gov/Downloads/CSV_files/parcels.csv
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: PACREA
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      PREFN: parcelIdProp
+      PANAME: ownerName
+      TMADDR: mailingAddress.street
+      CITYNM: mailingAddress.city
+      TAXSTE: mailingAddress.state
+      ZIP: mailingAddress.zip
+      FULLADD: situsAddress
+      PACREA: acreage
+      SALE_PRICE: lastSale.price
+      SALE_DATE: lastSale.dateBroken
+      PRECYR: lastSale.recordedYear
+      PRECMN: lastSale.recordedMonth
+      PRECDY: lastSale.recordedDay
+      totval: tax.marketValue
+      totlnd: tax.landValue
+      totbld: tax.improvementValue
+      PLUSC: dorCode
+      LUDESC: landUseDescription
+      PACITY: municipality
+      PABOOK: lastSale.deedBook
+      PAPAGE: lastSale.deedPage
+    notes: >
+      PRIMARY wire-first. Verified 2026-09-24: count 60029; CSV 60030;
+      PACREA 5–150 → 5943; SALE_PRICE>0 34789; sale+band 2169; totval>0 59883;
+      vacant band 3717. CRITICAL: SALE_DATE corrupt — use OneMap saledate or
+      PRECYR/M/D. MaxRecordCount 2000. Cloudflare may 403 without browser UA.
+      Geo sample PID 2-036   -7000 ~-77.007, 35.119. PACITY: blank 31348,
+      NEW BERN 17964, HAVELOCK 4984, TRENT WOODS 2204, RIVER BEND 1756,
+      VANCEBORO 648, BRIDGETON 402, DOVER 381, COVE CITY 343.
+    status: usable
+    verifiedCounts:
+      total: 60029
+      pacrea_5_150: 5943
+      sale_price_gt0: 34789
+      sale_price_in_5_150: 2169
+      totval_gt0: 59883
+      vacant_band: 3717
+
+  - role: parcels
+    name: NC OneMap Parcels (sale date + statewide REST)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+      - https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    filter: "cntyfips='049'"
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      gisacres: acreage
+      Shape__Area: acreageSqFt
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      parval: tax.marketValue
+      saledate: lastSale.date
+      cntyfips: countyFips
+    notes: >
+      Filter cntyfips='049'. Verified 2026-09-24: count 59840; gisacres 5–150 → 5902;
+      Shape__Area 5–150 → 5892; ownname/parval strong; saledate usable (prefer for
+      lastSale.date). Join parno=PID to JustParcels for SALE_PRICE. gisacres OK here.
+    status: usable
+    verifiedCounts:
+      total: 59840
+      gisacres_5_150: 5902
+      shape_area_5_150: 5892
+      parval_gt0: 59799
+      saledate_nonnull: 59840
+
+  - role: sales
+    name: Sales_For_Current_Calendar_Year.csv (supplemental)
+    restUrl: https://gis.cravencountync.gov/Downloads/CSV_files/Sales_For_Current_Calendar_Year.csv
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      Parcel_Id: parcelId
+      Sale_Date: lastSale.date
+      Sale_Price: lastSale.price
+      Sale_Type: lastSale.qualified
+      Deed_Book: lastSale.deedBook
+      Deed_Page: lastSale.deedPage
+    notes: >
+      Verified 822 rows. Sale_Date YYYYMMDD. Supplemental extract — prefer
+      JustParcels SALE_PRICE for countywide last-sale price.
+    status: partial
+    verifiedCounts:
+      total: 822
+
+  - role: zoning
+    name: New Bern Zoning (city-first PRIMARY)
+    restUrl: https://gis.newbernnc.gov/arcgis/rest/services/Dev_Services/Zoning/FeatureServer/0
+    alternateUrls:
+      - https://gis.newbernnc.gov/arcgis/rest/services/Dev_Services/Zoning/MapServer/0
+      - https://gis-newbern.opendata.arcgis.com/
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+      ZONE_DESC: zoningDescription
+    notes: >
+      PRIMARY inside New Bern. Verified ~261 ZONE polys (2026-09-24). Top C-3/C-4/R-6/C-5/R-10.
+    status: usable
+    verifiedCounts:
+      total: 261
+
+  - role: zoning
+    name: Havelock Zoning (city-first PRIMARY)
+    restUrl: https://gis.cravencountync.gov/arcgis/rest/services/mMaps/Planning/MapServer/5
+    layerId: 5
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      DETAILS: zoningDescription
+    notes: >
+      PRIMARY inside Havelock. Verified count 373. Top HC/R-20A/R-10/RM. Legacy Map2/85 404.
+    status: usable
+    verifiedCounts:
+      total: 373
+
+  - role: zoning
+    name: EWN Landuse Zoning (airport overlay)
+    restUrl: https://gis.cravencountync.gov/arcgis/rest/services/mMaps/Planning/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      AIRPORT_ZO: zoningOverlay
+    notes: Airport overlay only (count 538) — not municipal base zoning.
+    status: partial
+    verifiedCounts:
+      total: 538
+
+  - role: other
+    name: Political_Boundaries City Limits + ETJ
+    restUrl: https://gis.cravencountync.gov/arcgis/rest/services/Political_Boundaries/MapServer/2
+    alternateUrls:
+      - https://gis.cravencountync.gov/arcgis/rest/services/Political_Boundaries/MapServer/3
+      - https://gis.cravencountync.gov/Downloads/Shape_files/city_limits.zip
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      CITYNAME: municipality
+    notes: City Limits/2 = 8 munis; ETJ/3 = 4 polys (Havelock, New Bern x2, River Bend).
+    status: usable
+    verifiedCounts:
+      city_limits: 8
+      etj: 4
+
+  - role: flu
+    name: Future land use — PDF / plan docs only
+    restUrl: https://www.newbernnc.gov/departments/development_services/maps.php
+    alternateUrls:
+      - https://cravencountync.gov/343/Ordinances-Plans
+      - https://gis-newbern.opendata.arcgis.com/
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: No public FLU FeatureServer found 2026-09-24. New Bern 2022 LUP / CAMA regional PDFs only.
+    status: gap
+
+gaps:
+  - JustParcels/CSV SALE_DATE corrupt — use OneMap saledate or PRECYR/PRECMN/PRECDY
+  - No public zoning FS for Trent Woods, River Bend, Vanceboro, Bridgeton, Dover, Cove City
+  - Unincorporated Craven — no countywide base-zoning FS (airport/MCAS overlays only)
+  - FLU FeatureServer gap
+  - ITSPublicCRRP lacks working Parcel/{id} GET deep-link; AppraisalCard empty
+  - Legacy Map2 404 — use mMaps/Planning/5 for Havelock
+  - JustParcels queries may 403 without browser User-Agent
+  - Utilities / AADT / emails / phones / paid vendors intentionally out of scope
+
+license: Craven County public GIS + downloads; City of New Bern GIS; NC OneMap; attribution as required
+gisPortalUrl: https://gis.cravencountync.gov/new_home/
+viewerUrl: https://gis.cravencountync.gov/maps/default.aspx
+classicViewerUrl: https://gis.cravencountync.gov/maps/map.htm
+downloadsUrl: https://gis.cravencountync.gov/downloads-zip-files.aspx
+planningUrl: https://cravencountync.gov/343/Ordinances-Plans
+taxOfficeUrl: https://www.cravencountync.gov/220/Tax-Administration
+taxDataUrl: https://gis.cravencountync.gov/Downloads/CSV_files/parcels.csv
+jurisdictionGisUrl: https://gis.cravencountync.gov/maps/default.aspx
+appraiserSearchUrl: https://www.bttaxpayerportal.com/ITSPublicCRRP/RealEstateSearch
+appraiserDeepLinkTemplate: "https://gis.cravencountync.gov/maps/map.htm?pid={PID}"
+appraiserDeepLinkNotes: >
+  Primary deep-link: map.htm?pid={PID} (URL-encode spaces). Alternate NCPTS
+  parcel-detail/{PID}. CRRP search is interactive only (no Parcel/{id} GET).
+  Tax bills: ITSPublicCR/TaxBillSearch. iMaps: maps/default.aspx.
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/craven/parcel-search
+ncptsDeepLinkTemplate: "https://lrcpwa.ncptscloud.com/craven/parcel-detail/{PID}"
+verifiedAt: "2026-09-24"
+verifiedBy: North Carolina Public Info Researcher

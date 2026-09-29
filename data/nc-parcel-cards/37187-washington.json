@@ -1,0 +1,617 @@
+{
+  "state": "NC",
+  "jurisdiction": "Washington County",
+  "county": "Washington",
+  "fips": "37187",
+  "cntyfips": "187",
+  "slug": "washington",
+  "level": "county",
+  "markets": [
+    "Eastern NC"
+  ],
+  "msa": "Eastern NC",
+  "crs_preferred": {
+    "wkid": 3359,
+    "latestWkid": 3404,
+    "name": "NAD 1983 (2011) StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "jurisdictionGisUrl": "https://experience.arcgis.com/experience/3bffabc4dd484e1bbfa49186361dce5d",
+  "jurisdictionGisUrlAlt": "https://washconc.maps.arcgis.com/apps/webappviewer/index.html?id=1a51e666286842138be02492cab0ec95",
+  "jurisdictionGisUrlLandRecords": "https://experience.arcgis.com/experience/dd9851d8899942f1a03842e372b2c228/",
+  "jurisdictionGisUrlOfficeViewer": "https://washconc.maps.arcgis.com/apps/webappviewer/index.html?id=e1513afa991c41e0b0206c1bc492b156",
+  "jurisdictionGisUrlExperienceAlt": "https://experience.arcgis.com/experience/907e4539cc314066b1103d475b23cbdb",
+  "countyRestRoot": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services",
+  "agolOrgId": "hBMRLv0wWV0IhJ8I",
+  "agolOwner": "WashingtonCountyGIS",
+  "agolPortal": "https://washconc.maps.arcgis.com",
+  "countyWebsite": "https://washconc.org/",
+  "taxOfficeUrl": "https://washconc.org/tax-office/",
+  "taxWebUrl": "http://taxweb.washconc.org/",
+  "planningInspectionsUrl": "https://washconc.org/planning-and-inspections/",
+  "ordinancesUrl": "https://washconc.org/ordinances/",
+  "registerOfDeedsUrl": "https://washconc.org/register-of-deeds/",
+  "appraiserSearchUrl": "http://taxweb.washconc.org/Parcel.aspx?{WCParcel}",
+  "appraiserSearchUrlNotes": "PRIMARY PA deep-link. Field PropRecCard on Washington_Service/9 already embeds full URL. WCParcel numeric e.g. 7586 \u2192 HTTP 200. Also works with parcel_num when equal.",
+  "paDeepLinkKey": "WCParcel",
+  "paDeepLinkAltKey": "parcel_num",
+  "agdPrintUrlTemplate": "https://apps.agdmaps.com/print/nc/washington/index.html?NCPIN={NCPin}",
+  "agdPrintUrlNotes": "Field Print_ on Washington_Service/9 embeds this URL. HTTP 200 SPA shell verified 2026-09-24.",
+  "ncptsSearchUrl": "https://lrcpwa.ncptscloud.com/Washington/parcel-search",
+  "ncptsDeepLinkTemplate": "https://lrcpwa.ncptscloud.com/Washington/parcel-detail?reid={NCPin}",
+  "ncptsDeepLinkPathTemplate": "https://lrcpwa.ncptscloud.com/Washington/parcel-detail/{NCPin}",
+  "ncptsNotes": "SPA shell HTTP 200 for NCPin and parcel_num; prefer taxweb Parcel.aspx?{WCParcel} for PA.",
+  "parcelIdPreferred": "NCPin",
+  "joinKeys": [
+    "NCPin",
+    "parcels_nc",
+    "Pin",
+    "parcels_ta",
+    "TAX_PIN",
+    "parcel_num",
+    "TaxpayerNumber",
+    "WCParcel",
+    "parno",
+    "altparno"
+  ],
+  "oneMapUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "oneMapFilter": "cntyfips='187'",
+  "oneMapAlternateUrl": "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+  "countyZoningOrdinancePdfUrl": "https://washconc.org/wp-content/uploads/2022/04/2021-Zoning-Ordinance-Updated-for-7-1-2021-160-D-changes.pdf",
+  "subdivisionOrdinancePdfUrl": "https://washconc.org/wp-content/uploads/2026/03/Washington-County-Subdivision-Ordinance-March-16-2026-jjb.pdf",
+  "deqCertifiedLupHubUrl": "https://www.deq.nc.gov/about/divisions/division-coastal-management/coastal-management-land-use-planning/certified-lups/washington-county",
+  "deqCountyLupEdocsUrl": "https://edocs.deq.nc.gov/CoastalManagement/DocView.aspx?dbid=0&id=247907",
+  "deqPlymouthCamaPlanEdocsUrl": "https://edocs.deq.nc.gov/CoastalManagement/DocView.aspx?dbid=0&id=329963",
+  "deqPlymouthCertDateEdocsUrl": "https://edocs.deq.nc.gov/CoastalManagement/DocView.aspx?dbid=0&id=329863",
+  "ncdotCtpReportPdfUrl": "https://connect.ncdot.gov/projects/planning/TPBCTP/Washington%20County/REPORT.pdf",
+  "ncdotCtpAdoptionMapPdfUrl": "https://connect.ncdot.gov/projects/planning/TPBCTP/Washington%20County/Adoption%20Map.pdf",
+  "ncdotCtpHubUrl": "https://connect.ncdot.gov/projects/planning/Pages/CTP-Details.aspx?study_id=Washington%20County",
+  "tranche": 3,
+  "municipalities": [
+    {
+      "name": "Plymouth",
+      "role": "city-first-zoning",
+      "townCode": "0132",
+      "notes": "County seat; City_Limits ~2503 ac; Municipal Static TownCode 0132; PLYMOUTH_ZONING/21 PRIMARY (313 DISTRICT polys); Plymouth ETJ present; TownFlag='I' concentrates here"
+    },
+    {
+      "name": "Roper",
+      "role": "city-limits-only",
+      "townCode": "0136",
+      "notes": "City_Limits ~543 ac; Municipal TownCode 0136; Roper ETJ; no public zoning FS; DEQ CAMA See County"
+    },
+    {
+      "name": "Creswell",
+      "role": "city-limits-only",
+      "townCode": "0109",
+      "notes": "City_Limits ~264 ac; Municipal TownCode 0109; Old Creswell ETJ; no public zoning FS; DEQ CAMA See County"
+    }
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "NCPin",
+        "parcels_nc",
+        "Pin",
+        "parcel_num",
+        "WCParcel",
+        "parno"
+      ],
+      "bestLayer": "Washington_Service/FeatureServer/9",
+      "notes": "NCPin e.g. 7841626695 (=OneMap parno); WCParcel for taxweb PA; Pin/TAX_PIN dashed"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "Washington_Service/FeatureServer/9"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "CalculatedAcres",
+        "LandAcres",
+        "parcels__1",
+        "AreaAC",
+        "gisacres"
+      ],
+      "bestLayer": "Washington_Service/FeatureServer/9",
+      "notes": "Prefer CalculatedAcres; LandAcres deed/CAMA; parcels__1=AreaAc geometry"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Owner",
+        "OwnerName2",
+        "parcels_ow",
+        "OWNER_s",
+        "ownname"
+      ],
+      "bestLayer": "Washington_Service/FeatureServer/9"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "AddressLine1",
+        "AddressLine2",
+        "AddressLine3",
+        "AddressLine4",
+        "ZipCode",
+        "parcels__2",
+        "parcels_ci",
+        "parcels_st",
+        "parcels_zi"
+      ],
+      "bestLayer": "Washington_Service/FeatureServer/9",
+      "notes": "AddressLine2 often includes city/state; CITY on Parcels/0 is mailing city \u2014 not situs muni"
+    },
+    "situsAddress": {
+      "present": true,
+      "fields": [
+        "PropertyLocation",
+        "parcels_pr",
+        "PropLoc",
+        "siteadd"
+      ],
+      "bestLayer": "Washington_Service/FeatureServer/9"
+    },
+    "lastSale": {
+      "present": true,
+      "fields": [
+        "SalePrice",
+        "SaleDate",
+        "Qualified",
+        "QualifiedFlag"
+      ],
+      "bestLayer": "Washington_Service/FeatureServer/9",
+      "notes": "SaleDate mixed YYYYMMDD and M/D/YYYY strings; Qualified Qual/Disq/C Qual; OneMap saledate null \u2014 use saledatetx text"
+    },
+    "tax": {
+      "present": true,
+      "fields": [
+        "LandAssessedValue",
+        "BldgAssessedValue",
+        "DetachedAssessedValue",
+        "TotalAssessedValue",
+        "TotalUseValue",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "Washington_Service/FeatureServer/9"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "DISTRICT",
+        "NAME",
+        "ZONE"
+      ],
+      "bestLayer": "PLYMOUTH_ZONING/FeatureServer/21",
+      "notes": "Cities-first Plymouth PRIMARY; county Zoning/10 CI-only stubs; Roper/Creswell/unincorp Official Zoning Map REST gap (ordinance PDF)"
+    },
+    "flu": {
+      "present": false,
+      "fields": [],
+      "bestLayer": null,
+      "notes": "DEQ CAMA LUP edocs + Plymouth 2024 plan; landuse/5 LUSE W/C is existing LU not FLU; no FLU FeatureServer"
+    },
+    "appraiser": {
+      "present": true,
+      "fields": [
+        "PropRecCard",
+        "Print_",
+        "WCParcel",
+        "NCPin"
+      ],
+      "bestLayer": "Washington_Service/FeatureServer/9"
+    }
+  },
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "Washington_Service Parcels_in_use (PRIMARY county AGOL CAMA + sale)",
+      "restUrl": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/9",
+      "alternateUrls": [
+        "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/11",
+        "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Parcels/FeatureServer/0"
+      ],
+      "layerId": 9,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "CalculatedAcres",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "NCPin": "parcelId",
+        "parcels_nc": "parcelIdAlt",
+        "Pin": "parcelIdDashed",
+        "parcels_ta": "parcelIdTaxPin",
+        "parcel_num": "parcelIdAcct",
+        "TaxpayerNumber": "parcelIdTaxpayer",
+        "WCParcel": "parcelIdWeb",
+        "Owner": "ownerName",
+        "OwnerName2": "ownerName2",
+        "parcels_ow": "ownerNameGis",
+        "AddressLine1": "mailingAddress.street",
+        "AddressLine2": "mailingAddress.cityState",
+        "AddressLine3": "mailingAddress.line3",
+        "AddressLine4": "mailingAddress.line4",
+        "ZipCode": "mailingAddress.zip",
+        "PropertyLocation": "situsAddress",
+        "parcels_pr": "situsAddressGis",
+        "CalculatedAcres": "acreage",
+        "LandAcres": "acreageCama",
+        "parcels__1": "acreageGeometry",
+        "SalePrice": "lastSale.price",
+        "SaleDate": "lastSale.dateText",
+        "Qualified": "lastSale.qualified",
+        "QualifiedFlag": "lastSale.qualifiedFlag",
+        "LandAssessedValue": "tax.landValue",
+        "BldgAssessedValue": "tax.improvementValue",
+        "DetachedAssessedValue": "tax.detachedValue",
+        "TotalAssessedValue": "tax.marketValue",
+        "TotalUseValue": "tax.useValue",
+        "PropertyClass": "dorCode",
+        "TypeUse": "landUseDescription",
+        "DeedBook": "lastSale.deedBook",
+        "DeedPage": "lastSale.deedPage",
+        "parcels_db": "lastSale.deedBookPage",
+        "TownFlag": "insideTownFlag",
+        "Neighborhood": "neighborhood",
+        "PropRecCard": "appraiserDeepLink",
+        "Print_": "agdPrintUrl",
+        "YearBuilt": "yearBuilt",
+        "LegalDescription": "legalDescription"
+      },
+      "notes": "PRIMARY wire-first. Verified 2026-09-24: count 12630; CalculatedAcres 5\u2013150 \u2192 1800; LandAcres 5\u2013150 \u2192 1943; Shape__Area/43560 5\u2013150 \u2192 1999; SalePrice>0 \u2192 4374; sale+band \u2192 617; TotalAssessedValue>0 \u2192 10326; LandAssessedValue>0 \u2192 10323; BldgAssessedValue>0 \u2192 5348; vacant band (Bldg 0/null + acres 5\u2013150) \u2192 1372; Owner \u2192 10331; PropRecCard/Print_ \u2192 12630; TownFlag I=2966 O=7363. Geo sample NCPin 6767312559 / WCParcel 4842 TownFlag=I centroid \u2248 -76.762, 35.849 (Plymouth). MaxRecordCount 1000 \u2014 paginate. SaleDate mixed formats. Parcels_old/11 twin schema. Standalone Parcels/0 has cleaner GIS names but weaker/stale CAMA (no SalePrice/tax). Auth: none.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 12630,
+        "calculatedacres_5_150": 1800,
+        "landacres_5_150": 1943,
+        "shape_acres_5_150": 1999,
+        "sale_price_gt0": 4374,
+        "sale_price_in_5_150": 617,
+        "total_assessed_gt0": 10326,
+        "land_assessed_gt0": 10323,
+        "bldg_assessed_gt0": 5348,
+        "vacant_band": 1372,
+        "owner_nonnull": 10331,
+        "proprec_card_nonnull": 12630,
+        "qualified_qual": 2036,
+        "qualified_disq": 7632
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (statewide REST + saledatetx backup)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "alternateUrls": [
+        "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+        "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1"
+      ],
+      "layerId": 1,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "gisacres",
+      "coverage": "county-wide",
+      "filter": "cntyfips='187'",
+      "fieldMap": {
+        "parno": "parcelId",
+        "altparno": "parcelIdAlt",
+        "nparno": "parcelIdNational",
+        "ownname": "ownerName",
+        "mailadd": "mailingAddress.street",
+        "mcity": "mailingAddress.city",
+        "mstate": "mailingAddress.state",
+        "mzip": "mailingAddress.zip",
+        "siteadd": "situsAddress",
+        "scity": "situsCity",
+        "szip": "situsZip",
+        "gisacres": "acreage",
+        "Shape__Area": "acreageSqFt",
+        "landval": "tax.landValue",
+        "improvval": "tax.improvementValue",
+        "parval": "tax.marketValue",
+        "saledate": "lastSale.dateBroken",
+        "saledatetx": "lastSale.dateText",
+        "parusecode": "dorCode",
+        "parusedesc": "landUseDescription",
+        "cntyfips": "countyFips"
+      },
+      "notes": "Filter cntyfips='187'. Verified 2026-09-24: count 12608; gisacres 5\u2013150 \u2192 2000; ownname 12608; parval>0 10297; landval>0 10294; improvval>0 6228; vacant band 1334; saledatetx nonempty 9558 (excl 00000000 \u2192 8458); saledate date field NULL (0); scity empty (0). Join parno=NCPin. Prefer county SalePrice. MaxRecordCount 5000.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 12608,
+        "gisacres_5_150": 2000,
+        "ownname_nonnull": 12608,
+        "parval_gt0": 10297,
+        "landval_gt0": 10294,
+        "improvval_gt0": 6228,
+        "vacant_band": 1334,
+        "saledatetx_nonempty": 9558,
+        "saledatetx_real": 8458,
+        "saledate_nonnull": 0
+      }
+    },
+    {
+      "role": "parcels",
+      "name": "Parcels FeatureServer (GIS geometry twin; weaker CAMA)",
+      "restUrl": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Parcels/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "AreaAC",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "NCPIN": "parcelId",
+        "TAX_PIN": "parcelIdAlt",
+        "PARCEL_ID": "parcelIdAcct",
+        "OWNER_s": "ownerName",
+        "OwnerAdd1": "mailingAddress.street",
+        "CITY": "mailingAddress.city",
+        "STATE": "mailingAddress.state",
+        "ZIP": "mailingAddress.zip",
+        "PropLoc": "situsAddress",
+        "AreaAC": "acreage",
+        "SaleDate": "lastSale.date",
+        "DeedDate": "lastSale.deedDateText",
+        "DB_PG": "lastSale.deedBookPage",
+        "GRANTOR": "lastSale.grantor"
+      },
+      "notes": "Verified count 12516; AreaAC 5\u2013150 \u2192 1969; OWNER_s 12516; SaleDate non-null only 474 \u2014 no SalePrice/tax fields. Prefer Washington_Service/9 for CAMA. CITY is mailing city.",
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 12516,
+        "areaac_5_150": 1969,
+        "owner_nonnull": 12516,
+        "saledate_nonnull": 474
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "PLYMOUTH_ZONING (cities-first PRIMARY)",
+      "restUrl": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/PLYMOUTH_ZONING/FeatureServer/21",
+      "layerId": 21,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "city-only",
+      "fieldMap": {
+        "DISTRICT": "zoning",
+        "NAME": "zoningName"
+      },
+      "notes": "PRIMARY cities-first for Town of Plymouth. Verified 2026-09-24: count 313. DISTRICT top: R10 56, R7 54, R20 51, C2 37, R20A 23, R15 20, OI 18, C 18, IL 17, IH 10, C1 6, R7A 3. NAME: SINGLE FAMILY RESIDENTIAL 150, MULTI-FAMILY 57, HIGHWAY BUSINESS 37, CONSERVATION 18, O&I 18, LIGHT INDUSTRIAL 17, HEAVY INDUSTRIAL 10, CENTRAL BUSINESS 6.",
+      "status": "usable",
+      "verifiedCounts": {
+        "total": 313
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "Washington_Service Zoning (county CI stubs only)",
+      "restUrl": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/10",
+      "layerId": 10,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "sample",
+      "fieldMap": {
+        "ZONE": "zoning",
+        "NCPIN": "parcelId",
+        "CALACRE": "acreage",
+        "PARCEL_ID": "parcelIdAcct"
+      },
+      "notes": "Incomplete Official Zoning Map digitization \u2014 only 24 polys, all ZONE=CI. County Zoning Ordinance (2021) establishes R-A Rural Areas default + C-C Corridor Commercial + overlays; applies outside town limits/ETJ. Do NOT treat as countywide zoning coverage. Use ordinance PDF + Planning office Official Zoning Map for unincorporated.",
+      "status": "partial",
+      "verifiedCounts": {
+        "total": 24,
+        "zone_ci": 24
+      }
+    },
+    {
+      "role": "flu",
+      "name": "Washington_Service landuse (existing LU \u2014 NOT FLU)",
+      "restUrl": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "LUSE": "existingLandUse"
+      },
+      "notes": "Verified count 773; LUSE W=406 C=346 (wooded/cultivated-style existing LU). REJECT as FLU. FLU via DEQ CAMA LUP edocs (county 1994; Plymouth 2024) \u2014 no FLU FeatureServer.",
+      "status": "wrong-geography",
+      "verifiedCounts": {
+        "total": 773,
+        "luse_w": 406,
+        "luse_c": 346
+      }
+    },
+    {
+      "role": "other",
+      "name": "Municipal / City_Limits / ETJ (municipality router)",
+      "restUrl": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Static/FeatureServer/0",
+      "alternateUrls": [
+        "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/InternalLayers/FeatureServer/40",
+        "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/InternalLayers/FeatureServer/41"
+      ],
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "coverage": "county-wide",
+      "fieldMap": {
+        "MunicipalBoundaryName": "municipality",
+        "TownCode": "townCode",
+        "CITY": "municipality",
+        "TWNSHP": "etjName"
+      },
+      "notes": "Static/0 Municipal: Plymouth/Roper/Creswell (3). InternalLayers/40 City_Limits CITY same 3. ETJ/41: PLYMOUTH, ROPER, OLD CRESWELL ETJ (3). Spatial-join for situs muni \u2014 do not use mailing CITY/AddressLine2.",
+      "status": "usable",
+      "verifiedCounts": {
+        "municipal": 3,
+        "city_limits": 3,
+        "etj": 3
+      }
+    }
+  ],
+  "gaps": [
+    "County Official Zoning Map not fully published as FeatureServer (Zoning/10 = 24 CI stubs only); unincorporated zoning via ordinance PDF + Planning office map",
+    "Roper and Creswell: no public zoning FeatureServer (city-limits/ETJ only; DEQ CAMA See County)",
+    "FLU FeatureServer gap \u2014 DEQ CAMA LUP edocs (county 1994 Under Review; Plymouth CAMA Comp/Strategic certified 2024-06-24); landuse/5 is existing LU (W/C) not FLU",
+    "Growth Opportunities Plan PDF not found on washconc.org public site 2026-09-24",
+    "OneMap saledate date field null for cntyfips='187' \u2014 use county SalePrice/SaleDate or saledatetx text",
+    "SaleDate on county layer mixed YYYYMMDD and M/D/YYYY string formats \u2014 normalize before wire",
+    "Standalone Parcels/0 CAMA weaker/stale vs Parcels_in_use (owner mismatch observed on sample)",
+    "dl.agd.cc/prc/nc/washington/{NCPin}.pdf HTTP 404 \u2014 use taxweb Parcel.aspx?{WCParcel}",
+    "washconc.org/gis serves JPEG stub (not HTML GIS hub) \u2014 use Experience/webappviewer URLs",
+    "Utilities / AADT / emails / phones / paid vendors intentionally out of scope"
+  ],
+  "rejectLayers": [
+    {
+      "name": "AGD PRC nc/washington",
+      "url": "https://dl.agd.cc/prc/nc/washington/",
+      "reason": "HTTP 404 \u2014 use taxweb Parcel.aspx?{WCParcel}"
+    },
+    {
+      "name": "landuse LUSE as FLU",
+      "url": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/5",
+      "reason": "Existing land use (W/C) \u2014 not future land use"
+    },
+    {
+      "name": "County_Water_Lines / FIRE_HYDRANTS",
+      "url": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/County_Water_Lines/FeatureServer",
+      "reason": "Utilities out of scope"
+    },
+    {
+      "name": "Beaufort County City of Washington zoning",
+      "url": "https://services1.arcgis.com/oXsk9nimtmSEU8Ko/arcgis/rest/services/Beaufort_Static/FeatureServer/16",
+      "reason": "Wrong county \u2014 City of Washington is in Beaufort County (FIPS 37013), not Washington County (37187)"
+    }
+  ],
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "license": "County AGOL public FeatureServers; NC OneMap; attribution as required by source",
+  "pass2": {
+    "label": "PASS 2 full-suite upgrade (rural OZ) 2026-09-28",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "parcelLayer": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/9",
+    "parcelIdField": "NCPin",
+    "acreageFilter": "CalculatedAcres >= 5 AND CalculatedAcres <= 150",
+    "acres5to150Live": 1800,
+    "parcelCountLive": 12630,
+    "aadt": {
+      "primary2022": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+        "valueField": "AADT_2022 (string; trim, blank = no count)",
+        "countyFilter": "COUNTY='WASHINGTON'",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WASHINGTON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27WASHINGTON%27&returnCountOnly=true&f=json",
+        "liveStationCount": 185,
+        "stationsWithAADT2022": 104
+      },
+      "newer2025": {
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "valueField": "AADT_2025 (integer; also AADT_2024, AADT_2002-2025)",
+        "countyFilter": "County='Washington'",
+        "countyFilterNote": "Title case County name (2022 layer uses uppercase COUNTY)",
+        "queryUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Washington%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCounty%2CAADT_2024%2CAADT_2025&returnGeometry=true&outSR=4326&f=json",
+        "countUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Washington%27&returnCountOnly=true&f=json",
+        "liveStationCount": 183,
+        "stationsWithAADT2025": 122,
+        "stationsWithAADT2024": 121,
+        "dataLastEdit": "2026-09-23"
+      },
+      "also": {
+        "stations2024Service": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0",
+        "segments2025": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0"
+      },
+      "recommendation": "Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline."
+    },
+    "tax": {
+      "fields": [
+        "TotalAssessedValue",
+        "LandAssessedValue"
+      ],
+      "allTaxFieldsOnLayer": [
+        "LandAssessedValue",
+        "BldgAssessedValue",
+        "DetachedAssessedValue",
+        "TotalAssessedValue",
+        "TotalUseValue"
+      ],
+      "liveNonZero": {
+        "TotalAssessedValue": 10326,
+        "LandAssessedValue": 10323
+      },
+      "status": "ok"
+    },
+    "sale": {
+      "priceFields": [
+        "SalePrice"
+      ],
+      "dateFields": [
+        "SaleDate"
+      ],
+      "livePriceNonZero": {
+        "SalePrice": 4374
+      },
+      "liveDateNonNull": {
+        "SaleDate": 9596
+      },
+      "status": "ok"
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Owner",
+        "OwnerName2",
+        "parcels_ow"
+      ],
+      "primaryOwnerField": "Owner",
+      "rule": "Uppercase and trim the owner name(s), then flag as entity if it matches the regex (apply to every owner field; any hit = entity). Note: TRUSTEE does not match the TRUST word rule, and a surname such as CHURCH at the start of the name is a known false positive.",
+      "regex": "\\b(LLC|L\\.L\\.C\\.?|INC\\.?|CORP(ORATION)?|LP|L\\.P\\.|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\\b|^(CITY|COUNTY|STATE|TOWN) OF\\b",
+      "tokens": [
+        "LLC",
+        "INC",
+        "LP",
+        "LLP",
+        "LTD",
+        "TRUST",
+        "CHURCH",
+        "COMPANY",
+        "PARTNERSHIP",
+        "HOLDINGS",
+        "PROPERTIES",
+        "CORP/CORPORATION"
+      ],
+      "prefixes": [
+        "CITY OF",
+        "COUNTY OF",
+        "STATE OF",
+        "TOWN OF"
+      ],
+      "sqlApproxWhere": "(UPPER(Owner) LIKE '% LLC%' OR UPPER(Owner) LIKE '% INC%' OR UPPER(Owner) LIKE '% LP%' OR UPPER(Owner) LIKE '% LLP%' OR UPPER(Owner) LIKE '% LTD%' OR UPPER(Owner) LIKE '% TRUST%' OR UPPER(Owner) LIKE '% CHURCH%' OR UPPER(Owner) LIKE '% COMPANY%' OR UPPER(Owner) LIKE '% PARTNERSHIP%' OR UPPER(Owner) LIKE '% HOLDINGS%' OR UPPER(Owner) LIKE '% PROPERTIES%' OR UPPER(Owner) LIKE '% CORP%' OR UPPER(Owner) LIKE '%,LLC%' OR UPPER(Owner) LIKE '%,INC%' OR UPPER(Owner) LIKE 'CITY OF %' OR UPPER(Owner) LIKE 'COUNTY OF %' OR UPPER(Owner) LIKE 'STATE OF %' OR UPPER(Owner) LIKE 'TOWN OF %')",
+      "liveEntityCountAll": 1414,
+      "liveEntityCount5to150ac": 389,
+      "countNote": "The live count uses the SQL approximation (LIKE '% TOKEN%' on the primary owner field, which also catches TRUSTEE/INCOME-style prefixes) together with the acreage filter above."
+    },
+    "paDeepLink": {
+      "template": "http://taxweb.washconc.org/Parcel.aspx?{WCParcel}",
+      "testedParcelId": "4350",
+      "testedUrl": "http://taxweb.washconc.org/Parcel.aspx?4350",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=utf-8",
+      "contentVerified": true,
+      "note": "Owner and parcel id verified in the response."
+    },
+    "gisViewer": {
+      "url": "https://experience.arcgis.com/experience/3bffabc4dd484e1bbfa49186361dce5d",
+      "httpStatus": 200,
+      "pageTitle": "Experience",
+      "arcgisItem": {
+        "access": "public",
+        "title": "Washington County Parcel Viewer",
+        "type": "Web Experience",
+        "err": null
+      }
+    },
+    "gaps": []
+  }
+}

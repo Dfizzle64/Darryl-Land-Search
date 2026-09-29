@@ -1,0 +1,203 @@
+state: NC
+jurisdiction: Cherokee County
+fips: "37039"
+level: county
+markets: [Asheville]
+slug: cherokee
+cntyfips: "039"
+
+municipalities:
+  - name: Murphy
+    role: city-first-zoning
+    zoningLayer: MurphyNCZoning/FeatureServer/0
+    zoningField: ZoneType
+    count: 36
+    viewer: https://ccncgis.maps.arcgis.com/apps/instant/minimalist/index.html?appid=d488231337ce4dcc94c31b97b78c9ce3
+    notes: County seat; districts A-T/F-W/G-B/H-B/I-H-C/R-1/R-2; AmLegal code + media/5261 map
+  - name: Andrews
+    role: city-first-zoning
+    zoningLayer: AndrewsNCZoning/FeatureServer/0
+    zoningField: ZoneType
+    count: 21
+    viewer: https://ccncgis.maps.arcgis.com/apps/instant/minimalist/index.html?appid=656ca34590a049f888743876372772fb
+    notes: Districts CB/GR/HB/HC-I/SF; Zoning Ordinance PDF download/17
+  - name: Unincorporated Cherokee
+    role: gap
+    notes: Communities polys (Marble/Brasstown/Topton/Peachtree/…) place-name only; no zoning REST
+
+layers:
+  - role: parcels
+    name: OfficeView Parcels (CAMA + polygons)
+    restUrl: https://maps.cherokeecounty-nc.gov/ccgis/rest/services/OfficeView/MapServer/1
+    alternateUrls:
+      - https://services5.arcgis.com/UmQCfTNQbyTzAV5N/arcgis/rest/services/Parcels/FeatureServer/0
+      - https://maps.cherokeecounty-nc.gov/ccgis/rest/services/Land_Records/MapServer/17
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: TOTAL_CALCULATED_ACRES
+    coverage: county-wide
+    fieldMap:
+      NEWPIN: parcelId
+      ParcelID: parcelIdInternal
+      AccountNumber: parcelIdAccount
+      TOTAL_CALCULATED_ACRES: acreage
+      POLY_ACRES: acreage
+      LegalLandUnits: acreage
+      Name1: ownerName
+      Name2: ownerName
+      Address1: mailingAddress
+      Address2: mailingAddress
+      City: mailingAddress
+      State: mailingAddress
+      ZipCode: mailingAddress
+      HouseNumber: situsAddress
+      StreetDirection: situsAddress
+      StreetName: situsAddress
+      StreetType: situsAddress
+      LegalDescription: legalDescription
+      SalePrice: lastSale.price
+      SaleMonth: lastSale.date
+      SaleYear: lastSale.date
+      VacantOrImproved: lastSale.qualified
+      DeedBook: deed
+      DeedPage: deed
+      ParcelLandValue: tax.marketValue
+      ParcelBuildingValue: tax.marketValue
+      ParcelObxfValue: tax.marketValue
+      TotalAssessedValue: tax.assessedValue
+      ParcelDeferredValue: tax.taxableValue
+      TaxCardLink: appraiserSearchUrl
+    notes: >
+      PRIMARY verified 2026-09-24: count 35749; TOTAL_CALCULATED_ACRES BETWEEN 5 AND 150 → 6510;
+      SalePrice>0 → 20249; TotalAssessedValue>0 → 35728; TaxCardLink populated → 35749.
+      CRS 102719/2264. MaxRecordCount 2000 — paginate. Sample NEWPIN 555618308588000
+      FC ENCORE ANDREWS LLC centroid ≈ -83.843, 35.194. Legacy Dynamic/MapServer/2 retired (404).
+    status: usable
+
+  - role: parcels
+    name: AGOL Parcels (CAMA mirror)
+    restUrl: https://services5.arcgis.com/UmQCfTNQbyTzAV5N/arcgis/rest/services/Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TOTAL_CALC
+    coverage: county-wide
+    fieldMap:
+      NEWPIN: parcelId
+      TOTAL_CALC: acreage
+      Name1: ownerName
+      Name2: ownerName
+      SalePrice: lastSale.price
+      SaleMonth: lastSale.date
+      SaleYear: lastSale.date
+      ParcelLand: tax.marketValue
+      ParcelBuil: tax.marketValue
+      TotalAsses: tax.assessedValue
+      TaxCard: appraiserSearchUrl
+    notes: >
+      Truncated field names; count 35746; acres 5–150 → 6512; SalePrice>0 → 20264.
+      TaxCard holds full AppraisalCard URL with idP.
+    status: usable
+
+  - role: parcels
+    name: NC OneMap Parcels
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      siteadd: situsAddress
+      gisacres: acreage
+      saledatetx: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+    notes: >
+      Filter cntyfips='039'; count 35669; gisacres 5–150 → 6507; join parno=NEWPIN OK;
+      saledatetx present but no sale price — prefer county SalePrice.
+    status: usable
+
+  - role: zoning
+    name: Murphy Zoning (cities-first)
+    restUrl: https://services5.arcgis.com/UmQCfTNQbyTzAV5N/arcgis/rest/services/MurphyNCZoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZoneType: zoning
+      ZoneDesc: zoning
+    notes: Town of Murphy; 36 polys; spatial join inside Municipalities MB_NAME=Murphy
+    status: usable
+
+  - role: zoning
+    name: Andrews Zoning (cities-first)
+    restUrl: https://services5.arcgis.com/UmQCfTNQbyTzAV5N/arcgis/rest/services/AndrewsNCZoning/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: city-only
+    fieldMap:
+      ZoneType: zoning
+      ZoneDesc: zoning
+    notes: Town of Andrews; 21 polys
+    status: usable
+
+  - role: other
+    name: Municipalities
+    restUrl: https://services5.arcgis.com/UmQCfTNQbyTzAV5N/arcgis/rest/services/Municipalities/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    coverage: county-wide
+    fieldMap:
+      MB_NAME: municipality
+    notes: Andrews + Murphy only (count 2)
+    status: usable
+
+  - role: sales
+    name: QualifiedSales overlay
+    restUrl: https://services5.arcgis.com/UmQCfTNQbyTzAV5N/arcgis/rest/services/QualifiedSales/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    coverage: county-wide
+    fieldMap: {}
+    notes: Optional; 4354 points; prefer OfficeView SalePrice for wire-first
+    status: usable
+
+  - role: flu
+    name: Future Land Use
+    restUrl: null
+    geometry: none
+    auth: none
+    coverage: none
+    fieldMap: {}
+    notes: >
+      No FLU FeatureServer. Murphy AmLegal code + townofmurphync.com/media/5261;
+      Andrews Zoning Ordinance PDF andrewsnc.org/download/17/; NCDOT CTP ≠ FLU.
+    status: gap
+
+gaps:
+  - No public FLU FeatureServer (ordinance/CTP PDFs only)
+  - Unincorporated zoning REST gap outside Murphy and Andrews
+  - Legacy Dynamic/SalesData/MurphyZoning/AndrewsZoning MapServers return 404
+  - Sale date is SaleMonth/SaleYear integers not full timestamp
+  - TaxNet AppraisalCard is HTTP :8080 only
+  - Spatialest /nc/cherokee shell not used as PA deep-link
+  - OneMap lacks sale price
+  - Utilities / AADT / emails / phones / paid vendors excluded
+
+license: "Cherokee County GIS / Tax Assessor / Land Records; NCGS 132-10; attribute Town of Murphy / Town of Andrews for municipal zoning"
+appraiserSearchUrl: "http://www.cherokeecounty-nc.gov:8080/TaxNet/AppraisalCard.aspx?idP={ParcelID}&Action=Auto"
+jurisdictionGisUrl: https://maps.cherokeecounty-nc.gov/GISweb/GISviewer/
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher

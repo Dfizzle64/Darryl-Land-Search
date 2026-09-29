@@ -1,0 +1,367 @@
+state: NC
+jurisdiction: Rockingham County
+fips: 37157
+slug: rockingham
+level: county
+markets:
+  - Winston-Salem
+municipalities:
+- name: Eden
+  localGis: none — county WebGIS
+  zoningSource: "MapServer/30 + parcel Zoning *ED; Cities NAME_CITY='EDEN'"
+  fluSource: Planning_gdb/5 Land_Classification
+- name: Reidsville
+  localGis: City Instant Sidebar + Reidsville_Public_Zoning_Map_WFL1
+  zoningSource: Reidsville_Public_Zoning_Map_WFL1/FeatureServer/2 (ZONING) — CITY-FIRST
+  fluSource: Planning_gdb/5
+- name: Mayodan
+  localGis: none
+  zoningSource: "MapServer/30 + parcel Zoning *MY"
+  fluSource: Planning_gdb/5
+- name: Madison
+  localGis: none
+  zoningSource: "MapServer/30 + parcel Zoning *MD"
+  fluSource: Planning_gdb/5
+- name: Stoneville
+  localGis: none
+  zoningSource: "MapServer/30 + parcel Zoning *ST"
+  fluSource: Planning_gdb/5
+- name: Wentworth
+  localGis: none (county seat)
+  zoningSource: "MapServer/30; Cities NAME_CITY='WENTWORTH'"
+  fluSource: Planning_gdb/5
+layers:
+- role: parcels
+  name: Tax_gdb Expanded_Parcels_Tax_View_Long (PRIMARY CAMA)
+  restUrl: "https://services2.arcgis.com/6ceReeeoWYqSyV5I/arcgis/rest/services/Tax_gdb/FeatureServer/2"
+  layerId: 2
+  geometry: polygon
+  auth: none
+  acreageField: CALCULATED_ACREAGE
+  coverage: county-wide
+  filter: null
+  fieldMap: {"PIN": "parcelId", "ParcelNumber": "parcelIdAccount", "OwnerID": "parcelIdOwner", "Name1": "ownerName", "Name2": "ownerName2", "Name3": "ownerName3", "TaxpayAddress1": "mailingAddress.street", "TaxpayAddress2": "mailingAddress.street2", "TaxpayCity": "mailingAddress.city", "TaxpayState": "mailingAddress.state", "TaxpayZIP": "mailingAddress.zip", "PhysLocStreet": "situsAddress.number", "PhysLocStPRE": "situsAddress.prefix", "PhysLocStDIR": "situsAddress.dir", "PhysLocStNAME": "situsAddress.street", "PhysLocStTYPE": "situsAddress.streetType", "PhysLocDirSUF": "situsAddress.suffix", "CALCULATED_ACREAGE": "acreage", "MapAcres": "acreageMap", "DeedAcres": "acreageDeed", "LandFMVCUR": "tax.landValue", "ImproveFMVCUR": "tax.improvementValue", "LandLUVCUR": "tax.landUseValue", "SalesAmount": "lastSale.price", "DateSold": "lastSale.date", "QualifyCode": "lastSale.qualified", "DeedBook": "lastSale.deedBook", "DeedPage": "lastSale.deedPage", "DeedYear": "lastSale.deedYear", "CityCode": "municipality", "YearBuilt": "yearBuilt", "FarmUse": "farmUse"}
+  verifiedCounts: {"total": 56392, "calculatedAcres_5_150": 9915, "deedAcres_5_150": 10301, "mapAcres_5_150": 10301, "salesAmount_gt0": 23257, "salesAmount_gt0_inAcreRange": 3043, "improveFmvZeroOrNull_inAcreRange": 3474, "physLocStName_present": 56044}
+  crs: 102100/3857
+  maxRecordCount: 2000
+  notes: >
+    PRIMARY wire-first for tax/sale/owner/situs. No Zoning field — join MapServer/8 or Tax_gdb/10 by
+    PIN, or spatial-join Zoning. Geo sample centroid (−80.02, 36.49).
+  status: usable
+- role: parcels
+  name: NC/Rockingham MapServer Parcels (wire twin + Zoning attr)
+  restUrl: "https://www.webgis.net/arcgis/rest/services/NC/Rockingham/MapServer/8"
+  layerId: 8
+  geometry: polygon
+  auth: none
+  acreageField: DeedAcres
+  coverage: county-wide
+  filter: null
+  fieldMap: {"PIN": "parcelId", "ParcelNumber": "parcelIdAccount", "OwnerID": "parcelIdOwner", "Name1": "ownerName", "Name2": "ownerName2", "TaxpayAddress1": "mailingAddress.street", "TaxpayCity": "mailingAddress.city", "TaxpayState": "mailingAddress.state", "TaxpayZIP": "mailingAddress.zip", "DeedAcres": "acreage", "LandValue": "tax.landValue", "ImprovmentValue": "tax.improvementValue", "TotalValue": "tax.marketValue", "SalesAmount": "lastSale.price", "DateSold": "lastSale.date", "DeedBook": "lastSale.deedBook", "DeedPage": "lastSale.deedPage", "Zoning": "zoning"}
+  verifiedCounts: {"total": 56391, "deedAcres_5_150": 10302, "improveZeroOrNull_inAcreRange": 3428, "salesAmount_gt0": 23236, "zoningPresent": 56070}
+  crs: 102719/2264
+  maxRecordCount: 1000
+  notes: >
+    Same CAMA geometry family as Tax_gdb/10; carries Zoning attribute. Lacks situs PhysLoc* — prefer
+    Tax_gdb/2 for situs or join Addressed Structures. Hurt & Proffitt host; no FeatureServer SOE.
+  status: usable
+- role: parcels
+  name: Tax_gdb Rockingham_County_Parcel_Data (Zoning + Property_Card)
+  restUrl: "https://services2.arcgis.com/6ceReeeoWYqSyV5I/arcgis/rest/services/Tax_gdb/FeatureServer/10"
+  layerId: 10
+  geometry: polygon
+  auth: none
+  acreageField: DeedAcres
+  coverage: county-wide
+  filter: null
+  fieldMap: {"PIN": "parcelId", "ParcelNumber": "parcelIdAccount", "OwnerID": "parcelIdOwner", "Name1": "ownerName", "Name2": "ownerName2", "TaxpayAddress1": "mailingAddress.street", "TaxpayCity": "mailingAddress.city", "TaxpayState": "mailingAddress.state", "TaxpayZIP": "mailingAddress.zip", "DeedAcres": "acreage", "LandValue": "tax.landValue", "ImprovmentValue": "tax.improvementValue", "TotalValue": "tax.marketValue", "SalesAmount": "lastSale.price", "DateSold": "lastSale.date", "DeedBook": "lastSale.deedBook", "DeedPage": "lastSale.deedPage", "Zoning": "zoning", "Property_Card": "appraiserSearchUrl", "YearBuilt": "yearBuilt", "FarmUse": "farmUse"}
+  verifiedCounts: {"total": 56507}
+  crs: 102100/3857
+  maxRecordCount: null
+  notes: >
+    Property_Card embeds https://www.webgis.net/nc/Rockingham/PropertyCard.php?pid={ParcelNumber}.
+    Use for PA URL + Zoning attr join onto Expanded.
+  status: usable
+- role: parcels
+  name: NC OneMap Parcels (polys)
+  restUrl: "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  filter: "cntyfips='157'"
+  fieldMap: {"parno": "parcelId", "ownname": "ownerName", "mailadd": "mailingAddress.street", "mcity": "mailingAddress.city", "mstate": "mailingAddress.state", "mzip": "mailingAddress.zip", "siteadd": "situsAddress", "scity": "situsCity", "gisacres": "acreage", "saledate": "lastSale.date", "saledatetx": "lastSale.dateText", "parval": "tax.marketValue", "landval": "tax.landValue", "improvval": "tax.improvementValue", "cntyfips": "countyFips"}
+  verifiedCounts: {"total": 56362, "gisacres_5_150": 10337, "improvval_zeroOrNull_inAcreRange": 3614}
+  crs: null
+  maxRecordCount: null
+  notes: >
+    Filter cntyfips='157'. Verified count 56362; gisacres 5–150 → 10337; improvval=0/null in range →
+    3614. PIN↔parno verified. No sale price. Alternate host services.gis.nc.gov. MaxRecordCount
+    5000. CRS 102719/2264.
+  status: usable
+- role: zoning
+  name: Reidsville Zoning_Districts (CITY-FIRST)
+  restUrl: >
+    https://services6.arcgis.com/F05wl398YvOrLJax/arcgis/rest/services/Reidsville_Public_Zoning_Map_
+    WFL1/FeatureServer/2
+  layerId: 2
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: city-only
+  filter: null
+  fieldMap: {"ZONING": "zoning", "PREVZONING": "zoningPrevious", "LONGPIN": "parcelId", "AC_DEED": "acreageDeed", "AC_CALC": "acreage", "CUP": "conditionalUse"}
+  verifiedCounts: {"total": 8285}
+  crs: 102100/3857
+  maxRecordCount: null
+  notes: >
+    Verified districts: R-6, R-12, R-20, RA-20, RS-12, HB, GB, O & I, I-1/I-2/I-3, CB, NB, C, CU*,
+    CZ TN. Geo sample (−79.66, 36.39). Prefer inside Reidsville city limits.
+  status: usable
+- role: zoning
+  name: NC/Rockingham MapServer Zoning (countywide + muni)
+  restUrl: "https://www.webgis.net/arcgis/rest/services/NC/Rockingham/MapServer/30"
+  layerId: 30
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  filter: null
+  fieldMap: {"ZONE_CODE": "zoning", "ZONE_TYPE": "zoningType", "REZONE_DATE": "zoningDate", "CASE_NUMBER": "zoningCase"}
+  verifiedCounts: {"total": 58387}
+  crs: 102719/2264
+  maxRecordCount: null
+  notes: >
+    AGOL twin Planning_gdb/FeatureServer/1 (~58435, field ZONE_CODE). ZONE_TYPE mostly null; CD/CU
+    flags sparse. Route by spatial join to Cities/ETJ; parcel Zoning suffixes ED/RD/MY/MD/ST encode
+    muni.
+  status: usable
+- role: zoning
+  name: Planning_gdb County_Zoning (AGOL twin)
+  restUrl: "https://services2.arcgis.com/6ceReeeoWYqSyV5I/arcgis/rest/services/Planning_gdb/FeatureServer/1"
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  filter: null
+  fieldMap: {"ZONE_CODE": "zoning", "ZONE_TYPE": "zoningType", "REZONE_DATE": "zoningDate", "CASE_NUMBER": "zoningCase"}
+  verifiedCounts: {"total": 58435}
+  crs: 102100/3857
+  maxRecordCount: null
+  notes: >
+    FeatureServer twin of MapServer/30. Prefer for AGOL workflows; MapServer/30 for StatePlane join
+    to WebGIS parcels.
+  status: usable
+- role: flu
+  name: Planning_gdb Land_Classification (FLU proxy)
+  restUrl: "https://services2.arcgis.com/6ceReeeoWYqSyV5I/arcgis/rest/services/Planning_gdb/FeatureServer/5"
+  layerId: 5
+  geometry: polygon
+  auth: none
+  acreageField: ACRES
+  coverage: county-wide
+  filter: null
+  fieldMap: {"CLASS": "flu", "ACRES": "acreage"}
+  verifiedCounts: {"total": 55}
+  crs: 102100/3857
+  maxRecordCount: null
+  notes: >
+    Classes: DEVELOPED (37), RURAL (10), ECONOMIC DEVELOPMENT (2), RURAL TRANSITION (2), URBAN
+    TRANSITION (2). Coarse land-use plan classification — not parcel FLUM. Hub also lists Land Use
+    shapefile download.
+  status: partial
+- role: other
+  name: Cities + ETJ
+  restUrl: "https://www.webgis.net/arcgis/rest/services/NC/Rockingham/MapServer/27"
+  layerId: 27
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  filter: null
+  fieldMap: {"NAME_CITY": "municipality"}
+  verifiedCounts: {"cities": 6, "etj": 22}
+  crs: null
+  maxRecordCount: null
+  notes: >
+    Cities: EDEN, MADISON, MAYODAN, REIDSVILLE, STONEVILLE, WENTWORTH. ETJ layer 28 JURISDICTION
+    same six. Use for zoning routing.
+  status: usable
+- role: other
+  name: Addressed Structures (situs points)
+  restUrl: "https://www.webgis.net/arcgis/rest/services/NC/Rockingham/MapServer/1"
+  layerId: 1
+  geometry: point
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  filter: null
+  fieldMap: {"ADDRESS": "situsAddress", "ADDRESS_NU": "situsAddress.number", "ROAD_PRE": "situsAddress.prefix", "STREET_NAM": "situsAddress.street", "STREET_TYP": "situsAddress.streetType", "ROAD_SUF": "situsAddress.suffix", "CITY": "situsCity", "ZIP": "situsZip", "COMPLETE_NAME": "situsAddressFull"}
+  verifiedCounts: {"total": 54513}
+  crs: null
+  maxRecordCount: null
+  notes: >
+    CITY codes REID/EDEN/MAD/STON/MAY/… Top: REID 21598, EDEN 13112. Optional situs when Expanded
+    PhysLoc incomplete.
+  status: usable
+- role: other
+  name: "Property Sales (points, no PIN)"
+  restUrl: "https://www.webgis.net/arcgis/rest/services/NC/Rockingham/MapServer/2"
+  layerId: 2
+  geometry: point
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  filter: null
+  fieldMap: {"SALE_PRICE": "lastSale.price", "SALE_DATE": "lastSale.date", "SALE_YEAR": "lastSale.year"}
+  verifiedCounts: {"total": 6515}
+  crs: null
+  maxRecordCount: null
+  notes: No PIN/ParcelNumber — spatial-only. Prefer parcel SalesAmount/DateSold on Tax_gdb/2 or MapServer/8.
+  status: partial
+- role: other
+  name: Planning_gdb Overlay_Districts
+  restUrl: "https://services2.arcgis.com/6ceReeeoWYqSyV5I/arcgis/rest/services/Planning_gdb/FeatureServer/7"
+  layerId: 7
+  geometry: polygon
+  auth: none
+  acreageField: null
+  coverage: county-wide
+  filter: null
+  fieldMap: {"OVERLAY": "overlay"}
+  verifiedCounts: {"total": 26}
+  crs: null
+  maxRecordCount: null
+  notes: "Corridor overlays (220, NC 14, SUB, HAW, \u2026). Not base zoning."
+  status: usable
+gaps:
+  - "Eden / Mayodan / Madison / Stoneville / Wentworth \u2014 no independent public zoning FeatureServer (county Zoning + parcel Zoning suffixes only)"
+  - "No parcel-keyed Future Land Use map \u2014 Land_Classification is coarse plan categories only"
+  - "Tax_gdb Expanded lacks Zoning attribute \u2014 join Tax_gdb/10 or MapServer/8 by PIN, or spatial-join Zoning polygons"
+  - "MapServer/8 lacks situs PhysLoc* \u2014 use Expanded or Addressed Structures / OneMap siteadd"
+  - Property Sales MapServer/2 has no PIN — do not use as primary sale source
+  - AGOL Tax/Planning CRS 3857 vs WebGIS MapServer 2264 — reproject for joins
+  - "NCPTS parcel-detail is SPA shell (ParcelNumber and PIN both load) \u2014 prefer PropertyCard.php?pid={ParcelNumber} and ustaxdata account.cfm?account={ParcelNumber} (HTML verified)"
+  - QualifyCode blank on majority of SalesAmount>0 rows
+  - MunicipalUtilities MapServer out of scope (utilities)
+  - No phones/emails collected; no paid vendors; AADT out of scope
+license: >
+  Rockingham County NC public WebGIS (Hurt & Proffitt) + rockcogis AGOL + City of Reidsville
+  public zoning + NC OneMap; attribution recommended; not survey grade
+appraiserSearchUrl: "https://www.ustaxdata.com/nc/rockingham/rockinghamtaxsearch.cfm"
+viewerLinkTemplate: "https://www.webgis.net/nc/Rockingham/PropertyCard.php?pid={ParcelNumber}"
+viewerLinkTemplateAlt: "https://www.ustaxdata.com/nc/rockingham/account.cfm?account={ParcelNumber}"
+viewerLinkTemplateNcpts: "https://lrcpwa.ncptscloud.com/rockingham/parcel-detail/{ParcelNumber}"
+jurisdictionGisUrl: "https://www.webgis.net/nc/rockingham/"
+publicGisUrl: "https://www.webgis.net/nc/rockingham/"
+gisDepartmentUrl: "https://www.rockinghamcountync.gov/21346/GIS"
+openDataUrl: "https://data-hub-rock-co-gis.hub.arcgis.com/"
+countyRestRoot: "https://www.webgis.net/arcgis/rest/services/NC"
+agolRestRoot: "https://services2.arcgis.com/6ceReeeoWYqSyV5I/arcgis/rest/services"
+taxDeptUrl: "https://www.rockinghamcountync.gov/21344/Tax-Bill-Search"
+planningUrl: "https://www.rockinghamcountync.gov/21140/Rezoning"
+joinKeys:
+  - ParcelNumber
+  - PIN
+  - OwnerID
+  - parno
+parcelIdPreferred: PIN
+paDeepLinkKey: ParcelNumber
+tranche3: {"taxSaleOwner": true, "paDeepLinkWithParcelId": true, "jurisdictionGisUrl": true, "parcelsZoningFlu": true, "notes": "Tax/sale/owner on Tax_gdb/2 + MapServer/8; PA PropertyCard.php?pid={ParcelNumber} + ustaxdata account.cfm?account={ParcelNumber}; jurisdiction GIS https://www.webgis.net/nc/rockingham/; zoning county+Reidsville city-first; FLU Land_Classification"}
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://services2.arcgis.com/6ceReeeoWYqSyV5I/arcgis/rest/services/Tax_gdb/FeatureServer/2
+  parcelIdField: ParcelNumber
+  acreageFilter: CALCULATED_ACREAGE >= 5 AND CALCULATED_ACREAGE <= 150
+  acres5to150Live: 9915
+  parcelCountLive: 56392
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='ROCKINGHAM'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ROCKINGHAM%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27ROCKINGHAM%27&returnCountOnly=true&f=json
+      liveStationCount: 740
+      stationsWithAADT2022: 299
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Rockingham'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Rockingham%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Rockingham%27&returnCountOnly=true&f=json
+      liveStationCount: 738
+      stationsWithAADT2025: 422
+      stationsWithAADT2024: 467
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Rockingham'
+      stations2024LiveCount: 738
+      stations2024WithAADT2024: 738
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - LandFMVCUR
+    - ImproveFMVCUR
+    liveNonZero:
+      LandFMVCUR: 55885
+      ImproveFMVCUR: 43523
+    status: ok-derive-total
+    note: No total FMV field on Tax_gdb/2 — derive market = LandFMVCUR + ImproveFMVCUR (+ImproveFMVCUR2); LandLUVCUR = PUV.
+  sale:
+    priceFields:
+    - SalesAmount
+    dateFields:
+    - DateSold
+    livePriceNonZero:
+      SalesAmount: 23257
+    liveDateNonNull:
+      DateSold: 56034
+    status: ok
+  ownerEntity:
+    ownerFields:
+    - Name1
+    - Name2
+    - Name3
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 1158
+    liveEntityCount5to150acExtended: 1604
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - CARROLLWOOD FARMS LLC
+    - CARROLLWOOD FARMS LLC
+    - CARROLLWOOD FARMS LLC
+    - CARROLLWOOD FARMS LLC
+  paDeepLink:
+    template: https://www.webgis.net/nc/Rockingham/PropertyCard.php?pid={ParcelNumber}
+    testedParcelId: '169650'
+    testedUrl: https://www.webgis.net/nc/Rockingham/PropertyCard.php?pid=169650
+    httpStatus: 200
+    contentType: text/html
+    contentVerified: true
+    note: Parcel id found in the response body.
+  gisViewer:
+    url: https://www.webgis.net/nc/rockingham/
+    httpStatus: 200
+    pageTitle: Rockingham Co NC WebGIS
+  gaps:
+  - No total value field — derive

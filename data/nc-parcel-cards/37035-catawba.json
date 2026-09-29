@@ -1,0 +1,584 @@
+{
+  "county": "Catawba",
+  "state": "NC",
+  "msa": "Charlotte MSA",
+  "fips": "37035",
+  "cntyfips": "035",
+  "slug": "catawba",
+  "level": "county",
+  "markets": [
+    "Charlotte"
+  ],
+  "crs_preferred": {
+    "wkid": 102719,
+    "latestWkid": 2264,
+    "name": "NAD 1983 StatePlane North Carolina FIPS 3200 Feet"
+  },
+  "crs_notes": "County and Hickory city services both use 102719/2264 \u2014 no CRS split for primary overlays.",
+  "viewerLinkTemplate": "https://gis.catawbacountync.gov/parcel/?pinc={PIN}",
+  "viewerLinkTemplates": [
+    "https://gis.catawbacountync.gov/parcel/?pinc={PIN}",
+    "https://gis.catawbacountync.gov/nomap/?pinc={PIN}",
+    "https://gis.catawbacountync.gov/nomap/?lrk={LRK}",
+    "https://taxbill.catawbacountync.gov/ITSPublicCT/RealEstateSearch"
+  ],
+  "joinKeys": [
+    "PIN",
+    "Parcel_ID",
+    "LRK",
+    "parno",
+    "pinc"
+  ],
+  "targetAttributeMap": {
+    "id": {
+      "present": true,
+      "fields": [
+        "PIN",
+        "Parcel_ID",
+        "LRK",
+        "parno",
+        "pinc"
+      ],
+      "bestLayer": "energov_permit_ctr/Parcels"
+    },
+    "polygons": {
+      "present": true,
+      "bestLayer": "energov_permit_ctr/Parcels"
+    },
+    "acreage": {
+      "present": true,
+      "fields": [
+        "Caculated_Acreage",
+        "CALCAC",
+        "gisacres"
+      ],
+      "usefulRangeAcres": [
+        5,
+        150
+      ],
+      "approxCountInRange": 8502,
+      "bestLayer": "energov_permit_ctr/Parcels",
+      "caveat": "Field misspelled Caculated_Acreage on energov"
+    },
+    "ownerName": {
+      "present": true,
+      "fields": [
+        "Name+Name2",
+        "owner+owner2",
+        "ownname"
+      ],
+      "bestLayer": "energov_permit_ctr/Parcels",
+      "caveat": "LEO_HideName=Y on ~223 parcels"
+    },
+    "mailingAddress": {
+      "present": true,
+      "fields": [
+        "Address",
+        "Address2",
+        "City",
+        "State",
+        "Zip",
+        "mailadd"
+      ],
+      "bestLayer": "energov_permit_ctr/Parcels"
+    },
+    "situsAddress": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "Building_Number+Street_Name",
+        "Parcel_Zip",
+        "siteadd"
+      ],
+      "bestLayer": "energov_permit_ctr/Parcels",
+      "caveat": "Many vacant parcels lack Building_Number"
+    },
+    "lastSale": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "Sale_Date",
+        "Sale_Amount",
+        "sale_date",
+        "sale_amount",
+        "saledate"
+      ],
+      "bestLayer": "energov_permit_ctr/Parcels",
+      "caveat": "Sale_Amount is currency string on energov; ~3098 of 5-150ac have non-empty amount; OneMap has date only; Sale Validity on CSV only"
+    },
+    "taxValues": {
+      "present": true,
+      "fields": [
+        "Land_Value",
+        "Total_Buildings_Value",
+        "Total_Value",
+        "land_value",
+        "bldg_value",
+        "total_value",
+        "parval",
+        "landval",
+        "improvval"
+      ],
+      "bestLayer": "energov_permit_ctr/Parcels",
+      "caveat": "energov values are currency strings \u2014 strip $ and commas; cc_owner_all has typed ints"
+    },
+    "zoning": {
+      "present": true,
+      "fields": [
+        "Zoning",
+        "ZONING",
+        "GenZoning",
+        "GENZONING"
+      ],
+      "bestLayer": "Zoning_All + Hickory_Zoning (city-first)",
+      "split": "Zoning_All by District + County Zoning/59 + Hickory city-native Zoning_Overlays/Hickory_Zoning",
+      "join": "spatial join preferred; parcel Zoning* is jurisdiction-joined stub"
+    },
+    "flu": {
+      "present": true,
+      "partial": true,
+      "fields": [
+        "FLU",
+        "NAME",
+        "Small_Area_Plan"
+      ],
+      "bestLayer": "Hickory_Future_Land_Use (city); SAP/Small_Area_Districts (county partial)",
+      "caveat": "Full FLU REST only for Hickory; county has Small Area Plan districts + parcel Small_Area_Plan text / PDFs"
+    },
+    "viewerLink": {
+      "present": true,
+      "template": "https://gis.catawbacountync.gov/parcel/?pinc={PIN}",
+      "keyField": "PIN"
+    }
+  },
+  "portals": [
+    {
+      "name": "GIS Real Estate Maps",
+      "url": "https://gis.catawbacountync.gov/parcel/",
+      "notes": "Deep link ?pinc={PIN}"
+    },
+    {
+      "name": "GIS Real Estate Reports",
+      "url": "https://gis.catawbacountync.gov/nomap/",
+      "notes": "?pinc= or ?lrk="
+    },
+    {
+      "name": "County ArcGIS REST",
+      "url": "https://arcgis2.catawbacountync.gov/arcgis/rest/services",
+      "notes": "Primary county ArcGIS Server"
+    },
+    {
+      "name": "Tax Real Estate Search",
+      "url": "https://taxbill.catawbacountync.gov/ITSPublicCT/RealEstateSearch",
+      "notes": "REID/LRK search"
+    },
+    {
+      "name": "Parcel Analysis / CSV",
+      "url": "https://gis.catawbacountync.gov/parcel_analysis/",
+      "notes": "CSV https://gis.catawbacountync.gov/DataWarehouse/csv/catco_pa.csv"
+    },
+    {
+      "name": "Parcel field dictionary",
+      "url": "https://gis.catawbacountync.gov/misc/datadesc.html",
+      "notes": "Report field descriptions"
+    },
+    {
+      "name": "Planning & Parks",
+      "url": "https://www.catawbacountync.gov/county-services/planning-and-parks/",
+      "notes": "Small Area Plans"
+    },
+    {
+      "name": "City of Hickory ArcGIS REST",
+      "url": "https://arcgis.hickorync.gov/server/rest/services",
+      "notes": "Zoning_Overlays + other city folders"
+    },
+    {
+      "name": "SmartGov public",
+      "url": "https://co-catawba-nc.smartgovcommunity.com/Public/Home",
+      "notes": "Permitting portal"
+    },
+    {
+      "name": "NC OneMap",
+      "url": "https://www.nconemap.gov",
+      "notes": "Statewide parcels FeatureServer; filter cntyfips=035"
+    }
+  ],
+  "municipalities": [
+    {
+      "name": "Unincorporated Catawba County",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/59",
+      "zoningAllUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "zoningAllFilter": "District='County'",
+      "zoningField": "ZONING",
+      "featureCount": 1714,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "County Zoning layer; Zoning_All County count 1719"
+    },
+    {
+      "name": "Hickory",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "cityNativeZoningUrl": "https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Zoning/MapServer/0",
+      "cityNativeFluUrl": "https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Future_Land_Use/MapServer/0",
+      "zoningField": "Zoning",
+      "zoningAllFilter": "District='Hickory'",
+      "featureCount": 1740,
+      "zoningAllCount": 1736,
+      "fluCount": 142,
+      "ownGis": true,
+      "ownGisRoot": "https://arcgis.hickorync.gov/server/rest/services",
+      "fluRest": true,
+      "notes": "Prefer city-native Hickory_Zoning + Hickory_Future_Land_Use inside city limits; overlays on Hickory_Overlays"
+    },
+    {
+      "name": "Newton",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "zoningField": "Zoning",
+      "zoningAllFilter": "District='Newton'",
+      "featureCount": 796,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "No independent city ArcGIS host found"
+    },
+    {
+      "name": "Conover",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "zoningField": "Zoning",
+      "zoningAllFilter": "District='Conover'",
+      "featureCount": 621,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Claremont",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "zoningField": "Zoning",
+      "zoningAllFilter": "District='Claremont'",
+      "featureCount": 161,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Maiden",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "zoningField": "Zoning",
+      "zoningAllFilter": "District='Maiden'",
+      "featureCount": 334,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "Also extends into Lincoln County; Lincoln card notes sparse Maiden there"
+    },
+    {
+      "name": "Catawba",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "zoningField": "Zoning",
+      "zoningAllFilter": "District='Catawba'",
+      "featureCount": 126,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Brookford",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "zoningField": "Zoning",
+      "zoningAllFilter": "District='Brookford'",
+      "featureCount": 69,
+      "ownGis": false,
+      "fluRest": false
+    },
+    {
+      "name": "Long View",
+      "zoningUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "zoningField": "Zoning",
+      "zoningAllFilter": "District='Long View'",
+      "featureCount": 276,
+      "ownGis": false,
+      "fluRest": false,
+      "notes": "District spelling includes space: Long View"
+    }
+  ],
+  "layers": [
+    {
+      "role": "parcels",
+      "name": "energov_permit_ctr Parcels (CAMA + zoning attrs)",
+      "restUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "auth": "none",
+      "acreageField": "Caculated_Acreage",
+      "coverage": "county-wide",
+      "status": "usable",
+      "featureCount": 94864,
+      "acreageRangeCount": 8502,
+      "saleInRangeCount": 3098,
+      "maxRecordCount": 1000,
+      "primary": true
+    },
+    {
+      "role": "parcels",
+      "name": "Real_Estate_Basemap Parcels",
+      "restUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/Basemaps/Real_Estate_Basemap/MapServer/2",
+      "layerId": 2,
+      "geometry": "polygon",
+      "acreageField": "CALCAC",
+      "status": "partial",
+      "featureCount": 94268,
+      "acreageRangeCount": 8494
+    },
+    {
+      "role": "parcels",
+      "name": "Catawba_Basic cc_owner_all",
+      "restUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/Catawba_Basic_MIL1/MapServer/19",
+      "layerId": 19,
+      "geometry": "none",
+      "status": "usable",
+      "featureCount": 95119
+    },
+    {
+      "role": "parcels",
+      "name": "NC OneMap Parcels (polys)",
+      "restUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1",
+      "layerId": 1,
+      "geometry": "polygon",
+      "acreageField": "gisacres",
+      "status": "usable",
+      "featureCount": 93505,
+      "acreageRangeCount": 8502,
+      "filter": "cntyfips='035'"
+    },
+    {
+      "role": "zoning",
+      "name": "Zoning_All",
+      "restUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/60",
+      "layerId": 60,
+      "geometry": "polygon",
+      "status": "usable",
+      "featureCount": 5838,
+      "districtCounts": {
+        "Hickory": 1736,
+        "Newton": 796,
+        "Conover": 621,
+        "Long View": 276,
+        "Maiden": 334,
+        "County": 1719,
+        "Claremont": 161,
+        "Catawba": 126,
+        "Brookford": 69
+      }
+    },
+    {
+      "role": "zoning",
+      "name": "County Zoning",
+      "restUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/59",
+      "layerId": 59,
+      "geometry": "polygon",
+      "status": "usable",
+      "featureCount": 1714
+    },
+    {
+      "role": "zoning",
+      "name": "Hickory Zoning (city native)",
+      "restUrl": "https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Zoning/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "status": "usable",
+      "featureCount": 1740,
+      "coverage": "city-only"
+    },
+    {
+      "role": "flu",
+      "name": "Hickory Future Land Use",
+      "restUrl": "https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Future_Land_Use/MapServer/0",
+      "layerId": 0,
+      "geometry": "polygon",
+      "status": "usable",
+      "featureCount": 142,
+      "coverage": "city-only"
+    },
+    {
+      "role": "flu",
+      "name": "Small Area Districts / SAP",
+      "restUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/ugly_map/FeatureServer/27",
+      "layerId": 27,
+      "geometry": "polygon",
+      "status": "partial",
+      "featureCount": 23
+    },
+    {
+      "role": "other",
+      "name": "Cities",
+      "restUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/catawba/Basemap/FeatureServer/5",
+      "layerId": 5,
+      "geometry": "polygon",
+      "status": "usable"
+    },
+    {
+      "role": "other",
+      "name": "Hickory Zoning Overlays",
+      "restUrl": "https://arcgis.hickorync.gov/server/rest/services/Zoning_Overlays/Hickory_Overlays/MapServer",
+      "status": "partial",
+      "coverage": "city-only"
+    }
+  ],
+  "gaps": [
+    "No city-native ArcGIS for Newton/Conover/Claremont/Maiden/Catawba/Brookford/Long View \u2014 county Zoning_All District filter only",
+    "County FLU is Small Area Plan districts + parcel Small_Area_Plan text \u2014 not full FLU polygons outside Hickory",
+    "Sale_Amount / tax values on energov are currency strings; Sale Validity only on CSV warehouse",
+    "Real_Estate_Basemap parcels lack CAMA attrs \u2014 join energov or cc_owner_all",
+    "MaxRecordCount 1000 on energov FeatureServer \u2014 paginate",
+    "LEO_HideName redacts some owners (~223)",
+    "Owner phones/emails not collected",
+    "Utilities / AADT excluded by card rules"
+  ],
+  "csvWarehouse": "https://gis.catawbacountync.gov/DataWarehouse/csv/catco_pa.csv",
+  "license": "Catawba County Geospatial Information Services (GIS); attribution required; independent verification recommended; NCGS 132-10 commercial resale limits",
+  "appraiserSearchUrl": "https://gis.catawbacountync.gov/parcel/?pinc={PIN}",
+  "verifiedAt": "2026-09-24",
+  "verifiedBy": "North Carolina Public Info Researcher",
+  "verifiedLayerCount": 11,
+  "pass2": {
+    "label": "PASS2 full-suite upgrade \u2014 rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)",
+    "verifiedAt": "2026-09-28",
+    "verifiedBy": "North Carolina Public Info Researcher",
+    "aadtScreening": {
+      "source": "NCDOT Traffic Survey Group (public AGOL)",
+      "layer": "NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)",
+      "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0",
+      "countyField": "COUNTY",
+      "countyValue": "CATAWBA",
+      "valueField": "AADT_2022",
+      "valueType": "string (trim; blank = no count that year)",
+      "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CATAWBA%27&returnCountOnly=true&f=json",
+      "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27CATAWBA%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+      "liveStationCount": 800,
+      "stationsWithAADT2022": 49,
+      "newerYearAvailable": {
+        "available": true,
+        "layer": "NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)",
+        "restUrl": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1",
+        "countyField": "County",
+        "countyValue": "Catawba",
+        "valueField": "AADT_2025",
+        "valueType": "integer (null = no count)",
+        "countQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Catawba%27&returnCountOnly=true&f=json",
+        "featureQuery": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Catawba%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000",
+        "liveStationCount": 793,
+        "stationsWithAADT2025": 772,
+        "stationsWithAADT2024": 0,
+        "segmentsLayer": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide \u2014 spatial filter by county envelope)",
+        "also": "https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)"
+      },
+      "recommendation": "Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025\u2192AADT_2024\u2192AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title)."
+    },
+    "primaryParcelLayer": {
+      "restUrl": "https://arcgis2.catawbacountync.gov/arcgis/rest/services/energov/energov_permit_ctr/FeatureServer/0",
+      "acreageField": "Caculated_Acreage",
+      "range5to150Where": "Caculated_Acreage>=5 AND Caculated_Acreage<=150",
+      "liveTotalParcels": 94864,
+      "liveParcels5to150": 8502
+    },
+    "taxValues": {
+      "status": "ok",
+      "fields": {
+        "Land_Value": "tax.marketValue",
+        "Total_Buildings_Value": "tax.marketValue",
+        "Total_Value": "tax.marketValue"
+      },
+      "liveNonZeroCounty": {
+        "Land_Value": 91012,
+        "Total_Buildings_Value": 69875,
+        "Total_Value": 91271
+      },
+      "liveNonZero5to150": {
+        "Total_Value": 8387
+      },
+      "notes": "Tax values are STRING currency (e.g. '$177,700'; Total_Value may carry suffix '/ Use Total Value: $31,000' for PUV parcels) \u2014 strip $ and commas, take first number. CSV fallback: https://gis.catawbacountync.gov/DataWarehouse/csv/catco_pa.csv",
+      "publicFallback": "https://gis.catawbacountync.gov/parcel/?pinc={PIN}"
+    },
+    "saleHistory": {
+      "status": "ok",
+      "priceFields": [
+        "Sale_Amount"
+      ],
+      "dateFields": [
+        "Sale_Date"
+      ],
+      "livePriceGt0County": {
+        "Sale_Amount": 48177
+      },
+      "livePriceGt0_5to150": {
+        "Sale_Amount": 3098
+      },
+      "liveDateNonNullCounty": {
+        "Sale_Date": 48177
+      },
+      "notes": "Sale_Amount STRING currency ('$203,500'); Sale_Date STRING MM/DD/YY \u2014 parse 2-digit year (<=26 \u2192 20xx). Last sale only; no multi-transfer history on REST."
+    },
+    "ownerEntity": {
+      "ownerFields": [
+        "Name",
+        "Name2"
+      ],
+      "primaryOwnerField": "Name",
+      "rule": {
+        "apply": "Uppercase + trim Name (optionally also Name2)",
+        "regex": "(?i)(\\bL\\.?\\s?L\\.?\\s?C\\b|\\bINC\\b|\\bCORP|\\bL\\.?\\s?P\\b|\\bLLP\\b|\\bLLLP\\b|\\bLTD\\b|TRUST|CHURCH|MINISTR|\\bCOMPANY\\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\\bHOA\\b|FOUNDATION|AUTHORITY|\\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\\b|^UNITED STATES|^NORTH CAROLINA\\b|\\bCOUNTY$)",
+        "sqlLikeTokens": [
+          "% LLC%",
+          "%,LLC%",
+          "% L L C%",
+          "% INC",
+          "% INC %",
+          "% INC.%",
+          "%,INC%",
+          "% CORP%",
+          "%CORPORATION%",
+          "% LP",
+          "% LP %",
+          "% L P",
+          "% LLP%",
+          "% LTD%",
+          "%TRUST%",
+          "%CHURCH%",
+          "%MINISTR%",
+          "% COMPANY%",
+          "%PARTNERSHIP%",
+          "%HOLDINGS%",
+          "%PROPERTIES%",
+          "%INVESTMENT%",
+          "%ASSOCIATION%",
+          "%FOUNDATION%",
+          "%AUTHORITY%",
+          "CITY OF %",
+          "COUNTY OF %",
+          "STATE OF %",
+          "TOWN OF %",
+          "% COUNTY",
+          "%BOARD OF EDUCATION%",
+          "UNITED STATES%",
+          "NORTH CAROLINA %",
+          "% DEVELOPMENT%"
+        ],
+        "caveats": "TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); \"% COUNTY\" suffix catches e.g. \"PERSON COUNTY\"; bare \"CO\" and \"ESTATE\" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) \u2014 normalize first."
+      },
+      "liveEntityCount5to150": 2127,
+      "liveOwnerNonNull5to150": 8502,
+      "entityQuery": "where=Caculated_Acreage>=5 AND Caculated_Acreage<=150 AND (Name LIKE '% LLC%' OR Name LIKE '%,LLC%' OR Name LIKE '% L L C%' OR Name LIKE '% INC' OR Name LIKE '% INC %' OR Name LIKE '% INC.%' OR Name LIKE '%,INC%' OR Name LIKE '% CORP%' OR Name LIKE '%CORPORATION%' OR Name LIKE '% LP' OR Name LIKE '% LP %' OR Name LIKE '% L P' OR Name LIKE '% LLP%' OR Name LIKE '% LTD%' OR Name LIKE '%TRUST%' OR Name LIKE '%CHURCH%' OR Name LIKE '%MINISTR%' OR Name LIKE '% COMPANY%' OR Name LIKE '%PARTNERSHIP%' OR Name LIKE '%HOLDINGS%' OR Name LIKE '%PROPERTIES%' OR Name LIKE '%INVESTMENT%' OR Name LIKE '%ASSOCIATION%' OR Name LIKE '%FOUNDATION%' OR Name LIKE '%AUTHORITY%' OR Name LIKE 'CITY OF %' OR Name LIKE 'COUNTY OF %' OR Name LIKE 'STATE OF %' OR Name LIKE 'TOWN OF %' OR Name LIKE '% COUNTY' OR Name LIKE '%BOARD OF EDUCATION%' OR Name LIKE 'UNITED STATES%' OR Name LIKE 'NORTH CAROLINA %' OR Name LIKE '% DEVELOPMENT%')"
+    },
+    "paDeepLink": {
+      "template": "https://gis.catawbacountync.gov/parcel/?pinc={PIN}",
+      "testedUrl": "https://gis.catawbacountync.gov/parcel/?pinc=279006488235",
+      "httpStatus": 200,
+      "notes": "HTTP 200; JS app (Catawba GIS Real Estate Maps) renders parcel client-side, so parcel content not server-verifiable. Alt report: https://gis.catawbacountync.gov/nomap/?pinc={PIN} (200). Tax bill: https://taxbill.catawbacountync.gov/ITSPublicCT/RealEstateSearch"
+    },
+    "jurisdictionGisViewer": {
+      "url": "https://gis.catawbacountync.gov/parcel/",
+      "httpStatus": 200,
+      "notes": "Catawba County GIS Real Estate Maps"
+    },
+    "gaps": [
+      "AADT_2022 blank at 751 of 800 stations on the 2022 layer (NCDOT counts on a cycle) \u2014 prefer 2025 layer / latest non-blank year",
+      "No multi-transfer sale history on primary layer (last sale only)"
+    ]
+  }
+}

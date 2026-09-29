@@ -1,0 +1,398 @@
+state: NC
+jurisdiction: Surry County
+fips: 37171
+slug: surry
+level: county
+markets:
+  - Winston-Salem
+crs_preferred:
+  wkid: 102719
+  latestWkid: 2264
+  name: NAD 1983 StatePlane North Carolina FIPS 3200 Feet
+jurisdictionGisUrl: "https://gis.co.surry.nc.us/maps/"
+viewerDeepLinkTemplate: "https://gis.co.surry.nc.us/maps/default.htm?pid={Parcel}"
+appraiserSearchUrl: "https://gis.co.surry.nc.us/ITSPublic/RealEstateSearch"
+appraiserDeepLinkTemplate: "https://gis.co.surry.nc.us/maps/AppraisalCard.aspx?id={Parcel}"
+appraiserDeepLinkTemplateAlt: "https://gis.co.surry.nc.us/ITSPublic/AppraisalCard.aspx?id={Parcel}/2027"
+countyRestRoot: "https://gis.co.surry.nc.us/arcgis/rest/services"
+gisDepartmentUrl: "https://www.co.surry.nc.us/departments/(k_through_z)/tax/gis.php"
+landUsePlanPdf: "https://www.co.surry.nc.us/document_center/Planning/Surry%20County%20Land%20Use%20Plan%202040.pdf"
+futureLandUseMapPdf: "https://www.co.surry.nc.us/document_center/Development%20Services/SurryCountyLUPUpdateFinal_11_18_19.pdf"
+parcelIdPreferred: Parcel
+paDeepLinkKey: Parcel
+joinKeys:
+  - Parcel
+  - PARCEL_ID
+  - parno
+layers:
+  - role: parcels
+    name: InternalUse/SurryLayers Parcel (PRIMARY — tax/sale/owner)
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/InternalUse/SurryLayers/MapServer/11"
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: Calculated_Acreage
+    coverage: county-wide
+    fieldMap:
+      Parcel: parcelId
+      PARCEL_ID: parcelIdDashed
+      Calculated_Acreage: acreage
+      LegalLandUnits: acreageLegal
+      Name1: ownerName
+      Name2: ownerName2
+      Address1: mailingAddress.street
+      Address2: mailingAddress.street2
+      City: mailingAddress.city
+      State: mailingAddress.state
+      ZipCode: mailingAddress.zip
+      HouseNumber: situsAddress.number
+      StreetDirection: situsAddress.prefix
+      StreetName: situsAddress.streetName
+      StreetType: situsAddress.streetType
+      StreetSuffix: situsAddress.suffix
+      SalePrice: lastSale.price
+      SaleMonth: lastSale.month
+      SaleYear: lastSale.year
+      QualifiedCode: lastSale.qualified
+      VacantOrImproved: lastSale.vacantOrImproved
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      TotalMarketValue: tax.marketValue
+      TotalAssessedValue: tax.assessedValue
+      ParcelLandValue: tax.landValue
+      ParcelBuildingValue: tax.improvementValue
+      ParcelObxfValue: tax.obxfValue
+      Zoning: zoning
+      Township: township
+    notes: "PRIMARY wire-first TRANCHE-3 verified 2026-09-24: count 44434; Calculated_Acreage 5–150 → 10608; ParcelBuildingValue=0 in range → 5481; SalePrice>0 → 23424 (in 5–150 → 4869); VacantOrImproved=V in range → 6870; TotalMarketValue>0 → 44336. CRS 102719/2264. Auth none despite InternalUse folder. MaxRecordCount 2000 — paginate. PA key = Parcel (12-digit). Sample Parcel 502113140113 SalePrice 425000 Zoning B4."
+    status: usable
+    wireFirst: true
+    featureCount: 44434
+    acreage5to150Count: 10608
+    bldgZeroInRange: 5481
+    salesPriceGtZero: 23424
+    salesPriceGtZeroInRange: 4869
+  - role: parcels
+    name: Parcels MapServer/0 (public mirror — no sale price)
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/Parcels/MapServer/0"
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calculated_Acreage
+    coverage: county-wide
+    fieldMap:
+      Parcel: parcelId
+      Calculated_Acreage: acreage
+      Name1: ownerName
+      Address1: mailingAddress.street
+      City: mailingAddress.city
+      TotalAssessedValue: tax.assessedValue
+      ParcelLandValue: tax.landValue
+      ParcelBuildingValue: tax.improvementValue
+      HouseNumber: situsAddress.number
+      StreetName: situsAddress.streetName
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+    notes: Public single-layer mirror count 44434; acres 5–150 → 10608. Has owner/tax/deed; LACKS SalePrice/TotalMarketValue. Prefer InternalUse/11 for TRANCHE-3. Website_Map/29 and /30 are scale-dependent twins of same schema.
+    status: partial
+    alternateUrls:
+      - "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/29"
+      - "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/30"
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress.street
+      mcity: mailingAddress.city
+      mstate: mailingAddress.state
+      mzip: mailingAddress.zip
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      saledatetx: lastSale.dateText
+      parval: tax.marketValue
+      landval: tax.landValue
+      improvval: tax.improvementValue
+      cntyfips: countyFips
+    notes: "Verified 2026-09-24: cntyfips='171' count 44417; gisacres 5–150 → 10594; improvval=0 in range → 3745. parno aligns with Parcel. saledatetx typically '/'; saledate null; no sale price; scity empty. MaxRecordCount 5000. Alt host services.gis.nc.gov."
+    status: usable
+    featureCount: 44417
+    acreage5to150Count: 10594
+    alternateUrls:
+      - "https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1"
+  - role: zoning
+    name: Website_Map MUNICIPAL ZONING (cities-first PRIMARY)
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/51"
+    layerId: 51
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: municipalities
+    fieldMap:
+      ZONING: zoning
+      ZONING_NAME: zoningLabel
+      MUNICIPALITY: zoningMunicipality
+    notes: "Cities-first. Count 409. MUNICIPALITY: MOUNT AIRY 197, ELKIN 83, DOBSON 81, PILOT 43 (Pilot Mountain), ELKIN/WILKES 5. No independent city ArcGIS hosts — this IS the municipal zoning source. Spatial join in 2264. InternalUse/SurryLayers/26 is mirror."
+    status: usable
+    wireFirst: true
+    featureCount: 409
+    alternateUrls:
+      - "https://gis.co.surry.nc.us/arcgis/rest/services/InternalUse/SurryLayers/MapServer/26"
+  - role: zoning
+    name: Website_Map COUNTY ZONING (unincorporated)
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/52"
+    layerId: 52
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: unincorporated
+    fieldMap:
+      DISTRICT: zoning
+      ZONING_NAME: zoningLabel
+    notes: "Count 1520. Top: RA 399, RB 157, RR 100, RG 98, MHP 76, HB 66, CB 56, MI 17, RL 7 + conditional -C variants, ETJ, VR, RE, MR, CP, PR-CD. Do not apply inside /51. InternalUse/27 mirror."
+    status: usable
+    featureCount: 1520
+  - role: zoning
+    name: Website_Map OVERLAY_ZONING
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/53"
+    layerId: 53
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      DISTRICT: zoningOverlay
+      SPECIFICS: zoningOverlayLabel
+      ACRES: acreage
+      DATE_: overlayDate
+    notes: Count 16. AO-1/AO-2 airport, WO watershed, TO, MRO, SSB. Stack with base zoning.
+    status: usable
+    featureCount: 16
+  - role: flu
+    name: InternalUse FUTURE_LAND_USE (county coarse)
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/InternalUse/SurryLayers/MapServer/23"
+    layerId: 23
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      FLU: flu
+    notes: "Count 10 — coarse county FLU. Codes: CC, HD, RA, RC, RG, SAP, USA, WL. Auth none. Prefer field FLU. Supplement with PDF FLUM."
+    status: partial
+    featureCount: 10
+  - role: flu
+    name: InternalUse DobsonLandUse (town FLU)
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/InternalUse/SurryLayers/MapServer/25"
+    layerId: 25
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Land_Use: flu
+    notes: Dobson-only count 32. Mount Airy / Elkin / Pilot Mountain — no town FLU REST (PDF gap).
+    status: usable
+    featureCount: 32
+  - role: flu
+    name: Land Use Plan 2040 + FLUM (PDF only for non-Dobson detail)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: "PDFs: Land Use Plan 2040 + SurryCountyLUPUpdateFinal_11_18_19 (FLUM). No fine-grained public FLU FeatureServer for Mount Airy/Elkin/Pilot."
+    status: gap
+  - role: sales
+    name: InternalUse QUALIFIED SALES (supplement)
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/InternalUse/SurryLayers/MapServer/53"
+    layerId: 53
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      MASTER_PAR: parcelId
+      SALE_PRICE: lastSale.price
+      SALE_MONTH: lastSale.month
+      SALE_YEAR_: lastSale.year
+      SALE_BOOK_: lastSale.deedBook
+      SALE_PAGE_: lastSale.deedPage
+      SALE_QUAL_: lastSale.qualified
+      SALE_IMP_1: lastSale.vacantOrImproved
+      SALE_INST_: lastSale.instrument
+    notes: "Count 3936 (price>0 → 3926). Qualified-sales subset; join MASTER_PAR≈Parcel. Prefer parcel layer SalePrice for last sale on all parcels."
+    status: usable
+    featureCount: 3936
+  - role: other
+    name: Website_Map MUNICIPALITIES (routing)
+    restUrl: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/27"
+    layerId: 27
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: municipalities
+    fieldMap:
+      NAME: municipality
+    notes: "Count 5: Dobson, Elkin, Mount Airy (2 polys), Pilot Mountain. Route zoning/FLU."
+    status: usable
+    featureCount: 5
+municipalities:
+  - name: City of Mount Airy
+    districtLabel: MOUNT AIRY
+    zoningPolygons: 197
+    zoningPrefer: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/51"
+    zoningFilter: "MUNICIPALITY='MOUNT AIRY'"
+    fluPrefer: county FUTURE_LAND_USE /23 coarse + PDF FLUM (no city FLU REST)
+    hasLocalGis: false
+    publicGisUrl: "https://gis.co.surry.nc.us/maps/"
+    notes: Largest city; county-hosted municipal zoning is cities-first source.
+  - name: Town of Elkin
+    districtLabel: ELKIN
+    zoningPolygons: 83
+    zoningPolygonsAlt: 5
+    zoningPrefer: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/51"
+    zoningFilter: "MUNICIPALITY='ELKIN'"
+    zoningFilterAlt: "MUNICIPALITY='ELKIN/WILKES'"
+    fluPrefer: PDF / county coarse (no town FLU REST)
+    hasLocalGis: false
+    publicGisUrl: "https://gis.co.surry.nc.us/maps/"
+  - name: Town of Dobson
+    districtLabel: DOBSON
+    zoningPolygons: 81
+    fluPolygons: 32
+    zoningPrefer: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/51"
+    zoningFilter: "MUNICIPALITY='DOBSON'"
+    fluPrefer: "https://gis.co.surry.nc.us/arcgis/rest/services/InternalUse/SurryLayers/MapServer/25"
+    hasLocalGis: false
+    publicGisUrl: "https://gis.co.surry.nc.us/maps/"
+    notes: County seat. Only municipality with dedicated town FLU REST.
+  - name: Town of Pilot Mountain
+    districtLabel: PILOT
+    zoningPolygons: 43
+    zoningPrefer: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/51"
+    zoningFilter: "MUNICIPALITY='PILOT'"
+    fluPrefer: PDF / county coarse (no town FLU REST)
+    hasLocalGis: false
+    publicGisUrl: "https://gis.co.surry.nc.us/maps/"
+  - name: Unincorporated Surry / ETJ
+    districtLabel: COUNTY
+    zoningPrefer: "https://gis.co.surry.nc.us/arcgis/rest/services/Website_Map/MapServer/52"
+    zoningPolygons: 1520
+    fluPrefer: "https://gis.co.surry.nc.us/arcgis/rest/services/InternalUse/SurryLayers/MapServer/23"
+gaps:
+  - Website_Map / Parcels public layers omit sale price — use InternalUse/11 (or QUALIFIED SALES / AppraisalCard PDF)
+  - InternalUse folder label — publicly queryable 2026-09-24; if locked, fall back to Website_Map + PA PDF for sales
+  - Situs city/zip missing on parcel polygons (mailing City is owner mail)
+  - County FLU REST coarse (10 polygons); Mount Airy / Elkin / Pilot lack town FLU REST (PDF only)
+  - "OneMap saledatetx unusable ('/'); no OneMap sale price; scity empty for Surry"
+  - No independent municipal ArcGIS REST hosts — Website_Map/51 is cities-first zoning
+  - ELKIN/WILKES fringe zoning on Surry host — confirm county line for Wilkes-side parcels
+  - MaxRecordCount 1000 (Website_Map) / 2000 (InternalUse) — paginate
+  - No AADT / utilities / emails / phones / paid vendors collected (out of scope)
+license: Surry County GIS public REST; mapping disclaimer on county GIS site; attribution recommended
+verifiedAt: 2026-09-24
+verifiedBy: North Carolina Public Info Researcher
+
+# ---- PASS 2 full-suite upgrade (rural OZ), verifiedAt 2026-09-28; mirrors the json pass2 key ----
+pass2:
+  label: PASS 2 full-suite upgrade (rural OZ) 2026-09-28
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  parcelLayer: https://gis.co.surry.nc.us/arcgis/rest/services/InternalUse/SurryLayers/MapServer/11
+  parcelIdField: Parcel
+  acreageFilter: Calculated_Acreage >= 5 AND Calculated_Acreage <= 150
+  acres5to150Live: 10607
+  parcelCountLive: 44434
+  aadt:
+    primary2022:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+      valueField: AADT_2022 (string; trim, blank = no count)
+      countyFilter: COUNTY='SURRY'
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27SURRY%27&outFields=LocationID%2CROUTE%2CLOCATION%2CCOUNTY%2CAADT_2022&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27SURRY%27&returnCountOnly=true&f=json
+      liveStationCount: 560
+      stationsWithAADT2022: 242
+    newer2025:
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      valueField: AADT_2025 (integer; also AADT_2024, AADT_2002-2025)
+      countyFilter: County='Surry'
+      countyFilterNote: Title case County name (2022 layer uses uppercase COUNTY)
+      queryUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Surry%27&outFields=LocationID,Located_On,Crossroad,County,AADT_2025,AADT_2024,Latitude,Longitude&returnGeometry=true&outSR=4326&f=json
+      countUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Surry%27&returnCountOnly=true&f=json
+      liveStationCount: 562
+      stationsWithAADT2025: 336
+      stationsWithAADT2024: 363
+      dataLastEdit: '2026-09-23'
+    also:
+      stations2024Service: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0
+      stations2024CountyFilter: County='Surry'
+      stations2024LiveCount: 560
+      stations2024WithAADT2024: 560
+      stations2024Note: AADT_2024 string field populated on every station in this release
+      segments2025: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0
+    recommendation: 'Newer year IS on REST: prefer NCDOT_2025 layer 1 (AADT_2025, falling back to AADT_2024 then AADT_2022 when the newest is null). The 2022 layer is kept as the documented baseline.'
+  tax:
+    fields:
+    - TotalMarketValue
+    - TotalAssessedValue
+    liveNonZero:
+      TotalMarketValue: 44339
+      TotalAssessedValue: 44339
+    status: ok
+  sale:
+    priceFields:
+    - SalePrice
+    dateFields:
+    - SaleYear
+    livePriceNonZero:
+      SalePrice: 23419
+    liveDateNonNull:
+      SaleYear: 44098
+    status: ok-year-month
+    note: SalePrice + SaleYear/SaleMonth (no day). Supplement InternalUse/SurryLayers/MapServer/53 qualified sales.
+  ownerEntity:
+    ownerFields:
+    - Name1
+    - Name2
+    rule: Concatenate owner fields, uppercase and trim, then flag as entity if the convention regex matches (batch convention; TRUSTEE does not match TRUST; LIFE ESTATE / ESTATE are not flagged). regexExtended is an optional wider net (CO, TR/TRS/TRUSTEE, MINISTRIES, ASSOCIATION, BANK, SCHOOL, DEPT/DEPARTMENT, BOARD, any 'X OF' government form, leading NORTH CAROLINA/NC).
+    regex: \b(LLC|INC|CORP|LP|LLP|LTD|TRUST|CHURCH|COMPANY|PARTNERSHIP|HOLDINGS|PROPERTIES)\b|^(CITY|COUNTY|STATE|TOWN) OF\b
+    regexExtended: \b(LLC|L\s?L\s?C|INC|INCORPORATED|CORP|CORPORATION|COMPANY|CO|LP|L\s?P|LLP|LLLP|LTD|LIMITED|PARTNERSHIP|PARTNERS|PTNRS|TRUST|TRUSTEE|TRUSTEES|TR|TRS|TRSTE|REVOCABLE|IRREVOCABLE|CHURCH|MINISTRIES|MINISTRY|BAPTIST|METHODIST|PRESBYTERIAN|CONGREGATION|DIOCESE|ASSOCIATION|ASSN|ASSOC|HOA|FOUNDATION|HOLDINGS|PROPERTIES|INVESTMENTS|INVESTORS|DEVELOPMENT|DEVELOPERS|ENTERPRISES|BANK|UNIVERSITY|COLLEGE|SCHOOL|SCHOOLS|AUTHORITY|COMMISSION|DEPT|DEPARTMENT|BOARD|COMMISSIONERS|GOVERNMENT|FEDERAL|UNITED STATES|USA|NCDOT|DOT)\b|\b(CITY|TOWN|COUNTY|STATE|VILLAGE)\s+OF\b|\bOF\s+(EDUCATION|TRANSPORTATION)\b|^(NORTH CAROLINA|NC|N C|STATE OF NC)\b
+    prefixes:
+    - CITY OF
+    - COUNTY OF
+    - STATE OF
+    - TOWN OF
+    liveEntityCount5to150ac: 1113
+    liveEntityCount5to150acExtended: 1589
+    countNote: Counts computed 2026-09-28 by pulling owner fields for every parcel in the 5–150 ac filter (objectId paging) and applying the Python regex client-side.
+    sampleMatches:
+    - J & E PROPERTIES OF NC LLC
+    - L & L DOUMAS FAMILY LLC (1/2) | LAKE VISTA LLC (1/2)
+    - SCHLICHER JOAN M TRUSTEE
+    - CLINE DEBORAH HOBSON ET AL | SCOTT WADE CLINTON & SCOTT BRENDA H CO-TRUSTEES
+  paDeepLink:
+    template: https://gis.co.surry.nc.us/maps/AppraisalCard.aspx?id={Parcel}
+    testedParcelId: '503203325420'
+    testedUrl: https://gis.co.surry.nc.us/maps/AppraisalCard.aspx?id=503203325420
+    httpStatus: 200
+    contentType: application/pdf
+    contentVerified: true
+    note: Returns application/pdf property/appraisal card; parcel verified in PDF text.
+  gisViewer:
+    url: https://gis.co.surry.nc.us/maps/
+    httpStatus: 200
+    pageTitle: null
+  gaps:
+  - Sale date is year+month only
+  - Primary CAMA layer lives under InternalUse folder (public, but naming suggests it could be locked later)

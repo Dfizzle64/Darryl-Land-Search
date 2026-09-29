@@ -1,0 +1,263 @@
+state: NC
+jurisdiction: Bertie County
+county: Bertie
+fips: '37015'
+cntyfips: '015'
+slug: bertie
+level: county
+markets:
+- Eastern NC
+msa: Eastern NC
+crs_preferred:
+  wkid: 102719
+  latestWkid: 2264
+  name: NAD 1983 StatePlane North Carolina FIPS 3200 Feet
+jurisdictionGisUrl: https://experience.arcgis.com/experience/35c1e586958d4014b177c8b4082a9051
+jurisdictionGisUrlAlt: https://bertiecounty.maps.arcgis.com/apps/webappviewer/index.html?id=6b7b91023ce84d778d1a207f75fe0454
+appraiserSearchUrl: https://dl.agd.cc/prc/nc/bertie/{GEOPIN}.pdf
+appraiserSearchUrlNotes: AGD PRC AppraisalCard PDF deep-link with parcel GEOPIN. Field
+  PRC on Bertie_Parcel_Viewer/4 already stores full URL. Verified HTTP 200 PDF for
+  GEOPIN 6863878402 and 5892825294.
+paDeepLinkKey: GEOPIN
+parcelIdPreferred: GEOPIN
+joinKeys:
+- GEOPIN
+- parno
+sitePhotoUrlTemplate: https://dl.agd.cc/bertie/site-photos/?pid={GEOPIN}
+ncptsSearchUrl: https://lrcpwa.ncptscloud.com/Bertie/parcel-search
+ncptsDeepLinkTemplate: https://lrcpwa.ncptscloud.com/Bertie/parcel-detail?reid={GEOPIN}
+ncptsDeepLinkPathTemplate: https://lrcpwa.ncptscloud.com/Bertie/parcel-detail/{GEOPIN}
+taxPayUrl: http://bertie.webtaxpay.com/
+registerOfDeedsUrl: https://search.bertiedeeds.com/
+gisDeptUrl: http://www.co.bertie.nc.us/departments/tm/tm.html
+shapefileDownloadUrl: http://www.co.bertie.nc.us/departments/tm/shapedownload.html
+parcelShapefileZip: http://www.co.bertie.nc.us/departments/tm/gisdownloads/Parcel_Polygon.zip
+montyDataZip: http://www.co.bertie.nc.us/departments/tm/gisdownloads/MontyData.zip
+countyRestRoot: https://services3.arcgis.com/tiupcc8dC1j2CPV5/arcgis/rest/services/Bertie_Parcel_Viewer/FeatureServer
+staticRestRoot: https://services3.arcgis.com/tiupcc8dC1j2CPV5/arcgis/rest/services/Bertie_Static/FeatureServer
+oneMapUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+oneMapFilter: cntyfips='015'
+countyLupHubUrl: http://bertiecounty.nc.gov/departments/pi/LUP/lup.html
+countyLupPdfUrl: http://bertiecounty.nc.gov/departments/pi/LUP/LUP.pdf
+countyFlumPdfUrl: http://bertiecounty.nc.gov/departments/pi/LUP/FLUM.pdf
+windsorUdoPdfUrl: https://windsornc.com/wp-content/uploads/2020/12/Amended-UDO_10-8-2020.pdf
+windsorZoningMapPdfUrl: https://windsornc.com/wp-content/uploads/2020/04/Zoning-Map-8-22-18.pdf
+rejectLayers:
+- name: AGD print nc/bertie
+  url: https://apps.agdmaps.com/print/nc/bertie/index.html
+  reason: HTTP 404 NoSuchKey — use dl.agd.cc/prc/nc/bertie/{GEOPIN}.pdf instead
+municipalities:
+- name: Windsor
+  role: city-first-zoning
+  cityCode: WINDSOR
+  notes: County seat; City Limits ~1709 ac; PARZONE district codes (R-5/R-10/RA-20/R-5MH/R-75/HIGHWAY
+    COMMERCIAL/CENTRAL BUSINESS/…) PRIMARY; UDO + Zoning Map PDF; Windsor prepares
+    individual CAMA LUP (not under county LUP)
+- name: Aulander
+  role: city-first-zoning-attr
+  cityCode: AULANDER
+  notes: City Limits ~1040 ac; PARZONE stubs (LOW DENSITY / GENERAL RESIDENTIAL /
+    COMMUNITY COMMERCIAL); under county CAMA LUP; no zoning FS
+- name: Lewiston-Woodville
+  role: city-first-zoning-attr
+  cityCode: LEWISTON
+  notes: City Limits labeled LEWISTON ~1258 ac; PARZONE stubs; under county CAMA LUP;
+    no zoning FS
+- name: Roxobel
+  role: city-limits-only
+  cityCode: ROXOBEL
+  notes: City Limits ~667 ac; PARZONE stubs; under county CAMA LUP; no zoning FS
+- name: Askewville
+  role: city-limits-only
+  cityCode: ASKEWVILLE
+  notes: City Limits ~366 ac; under county CAMA LUP; no zoning FS
+- name: Kelford
+  role: city-limits-only
+  cityCode: KELFORD
+  notes: City Limits ~328 ac; under county CAMA LUP; no zoning FS
+- name: Powellsville
+  role: city-limits-only
+  cityCode: POWELLSVILLE
+  notes: City Limits ~216 ac (MCD=T); under county CAMA LUP; no zoning FS
+- name: Colerain
+  role: city-first-zoning-attr
+  cityCode: COLERAIN
+  notes: City Limits ~173 ac; PARZONE stubs (CENTRAL BUSINESS / RESIDENTIAL); under
+    county CAMA LUP; no zoning FS
+layers:
+- role: parcels
+  name: Bertie_Parcel_Viewer Parcels (PRIMARY county AGOL CAMA + STAMPS)
+  restUrl: https://services3.arcgis.com/tiupcc8dC1j2CPV5/arcgis/rest/services/Bertie_Parcel_Viewer/FeatureServer/4
+  alternateUrls:
+  - https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Bertie_ParcelViewer/FeatureServer/4
+  - http://www.co.bertie.nc.us/departments/tm/gisdownloads/Parcel_Polygon.zip
+  - http://www.co.bertie.nc.us/departments/tm/gisdownloads/MontyData.zip
+  layerId: 4
+  geometry: polygon
+  auth: none
+  acreageField: CALCACRE
+  coverage: county-wide
+  fieldMap:
+    GEOPIN: parcelId
+    GEOPIN27: parcelIdAlt
+    GEOPINF10: parcelIdF10
+    OWNER: ownerName
+    ADDR1: mailingAddress.street
+    ADDR2: mailingAddress.street2
+    OWNCITY: mailingAddress.city
+    OWNST: mailingAddress.state
+    OWNZIP: mailingAddress.zip
+    PARADDR: situsAddress
+    CALCACRE: acreage
+    DEEDACRE: acreageDeed
+    ASDACRES: acreageAssessed
+    CALACRES: acreageCalcAlt
+    LANDVAL: tax.landValue
+    BLDGVAL: tax.improvementValue
+    DEFRVAL: tax.deferredValue
+    TAXVAL: tax.taxableValue
+    PARCLASS: dorCode
+    PARZONE: zoning
+    PROPDESC: legalDescription
+    DEEDBKPG: lastSale.deedBookPage
+    STAMPS: lastSale.stamps
+    TOWNSHIP: township
+    NUMBLDG: buildingCount
+    PRC: appraiserDeepLink
+    PIC_LINK: sitePhotoUrl
+    SUBDMAME: subdivision
+    PRINCIPDUE: tax.principalDue
+  notes: 'PRIMARY wire-first. Verified 2026-09-24: count 18788; CALCACRE 5–150 → 4455;
+    LANDVAL>0 18731; TAXVAL>0 18731; OWNER 18731; STAMPS>0 7736; stamps+band 1570;
+    vacant band 3402; PARZONE non-empty 6331; PRC 18788. No SALE_PRICE — STAMPS is
+    excise-stamp proxy only. OWNCITY is mailing city — situs muni via City Limits
+    spatial join. Geo sample GEOPIN 5892825294 RA-20 centroid ~-76.976, 35.992 (Windsor).
+    MaxRecordCount 1000. CRS 102719/2264. Parcel_Polygon.zip geometry-only; MontyData
+    DBF mirrors CAMA attrs.'
+  status: usable
+  verifiedCounts:
+    total: 18788
+    calcacre_5_150: 4455
+    landval_gt0: 18731
+    taxval_gt0: 18731
+    owner_nonnull: 18731
+    stamps_gt0: 7736
+    stamps_in_5_150: 1570
+    vacant_band: 3402
+    parzone_nonempty: 6331
+    prc_nonnull: 18788
+- role: parcels
+  name: NC OneMap Parcels (cntyfips='015')
+  restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  alternateUrls:
+  - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+  layerId: 1
+  geometry: polygon
+  auth: none
+  acreageField: gisacres
+  coverage: county-wide
+  filter: cntyfips='015'
+  fieldMap:
+    parno: parcelId
+    altparno: parcelIdAlt
+    ownname: ownerName
+    mailadd: mailingAddress.street
+    mcity: mailingAddress.city
+    mstate: mailingAddress.state
+    mzip: mailingAddress.zip
+    siteadd: situsAddress
+    gisacres: acreage
+    landval: tax.landValue
+    improvval: tax.improvementValue
+    parval: tax.marketValue
+    saledate: lastSale.date
+    saledatetx: lastSale.dateText
+    parusedesc: landUseDescription
+  notes: 'Statewide fallback. Verified 2026-09-24: count 18788; gisacres 5–150 → 4455;
+    Shape acres 5–150 → 4430; ownname 18788; parval>0 18731; landval>0 18731; saledate
+    0; saledatetx non-empty 0. Join parno=GEOPIN. Prefer county layer for PARZONE/STAMPS/PRC.'
+  status: usable
+  verifiedCounts:
+    total: 18788
+    gisacres_5_150: 4455
+    shape_acres_5_150: 4430
+    parval_gt0: 18731
+    landval_gt0: 18731
+    ownname_nonnull: 18788
+    saledate_nonnull: 0
+    saledatetx_nonempty: 0
+- role: zoning
+  name: Parcel PARZONE attribute (cities-first; Windsor PRIMARY)
+  restUrl: https://services3.arcgis.com/tiupcc8dC1j2CPV5/arcgis/rest/services/Bertie_Parcel_Viewer/FeatureServer/4
+  layerId: 4
+  geometry: polygon
+  auth: none
+  coverage: municipal-attr + PDF
+  fieldMap:
+    PARZONE: zoning
+    GEOPIN: parcelId
+  notes: 'No dedicated zoning FeatureServer. Cities-first via PARZONE on parcels (~6331
+    non-empty) spatial-joined to City Limits. Windsor district codes match UDO Zoning
+    Map (R-5/R-10/RA-20/…). Other munis: coarser PARZONE stubs. Unincorporated: county
+    lacks base zoning.'
+  status: partial
+  supportingDocs:
+  - https://windsornc.com/wp-content/uploads/2020/04/Zoning-Map-8-22-18.pdf
+  - https://windsornc.com/wp-content/uploads/2020/12/Amended-UDO_10-8-2020.pdf
+  verifiedCounts:
+    parzone_nonempty: 6331
+    windsor_township_parzone: 2425
+- role: flu
+  name: County CAMA LUP + FLUM (PDF gap)
+  restUrl: null
+  geometry: none
+  auth: none
+  coverage: county + joint towns (excl. Windsor individual LUP)
+  notes: No public FLU FeatureServer. Use LUP.pdf + FLUM.pdf from county LUP hub.
+    Windsor prepares separate LUP. Related maps ECM/WM/LSM/PAM/BELU/SM also published.
+  status: gap
+  supportingDocs:
+  - http://bertiecounty.nc.gov/departments/pi/LUP/lup.html
+  - http://bertiecounty.nc.gov/departments/pi/LUP/LUP.pdf
+  - http://bertiecounty.nc.gov/departments/pi/LUP/FLUM.pdf
+  - https://www.deq.nc.gov/documents/pdf/land-use-plans/bertie-county-lup-crc-certified-2-10-16/download
+- role: other
+  name: City Limits (muni router)
+  restUrl: https://services3.arcgis.com/tiupcc8dC1j2CPV5/arcgis/rest/services/Bertie_Static/FeatureServer/10
+  layerId: 10
+  geometry: polygon
+  auth: none
+  coverage: municipal
+  fieldMap:
+    CITY: municipality
+    MCD: mcdClass
+  notes: 8 city/town polys for cities-first router. Verified 2026-09-24.
+  status: usable
+  verifiedCounts:
+    total: 8
+- role: other
+  name: Voluntary Agricultural Districts (overlay)
+  restUrl: https://services3.arcgis.com/tiupcc8dC1j2CPV5/arcgis/rest/services/Bertie_Parcel_Viewer/FeatureServer/3
+  layerId: 3
+  geometry: polygon
+  auth: none
+  coverage: county-wide overlay
+  notes: VAD overlay only — not municipal base zoning.
+  status: usable
+gaps:
+- Sale price REST gap — no SALE_PRICE; STAMPS excise-stamp proxy only; OneMap saledate/saledatetx
+  empty for cntyfips='015'
+- No dedicated zoning FeatureServer — cities-first via parcel PARZONE + Windsor UDO/Zoning
+  Map PDFs; other towns stubs only
+- Unincorporated Bertie lacks countywide base zoning (Subdivision Ordinance + VAD
+  overlay only)
+- FLU FeatureServer gap — County CAMA LUP + FLUM.pdf only
+- Parcel_Polygon.zip geometry/acres only — CAMA requires MontyData join or AGOL
+- OWNCITY is mailing city — situs municipality requires City Limits spatial join
+- ETJ layer is nameless polylines (no per-muni ETJ attribute)
+- AGD print apps.agdmaps.com/print/nc/bertie 404 — use PRC PDF
+- Utilities / AADT / emails / phones / paid vendors intentionally out of scope
+license: County public GIS / AGOL; public domain notice on shapefile download page;
+  attribution recommended
+verifiedAt: '2026-09-24'
+verifiedBy: North Carolina Public Info Researcher

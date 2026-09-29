@@ -1,0 +1,596 @@
+state: NC
+jurisdiction: Gaston County
+fips: "37071"
+level: county
+markets: [Charlotte]
+
+# PRIMARY — wire first for county-wide site search (CAMA + polygons)
+layers:
+  - role: parcels
+    name: PublicGIS Parcels (CAMA)
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/MapServer/11
+    alternateUrls:
+      - https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: CALCAC
+    coverage: county-wide
+    fieldMap:
+      AKPAR: parcelId
+      PIN: parcelId
+      PID: parcelId
+      CALCAC: acreage
+      DEEDAC: acreage
+      CURR_NAME1: ownerName
+      CURR_NAME2: ownerName
+      CURR_ADDR1: mailingAddress
+      CURR_ADDR2: mailingAddress
+      CURR_CITY: mailingAddress
+      CURR_STATE: mailingAddress
+      CURR_ZIPCODE: mailingAddress
+      WHOLE_ADDRESS: situsAddress
+      POSTAL: situsCity
+      ZIP: situsZip
+      SALEDATE: lastSale.date
+      SALESAMT: lastSale.price
+      FMV_LAND: tax.marketValue
+      FMV_IMPRV: tax.marketValue
+      FMV_TOTAL: tax.marketValue
+      TOTVAL: tax.taxableValue
+      property_use: dorCode
+      VacantImpro: other
+      DEEDQUAL_CODEDESC: lastSale.qualified
+    notes: >
+      Preferred county-wide parcel source. Live count 118045 (2026-09-23);
+      CALCAC BETWEEN 5 AND 150 → 6818; SALESAMT>0 in range → 2457.
+      SR NAD 1983 StatePlane NC Feet (wkid 102719 / latestWkid 2264).
+      MaxRecordCount 10000. No zoning on this layer — spatial-join PublicGIS/Zoning.
+      License: attribute Gaston County; NCGS 132-10 commercial resale limits.
+    status: usable
+
+  - role: parcels
+    name: Gastonia-hosted GastonCountyParcels mirror
+    restUrl: https://cogserver.gastonianc.gov/serverweb/rest/services/Parcels/GastonCountyParcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CALCAC
+    coverage: county-wide
+    fieldMap:
+      AKPAR: parcelId
+      PIN: parcelId
+      CALCAC: acreage
+      CURR_NAME1: ownerName
+      SALESAMT: lastSale.price
+      SALEDATE: lastSale.date
+      FMV_TOTAL: tax.marketValue
+      TOTVAL: tax.taxableValue
+    notes: >
+      City of Gastonia mirror of county CAMA parcels. Count 115066.
+      CRS wkid 103122 / latestWkid 6543 (NAD 1983 2011) — reproject before
+      overlaying county Zoning (2264). Prefer PublicGIS/Parcels/11.
+    status: partial
+
+  - role: parcels
+    name: NC OneMap Parcels (polys)
+    restUrl: https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    alternateUrls:
+      - https://services.gis.nc.gov/secure/rest/services/NC1Map_Parcels/FeatureServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: gisacres
+    coverage: county-wide
+    fieldMap:
+      parno: parcelId
+      ownname: ownerName
+      mailadd: mailingAddress
+      mcity: mailingAddress
+      mstate: mailingAddress
+      mzip: mailingAddress
+      siteadd: situsAddress
+      scity: situsCity
+      gisacres: acreage
+      saledate: lastSale.date
+      parval: tax.marketValue
+      landval: tax.marketValue
+      improvval: tax.marketValue
+      cntyfips: other
+    notes: >
+      Statewide fallback. Filter cntyfips='071' (count 117252; 5–150 ac ≈ 6819).
+      No sale price field. Join parno to county PIN carefully vs AKPAR.
+    status: usable
+
+  # --- Municipal / county zoning (city-first; spatial join to parcels) ---
+  - role: zoning
+    name: Gaston County UDO
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/1
+    layerId: 1
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+    notes: "Unincorporated county UDO. Count 2057. Overlays on layer 0 (38)."
+    status: usable
+
+  - role: zoning
+    name: Gastonia Zoning (county host)
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      ZONE_: zoning
+      MODIFIER: other
+    notes: "City of Gastonia on county Zoning MapServer (2264). Count 801."
+    status: usable
+
+  - role: zoning
+    name: Gastonia Zoning_UDO (city native)
+    restUrl: https://cogserver.gastonianc.gov/serverweb/rest/services/Planning/Zoning_UDO/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: city-only
+    fieldMap:
+      ZONING: zoning
+      ZONE_: zoning
+      MODIFIER: other
+    notes: "cogserver CRS 6543; count 801. Reproject to join county parcels."
+    status: usable
+
+  - role: zoning
+    name: Belmont Zoning
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 677. Overlays layer 3. Belmont defers to county GIS for parcel lookup."
+    status: usable
+
+  - role: zoning
+    name: Bessemer City Land Development Code
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 346. Overlays layer 4."
+    status: usable
+
+  - role: zoning
+    name: Cherryville Zoning
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/13
+    layerId: 13
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 519."
+    status: usable
+
+  - role: zoning
+    name: Cramerton Zoning
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/14
+    layerId: 14
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 225. Overlays layer 18."
+    status: usable
+
+  - role: zoning
+    name: Dallas Zoning
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/15
+    layerId: 15
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 257."
+    status: usable
+
+  - role: zoning
+    name: Kings Mountain Zoning (Gaston side)
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/19
+    layerId: 19
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 88. City also extends into Cleveland County."
+    status: usable
+
+  - role: zoning
+    name: Lowell Land Use Code
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 249. Title says Land Use Code — zoning polygons."
+    status: usable
+
+  - role: zoning
+    name: McAdenville UDO
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/10
+    layerId: 10
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 64."
+    status: usable
+
+  - role: zoning
+    name: Mount Holly Zoning (county host)
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/16
+    layerId: 16
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 461. Overlays layer 5. Cross-check city AGOL Zoning_Auth."
+    status: usable
+
+  - role: zoning
+    name: Mount Holly Zoning_Auth (city AGOL)
+    restUrl: https://services7.arcgis.com/R3hvotzf6HmfdzVd/arcgis/rest/services/Zoning_Auth/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Area_ac
+    coverage: city-only
+    fieldMap:
+      Zone_Abbv: zoning
+      Zone_Name: zoning
+    notes: >
+      City of Mount Holly AGOL (org R3hvotzf6HmfdzVd). Count 387. CRS 2264.
+      Hub: https://city-of-mount-holly-gis-mapping-comh.hub.arcgis.com/
+    status: usable
+
+  - role: zoning
+    name: Ranlo Zoning
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/20
+    layerId: 20
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 210."
+    status: usable
+
+  - role: zoning
+    name: Stanley Zoning
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/17
+    layerId: 17
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      TYPE: zoning
+      NAME: zoning
+      JURISDICTION: other
+      ETJ: other
+    notes: "Count 244."
+    status: usable
+
+  - role: other
+    name: Municipalities (city limits)
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Municipalities/MapServer/18
+    layerId: 18
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      NAME: other
+    notes: >
+      Jurisdiction polygons to choose zoning layer. Includes HIGH SHOALS,
+      SPENCER MTN, DELLVIEW which lack Zoning MapServer layers.
+    status: usable
+
+  - role: other
+    name: DevelopmentArea
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/DevelopmentArea/FeatureServer/4
+    layerId: 4
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      NAME: other
+      JURISDICTION: other
+      ACREAGE: acreage
+      TOTALMFUNITS: other
+    notes: "Approved/proposed developments (219). NOT future land use."
+    status: partial
+
+  - role: flu
+    name: Future Land Use (public REST)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      GAP — no public FLU FeatureServer found. Envision Gaston 2050 and city
+      comprehensive plans (e.g. Belmont) are PDF/policy only.
+    status: gap
+
+municipalities:
+  - name: Unincorporated Gaston
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/1
+    zoningField: TYPE
+    join: spatial to PublicGIS/Parcels/11 (CRS 2264)
+  - name: Gastonia
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/2
+    cityNativeZoningRestUrl: https://cogserver.gastonianc.gov/serverweb/rest/services/Planning/Zoning_UDO/MapServer/0
+    zoningField: ZONING
+    join: "county parcels 2264 ∩ Zoning/2; or reproject for cogserver 6543"
+  - name: Belmont
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/11
+    zoningField: TYPE
+    join: spatial to county parcels (city-only zoning / county parcels)
+  - name: Bessemer City
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/7
+    zoningField: TYPE
+    join: spatial to county parcels
+  - name: Cherryville
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/13
+    zoningField: TYPE
+    join: spatial to county parcels
+  - name: Cramerton
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/14
+    zoningField: TYPE
+    join: spatial to county parcels
+  - name: Dallas
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/15
+    zoningField: TYPE
+    join: spatial to county parcels
+  - name: Kings Mountain
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/19
+    zoningField: TYPE
+    join: spatial to county parcels (Gaston side only)
+  - name: Lowell
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/9
+    zoningField: TYPE
+    join: spatial to county parcels
+  - name: McAdenville
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/10
+    zoningField: TYPE
+    join: spatial to county parcels
+  - name: Mount Holly
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/16
+    cityNativeZoningRestUrl: https://services7.arcgis.com/R3hvotzf6HmfdzVd/arcgis/rest/services/Zoning_Auth/FeatureServer/0
+    zoningField: TYPE
+    cityNativeZoningField: Zone_Abbv
+    join: spatial to county parcels (2264)
+  - name: Ranlo
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/20
+    zoningField: TYPE
+    join: spatial to county parcels
+  - name: Stanley
+    zoningRestUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Zoning/MapServer/17
+    zoningField: TYPE
+    join: spatial to county parcels
+  - name: High Shoals
+    zoningRestUrl: null
+    status: gap
+    notes: Boundary only — no public zoning REST
+  - name: Spencer Mountain
+    zoningRestUrl: null
+    status: gap
+    notes: Boundary only — no public zoning REST
+  - name: Dellview
+    zoningRestUrl: null
+    status: gap
+    notes: Boundary only — no public zoning REST
+
+gaps:
+  - No public FLU FeatureServer (Envision Gaston 2050 / city comps are PDF)
+  - High Shoals / Spencer Mountain / Dellview lack Zoning MapServer layers
+  - No parcel-joined zoning attribute — must spatial join
+  - Sale price sparsity; OneMap has date only
+  - CRS split county 2264 vs Gastonia cogserver 6543
+  - Owner phones/emails not collected (public REST has none)
+
+license: "Gaston County GIS; attribution required; NCGS 132-10 commercial resale limits"
+appraiserSearchUrl: https://gastonnc.devnetwedge.com/parcel/view/{AKPAR}
+verifiedAt: 2026-09-23
+verifiedBy: GIS County Card Researcher
+verifiedLayerCount: 25
+
+# ---- PASS2 full-suite upgrade (rural OZ) — verifiedAt 2026-09-28 ----
+pass2:
+  label: PASS2 full-suite upgrade — rural OZ counties (tax / sale / owner-entity / PA link / GIS link / AADT)
+  verifiedAt: '2026-09-28'
+  verifiedBy: North Carolina Public Info Researcher
+  aadtScreening:
+    source: NCDOT Traffic Survey Group (public AGOL)
+    layer: NCDOT_AADT_Stations FeatureServer/0 (documented in enrichment/NC/ncdot-aadt-statewide-dig-2026-09-24.yaml)
+    restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0
+    countyField: COUNTY
+    countyValue: GASTON
+    valueField: AADT_2022
+    valueType: string (trim; blank = no count that year)
+    countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GASTON%27&returnCountOnly=true&f=json
+    featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/ArcGIS/rest/services/NCDOT_AADT_Stations/FeatureServer/0/query?where=COUNTY%3D%27GASTON%27&outFields=LocationID%2CROUTE%2CLOCATION%2CAADT_2021%2CAADT_2022&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+    liveStationCount: 905
+    stationsWithAADT2022: 873
+    newerYearAvailable:
+      available: true
+      layer: NCDOT_2025_AADTandTrafficSegments_gdb FeatureServer/1 (NCDOT_2025_AADT_Stations; dataLastEdit 2026-09-23)
+      restUrl: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1
+      countyField: County
+      countyValue: Gaston
+      valueField: AADT_2025
+      valueType: integer (null = no count)
+      countQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Gaston%27&returnCountOnly=true&f=json
+      featureQuery: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/1/query?where=County%3D%27Gaston%27&outFields=LocationID%2CRouteID%2CLocated_On%2CCrossroad%2CAADT_2023%2CAADT_2024%2CAADT_2025&outSR=4326&f=geojson&resultOffset=0&resultRecordCount=1000
+      liveStationCount: 900
+      stationsWithAADT2025: 114
+      stationsWithAADT2024: 824
+      segmentsLayer: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT_2025_AADTandTrafficSegments_gdb/FeatureServer/0 (AADT, AADT_Year=2025, AADTT truck volumes; polyline, statewide — spatial filter by county envelope)
+      also: https://services.arcgis.com/NuWFvHYDMVmmxMeM/arcgis/rest/services/NCDOT__2024_AADT_Stations_published_September_2025/FeatureServer/0 (2024 stations, published Sep 2025; County title-case; AADT_2023/AADT_2024 strings)
+    recommendation: Keep AADT_2022 wiring (#59) as-is; optionally switch to 2025 stations layer and take latest non-null of AADT_2025→AADT_2024→AADT_2023 per station. Note County value case differs (2022 layer UPPER, 2025 layer Title).
+  primaryParcelLayer:
+    restUrl: https://gis.gastoncountync.gov/publicgis/rest/services/PublicGIS/Parcels/MapServer/11
+    acreageField: CALCAC
+    range5to150Where: CALCAC>=5 AND CALCAC<=150
+    liveTotalParcels: 118056
+    liveParcels5to150: 6820
+  taxValues:
+    status: ok
+    fields:
+      FMV_LAND: tax.marketValue
+      FMV_IMPRV: tax.marketValue
+      FMV_TOTAL: tax.marketValue
+      TOTVAL: tax.taxableValue
+    liveNonZeroCounty:
+      FMV_LAND: 112727
+      FMV_IMPRV: 95717
+      FMV_TOTAL: 114236
+      TOTVAL: 111020
+    liveNonZero5to150:
+      TOTVAL: 5915
+    notes: Numeric Double fields; FMV_* = market, TOTVAL = taxable.
+    publicFallback: https://gastonnc.devnetwedge.com/parcel/view/{AKPAR}
+  saleHistory:
+    status: ok
+    priceFields:
+    - SALESAMT
+    dateFields:
+    - SALEDATE
+    livePriceGt0County:
+      SALESAMT: 69395
+    livePriceGt0_5to150:
+      SALESAMT: 2461
+    liveDateNonNullCounty:
+      SALEDATE: 113342
+    notes: SALEDATE esriDate (epoch ms); SALESAMT numeric; DEEDQUAL_CODEDESC = qualified flag. Last sale only.
+  ownerEntity:
+    ownerFields:
+    - CURR_NAME1
+    - CURR_NAME2
+    primaryOwnerField: CURR_NAME1
+    rule:
+      apply: Uppercase + trim CURR_NAME1 (optionally also CURR_NAME2)
+      regex: (?i)(\bL\.?\s?L\.?\s?C\b|\bINC\b|\bCORP|\bL\.?\s?P\b|\bLLP\b|\bLLLP\b|\bLTD\b|TRUST|CHURCH|MINISTR|\bCOMPANY\b|PARTNERSHIP|PRTNRSHP|HOLDINGS|PROPERTIES|INVESTMENT|ASSOCIATION|\bHOA\b|FOUNDATION|AUTHORITY|\bDEVELOPMENT|BOARD OF EDUCATION|^(CITY|COUNTY|STATE|TOWN|VILLAGE) OF\b|^UNITED STATES|^NORTH CAROLINA\b|\bCOUNTY$)
+      sqlLikeTokens:
+      - '% LLC%'
+      - '%,LLC%'
+      - '% L L C%'
+      - '% INC'
+      - '% INC %'
+      - '% INC.%'
+      - '%,INC%'
+      - '% CORP%'
+      - '%CORPORATION%'
+      - '% LP'
+      - '% LP %'
+      - '% L P'
+      - '% LLP%'
+      - '% LTD%'
+      - '%TRUST%'
+      - '%CHURCH%'
+      - '%MINISTR%'
+      - '% COMPANY%'
+      - '%PARTNERSHIP%'
+      - '%HOLDINGS%'
+      - '%PROPERTIES%'
+      - '%INVESTMENT%'
+      - '%ASSOCIATION%'
+      - '%FOUNDATION%'
+      - '%AUTHORITY%'
+      - CITY OF %
+      - COUNTY OF %
+      - STATE OF %
+      - TOWN OF %
+      - '% COUNTY'
+      - '%BOARD OF EDUCATION%'
+      - UNITED STATES%
+      - NORTH CAROLINA %
+      - '% DEVELOPMENT%'
+      caveats: TRUST/TRUSTEE also flags family/revocable living trusts (still non-individual title holders); "% COUNTY" suffix catches e.g. "PERSON COUNTY"; bare "CO" and "ESTATE" intentionally excluded (too many false positives). Some owner strings carry trailing spaces (Wake) or mixed case (Yadkin) — normalize first.
+    liveEntityCount5to150: 1869
+    liveOwnerNonNull5to150: 6820
+    entityQuery: where=CALCAC>=5 AND CALCAC<=150 AND (CURR_NAME1 LIKE '% LLC%' OR CURR_NAME1 LIKE '%,LLC%' OR CURR_NAME1 LIKE '% L L C%' OR CURR_NAME1 LIKE '% INC' OR CURR_NAME1 LIKE '% INC %' OR CURR_NAME1 LIKE '% INC.%' OR CURR_NAME1 LIKE '%,INC%' OR CURR_NAME1 LIKE '% CORP%' OR CURR_NAME1 LIKE '%CORPORATION%' OR CURR_NAME1 LIKE '% LP' OR CURR_NAME1 LIKE '% LP %' OR CURR_NAME1 LIKE '% L P' OR CURR_NAME1 LIKE '% LLP%' OR CURR_NAME1 LIKE '% LTD%' OR CURR_NAME1 LIKE '%TRUST%' OR CURR_NAME1 LIKE '%CHURCH%' OR CURR_NAME1 LIKE '%MINISTR%' OR CURR_NAME1 LIKE '% COMPANY%' OR CURR_NAME1 LIKE '%PARTNERSHIP%' OR CURR_NAME1 LIKE '%HOLDINGS%' OR CURR_NAME1 LIKE '%PROPERTIES%' OR CURR_NAME1 LIKE '%INVESTMENT%' OR CURR_NAME1 LIKE '%ASSOCIATION%' OR CURR_NAME1 LIKE '%FOUNDATION%' OR CURR_NAME1 LIKE '%AUTHORITY%' OR CURR_NAME1 LIKE 'CITY OF %' OR CURR_NAME1 LIKE 'COUNTY OF %' OR CURR_NAME1 LIKE 'STATE OF %' OR CURR_NAME1 LIKE 'TOWN OF %' OR CURR_NAME1 LIKE '% COUNTY' OR CURR_NAME1 LIKE '%BOARD OF EDUCATION%' OR CURR_NAME1 LIKE 'UNITED STATES%' OR CURR_NAME1 LIKE 'NORTH CAROLINA %' OR CURR_NAME1 LIKE '% DEVELOPMENT%')
+  paDeepLink:
+    template: https://gastonnc.devnetwedge.com/parcel/view/{AKPAR}
+    testedUrl: https://gastonnc.devnetwedge.com/parcel/view/100066
+    httpStatus: 200
+    notes: HTTP 200 → redirects to /parcel/view/100066/2027; parcel id present in server HTML.
+  jurisdictionGisViewer:
+    url: https://gis.gastoncountync.gov/Map/Index
+    httpStatus: 200
+    notes: Gaston County public GIS map
+  gaps:
+  - AADT_2022 blank at 32 of 905 stations on the 2022 layer (NCDOT counts on a cycle) — prefer 2025 layer / latest non-blank year
+  - No multi-transfer sale history on primary layer (last sale only)

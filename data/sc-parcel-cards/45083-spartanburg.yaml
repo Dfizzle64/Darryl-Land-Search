@@ -1,0 +1,403 @@
+state: SC
+jurisdiction: Spartanburg County
+fips: "45083"
+level: county
+markets: [Greenville, Spartanburg]
+
+layers:
+  - role: parcels
+    name: CAMA Parcels (FeatureServer)
+    restUrl: https://maps.spartanburgcounty.org/server/rest/services/GIS/CAMA_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      MAPNUMBER: parcelId
+      GISParcelNumber: parcelIdAlt
+      PARCELNUMBER: parcelNumber
+      AccountNumber: taxAccount
+      OwnerName: ownerName
+      TaxpayerName: taxpayerName
+      StreetAddress: mailingAddress
+      City: mailingAddress.city
+      State: mailingAddress.state
+      Zip: mailingAddress.zip
+      PropertyLocation: situsAddress
+      StreetNumber: situsAddress.number
+      StreetName: situsAddress.street
+      StreetCommunity: situsCity
+      StreetZip: situsZip
+      Acreage: acreage
+      DEEDACREAGE: acreageDeed
+      LandUse: dorCode
+      SaleDate: lastSale.date
+      SaleAmount: lastSale.price
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      InstrumentNumber: lastSale.instrument
+      CurrentAppraisedLandValue: tax.landValue
+      CurrentAppraisedBuildingValue: tax.improvementValue
+      CurrentAssessedLandValue: tax.assessedLand
+      CurrentAssessedBuildingValue: tax.assessedImprovement
+      CurrentTaxableLandValue: tax.taxableLand
+      CurrentTaxableBuildingValue: tax.taxableImprovement
+      TownCode: municipalityCode
+      District: tax.district
+      YearBuilt: yearBuilt
+    notes: 'Verified 2026-09-23: HTTP 200 pjson + count 182804, no token. Rich countywide CAMA polygons
+      — preferred Spartanburg MSA ingest source. TownCode ''Z'' ≈ City of Spartanburg (~16111). No zoning
+      attribute on CAMA — JOIN city Zoning_Layer_2026 (spatial) inside city; county EnerGov Zoning Districts
+      are only 3 coarse districts (see zoning role). OneMap viewer: https://maps.spartanburgcounty.org/portal/apps/webappviewer/index.html?id=8a88ed02adb845938c81f8c0c4214b9e
+      Open data: https://data-spartanburgcountysc.opendata.arcgis.com/ Assessor search: https://www.spartanburgcounty.gov/288/Assessor-Property-Records-Search
+
+      '
+    status: usable
+    liveness2: '2026-09-28 ~14:30 ET OK via external fetch (count 182816) - box egress IP is blocked by county, not an outage.'
+    liveness: '2026-09-28 FAILED from box (false negative): <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation
+      of protocol (_ssl.c:1029)> (curl retry also timed out). Status left as prior; fallback = SC RFA Statewide_Parcels
+      layer 18 where County=''Spartanburg County''.'
+
+  - role: tax
+    name: Assessment / appraised values on CAMA Parcels
+    restUrl: https://maps.spartanburgcounty.org/server/rest/services/GIS/CAMA_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    fieldMap:
+      MAPNUMBER: parcelId
+      CurrentAppraisedLandValue: tax.landValue
+      CurrentAppraisedBuildingValue: tax.improvementValue
+      CurrentAssessedLandValue: tax.assessedLand
+      CurrentAssessedBuildingValue: tax.assessedImprovement
+      CurrentTaxableLandValue: tax.taxableLand
+      CurrentTaxableBuildingValue: tax.taxableImprovement
+    notes: Tax values embedded on CAMA Parcels; not a separate service.
+    status: usable
+
+  - role: ownership
+    name: Ownership / mailing on CAMA Parcels
+    restUrl: https://maps.spartanburgcounty.org/server/rest/services/GIS/CAMA_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      MAPNUMBER: parcelId
+      OwnerName: ownerName
+      TaxpayerName: taxpayerName
+      StreetAddress: mailingAddress
+      City: mailingAddress.city
+      State: mailingAddress.state
+      Zip: mailingAddress.zip
+    notes: Ownership embedded on CAMA Parcels. StreetAddress/City/State/Zip are mailing.
+    status: usable
+
+  - role: sales
+    name: Last-sale on CAMA Parcels
+    restUrl: https://maps.spartanburgcounty.org/server/rest/services/GIS/CAMA_Parcels/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      MAPNUMBER: parcelId
+      SaleDate: lastSale.date
+      SaleAmount: lastSale.price
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      InstrumentNumber: lastSale.instrument
+    notes: >
+      Last-sale attributes on parcel feature. SaleAmount often null in samples — do not
+      invent. No separate multi-sale history FeatureServer verified this pass. Parcel_Archive
+      under Planning is geometry archive, not transactions.
+    status: partial
+
+  - role: zoning
+    name: County Zoning Districts (EnerGov Display_Map) — coarse only
+    restUrl: https://maps.spartanburgcounty.org/server/rest/services/EnerGov/Display_Map/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      District: zoning
+    notes: >
+      Verified 2026-09-23: public, count 3 only — GENERAL DEVELOPMENT / RESTRICTIVE
+      DEVELOPMENT / PARTIAL RESTRICTION. Spartanburg County historically has limited zoning;
+      this is NOT municipal district zoning. IZM_Districts MapServer PZO/ULMO also coarse
+      (counts 2 / 1). For City of Spartanburg use companion 45083-spartanburg-city.yaml
+      Zoning_Layer_2026. Other municipalities (Inman, Lyman, Cowpens, Pacolet, Reidville,
+      Landrum, Wellford, Campobello, Pacolet, Chesnee): no verified public zoning FeatureServer
+      this pass — parcel MapServers exist under GIS/*_Parcels (attributes only).
+    status: partial
+
+  - role: flu
+    name: Spartanburg County Future Land Use
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      No verified countywide Future Land Use FeatureServer this pass. Planning folder has
+      Development_Dashboard / IZM / Parcel_Archive / Schools — not FLU polygons.
+    status: gap
+
+  - role: zoning
+    name: City of Spartanburg zoning (see city companion)
+    restUrl: https://services9.arcgis.com/HoRra3ATPLGmyjn6/arcgis/rest/services/Zoning_Layer_2026/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      CityofSp_2: zoning
+      Zoning_J_1: zoning
+      Zoning_J_2: zoningDescription
+      Zoning_J_4: zoningOrdinanceUrl
+    notes: >
+      Verified count 16225. City-only — JOIN to county CAMA via spatial intersect or
+      MAPNUMBER/GISParcelNumber on city Parcel_Info_1_2026. Full detail on
+      45083-spartanburg-city.yaml. Field names are truncated shapefile aliases; CityofSp_2
+      and Zoning_J_1 hold district codes (e.g. R-15).
+    status: usable
+
+  - role: parcels
+    name: Municipal parcel extracts (Inman/Lyman/Cowpens/Pacolet/Reidville)
+    restUrl: https://maps.spartanburgcounty.org/server/rest/services/GIS/Lyman_Parcels/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: city-only
+    fieldMap:
+      MAPNUMBER: parcelId
+      OwnerName: ownerName
+      Acreage: acreage
+    notes: >
+      County hosts city-named parcel MapServers (Lyman verified count 4550; also
+      Cowpens_Parcels, Pacolet_Parcels, Reidville_Parcels, Inman_Parcels — Inman timed out
+      this pass). These are parcel extracts, NOT zoning. Prefer county CAMA/0 for CAMA;
+      use muni layers only if city-boundary clip needed. Zoning for these towns remains gap.
+    status: partial
+
+  # --- Municipalities inventory (first-class local REST when found) ---
+  - role: zoning
+    name: City of Inman Zoning Districts
+    restUrl: https://services1.arcgis.com/V7y6OwUBYsqBoMer/arcgis/rest/services/City_of_Inman_Interactive_Zoning_Map___5_25_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: city-only
+    fieldMap:
+      Zoning: zoning
+      MAPNUMBER: parcelId
+      TAXPIN: parcelIdAlt
+      OwnerName: ownerName
+      Acreage: acreage
+      TownCode: municipalityCode
+    notes: >
+      Verified 2026-09-23: public, count 1721. Districts CBD/GBD/GI/NBD/PDD/R-4/R-6/R-10/R-12/RG/RM.
+      PREFER over county EnerGov coarse zoning. JOIN KEY to county CAMA: MAPNUMBER (also TAXPIN).
+      Experience: https://experience.arcgis.com/experience/20c5d2c0c71c40cd857870e5dfd6cd4d
+      WARNING: same service Parcels layer 0 count 172931 is countywide wrong-geography — do not use.
+    status: usable
+
+  - role: zoning
+    name: City of Wellford Zoning-Jan_2025
+    restUrl: https://services3.arcgis.com/1ttwkTr24vz3npzH/arcgis/rest/services/WellfordZoning_Jan2026_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: DEEDACREAG
+    coverage: city-only
+    fieldMap:
+      Zoning_Cla: zoning
+      MAPNUMBER: parcelId
+      TAXPIN: parcelIdAlt
+      DEEDACREAG: acreage
+    notes: >
+      Verified 2026-09-23: public, count 1764. Parcel-grain zoning (Zoning_Cla e.g. I-2).
+      JOIN KEY to county CAMA: MAPNUMBER / TAXPIN. WARNING: Spartanburg_Parcels layer 1
+      count ~179k is countywide wrong-geography — do not use as city parcels.
+    status: usable
+
+  - role: zoning
+    name: Town of Lyman zoning districts (TOL_Zoning_Map layers 11–22)
+    restUrl: https://services7.arcgis.com/6RbHWnr6Sl6FYOC4/arcgis/rest/services/TOL_Zoning_Map_WFL1/FeatureServer/11
+    layerId: 11
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-23: public. Zoning published as SEPARATE named layers (no Zoning
+      attribute) — layer name IS the district: 11=R-15 (209), 12=R-8 (55), 13=RPH (54),
+      14=MHP (6), 15=R-8/10 (0), 16=RM (5), 17=RBD (4), 18=NBD (8), 19=CBD (11),
+      20=GBD1 (42), 21=GBD2 (3), 22=GI (17). Spatial join each to CAMA; assign zoning from
+      layer title. Companion LymanParcels layer 1 count 3320 (MAPNUMBER/TAXPIN) is city-scale;
+      Parcel layer 4 count 151306 is countywide wrong-geography. Also clips Duncan/Wellford
+      parcels (layers 7–8) without zoning attrs.
+    status: partial
+
+  - role: zoning
+    name: City of Greer UDO Zoning (Spa-side Greer)
+    restUrl: https://services1.arcgis.com/bskBH6JV42oEWJvZ/arcgis/rest/services/Greer_UDO_ZoningMap/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      Pro_Zoning: zoning
+    notes: >
+      Greer straddles Greenville/Spartanburg. Prefer this local UDO layer (count 1422) for
+      Spa-side Greer parcels. JOIN KEY: spatial intersect to CAMA MAPNUMBER. Full detail
+      companion 45045-greer-city.yaml. County Greer_City_and_FD MapServer is parcels/FD only
+      (no zoning field; TownCode L ≈ Greer).
+    status: usable
+
+  - role: zoning
+    name: Campobello / Cowpens / Chesnee / Duncan / Landrum / Pacolet / Central Pacolet / Reidville / Woodruff municipal zoning
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: city-only
+    fieldMap: {}
+    notes: >
+      Checked 2026-09-23: no verified SC municipal zoning FeatureServer for Campobello,
+      Cowpens, Chesnee, Duncan, Landrum, Pacolet, Central Pacolet, Reidville, or Woodruff.
+      REJECT: AGOL "Campobello Zoning" (services3…/Campobello_Zoning) is Campobello Island
+      NB, Canada (wrong-geography — Bylaw links to Campobello Island Rural Plan / GeoNB).
+      County hosts parcel MapServers for Cowpens/Pacolet/Reidville/Lyman (attributes only).
+      County EnerGov Zoning Districts (3 coarse) do NOT replace municipal districts.
+    status: gap
+
+
+gaps:
+  - "MUNICIPALITY INVENTORY checked: Spartanburg, Greer‡, Inman, Wellford, Lyman, Woodruff, Landrum, Cowpens, Duncan, Campobello, Pacolet, Central Pacolet, Chesnee, Reidville (‡ also Greenville Co.)."
+  - "LOCAL REST FOUND: City of Spartanburg (companion 45083-spartanburg-city.yaml), Greer UDO (45045-greer-city.yaml), Inman Zoning Districts, Wellford Zoning-Jan_2025, Lyman TOL district layers 11–22."
+  - "GAPS (no verified SC zoning FeatureServer): Campobello, Cowpens, Chesnee, Duncan, Landrum, Pacolet, Central Pacolet, Reidville, Woodruff."
+  - "REJECT wrong-geography: Campobello_Zoning AGOL = Campobello Island NB Canada; Inman/Wellford/Lyman services include countywide parcel layers — use only city zoning / city-clip parcel layers."
+  - "County CAMA has no zoning attribute — join local city REST or (weak) EnerGov 3-district layer."
+  - "County EnerGov Zoning Districts count=3 (GENERAL/RESTRICTIVE/PARTIAL DEVELOPMENT) — not municipal zoning."
+  - "No verified countywide Future Land Use FeatureServer."
+  - "JOIN KEYS: Inman/Wellford Zoning→CAMA via MAPNUMBER/TAXPIN; Spartanburg city Zoning_Layer_2026→spatial or Parcel_Info ZoningDist; Greer→spatial; Lyman→spatial by district layer."
+  - "SaleAmount often null; no multi-sale history table verified."
+  - "Do not scrape emails/phones; Assessor HTML is lookup-only."
+  - '2026-09-28 Pass 2: CAMA_Parcels is UP (external fetch count 182,816); the research box egress is blocked by the county (TLS EOF). SaleAmount>0 count = 0.'
+
+license: "Public Spartanburg County GIS REST (maps.spartanburgcounty.org) and City of Spartanburg AGOL (services9.arcgis.com/HoRra3ATPLGmyjn6). Attribute Spartanburg County GIS / City of Spartanburg. Confirm open-data license before bulk republish."
+appraiserSearchUrl: https://www.spartanburgcounty.gov/288/Assessor-Property-Records-Search
+publicGisUrl: https://maps.spartanburgcounty.org/portal/apps/webappviewer/index.html?id=8a88ed02adb845938c81f8c0c4214b9e
+jurisdictionGisUrl: https://data-spartanburgcountysc.opendata.arcgis.com/
+appraiserDeepLink: https://qpublic.schneidercorp.com/Application.aspx?App=SpartanburgCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  primaryRetry:
+    url: https://maps.spartanburgcounty.org/server/rest/services/GIS/CAMA_Parcels/FeatureServer/0
+    result: 'SERVER IS UP. 2026-09-28 ~14:30 ET via WebFetch (external network): count 182,816; MAPNUMBER 7-17-09-094.00
+      returned owner/mailing/values. From the research box every connection fails (TLS unexpected EOF on 443, timeout
+      on 80, 3 retries) - the county blocks the box egress IP / datacenter ranges, it is not an outage. The morning
+      "liveness-fail" was a false negative. Ingest workers need a non-blocked egress or fall back.'
+  fallbacks:
+  - url: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18
+    where: County='Spartanburg County'
+    count: 175337
+    note: 'RFA state layer: geometry + T_Map_Number + L_Value only for Spartanburg (no Ownership / M_Value populated).
+      ID format = county MAPNUMBER.'
+  - url: https://services3.arcgis.com/1ttwkTr24vz3npzH/arcgis/rest/services/WellfordZoning_Jan2026_WFL1/FeatureServer/1
+    count: 179103
+    dataLastEdit: '2026-09-02'
+    note: City of Wellford AGOL copy of countywide CAMA (third-party municipal host). Owner/mailing + SaleDate populated;
+      Current* values and SaleAmount zeroed.
+  tax:
+    status: usable
+    reason: 'County CAMA_Parcels has appraised/assessed/taxable land+building (verified 7-17-09-094.00: land 18,300
+      / bldg 135,600 / assessed 732+5,424). No total field - market = land+building.'
+    fieldMap:
+      CurrentAppraisedLandValue: tax.landValue
+      CurrentAppraisedBuildingValue: tax.improvementValue
+      CurrentAssessedLandValue: tax.assessedLand
+      CurrentAssessedBuildingValue: tax.assessedImprovement
+      CurrentTaxableLandValue: tax.taxableLand
+      CurrentTaxableBuildingValue: tax.taxableImprovement
+    caveat: Box egress blocked; RFA fallback = L_Value only.
+  sale:
+    status: partial
+    reason: SaleDate + DeedBook/DeedPage/InstrumentNumber published; SaleAmount>0 count = 0 countywide (price never
+      published).
+    fieldMap:
+      SaleDate: lastSale.date
+      SaleAmount: lastSale.price (always null/0)
+      DeedBook: lastSale.deedBook
+      DeedPage: lastSale.deedPage
+      InstrumentNumber: lastSale.instrument
+    format: SaleDate esri Date epoch ms (1642118400000 = 2022-01-14). Deed book alphanumeric (135K). Instrument
+      e.g. DEE-2022-2340.
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      OwnerName: ownerName
+      TaxpayerName: taxpayerName
+      StreetAddress: mailingAddress.street
+      City: mailingAddress.city
+      State: mailingAddress.state
+      Zip: mailingAddress.zip
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?App=SpartanburgCountySC&Layer=Parcels&PageType=Report&KeyValue={parcelId}
+    testedParcelId: 7-17-09-094.00
+    idTransform: KeyValue = MAPNUMBER as-is (d-dd-dd-ddd.dd); RFA T_Map_Number identical.
+    reason: County Assessor page links qPublic App=SpartanburgCountySC. Report deep link uses Schneider named-app
+      pattern; Cloudflare 403 challenge from box, so not machine-confirmed.
+  publicGis:
+    status: usable
+    url: https://maps.spartanburgcounty.org/portal/apps/webappviewer/index.html?id=8a88ed02adb845938c81f8c0c4214b9e
+    alt: https://data-spartanburgcountysc.opendata.arcgis.com/
+    reason: OneMap viewer on maps.spartanburgcounty.org (host up externally; blocked only from box). Open Data hub
+      200.
+  aadt:
+    status: usable
+    reason: enrichment.aadt already present (SCDOT 2025 Statewide Traffic Points); confirmed, not re-dug.
+  gaps:
+  - maps.spartanburgcounty.org blocks the research box egress IP (TLS EOF) - external fetch works. Morning liveness-fail
+    was a false negative.
+  - Sale price never published (SaleAmount>0 = 0).
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "South Carolina Public Info Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points)"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "South Carolina Public Info Researcher"
+    notes: "SCDOT-published 2025 statewide points (~11570); FactoredAA=factored AADT; FactoredA1 companion; filter CountyName (stored UPPERCASE; AGOL queries case-insensitive). smpesri.scdot.org EGIS has roads but no AADT layer. Sibling 2025_Statewide_Traffic_Lines also exists (~11575) — points are the stamped source."

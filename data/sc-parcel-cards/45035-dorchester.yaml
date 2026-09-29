@@ -1,0 +1,223 @@
+state: SC
+jurisdiction: Dorchester County
+fips: "45035"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: Parcel_PUBLIC (Parcels_Public FeatureServer)
+    restUrl: https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACREAGE
+    coverage: county-wide
+    fieldMap:
+      TMS13: parcelId
+      FULL_TMS: parcelIdAlt
+      FULL_PARCELNO: parcelIdFull
+      ACCOUNTNO: taxAccount
+      OWNER: ownerName
+      CARE_OF: ownerCareOf
+      MAILING_ADDRESS: mailingAddress
+      CITY_STATE_ZIP: mailingAddress.cityStateZip
+      PROPERTY_LOCATION: situsAddress
+      GIS_ACREAGE: acreage
+      TAXED_ACRES: acreageTaxed
+      SALE_PRICE: lastSale.price
+      SALE_DATE: lastSale.date
+      RECORDING_DATE: lastSale.recordedDate
+      GRANTOR: lastSale.grantor
+      GRANTEE: lastSale.grantee
+      DEED: lastSale.deed
+      ZONINGCODE: zoning
+      JURISDICTION: jurisdiction
+      TAX_DISTRICT: tax.district
+    notes: 'Verified 2026-09-23: HTTP 200 FeatureServer pjson + layer pjson + count query returned 80111
+      features, no token. Best MSA-ready public parcel layer found — geometry + owner + situs + acreage
+      + last sale + zoning code on one FeatureServer. No market/assessed value fields on this public layer
+      (only TAXED_ACRES / TAX_DISTRICT). MaxRecordCount reported as 90000.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=80296; 1-feature outSR=4326 sample TMS13=''0030000037000''
+      vertex (-80.573,33.295) inside Dorchester County SC bbox; parcel ID field TMS13 present.'
+    count: 80296
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcel_PUBLIC assessment values
+    restUrl: https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: TAXED_ACRES
+    coverage: county-wide
+    fieldMap:
+      TMS13: parcelId
+      TAXED_ACRES: acreageTaxed
+      TAX_DISTRICT: tax.district
+    notes: >
+      Same public parcel layer — no LAND/IMP/APPRAISAL/market/assessed value attributes
+      exposed in pjson field list (confirmed no *VAL* / *APPR* / *ASSESS* fields).
+      Values require county CAMA web inquiry, not this REST layer.
+    status: gap
+
+  - role: ownership
+    name: Parcel_PUBLIC ownership fields
+    restUrl: https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS13: parcelId
+      OWNER: ownerName
+      CARE_OF: ownerCareOf
+      MAILING_ADDRESS: mailingAddress
+      CITY_STATE_ZIP: mailingAddress.cityStateZip
+    notes: Ownership is embedded on Parcels_Public; not a separate ownership service.
+    status: usable
+
+  - role: sales
+    name: Parcel_PUBLIC last sale fields
+    restUrl: https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Parcels_Public/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      TMS13: parcelId
+      SALE_PRICE: lastSale.price
+      SALE_DATE: lastSale.date
+      RECORDING_DATE: lastSale.recordedDate
+      GRANTOR: lastSale.grantor
+      GRANTEE: lastSale.grantee
+      DEED: lastSale.deed
+    notes: Last-sale attributes embedded on parcels; no separate multi-sale history FeatureServer verified.
+    status: partial
+
+  - role: zoning
+    name: Zoning Dorchester County (Zoning_PUBLIC)
+    restUrl: https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/Zoning_PUBLIC/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONECLASS: zoning
+      ZONEDESC: zoningDescription
+      MUNICIPALITY: municipality
+    notes: >
+      Verified 2026-09-23: public MapServer layer, count 1300. FeatureServer extension
+      for this service returns 500 (SOE not found) — query via MapServer.
+      Parcel layer also carries ZONINGCODE attribute for join-free filtering.
+    status: usable
+
+  - role: parcels
+    name: COUNTY LANDS FILTERD (County_Lands_Pub)
+    restUrl: https://gisportal.dorchestercounty.net/hosting/rest/services/General_Data/County_Lands_Pub/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: GIS_ACREAGE
+    coverage: sample
+    fieldMap:
+      TMS13: parcelId
+      OWNER: ownerName
+      PROPERTY_LOCATION: situsAddress
+      GIS_ACREAGE: acreage
+      SALE_PRICE: lastSale.price
+      SALE_DATE: lastSale.date
+      ZONINGCODE: zoning
+    notes: >
+      Verified 2026-09-23: public FeatureServer; same schema family as Parcels_Public but
+      filtered to county lands — not county-wide inventory. Prefer Parcels_Public for search.
+    status: partial
+
+gaps:
+  - "Town of Summerville zoning/parcels: companion 45035-summerville.yaml (Zoning_View_Layer/4 Zone_Class; count 20205; filter County=DORCHESTER ~17203 for Dorchester market; also spills to Charleston/Berkeley)."
+  - "No public assessed/market value fields on Parcels_Public REST (tax values only via county CAMA web inquiry)."
+  - "Zoning_PUBLIC FeatureServer SOE missing; use MapServer/0 for queries."
+  - "Sale history is last-sale only on the parcel feature, not a multi-transaction table."
+  - "County website maps-gis page returned HTTP 403 to this research box; REST hosting root remained public."
+
+license: "Public Dorchester County GIS / Assessor CAMA attributes via gisportal.dorchestercounty.net. Attribute Dorchester County GIS and Assessor. Confirm portal license before bulk republish."
+appraiserSearchUrl: https://www.dorchestercountysc.gov/government/property-tax-services/assessor/real-estate-mobile-home-search/cama-property-lookup
+publicGisUrl: https://www.arcgis.com/apps/webappviewer/index.html?id=c5b2bd07c3b84ce98d09c6611377e89c
+jurisdictionGisUrl: https://www.arcgis.com/apps/webappviewer/index.html?id=c5b2bd07c3b84ce98d09c6611377e89c
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: gap
+    reason: No appraised/assessed/market value field on Parcels_Public/0 (only TAX_DISTRICT, TAXED_ACRES); RFA layer
+      18 has no M_Value for Dorchester (0 of 76,932). Values only in county CAMA lookup (human).
+    fieldMap:
+      TAX_DISTRICT: tax.district
+      TAXED_ACRES: acreageTaxed
+  sale:
+    status: usable
+    reason: Last-sale price, sale date, recording date, grantor, grantee, deed on Parcels_Public/0.
+    fieldMap:
+      SALE_PRICE: lastSale.price
+      SALE_DATE: lastSale.date
+      RECORDING_DATE: lastSale.recordedDate
+      GRANTOR: lastSale.grantor
+      GRANTEE: lastSale.grantee
+      DEED: lastSale.deedBookPage
+    format: SALE_DATE / RECORDING_DATE esri Date epoch ms (1693198800000 = 2023-08-28 ET); SALE_PRICE Double; DEED
+      "014917-158" = book-page. No qualified flag.
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      OWNER: ownerName
+      CARE_OF: ownerCareOf
+      MAILING_ADDRESS: mailingAddress.street
+      CITY_STATE_ZIP: mailingAddress.cityStateZip (single string, split "HARLEYVILLE SC 29448")
+  paLink:
+    status: partial
+    pattern: null
+    searchUrl: https://www.dorchestercountysc.gov/government/property-tax-services/assessor/real-estate-mobile-home-search/cama-property-lookup
+    testedParcelId: 0080000018000 (TMS13)
+    idTransform: County lookup wants TMS13 (13 digits, no dashes/decimal) = TMS13/PARCELNO field; FULL_TMS 008-00-00-018.000
+      -> strip "-" and ".".
+    reason: CAMA Parcel Lookup is an in-page Angular app on dorchestercountysc.gov with no documented {parcelId}
+      URL parameter; county site returns Akamai "Access Denied" to the box. Search-page link only.
+  publicGis:
+    status: usable
+    url: https://www.arcgis.com/apps/webappviewer/index.html?id=c5b2bd07c3b84ce98d09c6611377e89c
+    reason: '"Dorchester County GIS Viewer" public AGOL WAB app (owner Dorchester_GIS, modified 2026-09).'
+  aadt:
+    status: usable
+    reason: enrichment.aadt already present; confirmed, not re-dug.
+  gaps:
+  - No value (market/assessed) fields in any public Dorchester REST or RFA layer.
+  - No PA deep link with parcel id.
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points)"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "SCDOT-published 2025 statewide points (~11570); FactoredAA=factored AADT; FactoredA1 companion; filter CountyName. smpesri.scdot.org EGIS has roads but no AADT layer."

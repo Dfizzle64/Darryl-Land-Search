@@ -1,0 +1,173 @@
+state: SC
+jurisdiction: Jasper County
+fips: "45053"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: Parcel Cama (DataSharing)
+    restUrl: https://gis.jaspercountysc.gov/server/rest/services/DataSharing/Parcel_Cama_HDV/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CAMA_Table_Tot_Number_Acres
+    coverage: county-wide
+    fieldMap:
+      DBO_Parcels_TaxPIN: parcelId
+      CAMA_Table_Map_Number: parcelIdAlt
+      CAMA_Table_Name: ownerName
+      CAMA_Table_Name_2: ownerName2
+      CAMA_Table_Address_1: mailingAddress.street
+      CAMA_Table_Address_2: mailingAddress.cityState
+      CAMA_Table_Zip_Code: mailingAddress.zip
+      CAMA_Table_Street_Number_E911: situsAddress.number
+      CAMA_Table_Street_Name_E911: situsAddress.street
+      CAMA_Table_Zip_Code_E911: situsAddress.zip
+      CAMA_Table_Tot_Number_Acres: acreage
+      DBO_Parcels_GISAC: acreageGis
+      DBO_Parcels_DeedAc: acreageDeed
+      CAMA_Table_Tot_Assesd_Value: tax.assessedValue
+      CAMA_Table_Consideration_: lastSale.price
+      CAMA_Table_Instrmnt_Dt_YYYYMMDD: lastSale.date
+      CAMA_Table_Deed_Book: lastSale.deedBook
+      CAMA_Table_Deed_Page: lastSale.deedPage
+      DBO_Parcels_Zoning: zoning
+      CAMA_Table_District: tax.district
+      CAMA_Table_Use_Class: dorCode
+    notes: 'Verified 2026-09-24: official Jasper County GIS public FeatureServer, no token; count 28,929.
+      Polygon full extent and samples geo-verify in Jasper County, SC (service extent approximately -81.23
+      to -80.80 longitude and 32.00 to 32.60 latitude; envelope queries returned 9,445 parcels around Ridgeland
+      and 4,886 in western Jasper). Sample query returned WGS84 geometry. Instrument date is YYYYMMDD. CAMA_Table_Tot_Number_Acres
+      is the reported tax/CAMA acreage; DBO_Parcels_GISAC is GIS-calculated acreage. Rejected JascoGIS AGOL
+      Parcels (Jasper County, Missouri) and SCDOT SC_Parcels (token required). Hardeeville-only extracts
+      are not countywide and are not used as primary.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=28929; 1-feature outSR=4326 sample DBO_Parcels_TaxPIN=''075-00
+      -00-001'' vertex (-80.923,32.053) inside Jasper County SC bbox; parcel ID field DBO_Parcels_TaxPIN
+      present.'
+    count: 28929
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcel Cama — tax / sale
+    restUrl: https://gis.jaspercountysc.gov/server/rest/services/DataSharing/Parcel_Cama_HDV/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CAMA_Table_Tot_Number_Acres
+    coverage: county-wide
+    fieldMap:
+      DBO_Parcels_TaxPIN: parcelId
+      CAMA_Table_Name: ownerName
+      CAMA_Table_Tot_Assesd_Value: tax.assessedValue
+      CAMA_Table_Consideration_: lastSale.price
+      CAMA_Table_Instrmnt_Dt_YYYYMMDD: lastSale.date
+      CAMA_Table_Deed_Book: lastSale.deedBook
+      CAMA_Table_Deed_Page: lastSale.deedPage
+    notes: Same public layer; sale consideration may be zero/null and must be treated as unqualified unless separately validated.
+    status: usable
+
+  - role: zoning
+    name: Zoning_Tiles
+    restUrl: https://gis.jaspercountysc.gov/server/rest/services/Zoning_Tiles/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      Zoning: zoning
+      TaxPIN: parcelId
+    notes: Public zoning FeatureServer enumerated from the official Jasper GIS REST root; use parcel-layer DBO_Parcels_Zoning when joining by parcel ID where available.
+    status: usable
+
+gaps:
+  - "No verified market-value field in the public Parcel Cama layer; assessed value is available."
+  - "qPublic https://qpublic.net/sc/jasper/ is public, but a KeyValue deep-link pattern was not confirmed."
+  - "Rejected wrong-geography: JascoGIS services6.../Parcels is Jasper County, Missouri."
+  - "Hardeeville AGOL parcel extracts are city-subset only, not countywide."
+
+license: "Jasper County GIS public services (gis.jaspercountysc.gov); attribution required."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=921&LayerID=17896&PageTypeID=4&PageID=7982&KeyValue={parcelId}
+publicGisUrl: https://jaspercounty.maps.arcgis.com/apps/webappviewer/index.html?id=ebd2e0b533604e99b171c0f2a3ea4305
+jurisdictionGisUrl: https://www.jaspercountysc.gov/services/maps-and-gis/
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: usable
+    reason: 'Assessed total + market components (acres/lots/bldgs) + taxable-cap appraisal on county CAMA-joined layer
+      (28,929). No single market-total field: sum components.'
+    source: https://gis.jaspercountysc.gov/server/rest/services/DataSharing/Parcel_Cama_HDV/FeatureServer/0
+    fieldMap:
+      CAMA_Table_Tot_Assesd_Value: tax.assessedValue
+      Tot_Market_Acres+Tot_Market_Lots+Tot_Market_Bldgs: tax.marketValue (sum of CAMA_Table_ components; e.g. 072-00-02-051
+        = 46000+5067500+1169900)
+      CAMA_Table_Tot_Tax_Cap_Appr: tax.taxableValue (cap-adjusted appraisal)
+      CAMA_Table_Tot_Agri_Use_Value: tax.agUseValue
+      CAMA_Table_District: tax.district
+      CAMA_Table_Class_1: dorCode (SC class code)
+  sale:
+    status: usable
+    reason: Instrument date, consideration, deed ref, true-sale code, previous owner on layer (28,070 with valid date).
+    source: https://gis.jaspercountysc.gov/server/rest/services/DataSharing/Parcel_Cama_HDV/FeatureServer/0
+    fieldMap:
+      CAMA_Table_Instrmnt_Dt_YYYYMMDD: lastSale.date
+      CAMA_Table_Consideration_: lastSale.price
+      CAMA_Table_True_Sale_Code: lastSale.qualified (code; 9 seen on arms-length-looking sales - dictionary not published)
+      CAMA_Table_Deed_Book: lastSale.deedBook
+      CAMA_Table_Deed_Page: lastSale.deedPage
+      CAMA_Table_Prev_Owner: lastSale.seller
+    format: Instrmnt_Dt Integer YYYYMMDD (0 = none); Consideration_ Integer dollars (0 = none).
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: CAMA owner + mailing on layer.
+    source: https://gis.jaspercountysc.gov/server/rest/services/DataSharing/Parcel_Cama_HDV/FeatureServer/0
+    fieldMap:
+      CAMA_Table_Name: ownerName
+      CAMA_Table_Name_2: ownerName2
+      CAMA_Table_Address_1: mailingAddress.street
+      CAMA_Table_Address_2: mailingAddress.cityState
+      CAMA_Table_Zip_Code: mailingAddress.zip (Integer)
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=921&LayerID=17896&PageTypeID=4&PageID=7982&KeyValue={parcelId}
+    testedParcelId: 077-00-00-003
+    idTransform: DBO_Parcels_TaxPIN / CAMA_Table_Map_Number contain an embedded space ("077-00 -00-003", 28,154 rows)
+      - remove spaces before use as KeyValue (expected "077-00-00-003"). Not confirmed against a live report.
+    reason: AppID=921/LayerID=17896 and search PageID=7980 from qpublic.net/sc/jasper/search.html; report PageID=7982
+      INFERRED (+2 convention verified Aiken/Darlington). Cloudflare 403 blocks direct test; no indexed report found.
+      Card previously had only qpublic.net landing page.
+  publicGis:
+    status: usable
+    reason: Previous publicGisUrl was the "Jasper County, SC Visitors Center" experience (tourism, not parcels) -
+      replaced with county "Jasper County GIS Map" web app (owner pkrupp_jaspercounty, public; webmap includes County_Parcels,
+      zoning, address points). jurisdictionGisUrl county Maps & GIS page kept.
+  gaps:
+  - No single market-total field (sum components).
+  - qPublic report PageID inferred; KeyValue space-stripping unverified.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

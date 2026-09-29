@@ -1,0 +1,32 @@
+{
+  "name": "Florence",
+  "fips": "45041",
+  "state": "South Carolina",
+  "markets": [
+    "Charleston"
+  ],
+  "featureCount": 10091,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-florence-parcels-45041",
+  "queryUrl": "https://services1.arcgis.com/40L6yX6OtdCifNez/arcgis/rest/services/County_Tax_Parcel/FeatureServer/0/query",
+  "gaps": [
+    "Source query returned 10107 rows; 10091 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are County Tax Parcel (REPL_Parcels_Owners) (https://services1.arcgis.com/40L6yX6OtdCifNez/arcgis/rest/services/County_Tax_Parcel/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "No countywide zoning FeatureServer verified on dig day (Olanta downtown + gateway studies only; City of Florence Zoning MapServer is localhost.flocity.local — not public).",
+    "Assessor CGI deep links are HTTP; pattern uses map/block/parcel from TMS parts.",
+    "Sale multi-history via PROPERTYHISTORY CGI, not attributes on GIS layer."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45041/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45041/lookup.json",
+  "sourceCount": 10107,
+  "dropped": 12,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "http://web.florenceco.org/cgi-bin/ta/tax-pr.cgi?step=2&map={map}&block={block}&parcel={parcel}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/310ee59e368946cfb111ca6ffc928dbe"
+}

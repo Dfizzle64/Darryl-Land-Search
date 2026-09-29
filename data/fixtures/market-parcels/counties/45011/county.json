@@ -1,0 +1,33 @@
+{
+  "name": "Barnwell",
+  "fips": "45011",
+  "state": "South Carolina",
+  "markets": [
+    "Charleston"
+  ],
+  "featureCount": 4150,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-barnwell-parcels-45011",
+  "queryUrl": "https://services8.arcgis.com/qqnlHdXochyJPfSY/arcgis/rest/services/ParcelData_ExportFeatures/FeatureServer/2/query",
+  "gaps": [
+    "Source query returned 4435 rows; 4150 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Barnwell County ParcelData_ExportFeatures (parcels joined to CAMA, county AGOL BarnwellCountySC) (https://services8.arcgis.com/qqnlHdXochyJPfSY/arcgis/rest/services/ParcelData_ExportFeatures/FeatureServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "tax usable: County-published CAMA join on parcel polygons (Barnwell County AGOL, edited 2026-09). No single total-market field — sum components.",
+    "sale usable: Format: integer YYYYMMDD — parse with strptime(str(v),\"%Y%m%d\"); filter Consideration__>100 for arm-length prices.",
+    "owner usable: Owner + mailing address public on county layer.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "SCDOT statewide SC_Parcels requires token — not usable as primary."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45011/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45011/lookup.json",
+  "sourceCount": 4435,
+  "dropped": 45,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=898&LayerID=16996&PageTypeID=4&PageID=7646&KeyValue={parcelId}",
+  "gisViewerUrl": "https://barnwellcountysc.maps.arcgis.com/apps/instant/sidebar/index.html?appid=41016e97f0ba46e09561a0420dc45fb0"
+}

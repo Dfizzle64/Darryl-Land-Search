@@ -1,0 +1,228 @@
+state: SC
+jurisdiction: Pickens County
+fips: "45077"
+level: county
+markets: [Greenville]
+
+layers:
+  - role: parcels
+    name: Parcels (Pickens_Open_data — county AGOL GISpickens)
+    restUrl: https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      ACCTNO: taxAccount
+      NAME1: ownerName
+      NAME2: ownerName2
+      ADD1: mailingAddress
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP: mailingAddress.zip
+      LOCADD: situsAddress
+      LOCCITY: situsCity
+      LOCZIP: situsZip
+      ACRES: acreage
+      CalcAcres: acreageGis
+      SALEP: lastSale.price
+      SALEDT: lastSale.date
+      TAXAREA: tax.district
+      ZONINGCODE: zoning
+      ZONINGDESC: zoningDescription
+      IMPVAC: improvedVacant
+      SubDivisio: subdivision
+      BLDGS: buildingCount
+      TAXYEAR: tax.year
+    notes: >
+      Verified 2026-09-24: public county open-data FeatureServer, count 66417, no token.
+      Geo-verified WGS84 centroids in Pickens Co (e.g. Central ~34.77 N, −82.88 W; extent
+      ~−82.93..−82.48, 34.61..35.09). Official org GISpickens
+      (services1.arcgis.com/59960rq18IxUcAVI). CAMA-like: owner, mailing, situs, acres,
+      last sale (~31k with SALEP>1000), tax district, parcel-grain ZONINGCODE/ZONINGDESC
+      where populated (~23k non-blank — mostly municipal districts; unincorporated often
+      blank under UDSO General Development District). Prefer this over Easley-hosted
+      copies. Open data hub https://pcgis-pickenscosc.opendata.arcgis.com/ is misconfigured
+      (unrelated Hub datasets) — use FeatureServer URL above, not Hub search. qPublic
+      AppID=927 for PA deep-link. Viewer layers also on ArcReaderData/Energov_AGOL.
+    status: usable
+
+  - role: tax
+    name: Tax district on Pickens_Open_data Parcels (no market value on open layer)
+    restUrl: https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      TAXAREA: tax.district
+      TAXYEAR: tax.year
+    notes: >
+      Open-data parcels lack market/assessed value fields. ArcReaderData/2 exposes
+      ACTUALVAL as string but samples are '0' (stripped). Use qPublic AppID=927 for values.
+    status: partial
+
+  - role: ownership
+    name: Ownership / mailing on Pickens_Open_data Parcels/6
+    restUrl: https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      NAME1: ownerName
+      NAME2: ownerName2
+      ADD1: mailingAddress
+      CITY: mailingAddress.city
+      STATE: mailingAddress.state
+      ZIP: mailingAddress.zip
+    notes: Ownership embedded. ADD1/CITY/STATE/ZIP are mailing (off-city mail samples e.g. Leicester NC / Seneca SC).
+    status: usable
+
+  - role: sales
+    name: Last-sale on Pickens_Open_data Parcels/6
+    restUrl: https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      SALEP: lastSale.price
+      SALEDT: lastSale.date
+    notes: >
+      Last-sale on parcel (~31010 with SALEP>1000). ArcReaderData/2 and Energov_AGOL/7
+      zero out SALEP/ACTUALVAL on public view — do not use those for sales. No separate
+      multi-sale history FeatureServer verified. Status partial for history table.
+    status: partial
+
+  - role: zoning
+    name: Zoning attributes on Pickens_Open_data Parcels (parcel-grain)
+    restUrl: https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/Pickens_Open_data/FeatureServer/6
+    layerId: 6
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: partial
+    fieldMap:
+      PIN: parcelId
+      ZONINGCODE: zoning
+      ZONINGDESC: zoningDescription
+    notes: >
+      ~22774 parcels with non-blank ZONINGCODE (municipal-style codes: R 20, RM3, CP1/CP2,
+      GC, etc.). Unincorporated UDSO territory often blank — county regulates via Unified
+      Development Standards Ordinance (General Development District) without a separate
+      countywide zoning polygon REST verified this pass. Prefer City of Easley zoning REST
+      inside Easley (companion 45077-easley.yaml). proposed_overlay_dist exists on county
+      AGOL (overlay proposals, not base zoning).
+    status: partial
+
+  - role: zoning
+    name: City of Easley Zoning (prefer city REST — see companion)
+    restUrl: https://services7.arcgis.com/xWLt4FVDOKzkUzCP/ArcGIS/rest/services/EasleyZoningMap_2022/FeatureServer/8
+    layerId: 8
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE: zoning
+    notes: >
+      Verified count 229 district polygons; geo Easley (~34.83 N, −82.60 W). PREFER over
+      county parcel ZONINGCODE when parcel is inside Easley. Full detail + FLU:
+      45077-easley.yaml. Alt parcel-grain CityofEasley_Zoning/FeatureServer/2 (count 11531,
+      ZONE+PIN).
+    status: usable
+
+  - role: flu
+    name: County Future Land Use
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: unknown
+    fieldMap: {}
+    notes: >
+      No countywide FLU FeatureServer verified. City of Easley FLU:
+      Future_Land_Use/FeatureServer/39 (companion card).
+    status: gap
+
+  - role: parcels
+    name: ArcReaderData / Energov_AGOL Parcels (alt — sales/values stripped)
+    restUrl: https://services1.arcgis.com/59960rq18IxUcAVI/arcgis/rest/services/ArcReaderData/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      NAME1: ownerName
+      ACRES: acreage
+      ZONINGCODE: zoning
+      ACTUALVAL: tax.marketValue
+    notes: >
+      Same org, count 66792. Schema includes ZONINGCODE + ACTUALVAL but public query
+      samples show SALEP=0 and ACTUALVAL='0'. Prefer Pickens_Open_data/6 for sales.
+      Energov_AGOL/FeatureServer/7 identical count/schema family.
+    status: partial
+
+  - role: parcels
+    name: EasleyZoningMap_2022 /7 "Pickens County Parcels" — REJECT as countywide
+    restUrl: https://services7.arcgis.com/xWLt4FVDOKzkUzCP/ArcGIS/rest/services/EasleyZoningMap_2022/FeatureServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: ACRES
+    coverage: sample
+    fieldMap:
+      PIN: parcelId
+      NAME1: ownerName
+      ACRES: acreage
+      SALEP: lastSale.price
+    notes: >
+      Seed lead. Count only 16349 vs county ~66k — city zoning-map context subset despite
+      county-scale envelope. Owner is City of Easley AGOL (xWLt4FVDOKzkUzCP), not
+      GISpickens. Status wrong-geography for countywide ingest. SupportingLayers/3 on same
+      org (count 64628) is a fuller Easley-hosted copy — prefer official Pickens_Open_data/6.
+    status: wrong-geography
+
+gaps:
+  - "MUNICIPALITY INVENTORY: Easley (city zoning+FLU REST — companion 45077-easley.yaml), Clemson, Liberty, Pickens, Central, Norris, Six Mile. Clemson/Liberty/Pickens/Central — no separate city zoning FeatureServer verified 2026-09-24; use parcel ZONINGCODE where populated or UDSO rules."
+  - "County UDSO applies to unincorporated land; no dissolved countywide zoning polygon layer found — parcel ZONINGCODE partial."
+  - "Market/assessed values not reliable on public open-data/ArcReader layers — use qPublic AppID=927."
+  - "pcgis-pickenscosc.opendata.arcgis.com Hub search returns unrelated datasets — use GISpickens FeatureServer URLs directly."
+  - "EasleyZoningMap/7 is a ~16k subset — wrong-geography for county ingest."
+  - "AssessorAssessmentPCCAMA* layers are disaster/field points (~500), not county CAMA."
+  - "Do not scrape emails/phones; qPublic HTML is lookup-only."
+
+license: "Public Pickens County GIS / open data (GISpickens AGOL). Attribute Pickens County GIS. Confirm data-dissemination policy (pcgis@pickenscountysc.gov) before bulk republish."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=927&LayerID=18058&PageTypeID=2&PageID=8075
+verifiedAt: 2026-09-24
+verifiedBy: South Carolina Public Info Researcher
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "South Carolina Public Info Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "South Carolina Public Info Researcher"
+    notes: "Statewide SCDOT points; filter CountyName. Skip per full-suite pattern."

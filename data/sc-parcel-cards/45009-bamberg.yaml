@@ -1,0 +1,140 @@
+state: SC
+jurisdiction: Bamberg County
+fips: "45009"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: SC RFA Statewide_Parcels filtered to Bamberg County
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18
+    layerId: 18
+    where: County='Bamberg County'
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    count: 11858
+    parcelIdField: T_Map_Number
+    fieldMap:
+      T_Map_Number: parcelId
+      County: countyName (filter)
+      Acreage: acreage
+      Ownership: ownerName
+      L_Value: tax.landValue
+      M_Value: tax.marketValue
+      B_Value: tax.buildingValue
+      Land_Use: landUse
+      Zoning: zoning
+      Centroid_Latitude: centroidLat
+      Centroid_Longitude: centroidLon
+      GeoID: placeGeoId
+    notes: 'Verified 2026-09-28: SC Revenue and Fiscal Affairs Office (RFA, state agency) statewide parcel
+      polygon layer ''Statewide_Parcels'' (2,968,877 features, all 46 SC counties), published inside RFA
+      County Boundary Program service Lexington_Richland_Web_Map_WFL1 (item 0eb57066abc0403b8e2bdf760b6aae7d,
+      owner RFA_Administrator, public, capabilities Query,Extract, no token; RFA as-is disclaimer). FILTER
+      where County=''Bamberg County'': count=11858; parcels 5-150 ac by Acreage=3105; 4326 extent [-81.256,
+      33.01, -80.773, 33.439] vs TIGER county bbox [-81.228, 33.027, -80.798, 33.44] (match); sample T_Map_Number
+      ''0063-00-00-001'' centroid (-81.085,33.126) inside county. Blank T_Map_Number rows: 2. Ownership
+      populated 11858/11858; M_Value populated 11823/11858. County rows last_edited ~2026-01-30 (layer dataLastEditDate
+      2026-09-09). SR wkid 3600 — request outSR=4326; maxRecordCount 2000, paginate with resultOffset. FRAGILITY:
+      statewide layer lives in a boundary-dispute project web map, not a dedicated open-data item — may
+      be removed/renamed without notice; snapshot the county extract. '
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Assessor / PA public search
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: Public PA/viewer links documented under appraiserSearchUrl / publicGisUrl; owner/tax/sale not REST-verified.
+    status: partial
+
+gaps:
+  - "Parcel polygons now loadable from SC RFA Statewide_Parcels (layer 18, where County='Bamberg County'); state-hosted inside a boundary-program map — fragile, snapshot extracts. No county-published parcel REST found 2026-09-28."
+  - "SCDOT statewide SC_Parcels requires token — not usable as primary."
+  - "Zoning/FLU REST not verified."
+
+license: "Public county portals where linked; confirm redistribution before bulk republish. Do not scrape emails/phones."
+parcelSourceLicense: "SC Revenue and Fiscal Affairs Office public layer, provided as-is without warranty (RFA disclaimer on item 0eb57066abc0403b8e2bdf760b6aae7d)."
+
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=899&LayerID=17021&PageTypeID=4&PageID=7655&KeyValue={parcelId}
+publicGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=899&LayerID=17021&PageTypeID=2&PageID=7653
+jurisdictionGisUrl: https://qpublic.net/sc/bamberg/
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference added in Pass 2 (was missing
+      on card); not re-dug.
+
+fullSuite:
+  tax:
+    status: partial
+    source: RFA Statewide_Parcels/18 where County='Bamberg County'
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18
+    fieldMap:
+      M_Value: tax.marketValue
+      L_Value: tax.landValue (empty for this county)
+      B_Value: tax.buildingValue (empty for this county)
+    populated:
+      M_Value>0: 6537
+      total: 11858
+    reason: Market value only (RFA M_Value, Double, dollars); no assessed/taxable field on RFA layer; L_Value/B_Value
+      empty. Assessed/taxable only on PA page.
+  sale:
+    status: gap
+    fieldMap: {}
+    reason: RFA Statewide_Parcels has no sale date/price fields; no county sale REST found. Sales visible only on
+      PA parcel page (HTML).
+  owner:
+    status: partial
+    fieldMap:
+      Ownership: ownerName
+    populated:
+      Ownership: 11823
+      total: 11858
+    mailingAddress: gap — RFA layer carries owner name only (String, may be truncated ~30 chars, trailing spaces;
+      trim)
+    reason: Owner name public on RFA layer; no mailing address on any public REST found.
+  paDeepLink:
+    status: partial
+    template: https://qpublic.schneidercorp.com/Application.aspx?AppID=899&LayerID=17021&PageTypeID=4&PageID=7655&KeyValue={parcelId}
+    searchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=899&LayerID=17021&PageTypeID=2&PageID=7653
+    testedParcelId: 0063-00-00-001
+    testedUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=899&LayerID=17021&PageTypeID=4&PageID=7655&KeyValue=0063-00-00-001
+    httpStatus: 403 (Cloudflare JS challenge from box/WebFetch; not a dead link)
+    contentVerified: false
+    reason: 'Report PageID inferred as search PageID+2 (pattern confirmed on SC Newberry 7247->7249 and Barnwell
+      AppID 898 report 7646). Could not load content from box. ID transform: Bamberg RFA T_Map_Number uses 4-digit
+      map segment (0063-00-00-001); qPublic KeyValue format unverified (may be 063-00-00-001). Source of search
+      link: Bamberg county nav page.'
+  publicGisUrl:
+    status: partial
+    reason: Card had https://bambergcounty.maps.arcgis.com but that urlKey does not resolve to an AGOL org (portals/self
+      empty) and no Bamberg County AGOL viewer found; qPublic app (map+search) used instead.
+  gaps:
+  - 'Tax: RFA M_Value populated for only 6537/11858 Bamberg parcels (55%); no assessed value.'
+  - 'Sale: no public REST sale fields.'
+  - Owner mailing not public on REST.
+  - bambergcounty.maps.arcgis.com removed (not a real org).
+  - PA deep link content not verifiable from box (qPublic Cloudflare).
+  aadtReference: added 2026-09-28 (enrichment.aadt)
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher

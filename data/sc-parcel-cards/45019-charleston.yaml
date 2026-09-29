@@ -1,0 +1,250 @@
+state: SC
+jurisdiction: Charleston County
+fips: "45019"
+level: county
+markets: [Charleston]
+
+layers:
+  - role: parcels
+    name: PARCELS WITH ATTRIBUTES (ENERGOV ent)
+    restUrl: https://gisccapps.charlestoncounty.org/arcgis/rest/services/ENERGOV/energov_ent/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      GPIN: parcelIdAlt
+      OWNER1: ownerName
+      OWNER2: ownerName2
+      PROP_ST_NO: situsAddress.number
+      PROP_ST_NAME: situsAddress.street
+      PROP_TYPE: situsAddress.streetType
+      PROP_CITY: situsCity
+      PROP_STATE: situsState
+      PROP_ZIP: situsZip
+      MAIL_ST_NO: mailingAddress.number
+      MAIL_ST_NAME: mailingAddress.street
+      MAIL_ST_TYPE: mailingAddress.streetType
+      MAIL_CITY: mailingAddress.city
+      MAIL_STATE: mailingAddress.state
+      MAIL_ZIP: mailingAddress.zip
+      ACREAGE: acreage
+      ACRES_CAL: acreageGis
+      CLASS_CODE: dorCode
+      SALE_PRICE: lastSale.price
+      DOC_DATE: lastSale.date
+      RECORDED_DATE: lastSale.recordedDate
+      LAND_APPR: tax.landValue
+      TAX_DISTRICT: tax.district
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count query returned 197679 features, no token.
+      Prefer this over token-walled GIS_VIEWER/Parcel_Search and Public_Search.
+      Has situs (PROP_*) + owner + last sale + land appraisal; total/improvement appraisal
+      live on ProVal ParcelMap (qualified SDE.* field names) and energov_css/4 (APPRAISAL, no situs).
+      Description historically said 2019 Manatron snapshot; live sample DOC_DATE values are 2025–2026 — treat as current until proven stale.
+    status: usable
+
+  - role: tax
+    name: Parcels (ProVal ParcelMap)
+    restUrl: https://gisccapps.charlestoncounty.org/arcgis/rest/services/ProVal/ParcelMap/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: SDE.CAMA.ACREAGE
+    coverage: county-wide
+    fieldMap:
+      SDE.P_POLY_PARCEL.PID: parcelId
+      SDE.P_POLY_PARCEL.GPIN: parcelIdAlt
+      SDE.P_POLY_PARCEL.ACRES_CAL: acreageGis
+      SDE.CAMA.OWNER1: ownerName
+      SDE.CAMA.PROP_ST_NO: situsAddress.number
+      SDE.CAMA.PROP_ST_NAME: situsAddress.street
+      SDE.CAMA.PROP_TYPE: situsAddress.streetType
+      SDE.CAMA.PROP_CITY: situsCity
+      SDE.CAMA.PROP_ZIP: situsZip
+      SDE.CAMA.ACREAGE: acreage
+      SDE.CAMA.SALE_PRICE: lastSale.price
+      SDE.CAMA.DOC_DATE: lastSale.date
+      SDE.CAMA.LAND_APPR: tax.landValue
+      SDE.CAMA.IMP_APPR: tax.improvementValue
+      SDE.CAMA.APPRAISAL: tax.marketValue
+      SDE.CAMA.CLASS_CODE: dorCode
+    notes: >
+      Verified 2026-09-23: HTTP 200 pjson + count 197620. Queries require fully-qualified
+      SDE.P_POLY_PARCEL.* / SDE.CAMA.* outFields (short names return HTTP 400).
+      Richest public tax attributes for the county.
+    status: usable
+
+  - role: parcels
+    name: Parcels ***Assessor Maintained*** (External GIS Website)
+    restUrl: https://gisccapps.charlestoncounty.org/arcgis/rest/services/GIS_VIEWER/External_GIS_Website/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: ACREAGE
+    coverage: county-wide
+    fieldMap:
+      PID: parcelId
+      OWNER1: ownerName
+      MAIL_ST_NO: mailingAddress.number
+      MAIL_ST_NAME: mailingAddress.street
+      MAIL_ST_TYPE: mailingAddress.streetType
+      MAIL_CITY: mailingAddress.city
+      MAIL_STATE: mailingAddress.state
+      MAIL_ZIP: mailingAddress.zip
+      ACREAGE: acreage
+      SALE_PRICE: lastSale.price
+      DOC_DATE: lastSale.date
+      CLASS_CODE: dorCode
+    notes: >
+      Verified 2026-09-23: public, count 197677. No situs PROP_* and no appraisal values.
+      Used by public parcel search viewer; weaker than energov_ent / ProVal for land-search.
+    status: partial
+
+  - role: zoning
+    name: County Zoning (ENERGOV css)
+    restUrl: https://gisccapps.charlestoncounty.org/arcgis/rest/services/ENERGOV/energov_css/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      ZONING: zoning
+      ZONE_DESC: zoningDescription
+      ZONING_2: zoningAlt
+      ZONE_DESC2: zoningDescriptionAlt
+    notes: >
+      Verified 2026-09-23: public, count 5788. County Planning zoning for unincorporated
+      areas and smaller municipalities. Same geometry also on External_GIS_Website/44
+      and energov_ent/17. Does not replace City of Charleston / North Charleston /
+      Mount Pleasant municipal zoning inside those cities (use city layers). Smaller
+      munis inventory 2026-09-23: Mount Pleasant usable (45019-mount-pleasant.yaml);
+      IOP fragmented AGOL districts; Sullivan's Island PDF-only (+ unofficial AGOL);
+      Folly Beach county FollyViewer usable; James Island PDF-only gap; Summerville
+      town REST exists with Charleston Co spill (~1310).
+    status: usable
+
+  - role: flu
+    name: Chas County Future Land Use
+    restUrl: https://gisccapps.charlestoncounty.org/arcgis/rest/services/GIS_VIEWER/External_GIS_Website/MapServer/60
+    layerId: 60
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      REC_USE: flu
+      ProtectTyp: fluProtectType
+    notes: "Verified 2026-09-23: public, count 3768."
+    status: usable
+
+  - role: parcels
+    name: GIS_VIEWER/Parcel_Search (blocked)
+    restUrl: https://gisccapps.charlestoncounty.org/arcgis/rest/services/GIS_VIEWER/Parcel_Search/MapServer
+    layerId: null
+    geometry: polygon
+    auth: token
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: >
+      Verified 2026-09-23: ?f=pjson returns error code 499 Token Required.
+      Indexed/cached docs still list layer 4 Parcels; do not use without a public token path.
+      Same 499 on GIS_VIEWER/Public_Search/MapServer.
+    status: blocked
+
+  - role: zoning
+    name: City of Charleston Zoning (mapnetExternal)
+    restUrl: https://gis.charleston-sc.gov/arcgis2/rest/services/External/mapnetExternal/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONE_BASE: zoning
+      PUD_ID: pudId
+      PUD_NAME: pudName
+    notes: >
+      Verified 2026-09-23: public, count 5146. City-only; fills county zoning gap inside
+      City of Charleston. MAPNET viewer: https://gis.charleston-sc.gov/interactive/mapnet/
+      Related FLU: External/mapnetExternal/MapServer/382 (LAND_USE).
+      Property Lines city parcel attributes: External/mapnetExternal/MapServer/4 (TMS, OWNER, ADDRESS, GISACRES, LAND_APPR, IMP_APPR) — city-only.
+    status: usable
+
+  - role: zoning
+    name: North Charleston Zoning
+    restUrl: https://arc.northcharleston.org/arcgis/rest/services/DYlayers/Zoning/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      ZONECODE: zoning
+      ZONETYPE: zoningType
+      ZONEDESC: zoningDescription
+    notes: >
+      Verified 2026-09-23: public, count 4044. City-only.
+      Companion parcels (geometry/ids, limited CAMA): DYlayers/Parcels/MapServer/0
+      (PID, TMS, ACRES_CAL; count 53542) — no owner/sale/tax values on that layer.
+    status: usable
+
+  - role: zoning
+    name: Mount Pleasant Zoning (MPSC_Zoning_New)
+    restUrl: https://maps.tompsc.com/arcgis/rest/services/Parcel_Search_New/MPSC_Zoning_New/MapServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: city-only
+    fieldMap:
+      PARCEL_ID: parcelId
+      ZONINGVALU: zoning
+      SPLITZONED: zoningSplit
+      DEVNAME: developmentName
+    notes: >
+      Verified 2026-09-23: public town REST, count 43784. Fills former Mount Pleasant municipal
+      zoning gap. JOIN to county parcels via PARCEL_ID = PID. Companion card:
+      cards/SC/45019-mount-pleasant.yaml (also FLU MPSC_Land_Use_New/3, town parcels Base/2,
+      overlay districts Zoning_New/0). Filter ZONINGVALU NOT IN ('COUNTY','AWENDAW') for
+      strict town districts. Prefer town endpoint over county Public_Works_Viewer/46.
+    status: usable
+
+gaps:
+  - "GIS_VIEWER/Parcel_Search and Public_Search require ArcGIS token (HTTP 499) — do not rely on them for bot ingest."
+  - "County zoning layer does not cover City of Charleston / North Charleston / Mount Pleasant municipal districts; use city layers (this card + 45019-mount-pleasant.yaml)."
+  - "Isle of Palms: fragmented official AGOL (gdkerr / iopbuilding, org Cv3A9wUHusU2ofWZ) — one FeatureServer per district (SR1/SR2/SR3, GC1/GC2/GC3, LC, PDD, Conservation-Recreation); no ZONING field (district=service name). Companion 45019-isle-of-palms.yaml status partial."
+  - "Sullivan's Island: official PDF / Instant app only (gap). Unofficial AGOL Zoning_2025 (the_charliosouljah; count 1196) geo-matches but not town-hosted — companion 45019-sullivans-island.yaml."
+  - "Folly Beach: UPGRADED — prefer Charleston County FOLLY/FollyViewer/MapServer/19 (count 3119; zoning; PID join; usable). CofC/SCGIS AGOL /12 retained as alternate (partial). Companion 45019-folly-beach.yaml."
+  - "Town of James Island: PDF/static only (jamesislandsc.us/maps) — gap. Companion 45019-james-island.yaml."
+  - "Summerville spill: Town Zoning_View_Layer/FeatureServer/4 (Zone_Class; count 20205; County=CHARLESTON ~1310) — companion 45035-summerville.yaml; filter County for Charleston market."
+  - "Sale history is last-sale fields only (DOC_DATE / SALE_PRICE), not a multi-sale history table."
+  - "energov_css/4 has APPRAISAL but no situs; energov_ent/12 has situs + LAND_APPR but not APPRAISAL — join by PID if both needed, or use ProVal ParcelMap."
+  - "Charleston County GIS Hub exists (charleston-county-gis-chascogis.hub.arcgis.com) but primary queryable layers used here are on gisccapps.charlestoncounty.org."
+
+license: "Public Charleston County / City of Charleston / City of North Charleston / Town of Mount Pleasant GIS REST services; attribute to source agency. Confirm redistribution terms on county/city hubs before bulk republish."
+appraiserSearchUrl: https://gisccweb.charlestoncounty.org/public_search/
+verifiedAt: 2026-09-23
+verifiedBy: South Carolina Public Info Researcher
+
+enrichment:
+  householdIncome:
+    defaultSource: "Census ACS B19013 tract medians (national join)"
+    localException: null
+    checkedAt: "2026-09-24"
+    checkedBy: "Public Information Researcher"
+  aadt:
+    source: "SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points)"
+    restUrl: "https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0"
+    layerId: 0
+    field: "FactoredAA"
+    geography: "state traffic count stations (points)"
+    coverage: state-wide
+    status: usable
+    verifiedAt: "2026-09-24"
+    verifiedBy: "Public Information Researcher"
+    notes: "SCDOT-published 2025 statewide points (~11570); FactoredAA=factored AADT; FactoredA1 companion; filter CountyName. smpesri.scdot.org EGIS has roads but no AADT layer."

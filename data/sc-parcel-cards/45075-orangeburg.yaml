@@ -1,0 +1,149 @@
+state: SC
+jurisdiction: Orangeburg County
+fips: "45075"
+level: county
+markets: [Columbia]
+
+layers:
+  - role: parcels
+    name: Tax Parcels (Public Tax Parcel Map)
+    restUrl: https://services2.arcgis.com/bUKn95BqgpYYTnx3/arcgis/rest/services/Main_Public_Tax_Parcel_Map_WFL1/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CalculatedAcres
+    coverage: county-wide
+    fieldMap:
+      parcel_id: parcelId
+      MAPBLOLOT: parcelIdAlt
+      owner1: ownerName
+      own_street: mailingAddress.street
+      own_city: mailingAddress.city
+      own_state: mailingAddress.state
+      own_zip: mailingAddress.zip
+      CMPLNN: situsAddress
+      CalculatedAcres: acreage
+      FriendlyLink: appraiserDeepLink
+      ShareLink: shareLink
+      PLATBK: platBook
+      PLATPG: platPage
+    notes: 'Verified 2026-09-24: public AGOL (owner wjeffcoat_oc), count 62519, no token. Geo-verified via
+      county map extent (sample zoning centroid ≈ -80.56, 33.46). FriendlyLink / ShareLink provide per-parcel
+      viewer deep links when populated.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=62530; 1-feature outSR=4326 sample parcel_id=None vertex (-80.703,33.228)
+      inside Orangeburg County SC bbox; parcel ID field parcel_id present.'
+    count: 62530
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Tax Parcels — owner / acreage
+    restUrl: https://services2.arcgis.com/bUKn95BqgpYYTnx3/arcgis/rest/services/Main_Public_Tax_Parcel_Map_WFL1/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: CalculatedAcres
+    coverage: county-wide
+    fieldMap:
+      parcel_id: parcelId
+      owner1: ownerName
+      CalculatedAcres: acreage
+      FriendlyLink: appraiserDeepLink
+    notes: Owner + acreage on parcel layer; market/assessed values not on public fields reviewed.
+    status: partial
+
+  - role: zoning
+    name: Zoning (Public Tax Parcel Map)
+    restUrl: https://services2.arcgis.com/bUKn95BqgpYYTnx3/arcgis/rest/services/Main_Public_Tax_Parcel_Map_WFL1/FeatureServer/33
+    layerId: 33
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: unknown
+    fieldMap:
+      ZONING: zoning
+      ZONINGNAME: zoningName
+    notes: >
+      Layer exists (count 12) but sample features have null/blank ZONING — treat as gap
+      until county publishes usable zoning polygons. Do not rely on for site screen.
+    status: gap
+
+gaps:
+  - "Zoning layer FS/33 is effectively empty/unusable (null codes); county zoning REST gap."
+  - "No sale price/date fields on public Tax Parcels layer; use FriendlyLink / assessor for sales."
+  - "Market/assessed tax values not on public parcel fields reviewed."
+  - "Rejected SCDOT SC_Parcels MapServer (token required)."
+
+license: "Orangeburg County public AGOL (bUKn95BqgpYYTnx3). Attribute to Orangeburg County."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?App=OrangeburgCountySC&PageType=Search
+publicGisUrl: https://experience.arcgis.com/experience/02a8eeae9f074df9a0821ae7e1125c86
+jurisdictionGisUrl: https://www.orangeburgcounty.org/165/Assessor
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: gap
+    reason: No assessed/market/taxable fields on Main_Public_Tax_Parcel_Map_WFL1/0 (schema re-checked 2026-09-28).
+      RFA Statewide_Parcels Orangeburg rows have Ownership (61,273) but no M_Value. Values only via qPublic HTML.
+    fieldMap: {}
+  sale:
+    status: gap
+    reason: No sale date/price/deed fields; only plat book/page/instrument (PlatBk_txt/PlatPg_txt/PlatInstrument,
+      often "0000"). qPublic HTML only.
+    fieldMap:
+      PlatInstrument: platInstrument (not a sale)
+    format: n/a
+  owner:
+    status: usable
+    mailingStatus: usable
+    reason: owner1 + mailing on county layer; strings space-padded (trim).
+    source: https://services2.arcgis.com/bUKn95BqgpYYTnx3/arcgis/rest/services/Main_Public_Tax_Parcel_Map_WFL1/FeatureServer/0
+    fieldMap:
+      owner1: ownerName
+      own_street: mailingAddress.street
+      own_city: mailingAddress.city
+      own_state: mailingAddress.state
+      own_zip: mailingAddress.zip (ZIP+4 "29322-9466", padded)
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?App=OrangeburgCountySC&PageType=Search
+    testedParcelId: 0001-00-00-001.000
+    idTransform: 'IMPORTANT: parcel_id field is the 7-digit ACCOUNT number (= CMPLNN, space-padded), NOT the TMS.
+      TMS = MAPBLOLOT ("0001-00-00-001.000", 4-digit map + .000 suffix). Use MAPBLOLOT for qPublic parcel-number search;
+      CMPLNN for account search. Card fieldMap parcel_id->parcelId should be read as account id.'
+    reason: County Assessor page links qPublic App=OrangeburgCountySC&PageType=Search (friendly form). Numeric AppID/report
+      PageID not found in county pages or indexes; Cloudflare blocks direct test. FriendlyLink/ShareLink are SharePoint
+      scans of OLD property cards (plus gis2.orangeburgcounty.org/oldpropcard/), not current CAMA. Previous appraiserSearchUrl
+      was a truncated webappviewer id - replaced.
+  publicGis:
+    status: usable
+    reason: Previous URL used a truncated app id (3e15dcb06159404384fdff6d4a287b, item does not exist; real id ...b63
+      is a "[Copy]"). Replaced with "Orangeburg Public Tax Parcel App" experience 02a8eeae9f074df9a0821ae7e1125c86
+      (public, owner wjeffcoat_oc, updated 2026-07-08, ~104k views) - the viewer linked from the county Assessor page.
+  gaps:
+  - No tax value or sale fields in any public REST source.
+  - parcel_id is account number, not TMS (use MAPBLOLOT).
+  - qPublic numeric AppID not found - search-level PA link only.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

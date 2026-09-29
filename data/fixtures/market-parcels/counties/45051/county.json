@@ -1,0 +1,33 @@
+{
+  "name": "Horry",
+  "fips": "45051",
+  "state": "South Carolina",
+  "markets": [
+    "Charleston"
+  ],
+  "featureCount": 12037,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "sc-horry-parcels-45051",
+  "queryUrl": "https://www.horrycounty.org/gispublic/rest/services/Public/HorryCountyGIS_GS/MapServer/24/query",
+  "gaps": [
+    "Source query returned 14961 rows; 12037 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Parcels are Parcels (HorryCountyGIS_GS) (https://www.horrycounty.org/gispublic/rest/services/Public/HorryCountyGIS_GS/MapServer/24). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "qPublic and Beacon property-appraiser links are stored as patterns and were not requested.",
+    "Owner phone and email are not ingested. SCDOT AADT stays the query-time statewide join.",
+    "No situs street/city fields on public parcel layer (Owner* mailing only); join addresses from Addresses layer (GS/22) spatially if needed.",
+    "City of Myrtle Beach has its own zoning REST — use companion 45051-myrtle-beach.yaml inside city limits.",
+    "Assessor/Land Records online access requires free Horry County account as of 2026-03-16 notice; GIS REST remains public.",
+    "Sale history is last-sale fields only (SaleDate / DeedBook / DeedPage), not multi-sale table."
+  ],
+  "path": "data/fixtures/market-parcels/counties/45051/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/45051/lookup.json",
+  "sourceCount": 14961,
+  "dropped": 2911,
+  "tileCount": 11,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://www.horrycountysc.gov/apps/LandRecords/?PIN={parcelId}",
+  "gisViewerUrl": "https://www.horrycounty.org/gis/parcels/"
+}

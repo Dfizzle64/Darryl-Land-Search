@@ -1,0 +1,237 @@
+state: SC
+jurisdiction: Greenwood County
+fips: "45047"
+level: county
+markets: [Greenville]
+
+layers:
+  - role: parcels
+    name: Parcels (Parcels_Search_and_Select)
+    restUrl: https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Parcels_Search_and_Select/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Area
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Owner: ownerName
+      MailAddress: mailingAddress.street
+      MailCityState: mailingAddress.cityStateZip
+      SiteAddress: situsAddress
+      Area: acreageRaw
+      PurchaseDate: lastSale.date
+      Deed: lastSale.deed
+      Plat: lastSale.plat
+      DeedLink: lastSale.deedLink
+      PlatLink: lastSale.platLink
+      TaxValue_Total: tax.taxValue
+      CapValue_Total: tax.capValue
+      MarketValue_Total: tax.marketValue
+      AssessedValue: tax.assessedValue
+      TaxValue_Land: tax.taxValueLand
+      TaxValue_Improvement: tax.taxValueImprovement
+      MarketValue_Land: tax.marketValueLand
+      MarketValue_Improvement: tax.marketValueImprovement
+      PropType: dorCode
+      PropUseCode: dorCodeDescription
+      TaxDistrict: tax.district
+      Subdivision: subdivision
+    notes: 'Verified 2026-09-24: public MapServer, count 40306, no token. Sample polygon centroid approximately
+      (-82.2700, 34.3892) WGS84, inside Greenwood County, South Carolina. Parcel layer is CAMA-rich and
+      includes tax, owner, mailing, situs, deed/plat and purchase-date fields. Source alias calls Area acres,
+      but sample Area=64970.6 for a 1-lot property; treat as acreageRaw and validate units/convert before
+      acreage filters. Official GIS Quick Search uses PIN={parcelId}; no stable parcel deep-link pattern
+      verified.
+
+      '
+    status: usable
+    liveness: '2026-09-28 OK: returnCountOnly=40305; 1-feature outSR=4326 sample PIN=''6913-674-230'' vertex
+      (-82.270,34.389) inside Greenwood County SC bbox; parcel ID field PIN present.'
+    count: 40305
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Parcel tax and assessment attributes (Parcels_Search_and_Select)
+    restUrl: https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Parcels_Search_and_Select/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Area
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      TaxValue_Total: tax.taxValue
+      CapValue_Total: tax.capValue
+      MarketValue_Total: tax.marketValue
+      AssessedValue: tax.assessedValue
+      TaxValue_Land: tax.taxValueLand
+      TaxValue_Improvement: tax.taxValueImprovement
+      CapValue_Land: tax.capValueLand
+      CapValue_Improvement: tax.capValueImprovement
+      MarketValue_Land: tax.marketValueLand
+      MarketValue_Improvement: tax.marketValueImprovement
+      TaxDistrict: tax.district
+      TaxCommission: tax.appraisedBy
+    notes: Tax and assessment fields are embedded on the countywide parcel polygon layer; assessor data is reported by the county as updated nightly.
+    status: usable
+
+  - role: ownership
+    name: Parcel ownership and mailing (Parcels_Search_and_Select)
+    restUrl: https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Parcels_Search_and_Select/MapServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      PIN: parcelId
+      Owner: ownerName
+      MailAddress: mailingAddress.street
+      MailCityState: mailingAddress.cityStateZip
+      SiteAddress: situsAddress
+    notes: Owner, mailing, and situs fields are embedded on the public parcel layer; deed remains the official ownership record.
+    status: usable
+
+  - role: sales
+    name: Recent sales points (Sales_Points)
+    restUrl: https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Sales_Points/MapServer/6
+    layerId: 6
+    geometry: point
+    auth: none
+    acreageField: Area_SqFt
+    coverage: county-wide
+    fieldMap:
+      Pin: parcelId
+      SiteAddress: situsAddress
+      SalePrice: lastSale.price
+      SaleDate: lastSale.date
+      SaleType: lastSale.type
+      PropType: dorCode
+      Area_SqFt: acreageRaw
+      Subdivision: subdivision
+    notes: >
+      Verified 2026-09-24: public point layer, count 83968, sample centroid approximately
+      (-82.3284, 34.3424) in Greenwood County SC. Sale fields are useful for comps but are
+      point records rather than polygon parcel records; sample included SaleType=Invalid and
+      SalePrice=0, so qualify/filter source values and do not assume every point is a valid sale.
+    status: partial
+
+  - role: zoning
+    name: Greenwood County zoning (Search_and_Select_Query)
+    restUrl: https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Search_and_Select_Query/MapServer/7
+    layerId: 7
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap:
+      JURISDICTION: jurisdiction
+      ORDINANCENUM: ordinanceNumber
+      REVISION: zoningRevision
+      IMS_LABEL: zoning
+      ZONECLASS: zoningClass
+      DENSITY: density
+    notes: >
+      Verified 2026-09-24: public zoning polygons, count 1650; sample jurisdiction Ware Shoals
+      and label I-1, WGS84 centroid inside Greenwood County SC. Spatial join to parcel polygons.
+    status: usable
+
+  - role: flu
+    name: Future Land Use 2030 (Search_and_Select_Query)
+    restUrl: https://www.greenwoodsc.gov/arcgis/rest/services/Operational_Layers/Search_and_Select_Query/MapServer/12
+    layerId: 12
+    geometry: polygon
+    auth: none
+    acreageField: Acres
+    coverage: county-wide
+    fieldMap:
+      TaxDistrict: tax.district
+      LandUsage: existingLandUse
+      F2030Future: flu
+      LandUse: landUseCode
+      Acres: acreage
+    notes: >
+      Verified 2026-09-24: public Future Land Use 2030 polygons, count 844; sample
+      F2030Future=MDR in Greenwood County SC. Spatial join to parcel polygons.
+    status: usable
+
+gaps:
+  - "Sales_Points is point-based and includes invalid/zero-price source records; it is not a complete parcel sale-history table."
+  - "Greenwood Area/Area_SqFt aliases and observed numeric values require unit validation before converting to acreage."
+  - "No stable PIN-specific assessor deep link verified; use official GIS Quick Search with PIN={parcelId}."
+  - "Reject SCDOT SC_Parcels token-walled services as a primary source; county MapServer above is public and preferred."
+
+license: "Greenwood County GIS public REST and Greenwood County GIS viewer; attribute Greenwood County. Confirm redistribution terms before bulk republish."
+appraiserSearchUrl: https://www.greenwoodsc.gov/greenwoodnj/
+publicGisUrl: "https://www.greenwoodsc.gov/greenwoodnj/"
+jurisdictionGisUrl: "https://www.greenwoodsc.gov/greenwoodnj/"
+appraiserDeepLink: https://www.greenwoodsc.gov/Property_Report_TS/Default.aspx?pin={parcelId}&isTinyScreen=false
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: usable
+    reason: Parcels_Search_and_Select/0 has market, tax (capped), cap and assessed values with land/improvement
+      splits.
+    fieldMap:
+      MarketValue_Total: tax.marketValue
+      AssessedValue: tax.assessedValue
+      TaxValue_Total: tax.taxableValue
+      CapValue_Total: tax.cappedValue
+      MarketValue_Land: tax.landValue
+      MarketValue_Improvement: tax.improvementValue
+    note: 'Sample 6913-469-030: market 160,000 / tax 122,000 / assessed 4,880. Integer.'
+  sale:
+    status: partial
+    reason: Parcel layer has PurchaseDate + Deed (no price). Prices on separate Sales_Points/6 point layer (83977
+      sales, 1800-01-01..2047-04-24) keyed Pin - a sales dataset, not every parcel.
+    fieldMap:
+      PurchaseDate: lastSale.date (parcel layer)
+      Deed: lastSale.deedBookPage
+      DeedLink: lastSale.deedPdfPath
+      SalePrice: lastSale.price (Sales_Points)
+      SaleDate: lastSale.date (Sales_Points)
+      SaleType: lastSale.qualified (Valid/...)
+      SaleClass: lastSale.improvedVacant
+    format: Dates esri Date epoch ms (1762473600000 = 2025-11-07). SalePrice Integer. Deed "259-278" book-page;
+      DeedLink relative to https://www.greenwoodsc.gov.
+  owner:
+    status: usable
+    mailingStatus: usable
+    fieldMap:
+      Owner: ownerName
+      MailAddress: mailingAddress.street
+      MailCityState: mailingAddress.cityStateZip (single string "WARE SHOALS, SC 29692-0384")
+  paLink:
+    status: usable
+    pattern: https://www.greenwoodsc.gov/Property_Report_TS/Default.aspx?pin={parcelId}&isTinyScreen=false
+    testedParcelId: 6913-469-030
+    idTransform: pin = PIN as-is (dddd-ddd-ddd).
+    reason: HTTP 200 Property Report returned owner MATTISON MICHAEL L(EST)/CAROL H from box 2026-09-28. Pattern
+      taken from greenwoodnj viewer JS (webServerURL + /Property_Report_TS/Default.aspx?pin=).
+  publicGis:
+    status: usable
+    url: https://www.greenwoodsc.gov/greenwoodnj/
+    reason: Greenwood County GIS viewer (already on card; verified 200).
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) - SCDOT 2025 Statewide Traffic Points, CountyName=GREENWOOD
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28);
+      not re-dug.

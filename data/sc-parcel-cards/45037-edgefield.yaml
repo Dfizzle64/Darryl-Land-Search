@@ -1,0 +1,189 @@
+state: SC
+jurisdiction: Edgefield County
+fips: "45037"
+level: county
+markets: [Augusta, Columbia]
+
+layers:
+  - role: parcels
+    name: Edgefield County Parcels_Reassessment_2025 (county AGOL, edgefieldcounty.maps.arcgis.com org)
+    restUrl: https://services5.arcgis.com/GrsHGJ284Po4FBDs/arcgis/rest/services/Parcels_Reassessment_2025_Updated_damage__view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    count: 19008
+    parcelIdField: PIN
+    fieldMap:
+      PIN: parcelId
+    notes: 'Verified 2026-09-28: NEW source via ArcGIS Online search of Edgefield County org GrsHGJ284Po4FBDs
+      (services include Edgefield_Town_Council, SDE_SDE_JohnstonTownCouncil, New_County_Council_Districts;
+      parcel editor GRTEDGE = county GIS). count=19008; SR 2273; 4326 extent -82.186,33.532 to -81.650,33.979
+      (= Edgefield County SC); sample PIN 004-00-00-001-000 at (-82.179,33.729). Geometry + PIN only (no
+      acreage/owner) — compute acreage from geometry; data last edited 2024-09-30. Query only; maxRecordCount
+      2000. Alternates same org: parcels_for_proposed_zoning__view/FeatureServer/0 (18371, last edit 2025-10-29,
+      has Calc_Acre/DeedAcreage/AcreText + PropZoning2021) and SDE parcels/FeatureServer/0 (18159, 2021-01
+      vintage). Also rejected: dloberger EdgefieldParcels (17263, personal copy, no edit date). Owner/tax/sale
+      via qPublic join on PIN.'
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: parcels
+    name: Edgefield County parcels w/ acreage (proposed-zoning view, same county org)
+    restUrl: https://services5.arcgis.com/GrsHGJ284Po4FBDs/arcgis/rest/services/parcels_for_proposed_zoning__view/FeatureServer/0
+    layerId: 0
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acre
+    coverage: county-wide
+    count: 18371
+    parcelIdField: PIN
+    fieldMap:
+      PIN: parcelId
+      Calc_Acre: acreage
+      DeedAcreage: deedAcres
+      PropZoning2021: zoningProposed2021
+    notes: 'Verified 2026-09-28: count=18371, last edit 2025-10-29, extent = Edgefield County SC. Use as
+      acreage source joined on PIN (New_Calc_Acre is sq ft, not acres). ~640 fewer parcels than Reassessment_2025
+      view.'
+    status: partial
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Assessor / PA public search
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: Public PA/viewer links documented under appraiserSearchUrl / publicGisUrl; owner/tax/sale not REST-verified.
+    status: partial
+
+
+  - role: tax
+    name: SC RFA Edgefield Parcels (county CAMA join) — Edgefield_McCormick_Greenwood_Web_Map_WFL1 layer 9
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/9
+    layerId: 9
+    geometry: polygon
+    auth: none
+    acreageField: Calc_Acre
+    coverage: county-wide
+    count: 19470
+    parcelIdField: PIN
+    fieldMap:
+      PIN: parcelId
+      Name: ownerName
+      Name_2: ownerName2
+      Address_1: mailingAddress.street
+      Address_2: mailingAddress.cityState
+      Zip_Code: mailingAddress.zip (Integer 9-digit)
+      Street_Num + Street_Nam: situsAddress
+      Tot_Assesd: tax.assessedValue
+      Tot_Tax_Ca: tax.taxableValue (capped)
+      Tot_Market + Tot_Mark_1 + Tot_Mark_2: tax.marketValue (acres+lots+bldgs market; sum)
+      Considerat: lastSale.price (String $)
+      Instrmnt_D: lastSale.date (Integer YYYYMMDD)
+      Deed_Ref_D: lastSale.deedRefDate (Integer YYYYMMDD)
+      True_Sale: lastSale.qualified (code)
+      Calc_Acre: acreage
+      Class_1: dorCode
+    notes: 'Verified 2026-09-28 (Pass 2): NEW — RFA county-specific layer, public, Query/Extract, no token, SR 3857,
+      dataLastEdit 2025-11-04 (RFA load). Populated: Name 19470, Address_1 19470, Tot_Assesd>0 18587, Tot_Market>0
+      15493, Instrmnt_D 19419, Considerat 19470 of 19470. Sample PIN 004-00-00-001-000: RHODES DALTON FORREST, Tot_Assesd
+      3130, Tot_Market 52084, Considerat 175000, Instrmnt_D 20240923. Same PIN format as county AGOL parcels and qPublic.
+      FRAGILE (boundary-program map) and ~11 months stale; refresh from qPublic for recent sales.'
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+gaps:
+  - "SCDOT statewide SC_Parcels requires token — not usable as primary."
+  - "Zoning/FLU REST not verified."
+  - "qPublic portal live (2026-09-28: county AGOL parcel layer found — see parcels layer)."
+
+license: "Public county portals where linked; confirm redistribution before bulk republish. Do not scrape emails/phones."
+
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=859&LayerID=16089&PageTypeID=4&PageID=7162&KeyValue={parcelId}
+publicGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=859&LayerID=16089&PageTypeID=2&PageID=7160
+jurisdictionGisUrl: https://edgefieldsc.maps.arcgis.com
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference added in Pass 2 (was missing
+      on card); not re-dug.
+
+fullSuite:
+  tax:
+    status: usable
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/9
+    fieldMap:
+      Tot_Assesd: tax.assessedValue (Integer)
+      Tot_Tax_Ca: tax.taxableValue
+      Tot_Market + Tot_Mark_1 + Tot_Mark_2: tax.marketValue (sum)
+    populated:
+      Tot_Assesd>0: 18587
+      Tot_Market>0: 15493
+      total: 19470
+    reason: RFA Edgefield Parcels layer 9 (new this pass) carries county CAMA; 2025-11 vintage. RFA/18 M_Value =
+      Tot_Market only (acres component).
+  sale:
+    status: usable
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/9
+    fieldMap:
+      Considerat: lastSale.price (String $ — cast)
+      Instrmnt_D: lastSale.date (Integer YYYYMMDD)
+      Deed_Ref_D: deedRefDate (Integer YYYYMMDD)
+      True_Sale: qualified code
+    populated:
+      Instrmnt_D: 19419
+      Considerat: 19470
+    reason: Parse Instrmnt_D with %Y%m%d; Considerat is a String. Stale ~2025-11.
+  owner:
+    status: usable
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Edgefield_McCormick_Greenwood_Web_Map_WFL1/FeatureServer/9
+    fieldMap:
+      Name: ownerName
+      Address_1: mailingAddress.street
+      Address_2: mailingAddress.cityState
+      Zip_Code: mailingAddress.zip (Integer, 9-digit)
+    populated:
+      Name: 19470
+      Address_1: 19470
+    reason: Owner + mailing public on RFA layer 9 (also Ownership on RFA/18, 19438).
+  paDeepLink:
+    status: partial
+    template: https://qpublic.schneidercorp.com/Application.aspx?AppID=859&LayerID=16089&PageTypeID=4&PageID=7162&KeyValue={parcelId}
+    searchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=859&LayerID=16089&PageTypeID=2&PageID=7160
+    testedParcelId: 004-00-00-001-000
+    testedUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=859&LayerID=16089&PageTypeID=4&PageID=7162&KeyValue=004-00-00-001-000
+    httpStatus: 403 (Cloudflare JS challenge from box/WebFetch; not a dead link)
+    contentVerified: false
+    reason: 'Report PageID inferred as search PageID+2 (pattern confirmed on SC Newberry 7247->7249 and Barnwell
+      AppID 898 report 7646). Could not load content from box. ID transform: none — PIN form 004-00-00-001-000 is
+      shared by county AGOL, RFA layers and (per qPublic SC convention) KeyValue; unverified. Search link from qpublic.net/sc/edgefield/topmenu.html.'
+  publicGisUrl:
+    status: partial
+    reason: Edgefield County AGOL org urlKey is edgefieldsc (card had edgefieldcounty — does not resolve). Org publishes
+      zoning/streets/voting apps but no parcel viewer; qPublic (map+search) is the public parcel viewer.
+  gaps:
+  - Value/sale/owner source is RFA-hosted (fragile, 2025-11 vintage); county AGOL parcels are geometry-only.
+  - PA deep-link content not verifiable from box (qPublic Cloudflare).
+  aadtReference: added 2026-09-28 (enrichment.aadt)
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher

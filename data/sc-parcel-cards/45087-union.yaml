@@ -1,0 +1,209 @@
+state: SC
+jurisdiction: Union County
+fips: "45087"
+level: county
+markets: [Greenville]
+
+layers:
+  - role: parcels
+    name: SC RFA Statewide_Parcels filtered to Union County
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18
+    layerId: 18
+    where: County='Union County'
+    geometry: polygon
+    auth: none
+    acreageField: Acreage
+    coverage: county-wide
+    count: 18817
+    parcelIdField: T_Map_Number
+    fieldMap:
+      T_Map_Number: parcelId
+      County: countyName (filter)
+      Acreage: acreage
+      Ownership: ownerName
+      L_Value: tax.landValue
+      M_Value: tax.marketValue
+      B_Value: tax.buildingValue
+      Land_Use: landUse
+      Zoning: zoning
+      Centroid_Latitude: centroidLat
+      Centroid_Longitude: centroidLon
+      GeoID: placeGeoId
+    notes: 'Verified 2026-09-28: SC Revenue and Fiscal Affairs Office (RFA, state agency) statewide parcel
+      polygon layer ''Statewide_Parcels'' (2,968,877 features, all 46 SC counties), published inside RFA
+      County Boundary Program service Lexington_Richland_Web_Map_WFL1 (item 0eb57066abc0403b8e2bdf760b6aae7d,
+      owner RFA_Administrator, public, capabilities Query,Extract, no token; RFA as-is disclaimer). FILTER
+      where County=''Union County'': count=18817; parcels 5-150 ac by Acreage=4315; 4326 extent [-81.865,
+      34.436, -81.38, 34.922] vs TIGER county bbox [-81.852, 34.445, -81.416, 34.913] (match); sample T_Map_Number
+      ''065-00-00-024'' centroid (-81.604,34.747) inside county. Blank T_Map_Number rows: 0. Ownership populated
+      18817/18817; M_Value populated 18817/18817. County rows last_edited ~2026-01-30 (layer dataLastEditDate
+      2026-09-09). SR wkid 3600 — request outSR=4326; maxRecordCount 2000, paginate with resultOffset. FRAGILITY:
+      statewide layer lives in a boundary-dispute project web map, not a dedicated open-data item — may
+      be removed/renamed without notice; snapshot the county extract. State-agency provenance preferred
+      over the mitchelllh AGOL copy listed below (18885, 2026-03).'
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: parcels
+    name: Union SC parcels (AGOL UNION_SC_PARCELS_WFL1, layer 2)
+    restUrl: https://services6.arcgis.com/xQgypOVdY84tFTiW/arcgis/rest/services/UNION_SC_PARCELS_WFL1/FeatureServer/2
+    layerId: 2
+    geometry: polygon
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    count: 18885
+    parcelIdField: ParcelID
+    fieldMap:
+      ParcelID: parcelId
+      CAMA_ID: camaId
+      Map_Number: parcelIdAlt
+      Name: ownerName
+      Address_2: mailingAddress
+      Address_3: mailingCityState
+    notes: 'Verified 2026-09-28: NEW source via ArcGIS Online web-map scan. Item 7872275addf4454ba9853dc9ebfc646a
+      "UNION SC PARCELS_WFL1" (snippet "UC PARCELS"), owner mitchelllh (individual AGOL account in org xQgypOVdY84tFTiW;
+      publisher not confirmed as Union County — org root lists no public services). Public, Query only,
+      created/last edited 2026-03-30. Layer 2 parcels count=18885; SR 102100; 4326 extent -81.852,34.444
+      to -81.417,34.913 (= Union County SC, NOT Union NM); sample ParcelID 065-00-00-024 at (-81.603,34.747),
+      owner mail Union SC. Layers 0 addresses (COUNTY="UNION COUNTY", STATE=SC) and 1 streets also in service.
+      No acreage/value/sale fields — compute acreage from geometry; join CAMA_ID ("065-00-00-024 000") to
+      qPublic for tax/sale. Status partial = provenance unconfirmed + static 2026-03 snapshot; geometry
+      and IDs are loadable.'
+    status: partial
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+
+  - role: tax
+    name: Union County SC assessor search (qPublic)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: Public assessor search supports the 13-digit SC tax map number, owner, address, and assessment lookup; no public tax REST layer verified.
+    status: partial
+
+  - role: ownership
+    name: Union County SC assessor / deed search
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: none
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: qPublic is the public tax-record search; the county states that deeds, not tax records, are the official ownership record. No public ownership REST layer verified.
+    status: partial
+
+  - role: sales
+    name: Union County SC public sale history (not verified)
+    restUrl: null
+    layerId: null
+    geometry: none
+    auth: n/a
+    acreageField: null
+    coverage: county-wide
+    fieldMap: {}
+    notes: No public sale-history REST table verified. Use the assessor qPublic record and official county deed research for parcelId verification.
+    status: gap
+
+  - role: other
+    name: Statewide SC parcel centroid (not polygon substitute)
+    restUrl: https://services9.arcgis.com/RvqSyw3diI7dTKo5/ArcGIS/rest/services/Statewide_Parcel_Centroid_for_South_Carolina/FeatureServer/0
+    layerId: 0
+    geometry: point
+    auth: none
+    acreageField: null
+    coverage: sample
+    fieldMap:
+      TAXMAP: parcelId
+    notes: >
+      Public South Carolina RFA statewide centroid service, current to October 2025 per its
+      metadata, has minimal tax-map-ID attributes and point geometry only. It is not a
+      county-owned polygon parcel source and is not suitable for map outlines; use only as a
+      possible SC parcel-ID cross-check after geographic filtering.
+    status: partial
+
+gaps:
+  - "Primary parcels now SC RFA Statewide_Parcels (layer 18, where County='Union County'), state-hosted inside a boundary-program map — fragile; alt source retained."
+  - Parcel polygons loadable from AGOL UNION_SC_PARCELS_WFL1/FeatureServer/2 (18,885; 2026-03-30 snapshot) — publisher account mitchelllh not confirmed as county; prefer a county-published source if one appears.
+  - "No county-published Union County SC parcel REST verified (GIS office page points to data orders); the AGOL layer above is third-party/unconfirmed publisher."
+  - "PublicGisUrl/PA link: qPublic search at https://www.qpublic.net/sc/union/search.html; use parcelId as the 13-digit SC tax map number in the search form. No stable parcel-specific deep link verified."
+  - "REJECT https://experience.arcgis.com/experience/8ce9289b0dbf4fa8a41a16794d8f0032 as wrong-state Union County, New Mexico; do not ingest it."
+  - "Reject SCDOT SC_Parcels token-walled services as a primary source."
+
+license: "Union County SC GIS/Assessor public pages and South Carolina RFA statewide centroid service; attribute source agencies. County GIS digital data may require a release/order."
+appraiserSearchUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=861&LayerID=16112&PageTypeID=4&PageID=7170&KeyValue={parcelId}
+publicGisUrl: https://qpublic.schneidercorp.com/Application.aspx?AppID=861&LayerID=16112&PageTypeID=2&PageID=7168
+jurisdictionGisUrl: https://gearupunionsc.com/departments/geographic-information-system/
+parcelSourceLicense: "SC Revenue and Fiscal Affairs Office public layer, provided as-is without warranty (RFA disclaimer on item 0eb57066abc0403b8e2bdf760b6aae7d)."
+verifiedAt: 2026-09-28
+verifiedBy: South Carolina Public Info Researcher
+
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: South Carolina Public Info Researcher
+  tax:
+    status: partial
+    reason: 'Market only: RFA statewide M_Value populated 17,987/18,817 (L_Value/B_Value null in sample; ~2026-01).
+      No assessed/taxable in any public REST; no county-published CAMA layer and no RFA county-specific Union layer
+      found.'
+    source: https://services9.arcgis.com/RvqSyw3diI7dTKo5/arcgis/rest/services/Lexington_Richland_Web_Map_WFL1/FeatureServer/18
+      (where County='Union County')
+    fieldMap:
+      M_Value: tax.marketValue
+      L_Value: tax.landValue (mostly null)
+      B_Value: tax.buildingValue (mostly null)
+  sale:
+    status: gap
+    reason: No sale fields on RFA layer 18 or mitchelllh AGOL layer; qPublic report (HTML, Cloudflare-gated) only.
+    fieldMap: {}
+    format: n/a
+  owner:
+    status: usable
+    mailingStatus: partial
+    reason: Owner name on RFA Ownership (17,921/18,817). Mailing street/city only on third-party AGOL layer (mitchelllh,
+      2026-03 snapshot, publisher unconfirmed) - no zip field.
+    fieldMap:
+      Ownership: ownerName (RFA)
+      Name: ownerName (AGOL alt)
+      Address_2: mailingAddress.street (AGOL alt)
+      Address_3: mailingAddress.cityState (AGOL alt)
+  paLink:
+    status: partial
+    pattern: https://qpublic.schneidercorp.com/Application.aspx?AppID=861&LayerID=16112&PageTypeID=4&PageID=7170&KeyValue={parcelId}
+    testedParcelId: 065-00-00-024
+    idTransform: KeyValue expected = T_Map_Number as-is (###-##-##-###) = AGOL ParcelID; AGOL CAMA_ID adds " 000"
+      suffix ("065-00-00-024 000") - strip it. Not confirmed on a live report.
+    reason: AppID=861/LayerID=16112 + search PageID=7168 confirmed from qpublic.net/sc/union/search.html (county GIS
+      page links qpublic.net/sc/union). Report PageID=7170 INFERRED (+2 convention verified Aiken 6877->6879, Darlington
+      7156->7158). Cloudflare 403; no indexed report.
+  publicGis:
+    status: partial
+    reason: Union County GIS page (gearupunionsc.com) offers only data orders + a qPublic link; no county web map
+      found. publicGisUrl set to the confirmed qPublic search page (Schneider map reachable from it).
+  gaps:
+  - No public sale data or assessed value; RFA market value only.
+  - Mailing address only on unconfirmed third-party AGOL copy.
+  - qPublic report PageID inferred.
+  aadt:
+    status: usable
+    reason: reference added Pass 2 (enrichment.aadt) — SCDOT 2025 Statewide Traffic Points, filter CountyName
+
+enrichment:
+  aadt:
+    source: SCDOT (AGOL gallowayra_SCDOT — 2025 Statewide Traffic Points) — not re-dug
+    restUrl: https://services1.arcgis.com/VaY7cY9pvUYUP1Lf/arcgis/rest/services/2025_Statewide_Traffic_Points/FeatureServer/0
+    layerId: 0
+    field: FactoredAA
+    geography: state traffic count stations (points)
+    coverage: state-wide
+    status: usable
+    verifiedAt: '2026-09-28'
+    verifiedBy: South Carolina Public Info Researcher
+    notes: Statewide SCDOT points; filter CountyName (stored UPPERCASE). Reference stamped in Pass 2 (2026-09-28); not
+      re-dug.

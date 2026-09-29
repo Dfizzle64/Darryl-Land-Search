@@ -1,0 +1,279 @@
+state: TN
+jurisdiction: Fentress County
+fips: '47049'
+level: county
+markets: []
+layers:
+- role: parcels
+  name: Tennessee Property Boundaries Public Use — Fentress (COUNTY_ID=25)
+  restUrl: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    PARCELID: parcelIdFull
+    DEEDAC: acreage
+    OWNER: ownerName
+    OWNER2: ownerName2
+    ADDRESS: situsAddress
+    COUNTY_ID: countyId
+    COUNTY_NAME: countyName
+    PARCEL_TYPE: parcelType
+    LINK_TPAD: appraiserSearchUrlLive
+    LINK_TPV: publicGisUrlLive
+  notes: 'Fentress is ABSENT from TN_County_Parcel_Map (HNTB). Preferred public AGOL fabric from tnmap
+    OIR. Filter COUNTY_NAME=''Fentress'' OR COUNTY_ID=25 AND PARCEL_TYPE=1. Live count COUNTY_NAME=Fentress
+    16,408; PARCEL_TYPE=1 16,394; DEEDAC 5–150 → 3,585 (2026-09-24 ET). Geo-verify PASS: sample centroids
+    (−84.99368, 36.40295) / (−85.05319, 36.39862) WGS84 in Fentress (Jamestown fringe); GISLINK prefix
+    025. Has OWNER/ADDRESS/DEEDAC + per-feature LINK_TPAD / LINK_TPV. Lacks sale price/date and appraisal
+    fields on this layer — use TPAD deep-link or IMPACT Themes when reachable. OZ 2.0: national tract
+    join by centroid. 2026-09-28 ET TN PIR re-verify: count 16,408; DEEDAC 5–150 → 3592; id GISLINK populated=True;
+    geo PASS (5/5 centroids in county, 5/5 polys touch county) (36.56109,-85.01682)→Fentress; (36.43297,-84.95248)→Fentress;
+    (36.36835,-84.7539)→Fentress (where COUNTY_ID=25).'
+  status: usable
+  auth: none
+  geometry: polygon
+  use: primary-geometry-owner
+  sourceEditDate: '2026-09-10'
+  acreageMethod: geodesic polygon area computed from geometry (DEEDAC = deed acres, NOT used for 5–150)
+  count5to150CalcArea: 5166
+- role: parcels
+  name: IMPACT Parcels sibling (COUNTY_ID=25)
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcels/FeatureServer/0
+  layerId: 0
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    GISLINK2: parcelIdAlt
+    CALC_ACRE: acreage
+    COUNTY_ID: countyId
+    PARCEL_TYPE: parcelType
+  notes: 'Filter COUNTY_ID=25 AND PARCEL_TYPE=1. Egress-sensitive (403 common). Sibling OK after Public
+    Use geo-verify; prefer Public Use when IMPACT blocked. 2026-09-28 ET TN PIR: maps.cot.tn.gov HTTP
+    403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: parcels
+  name: IMPACT Parcel_Layer_Themes sibling (JUR=025) — tax/sale when reachable
+  restUrl: https://maps.cot.tn.gov/server3/rest/services/IMPACT/Parcel_Layer_Themes/FeatureServer/12
+  layerId: 12
+  acreageField: CALC_ACRE
+  coverage: county-wide
+  fieldMap:
+    GISLINK: parcelId
+    OWNER: ownerName
+    OWNER2: ownerName2
+    MAILADDR: mailingAddress.street
+    MAILCITY: mailingAddress.city
+    STATE: mailingAddress.state
+    ZIP: mailingAddress.zip
+    ADDRESS: situsAddress
+    CALC_ACRE: acreage
+    SALEDATE: lastSale.date
+    PRICE: lastSale.price
+    VI: lastSale.qualified
+    LANDVAL: tax.landValue
+    IMPVAL: tax.improvementValue
+    APPRAISAL: tax.marketValue
+    LANDUSE: dorCode
+    ZONING: zoning
+    TAXYR: taxYear
+  notes: 'Filter JUR=''025''; prefer latest TAXYR. Only public source with sale/appraisal CAMA for Fentress
+    when not 403. Prefer Public Use geometry+owner; join Themes on GISLINK. 2026-09-28 ET TN PIR: maps.cot.tn.gov
+    HTTP 403 from box — not verifiable; keep as sibling only.'
+  status: partial
+  auth: blocked-403
+  geometry: polygon
+  use: sibling-fallback
+- role: other
+  name: TDOT Traffic Lines (AADT statewide)
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  acreageField: null
+  coverage: state-wide (filter county)
+  fieldMap:
+    AADT: aadt
+    AADTYEAR: aadtYear
+    COUNTY_NUMBER: countyNumberTdot
+    ROUTE_ID: routeId
+    FUNCTIONAL_CLASS: functionalClass
+  notes: >-
+    Added 2026-09-28 ET TN PIR Pass 2. Filter COUNTY_NUMBER='25' AND AADTYEAR='2025' → 959 segments (all
+    years 1,030). COUNTY_NUMBER = TDOT alphabetical county no. (NOT FIPS).
+  status: usable
+  auth: none
+  geometry: polyline
+  use: aadt-screening
+gaps:
+- Fentress not published on TN_County_Parcel_Map AGOL join (no Assessment_Data_25 layer)
+- Public Use layer lacks SALEDATE/PRICE/APPRAISAL/LANDMKTVAL — Themes/TPAD for tax+sale
+- No public countywide zoning FeatureServer found
+- No adopted FLU FeatureServer found
+- IMPACT Themes often 403 from datacenter egress
+- Fentress_GRC historic survey points are NOT cadastral parcels — do not use
+- IMPACT maps.cot.tn.gov HTTP 403 from box on 2026-09-28 — IMPACT layers kept as unverifiable siblings
+  only.
+license: State of Tennessee / tnmap OIR Property Boundaries Public Use; Comptroller IMPACT-TPAD; attribution
+  required. No paid GIS purchase channel.
+appraiserSearchUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+publicGisUrl: https://tnmap.tn.gov/Assessment/
+jurisdictionGisUrl: https://ucdd.maps.arcgis.com/apps/instant/minimalist/index.html?appid=3e5e6483d06f4a138b02948cea7bb8a6
+zoningOverall: gap
+packagingNote: 'Digged 2026-09-24 ET full-suite TRANCHE-3 wave3a2; Fentress missing from HNTB county map
+  — use Public Use COUNTY_ID=25; geo-verify PASS; tax/sale via Themes/TPAD; skip utilities/AADT. RURAL-OZ
+  PASS 1 re-verify 2026-09-28 ET (TN PIR): parcels usable; added none. LSB-approved parcel setup applied
+  2026-09-28 (see parcelSetup).'
+verifiedAt: '2026-09-28'
+verifiedBy: Tennessee Public Info Researcher
+sourceCheckedAt: '2026-09-28'
+parcelSetup:
+  approvedBy: Land Search Builder 2026-09-28
+  appliedAt: '2026-09-28'
+  appliedBy: Tennessee Public Info Researcher
+  vintageAppliesTo:
+  - lastSale.*
+  - tax.*
+  geometryOwnerSource: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+  geometryOwnerFilter: COUNTY_ID=25
+  geometryOwnerSourceEditDate: '2026-09-10'
+  salesValueSource: GAP
+  joinKey: n/a
+  salesValueVintage: n/a (sale/value gap)
+  salesValueSourceEditDate: n/a
+  acreageFilter: 5–150 ac on geodesic polygon area computed from OIR geometry (not DEEDAC deed acres)
+  count5to150CalcArea: 5166
+  gislinkJoinSample: n/a (no sale/value join layer)
+  exception: Fentress is ABSENT from TN_County_Parcel_Map and no fresher public county CAMA layer is known;
+    the only public sale/value source is IMPACT Parcel_Layer_Themes (maps.cot.tn.gov, HTTP 403 from box).
+    Sale/value = GAP; TPAD deep link per parcel via OIR LINK_TPAD.
+gapClosing_2026_09_28:
+  salesValue: No non-IMPACT GIS layer found; per-parcel public source verified = TPAD.
+  checked:
+  - source: TPAD deep link (assessment.cot.tn.gov — Comptroller TPAD app, not the maps.cot.tn.gov IMPACT
+      map host)
+    test: GISLINK 025084    00235
+    result: 'HTTP 200 via external fetch (Parcel Details, Tax Year 2026: land/improvement/total appraisal
+      + assessment; Sale Information table with 3 sales); box egress HTTP 403'
+    use: per-parcel only (LINK_TPAD on OIR); not bulk
+  - source: TN_County_Parcel_Map
+    result: no Fentress layer
+  - source: UCDD AGOL org EMZFDxQzNQloLbAf
+    result: no Fentress parcel/CAMA service (only county/municipal boundaries)
+  - source: AGOL search "Fentress parcels"
+    result: only Fentress VA (Chesapeake/Jacobs) and MTSU historic-survey points — not usable
+  - source: Fentress County Trustee (fentress.tennesseetrustee.org)
+    result: tax-bill search site only; not a GIS/bulk source — not used
+  recommendation: Keep sale/value = GAP for bulk scoring; expose TPAD per-parcel link (OIR LINK_TPAD)
+    for manual sale/value review.
+aadt:
+  source: TDOT Traffic Lines
+  restUrl: https://services2.arcgis.com/nf3p7v7Zy4fTOh6M/arcgis/rest/services/Traffic_Lines/FeatureServer/0
+  layerId: 0
+  field: AADT
+  yearField: AADTYEAR
+  preferredYear: '2025'
+  countyFilterField: COUNTY_NUMBER
+  countyNumberTdot: '25'
+  where: COUNTY_NUMBER='25' AND AADTYEAR='2025'
+  count2025: 959
+  countAllYears: 1030
+  maxAADT2025: 8963
+  segments2025AADTge5000: 10
+  status: usable
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+ownerEntityTypeRule:
+  appliesTo: OWNER + ' ' + OWNER2 (upper-cased; OWNER2 dropped when it starts with C/O, ATTN, %, CARE
+    OF); first match wins
+  order:
+  - type: church
+    regex: \b(CHURCH|BAPTIST|METHODIST|PRESBYTERIAN|LUTHERAN|EPISCOPAL|CATHOLIC|DIOCESE|MINISTR(Y|IES)|CONGREGATION|FELLOWSHIP|TABERNACLE|TEMPLE|CHAPEL|ASSEMBLY
+      OF GOD|CHURCH OF CHRIST|CEMETERY)\b
+  - type: government
+    regex: \b(UNITED STATES|U ?S ?A|USA|STATE OF (TENNESSEE|TN)|TENNESSEE (STATE|DEPT|DEPARTMENT)|DEPT
+      OF|DEPARTMENT OF|COUNTY OF|CITY OF|TOWN OF|BOARD OF EDUCATION|TENNESSEE VALLEY AUTHORITY|TVA|UTILITY
+      DISTRICT|HOUSING AUTHORITY|WILDLIFE RESOURCES|TWRA|CORPS OF ENGINEERS|NATIONAL PARK)\b|\b[A-Z]+
+      COUNTY( GOVERNMENT| BOARD| COMMISSION| SCHOOLS?| HIGHWAY( DEPT)?)?\s*$
+  - type: LLC
+    regex: \b(L\.?\s?L\.?\s?C|P\.?L\.?L\.?C)\b\.?|LIMITED LIABILITY (COMPANY|CO)
+  - type: LP
+    regex: \b(L\.?L\.?L\.?P|L\.?L\.?P|L\.?P|LTD|LIMITED PARTNERSHIP|PARTNERSHIP|PARTNERS)\b
+  - type: INC
+    regex: \b(INC|INCORPORATED)\b\.?
+  - type: CORP
+    regex: \b(CORP|CORPORATION|COMPANY|CO)\b\.?\s*$|\bCORP\b|\bCORPORATION\b
+  - type: TRUST
+    regex: \b(TRUST|TRUSTS|TRUSTEE|TRUSTEES|TRSTE|TR|TRS|RLT|REV(OCABLE)? (LIVING )?TR(UST)?)\b|\(TR\)
+  - type: individual
+    regex: .*
+  noContactInfo: true
+  contactFieldsExcluded: []
+pass2:
+  verifiedAt: '2026-09-28'
+  verifiedBy: Tennessee Public Info Researcher
+  status:
+    a: verified
+    b: gap
+    c: gap
+    d: verified
+    e: verified
+    f: verified
+  a_aadt:
+    countyNumberTdot: '25'
+    where: COUNTY_NUMBER='25' AND AADTYEAR='2025'
+    count2025: 959
+    countAllYears: 1030
+    maxAADT2025: 8963
+    segments2025AADTge5000: 10
+  b_value:
+    source: GAP
+  c_sale:
+    source: GAP
+    saleHistory: 'Public per-parcel only: TPAD Parcel Details "Sale Information" table (date, price, book/page,
+      vacant/improved, instrument, qualification) via PA deep link; no bulk sale-history layer on public
+      GIS'
+  d_owner:
+    source: https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0
+    filter: COUNTY_ID=25
+    ownerField: OWNER
+    owner2Field: OWNER2
+    total: 16408
+    ownerPopulated: 16406
+    entitySampleN: 2000
+    entityDist:
+      individual: 1690
+      TRUST: 124
+      LLC: 55
+      INC: 52
+      church: 36
+      government: 29
+      CORP: 13
+      LP: 1
+  e_paDeepLink:
+    template: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink={GISLINK}
+    testUrl: https://assessment.cot.tn.gov/TPAD/Parcel/GIS?GISlink=025087%20%20%20%2000100
+    testGislink: 025087    00100
+    httpBox: '403'
+    httpExternal: 200 details
+    taxYearShown: '2026'
+    saleHistoryRows: 3
+    note: TPAD per-parcel is the only public sale/value source for Fentress
+    perParcelFieldOnOIR: LINK_TPAD
+  f_viewer:
+    url: https://ucdd.maps.arcgis.com/apps/instant/minimalist/index.html?appid=3e5e6483d06f4a138b02948cea7bb8a6
+    http: '200'
+    arcgisItem:
+      id: 3e5e6483d06f4a138b02948cea7bb8a6
+      access: public
+      type: Web Mapping Application
+      title: Fentress County Community Resources
+      error: null
+    statewideTPV: https://tnmap.tn.gov/assessment/#/parcel/{GISLINK} (OIR LINK_TPV) HTTP 200
+    isStatewideFallback: false
+  vintage:
+    salesValueVintage: null
+  notes: []

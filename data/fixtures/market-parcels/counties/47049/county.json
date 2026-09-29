@@ -1,0 +1,50 @@
+{
+  "name": "Fentress",
+  "fips": "47049",
+  "state": "Tennessee",
+  "markets": [
+    "Knoxville"
+  ],
+  "featureCount": 5166,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "tn-oir-public-use-47049",
+  "queryUrl": "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+  "gaps": [
+    "Geometry and owner are Tennessee OIR Tennessee Property Boundaries Public Use, edited 2026-09-10, filtered by Comptroller COUNTY_ID. Acreage is the geodesic area of the polygon because DEEDAC is often 0. The filter is 5.0–150.0 acres inclusive. Vertices are not simplified.",
+    "Sale date, sale price, and appraisal stay empty. The card's sales-value source is a gap: TN_County_Parcel_Map does not publish this county, and the only bulk CAMA is IMPACT, which returns HTTP 403 from this network. The TPAD link is stored and not requested. Owner phone and email are not ingested.",
+    "The property-record link is LINK_TPAD when the OIR row publishes it, otherwise the TPAD GIS card for the same GISLINK. Opportunity Zone status was not inferred.",
+    "Regrid and other paid parcel vendors were not used.",
+    "No usable countywide zoning or future-land-use FeatureServer is on the research card. Those fields stay empty."
+  ],
+  "path": "data/fixtures/market-parcels/counties/47049/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/47049/lookup.json",
+  "sourceCount": 16408,
+  "dropped": 0,
+  "tileCount": 7,
+  "ingest": {
+    "sourceRows": 16408,
+    "deedAcresInBand": 3592,
+    "droppedGeometry": 0,
+    "droppedOutsideBand": 11242,
+    "droppedNoId": 0,
+    "duplicateIdsCollapsed": 0,
+    "tncpmLayer": null,
+    "tncpmMatched": 0,
+    "saleCount": 0,
+    "appraisalCount": 0,
+    "gislinkMatchRate": null,
+    "salesVintage": null,
+    "kept": 5166,
+    "ownerCount": 5165,
+    "tpadCount": 5166,
+    "opportunityZoneDesignated": 0,
+    "simplified": false,
+    "acreageBand": [
+      5.0,
+      150.0
+    ]
+  }
+}

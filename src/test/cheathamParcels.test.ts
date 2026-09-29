@@ -165,7 +165,7 @@ describe("Cheatham County TN parcel extract", () => {
     expect(listed?.featureCount).toBe(county.featureCount);
     expect(listed?.source).toBe("apsu-cheatgis-47021");
     expect(index.markets.Nashville.gapCountyCount).toBe(3);
-    expect(index.markets.Nashville.completeCountyCount).toBe(19);
+    expect(index.markets.Nashville.completeCountyCount).toBe(25);
     const docs = readFileSync(path.join(root, "docs/market-parcels.md"), "utf8");
     expect(docs).toContain(`| Cheatham | Tennessee | 47021 | complete-gte-5ac | ${county.featureCount.toLocaleString("en-US")} | apsu-cheatgis-47021 |`);
     expect(county.gaps.join(" ")).toMatch(/JUR is 011/);

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T06:00:02Z",
+  "generatedAt": "2026-09-29T06:43:55Z",
   "market": "Chattanooga",
   "tier": "other",
-  "parcelCount": 71632,
+  "parcelCount": 76655,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -370,20 +370,26 @@
       "name": "Whitfield",
       "fips": "13313",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 5023,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-whitfield-parcels-13313",
+      "queryUrl": "https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/4/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Parcels_and_Development Parcels (official Whitfield GIS) (https://gis.whitfieldcountyga.com/server/rest/services/Parcels_and_Development/MapServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Pass 2 sale attributes were joined from Recent Sales (saleyear only — no price) onto 1953 parcels.",
+        "Source query returned 7074 rows; 5023 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 5023 distinct parcel ids.",
+        "Pass 2 tax is REST, sale is REST-partial, and owner is REST. HTML-only values were not scraped.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13313/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13313/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 7074
     }
   ]
 }

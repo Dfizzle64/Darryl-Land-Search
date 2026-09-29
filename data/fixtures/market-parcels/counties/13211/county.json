@@ -5,19 +5,28 @@
   "markets": [
     "Atlanta"
   ],
-  "featureCount": 0,
-  "coverage": "gap",
-  "partition": "none",
+  "featureCount": 4496,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "unavailable",
-  "queryUrl": null,
+  "source": "ga-morgan-parcels-13211",
+  "queryUrl": "https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Parcels/FeatureServer/0/query",
   "gaps": [
-    "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+    "Parcels are Parcels (official Morgan County GA AGOL — owner tgiddens86) (https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Pass 2 sale attributes were joined from 2023_SALES_20240503 onto 141 parcels.",
+    "Pass 2 tax is REST, sale is REST-partial, and owner is HTML-only. HTML-only values were not scraped.",
+    "Pass 2 owner name is HTML-only and was not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
   ],
-  "path": null,
-  "lookup": null,
-  "sourceCount": null,
-  "dropped": null,
-  "tileCount": null
+  "path": "data/fixtures/market-parcels/counties/13211/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13211/lookup.json",
+  "sourceCount": 4496,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=morganCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=morganCountyGA&Layer=Parcels&PageType=Map",
+  "pulledOn": "2026-09-29"
 }

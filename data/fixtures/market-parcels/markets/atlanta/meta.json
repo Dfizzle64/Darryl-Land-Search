@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T06:19:42Z",
+  "generatedAt": "2026-09-29T06:45:10Z",
   "market": "Atlanta",
   "tier": "primary",
-  "parcelCount": 128566,
+  "parcelCount": 142542,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -861,20 +861,24 @@
       "name": "Meriwether",
       "fips": "13199",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4931,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-meriwether-parcels-13199",
+      "queryUrl": "https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are MeriwetherParcels (AGOL hosted — WinGAP-style CAMA) (https://services9.arcgis.com/Xv8vRekQ4FVHSSIe/arcgis/rest/services/MeriwetherParcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13199/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13199/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 4931
     },
     {
       "name": "Monroe",
@@ -906,20 +910,25 @@
       "name": "Morgan",
       "fips": "13211",
       "state": "Georgia",
-      "featureCount": 0,
-      "coverage": "gap",
-      "partition": "none",
+      "featureCount": 4496,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "unavailable",
-      "queryUrl": null,
+      "source": "ga-morgan-parcels-13211",
+      "queryUrl": "https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Parcels/FeatureServer/0/query",
       "gaps": [
-        "No public statewide Georgia parcel polygon service. This county is not in the Cobb/DeKalb pull."
+        "Parcels are Parcels (official Morgan County GA AGOL — owner tgiddens86) (https://services9.arcgis.com/mr2xH531NAL4tt7e/arcgis/rest/services/Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Pass 2 sale attributes were joined from 2023_SALES_20240503 onto 141 parcels.",
+        "Pass 2 tax is REST, sale is REST-partial, and owner is HTML-only. HTML-only values were not scraped.",
+        "Pass 2 owner name is HTML-only and was not copied.",
+        "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
       ],
-      "path": null,
-      "lookup": null,
-      "tileCount": null,
-      "sourceCount": null
+      "path": "data/fixtures/market-parcels/counties/13211/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13211/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 4496
     },
     {
       "name": "Newton",
@@ -1064,6 +1073,32 @@
       "lookup": "data/fixtures/market-parcels/counties/13255/lookup.json",
       "tileCount": 5,
       "sourceCount": 33700
+    },
+    {
+      "name": "Troup",
+      "fips": "13285",
+      "state": "Georgia",
+      "featureCount": 4549,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "ga-troup-parcels-13285",
+      "queryUrl": "https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0/query",
+      "gaps": [
+        "Parcels are Parcels (Troup County / LaGrange GIS AGOL) (https://services.arcgis.com/V4Y8xIvXuYJiVZwF/arcgis/rest/services/Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+        "Source query returned 4551 rows; 4549 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+        "Counted 4549 distinct parcel ids.",
+        "Pass 2 tax is HTML-only, sale is HTML-only, and owner is HTML-only. HTML-only values were not scraped.",
+        "Pass 2 tax is HTML-only. Assessed value and tax bills were not copied off qPublic.",
+        "Pass 2 sale date and price are HTML-only and were not copied.",
+        "Pass 2 owner name is HTML-only and was not copied."
+      ],
+      "path": "data/fixtures/market-parcels/counties/13285/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/13285/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 4551
     },
     {
       "name": "Walton",

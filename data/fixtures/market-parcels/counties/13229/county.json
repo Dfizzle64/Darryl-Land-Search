@@ -1,0 +1,33 @@
+{
+  "name": "Pierce",
+  "fips": "13229",
+  "state": "Georgia",
+  "markets": [
+    "Valdosta"
+  ],
+  "featureCount": 2985,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-pierce-parcels-13229",
+  "queryUrl": "https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0/query",
+  "gaps": [
+    "Parcels are Pierce ParcelInformation Tax Parcels (SGRC / sgrcmaps) (https://www.sgrcmaps.com/alma/rest/services/Pierce/ParcelInformation/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Source query returned 3031 rows; 2985 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Counted 2985 distinct parcel ids.",
+    "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13229/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13229/lookup.json",
+  "sourceCount": 3031,
+  "dropped": 0,
+  "tileCount": 7,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=PierceCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://sgrc.maps.arcgis.com/apps/webappviewer/index.html?id=83a7e536995d4a16932a41001432d990",
+  "pulledOn": "2026-09-29"
+}

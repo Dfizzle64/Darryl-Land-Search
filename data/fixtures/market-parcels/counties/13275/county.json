@@ -1,0 +1,33 @@
+{
+  "name": "Thomas",
+  "fips": "13275",
+  "state": "Georgia",
+  "markets": [
+    "Valdosta"
+  ],
+  "featureCount": 3841,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "ga-thomas-parcels-13275",
+  "queryUrl": "https://www.thomascountymaps.org/arcgis/rest/services/parcels_addresses/MapServer/4/query",
+  "gaps": [
+    "Parcels are parcels_addresses Parcels (Thomas County Maps / CMAP) (https://www.thomascountymaps.org/arcgis/rest/services/parcels_addresses/MapServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Household income stays the ACS B19013_001E tract join. GDOT AADT is not copied onto the parcel.",
+    "Source query returned 3863 rows; 3841 distinct parcel ids stayed in the 5.0–150.0 acre band after the geometry check.",
+    "Counted 3841 distinct parcel ids.",
+    "Pass 2 tax is REST, sale is HTML-only, and owner is REST. HTML-only values were not scraped.",
+    "Pass 2 sale date and price are HTML-only and were not copied.",
+    "Property-appraiser links use each parcel id in the pass-2 template and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/13275/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/13275/lookup.json",
+  "sourceCount": 3863,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?App=ThomasCountyGA&Layer=Parcels&PageType=Report&KeyValue={parcelId}",
+  "gisViewerUrl": "https://www.thomascountymaps.org/cmap/",
+  "pulledOn": "2026-09-29"
+}

@@ -61,6 +61,8 @@ Twenty Tennessee counties were loaded from public GIS only. Geometry and owner c
 
 Georgia rural Opportunity Zone batch 3 loads 5.0–150.0 acre parcels for pass-2 orders 48 through 69 whose pass-1 status is usable and whose public endpoint answered: Dooly, Echols, Emanuel, Evans, Floyd, Glynn, Greene, Hall, Houston, Irwin, Jackson, Jeff Davis, Lanier, Laurens, Liberty, Long, Lumpkin, and McDuffie. Fayette, Henry, and Lowndes were already complete 5.0–150.0 acre extracts and were not replaced. Grady's Schneider WFS returned layer metadata, but count and id queries timed out, so Grady was not loaded. McDuffie's host answered on this pull. Counties already on a shelf stayed there: Hall, Jackson, and Lumpkin on Atlanta, and Liberty on Savannah. The others joined the nearest existing Georgia shelf: Dooly, Emanuel, Houston, and Laurens on Macon; Echols, Irwin, Jeff Davis, and Lanier on Valdosta; Evans, Glynn, and Long on Savannah; Floyd on Chattanooga; Greene and McDuffie on Athens. No new market shelf was added. Glynn acreage is Shape__Area in Georgia East State Plane square feet divided by 43560. Jackson market value is the sum of FMVRES, FMVCOM, and FMVACC, and stays empty when those components are zero. WinGAP a_value on Dooly, Echols, and Greene is stored as land value because mavcurr, the assessed field, is empty. Lanier's live layer does not publish LASTNAME, so owner stays empty. Floyd's live layer has no sale price or date. A Hall NO_RELEASE flag suppresses owner and mailing fields. Property-appraiser links use each parcel's own id from the pass-2 template and were not requested. Liberty's link key is the PIN, which is not the parcel number. A sample account id is not copied onto every parcel. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. GDOT AADT stays off the parcel. Household income stays ACS B19013_001E. Tract display was not changed.
 
+Georgia rural Opportunity Zone batch 4 loads 5.0–150.0 acre parcels for pass-2 orders 70 through 92 whose pass-1 status is usable and whose public endpoint answered: McIntosh, Macon, Meriwether, Montgomery, Morgan, Pierce, Pulaski, Sumter, Talbot, Tattnall, Thomas, Tift, Toombs, Troup, Turner, Twiggs, Ware, Wheeler, Whitfield, and Wilcox. Rockdale and Spalding were already complete 5.0–150.0 acre extracts and were not replaced. Orders 26–69 belong to other batches and were not requested. Franklin (order 7) and Habersham (order 10) were retried on wfs.schneidercorp.com with 40-feature pages and backoff. Layer metadata answered, and the query endpoint still returned a server wait timeout, so both counties were skipped. Telfair's county-wide layer publishes only an object id and shape, with no parcel id, so it was not loaded. Counties already on a shelf stayed there: Meriwether and Morgan on Atlanta, and Whitfield on Chattanooga. The others joined the nearest existing Georgia shelf: McIntosh, Tattnall, and Toombs on Savannah; Macon, Montgomery, Pulaski, Sumter, Talbot, Twiggs, Wheeler, and Wilcox on Macon; Pierce, Thomas, Tift, Turner, and Ware on Valdosta; Troup on Atlanta. No new market shelf was added. Macon County has no filterable acre attribute, and Tift and Wheeler publish none, so those three use geodesic polygon area. This Macon County extract is not Macon-Bibb. Whitfield's query returned 7,074 rows and the extract keeps 5,023 distinct parcel ids. Pulaski is the county-wide Hawkinsville-Pulaski layer pass 1 counted for the county. Pass 2 tax, owner, and sale attributes are stored where that pass said REST. Sumter sale price and date are on the parcel layer. Morgan's 2023 sales layer matched 141 parcels. Whitfield's sale layer has a sale year and no price; it matched 1,953 parcels. Turner's land and improvement sale components were not summed into a sale price. Talbot owner is the WinGAP last-name field. Troup's Beacon key is the PARCEL suffix on the card, and that suffix is not unique. Property-appraiser links use each parcel's own id from the pass-2 template and were not requested. A sample parcel id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status, school grade, or base flood elevation was added. GDOT AADT stays off the parcel. Household income stays ACS B19013_001E. Tract display was not changed.
+
 ## Coverage
 
 # Market parcel coverage
@@ -71,7 +73,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 
 | Market | Tier | Parcels | Complete counties | Sample or partial | Gaps |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Atlanta | primary | 128,566 | 24 | 0 | 11 |
+| Atlanta | primary | 142,542 | 27 | 0 | 9 |
 | Tampa | primary | 127,713 | 10 | 0 | 0 |
 | Charleston | primary | 113,262 | 18 | 0 | 0 |
 | Nashville | primary | 202,510 | 34 | 0 | 0 |
@@ -87,10 +89,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Birmingham | other | 101,123 | 9 | 0 | 3 |
 | Mobile | other | 51,658 | 4 | 0 | 2 |
 | Huntsville | other | 132,496 | 16 | 0 | 0 |
-| Savannah | other | 53,765 | 15 | 0 | 0 |
+| Savannah | other | 62,356 | 18 | 0 | 0 |
 | Columbia | other | 96,799 | 12 | 0 | 2 |
 | Greenville | other | 91,872 | 10 | 0 | 0 |
-| Chattanooga | other | 71,632 | 14 | 0 | 2 |
+| Chattanooga | other | 76,655 | 15 | 0 | 1 |
 | Knoxville | other | 146,507 | 26 | 0 | 0 |
 | Memphis | other | 102,576 | 20 | 0 | 0 |
 | Jackson | other | 38,676 | 8 | 0 | 0 |
@@ -101,8 +103,8 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Asheville | other | 121,232 | 21 | 0 | 0 |
 | Tuscaloosa | other | 27,452 | 4 | 0 | 1 |
 | Montgomery | other | 85,425 | 13 | 0 | 1 |
-| Valdosta | other | 40,329 | 15 | 0 | 0 |
-| Macon | other | 48,828 | 18 | 0 | 0 |
+| Valdosta | other | 55,243 | 20 | 0 | 0 |
+| Macon | other | 65,160 | 26 | 0 | 0 |
 | Athens | other | 15,216 | 5 | 0 | 0 |
 | Hilton Head | other | 4,756 | 1 | 0 | 0 |
 | Jackson MS | other | 57,020 | 7 | 0 | 0 |
@@ -138,15 +140,16 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Jasper | Georgia | 13159 | complete-gte-5ac | 3,211 | ga-jasper-parcels-13159 |
 | Lamar | Georgia | 13171 | gap | 0 | unavailable |
 | Lumpkin | Georgia | 13187 | complete-gte-5ac | 3,872 | ga-lumpkin-parcels-13187 |
-| Meriwether | Georgia | 13199 | gap | 0 | unavailable |
+| Meriwether | Georgia | 13199 | complete-gte-5ac | 4,931 | ga-meriwether-parcels-13199 |
 | Monroe | Georgia | 13207 | complete-gte-5ac | 4,510 | ga-monroe-parcels-13207 |
-| Morgan | Georgia | 13211 | gap | 0 | unavailable |
+| Morgan | Georgia | 13211 | complete-gte-5ac | 4,496 | ga-morgan-parcels-13211 |
 | Newton | Georgia | 13217 | complete-gte-5ac | 4,474 | ga-newton-uofmd-parcels |
 | Paulding | Georgia | 13223 | complete-gte-5ac | 5,094 | ga-paulding-parcels |
 | Pickens | Georgia | 13227 | gap | 0 | unavailable |
 | Pike | Georgia | 13231 | gap | 0 | unavailable |
 | Rockdale | Georgia | 13247 | complete-gte-5ac | 2,555 | ga-rockdale-parcels |
 | Spalding | Georgia | 13255 | complete-gte-5ac | 3,832 | ga-spalding-parcels-public |
+| Troup | Georgia | 13285 | complete-gte-5ac | 4,549 | ga-troup-parcels-13285 |
 | Walton | Georgia | 13297 | complete-gte-5ac | 5,824 | ga-walton-choosewalton-parcels |
 
 ### Tampa
@@ -436,7 +439,10 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Jasper | South Carolina | 45053 | complete-gte-5ac | 3,682 | sc-jasper-parcels-45053 |
 | Liberty | Georgia | 13179 | complete-gte-5ac | 2,269 | ga-liberty-parcels-13179 |
 | Long | Georgia | 13183 | complete-gte-5ac | 1,662 | ga-long-parcels-13183 |
+| McIntosh | Georgia | 13191 | complete-gte-5ac | 1,423 | ga-mcintosh-parcels-13191 |
 | Screven | Georgia | 13251 | complete-gte-5ac | 3,680 | ga-screven-parcels-13251 |
+| Tattnall | Georgia | 13267 | complete-gte-5ac | 3,623 | ga-tattnall-parcels-13267 |
+| Toombs | Georgia | 13279 | complete-gte-5ac | 3,545 | ga-toombs-parcels-13279 |
 | Wayne | Georgia | 13305 | complete-gte-5ac | 3,775 | ga-wayne-parcels-13305 |
 
 ### Columbia
@@ -492,7 +498,7 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Rhea | Tennessee | 47143 | complete-gte-5ac | 3,977 | tn-oir-public-use-47143 |
 | Sequatchie | Tennessee | 47153 | complete-gte-5ac | 3,342 | tn-oir-public-use-47153 |
 | Walker | Georgia | 13295 | complete-gte-5ac | 6,575 | ga-walker-parcels-13295 |
-| Whitfield | Georgia | 13313 | gap | 0 | unavailable |
+| Whitfield | Georgia | 13313 | complete-gte-5ac | 5,023 | ga-whitfield-parcels-13313 |
 
 ### Knoxville
 
@@ -701,6 +707,11 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Jeff Davis | Georgia | 13161 | complete-gte-5ac | 2,603 | ga-jeff-davis-parcels-13161 |
 | Lanier | Georgia | 13173 | complete-gte-5ac | 1,263 | ga-lanier-parcels-13173 |
 | Lowndes | Georgia | 13185 | complete-gte-5ac | 5,815 | ga-lowndes-valor-taxparcels |
+| Pierce | Georgia | 13229 | complete-gte-5ac | 2,985 | ga-pierce-parcels-13229 |
+| Thomas | Georgia | 13275 | complete-gte-5ac | 3,841 | ga-thomas-parcels-13275 |
+| Tift | Georgia | 13277 | complete-gte-5ac | 2,915 | ga-tift-parcels-13277 |
+| Turner | Georgia | 13287 | complete-gte-5ac | 1,804 | ga-turner-parcels-13287 |
+| Ware | Georgia | 13299 | complete-gte-5ac | 3,369 | ga-ware-parcels-13299 |
 | Worth | Georgia | 13321 | complete-gte-5ac | 3,219 | ga-worth-parcels-13321 |
 
 ### Macon
@@ -721,10 +732,18 @@ Parcels stay off until neighborhood zoom, an area lock, or Show parcels. The map
 | Jefferson | Georgia | 13163 | complete-gte-5ac | 2,987 | ga-jefferson-parcels-13163 |
 | Johnson | Georgia | 13167 | complete-gte-5ac | 2,193 | ga-johnson-parcels-13167 |
 | Laurens | Georgia | 13175 | complete-gte-5ac | 6,986 | ga-laurens-parcels-13175 |
+| Macon | Georgia | 13193 | complete-gte-5ac | 1,998 | ga-macon-parcels-13193 |
+| Montgomery | Georgia | 13209 | complete-gte-5ac | 1,967 | ga-montgomery-parcels-13209 |
 | Peach | Georgia | 13225 | complete-gte-5ac | 2,052 | ga-peach-parcels-13225 |
+| Pulaski | Georgia | 13235 | complete-gte-5ac | 1,668 | ga-pulaski-parcels-13235 |
 | Stewart | Georgia | 13259 | complete-gte-5ac | 875 | ga-stewart-parcels-13259 |
+| Sumter | Georgia | 13261 | complete-gte-5ac | 2,869 | ga-sumter-parcels-13261 |
+| Talbot | Georgia | 13263 | complete-gte-5ac | 2,168 | ga-talbot-parcels-13263 |
 | Taylor | Georgia | 13269 | complete-gte-5ac | 2,404 | ga-taylor-parcels-13269 |
+| Twiggs | Georgia | 13289 | complete-gte-5ac | 2,100 | ga-twiggs-parcels-13289 |
 | Upson | Georgia | 13293 | complete-gte-5ac | 3,315 | ga-upson-parcels-13293 |
+| Wheeler | Georgia | 13309 | complete-gte-5ac | 1,516 | ga-wheeler-parcels-13309 |
+| Wilcox | Georgia | 13315 | complete-gte-5ac | 2,046 | ga-wilcox-parcels-13315 |
 
 ### Athens
 

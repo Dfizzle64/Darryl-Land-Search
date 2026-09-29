@@ -333,6 +333,18 @@ NEXT_PUBLIC_MAPTILER_KEY=
 - Block-group income is missing for a small number of centroids that do not fall in the simplified ACS polygons.
 - Contact data is **mailing address + Sunbiz / OCPA / Comptroller links only**. No skip-traced phones or emails.
 
+## Preview builds
+
+Vercel preview deployments skip when a pull request only changes generated parcel data. Production builds, and any deployment whose git ref is `main`, always build. The rule lives in `vercel.json` (`ignoreCommand` runs `scripts/vercel-ignore-build.sh`). A preview is skipped only when every changed file is under one of these paths:
+
+- `data/fixtures/market-parcels/` — county tiles (`*.geojson`), `county.json`, `lookup.json`, `markets/<slug>/meta.json`, `index.json`, `coverage.md`, and other generated files in that tree
+- `data/fixtures/orlando-parcels/` — Orlando parcel tiles and geojson
+- `data/market-parcel-counties.json`
+- `data/al-parcel-cards/`, `data/ga-parcel-cards/`, `data/nc-parcel-cards/`, `data/sc-parcel-cards/`, `data/tn-parcel-cards/`
+- `public/data/`
+
+A code, config, test, or docs change builds the preview. If the diff against `origin/main` cannot be determined, the preview builds. Pull requests still get a pass/fail check from GitHub Actions (`.github/workflows/test.yml`), which runs `npm ci` and `npm test`.
+
 ## Stack
 
 TypeScript, Next.js 15 App Router, MapLibre GL, Tailwind CSS. Data layer is fixture GeoJSON with a `ParcelProvider` adapter (see above).

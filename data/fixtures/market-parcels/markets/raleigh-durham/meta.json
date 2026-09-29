@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T05:10:06Z",
+  "generatedAt": "2026-09-29T05:15:33Z",
   "market": "Raleigh-Durham",
   "tier": "primary",
-  "parcelCount": 215243,
+  "parcelCount": 236519,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -56,6 +56,32 @@
       "lookup": "data/fixtures/market-parcels/counties/37015/lookup.json",
       "tileCount": 7,
       "sourceCount": 4455
+    },
+    {
+      "name": "Camden",
+      "fips": "37029",
+      "state": "North Carolina",
+      "featureCount": 1978,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-camden-parcels-37029",
+      "queryUrl": "https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Parcels/FeatureServer/1/query",
+      "gaps": [
+        "Parcels are Parcels FeatureServer/1 (PRIMARY county AGOL CAMA + owner/sale-date/zoning attr) (https://services7.arcgis.com/f8vjF7CsMeTPBIVC/arcgis/rest/services/Parcels/FeatureServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 1997 rows; 1978 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax gap, sale partial). Pass 2 counted 102 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Pass 2 tax status is gap. Scrubbed or missing tax values were not copied off the parcel layer.",
+        "Pass 2 sale: SaleDate (string) on layer; no price on REST. Price only on NCPTS https://lrcpwa.ncptscloud.com/camden/parcel-detail/{PIN} (script-rendered SPA).",
+        "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+        "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37029/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37029/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 1997
     },
     {
       "name": "Caswell",
@@ -122,6 +148,54 @@
       "lookup": "data/fixtures/market-parcels/counties/37041/lookup.json",
       "tileCount": 3,
       "sourceCount": 2153
+    },
+    {
+      "name": "Cumberland",
+      "fips": "37051",
+      "state": "North Carolina",
+      "featureCount": 8387,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-cumberland-parcels-37051",
+      "queryUrl": "https://gis.co.cumberland.nc.us/server/rest/services/Tax/Parcels/MapServer/0/query",
+      "gaps": [
+        "Parcels are Tax/Parcels (PRIMARY CAMA) (https://gis.co.cumberland.nc.us/server/rest/services/Tax/Parcels/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 8663 rows; 8387 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 1113 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+        "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37051/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37051/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 8663
+    },
+    {
+      "name": "Currituck",
+      "fips": "37053",
+      "state": "North Carolina",
+      "featureCount": 2771,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-currituck-parcels-37053",
+      "queryUrl": "https://maps.currituckcountync.gov/arcgis/rest/services/GISWebsite/OperationalLayers/MapServer/20/query",
+      "gaps": [
+        "Parcels are OperationalLayers Parcels/20 (PRIMARY CAMA ArcGIS REST) (https://maps.currituckcountync.gov/arcgis/rest/services/GISWebsite/OperationalLayers/MapServer/20). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 2913 rows; 2771 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 125 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+        "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37053/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37053/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 2913
     },
     {
       "name": "Durham",
@@ -241,6 +315,30 @@
       "lookup": "data/fixtures/market-parcels/counties/37069/lookup.json",
       "tileCount": 7,
       "sourceCount": 7785
+    },
+    {
+      "name": "Gates",
+      "fips": "37073",
+      "state": "North Carolina",
+      "featureCount": 2326,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-gates-parcels-37073",
+      "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer/5/query",
+      "gaps": [
+        "Parcels are GatesParcelService parcels (PRIMARY) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/GatesParcelService/FeatureServer/5). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 2331 rows; 2326 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 187 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+        "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37073/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37073/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 2331
     },
     {
       "name": "Granville",
@@ -546,6 +644,31 @@
       "sourceCount": 2814
     },
     {
+      "name": "Perquimans",
+      "fips": "37143",
+      "state": "North Carolina",
+      "featureCount": 2873,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-perquimans-parcels-37143",
+      "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/2/query",
+      "gaps": [
+        "Parcels are Perquimans_Service Parcels_2017 (PRIMARY county AGOL CAMA + PRC) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/Perquimans_Service/FeatureServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 2912 rows; 2873 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale partial). Pass 2 counted 151 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Pass 2 sale: DATE_SOLD (string) on layer; no price on REST or on the county search summary page. Price only via the property card linked from that page ([View Property Card] /prc/{opaque id}).",
+        "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+        "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37143/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37143/lookup.json",
+      "tileCount": 5,
+      "sourceCount": 2912
+    },
+    {
       "name": "Person",
       "fips": "37145",
       "state": "North Carolina",
@@ -604,6 +727,28 @@
       "lookup": "data/fixtures/market-parcels/counties/37163/lookup.json",
       "tileCount": 10,
       "sourceCount": 14177
+    },
+    {
+      "name": "Tyrrell",
+      "fips": "37177",
+      "state": "North Carolina",
+      "featureCount": 1159,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-tyrrell-parcels-37177",
+      "queryUrl": "https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/TyrrellService/FeatureServer/7/query",
+      "gaps": [
+        "Parcels are TyrrellService TaxParcels (PRIMARY county AGOL CAMA + SALEAMOUNT) (https://services3.arcgis.com/nJbIFHiSnaX0z0hS/arcgis/rest/services/TyrrellService/FeatureServer/7). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 1164 rows; 1159 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 80 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37177/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37177/lookup.json",
+      "tileCount": 4,
+      "sourceCount": 1164
     },
     {
       "name": "Vance",
@@ -672,6 +817,28 @@
       "lookup": "data/fixtures/market-parcels/counties/37185/lookup.json",
       "tileCount": 8,
       "sourceCount": 23477
+    },
+    {
+      "name": "Washington",
+      "fips": "37187",
+      "state": "North Carolina",
+      "featureCount": 1782,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-washington-parcels-37187",
+      "queryUrl": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/9/query",
+      "gaps": [
+        "Parcels are Washington_Service Parcels_in_use (PRIMARY county AGOL CAMA + sale) (https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/9). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 1800 rows; 1782 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 185 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37187/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37187/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 1800
     },
     {
       "name": "Wayne",

@@ -5,22 +5,25 @@
   "markets": [
     "Big Bend"
   ],
-  "featureCount": 4784,
-  "coverage": "sample",
+  "featureCount": 4866,
+  "coverage": "complete-gte-5ac",
   "partition": "tiles",
   "minAcres": 5.0,
   "maxAcres": 150.0,
-  "source": "fl-wakulla-county-parcels-12129",
-  "queryUrl": "https://services9.arcgis.com/vAltLjtfYIJc7pDt/arcgis/rest/services/Wakulla_County_Parcels/FeatureServer/0/query",
+  "source": "fl-wakulla-parcelm-12129",
+  "queryUrl": "https://services9.arcgis.com/vAltLjtfYIJc7pDt/arcgis/rest/services/ParcelM/FeatureServer/0/query",
   "gaps": [
-    "Partial. The county parcel layer has MAP_ACRES and PARCEL_ID only. No owner, situs, or county zoning.",
-    "County future land use is joined from the planning Future Land Use layer. Sopchoppy zoning (ZoningCat on Sopchoppy_FLUM_WFL1) is joined when the centroid falls inside it. St. Marks has no public zoning FeatureServer. Eligible tracts in this county stay eligible and are not designated QOZs.",
-    "Property appraiser search is https://mywakullapa.com/.",
-    "Join counts: flu=4776, sopchoppy=35, county=4749"
+    "4880 rows matched the acreage filter; 4866 kept after the parcel-id and geometry checks.",
+    "Wakulla parcels are ParcelM/FeatureServer/0. Acreage is MAP_ACRES, 5.0–150.0 inclusive. MIL1 2023 is not the polygon source.",
+    "FDOR joins need CO_NO=75 and PARCEL_ID with '-' removed. Owner, tax, and the roll sale come from that FDOR row. The property-appraiser pattern is stored and was not health-checked. No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 4675 parcel ids that still match."
   ],
   "path": "data/fixtures/market-parcels/counties/12129/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12129/lookup.json",
-  "sourceCount": 4801,
+  "sourceCount": 4880,
   "dropped": 1,
-  "tileCount": 8
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=836&LayerID=15205&PageTypeID=4&PageID=6833&KeyValue={id}",
+  "gisViewerUrl": "https://gis-portal-update-wakullaplanning.hub.arcgis.com/"
 }

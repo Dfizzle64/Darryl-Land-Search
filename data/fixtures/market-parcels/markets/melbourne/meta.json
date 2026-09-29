@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T05:10:06Z",
+  "generatedAt": "2026-09-29T05:15:33Z",
   "market": "Melbourne",
   "tier": "other",
-  "parcelCount": 41026,
+  "parcelCount": 41492,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -329,21 +329,24 @@
       "name": "Orange",
       "fips": "12095",
       "state": "Florida",
-      "featureCount": 11709,
+      "featureCount": 11769,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "reused-orlando-ocpa-5-150",
-      "queryUrl": "https://vgispublic.ocpafl.org/server/rest/services/Webmap/PARCEL/MapServer/4/query",
+      "source": "fl-orange-agol-open-data-12095",
+      "queryUrl": "https://ocgis4.ocfl.net/arcgis/rest/services/AGOL_Open_Data/MapServer/56/query",
       "gaps": [
-        "Reused the Orlando OCPA 5.0–150.0 acre tiles. Not a second download.",
-        "Geometry, owner, mailing, sale, tax, and zoning come from OCPA."
+        "11911 rows matched the acreage filter; 11769 kept after the parcel-id and geometry checks.",
+        "Orange parcels are AGOL_Open_Data/MapServer/56. The acreage filter is ACREAGE BETWEEN 5 AND 150 because the host rejects >= and <=. The OCPA Webmap/PARCEL extract is not this shelf.",
+        "Where NAME1='CONFIDENTIAL', NAME1, NAME2, and the mailing address are suppressed.",
+        "FDOR joins need CO_NO=58 and PARCEL with the 1st and 3rd 2-digit groups swapped (or ALT_KEY = PARCEL). No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 10074 parcel ids that still match."
       ],
       "path": "data/fixtures/orlando-parcels/tiles/12095",
       "lookup": "data/fixtures/orlando-parcels/lookup/12095.json",
       "tileCount": 10,
-      "sourceCount": 11887
+      "sourceCount": 11911
     },
     {
       "name": "Osceola",
@@ -354,10 +357,13 @@
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "reused-orlando-complete-5-150",
-      "queryUrl": "https://gis.osceola.org/hosting/rest/services/Parcels/FeatureServer/3/query",
+      "source": "osceola-parcels-12097",
+      "queryUrl": "https://gis.osceola.org/hosting/rest/services/Parcels/MapServer/3/query",
       "gaps": [
-        "Market rows point at the Orlando tile folder. Those tiles were reseeded from Osceola public parcels."
+        "6170 rows matched the acreage filter; 6169 kept after the parcel-id and geometry checks.",
+        "Osceola parcels are read from Parcels/MapServer/3. FeatureServer/3 advertises public edits and is not written. Acreage is TotalAcres, 5.0–150.0 inclusive. Tiles stay on the Orlando shelf.",
+        "FDOR joins need CO_NO=59 and PIN exactly. The property-appraiser pattern is stored and was not health-checked. No Opportunity Zone status is stored.",
+        "Zoning or future land use carried forward for 6129 parcel ids that still match."
       ],
       "path": "data/fixtures/orlando-parcels/tiles/12097",
       "lookup": "data/fixtures/orlando-parcels/lookup/12097.json",
@@ -368,21 +374,23 @@
       "name": "Volusia",
       "fips": "12127",
       "state": "Florida",
-      "featureCount": 12567,
+      "featureCount": 12973,
       "coverage": "complete-gte-5ac",
       "partition": "tiles",
       "minAcres": 5.0,
       "maxAcres": 150.0,
-      "source": "fl-doh-ehwaters-12127",
-      "queryUrl": "https://gis.floridahealth.gov/server/rest/services/EHWATER/Parcels/MapServer/63/query",
+      "source": "fl-volusia-open-data-12127",
+      "queryUrl": "https://maps5.vcgov.org/arcgis/rest/services/Open_Data/Open_Data_3/FeatureServer/34/query",
       "gaps": [
-        "City zoning and future land use are joined from municipal REST where a city polygon covers the centroid. Melbourne extract joined zoning on 2942 parcels and FLU on 1914 parcels. Volusia Open Data zoning layer 36 (ZONCODE 999) is not used. DeBary, New Smyrna Beach, Orange City, Lake Helen, and Pierson use CountywideZoning OriginalZoningCode only, not a city FLUM. Daytona Beach Shores and Beverly Beach are zoning-only. Flagler city layers are hosted on gis.palmcoast.gov; this repo has no Flagler parcel baseline."
+        "City zoning and future land use are joined from municipal REST where a city polygon covers the centroid. Melbourne extract joined zoning on 2962 parcels and FLU on 1914 parcels. Volusia Open Data zoning layer 36 (ZONCODE 999) is not used. DeBary, New Smyrna Beach, Orange City, Lake Helen, and Pierson use CountywideZoning OriginalZoningCode only, not a city FLUM. Daytona Beach Shores and Beverly Beach are zoning-only. Flagler city layers are hosted on gis.palmcoast.gov; this repo has no Flagler parcel baseline.",
+        "Volusia parcels are Open_Data_3/FeatureServer/34. Acreage is CALCACRES, 5.0–150.0 inclusive. The parcel id is PID. DORPID is not the FDOR key. The Florida DOH extract is not this shelf.",
+        "FDOR joins need CO_NO=74 and PID exactly. ALT_KEY is ALTKEY. No Opportunity Zone status is stored."
       ],
       "path": "data/fixtures/market-parcels/counties/12127/tiles",
       "lookup": "data/fixtures/market-parcels/counties/12127/lookup.json",
       "tileCount": 13,
-      "sourceCount": 12567,
-      "zoningJoinedCount": 2942,
+      "sourceCount": 12973,
+      "zoningJoinedCount": 2962,
       "fluJoinedCount": 1914
     }
   ]

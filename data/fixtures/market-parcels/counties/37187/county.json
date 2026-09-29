@@ -1,0 +1,29 @@
+{
+  "name": "Washington",
+  "fips": "37187",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 1782,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-washington-parcels-37187",
+  "queryUrl": "https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/9/query",
+  "gaps": [
+    "Parcels are Washington_Service Parcels_in_use (PRIMARY county AGOL CAMA + sale) (https://services6.arcgis.com/hBMRLv0wWV0IhJ8I/arcgis/rest/services/Washington_Service/FeatureServer/9). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 1800 rows; 1782 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 185 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37187/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37187/lookup.json",
+  "sourceCount": 1800,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "http://taxweb.washconc.org/Parcel.aspx?{WCParcel}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/3bffabc4dd484e1bbfa49186361dce5d"
+}

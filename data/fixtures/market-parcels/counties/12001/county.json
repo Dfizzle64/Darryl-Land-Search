@@ -11,20 +11,19 @@
   "minAcres": 5.0,
   "maxAcres": 150.0,
   "source": "fl-alachua-parcels35-12001",
-  "queryUrl": "https://services1.arcgis.com/MiBZ4u97DWldovjI/ArcGIS/rest/services/Parcels35/FeatureServer/0/query",
+  "queryUrl": "https://services1.arcgis.com/MiBZ4u97DWldovjI/arcgis/rest/services/Parcels35/FeatureServer/0/query",
   "gaps": [
-    "Jurisdiction is JurisNo on Parcels35, not the situs or mailing city. Gainesville postal addresses outside the city stay Unincorporated Alachua County.",
-    "Zoning and FLU are stored only when ZONECODE/FluCode starts with the jurisdiction prefix (0100 county, 0103 Gainesville, and the same pattern for the other cities). A mismatched county code on a city parcel is left blank.",
-    "Zoning prefix mismatches left blank: 214.",
-    "Address1/city/zip on Parcels35 are the owner mailing address. Situs comes from AddressPoints.",
-    "Assessed value is not on Parcels35. JustValue is stored as market value. TaxAmount is the tax bill when present.",
-    "Gainesville's separate FLU service requires a token and was not used. City FLU is the parcel FluCode when the prefix matches.",
-    "City zoning codes are labels, not Orange County multifamily districts.",
-    "Parcels with an unrecognized JurisNo: 29."
+    "15563 rows matched the acreage filter; 15539 kept after the parcel-id and geometry checks.",
+    "Alachua parcels are Parcels35/FeatureServer/0. Acreage is acres, 5.0–150.0 inclusive.",
+    "FDOR joins need CO_NO=11 and the dashed parcel id. Assessed and taxable values come from that FDOR row. firstName1 is the full owner name. No Opportunity Zone status is stored.",
+    "Zoning or future land use carried forward for 15539 parcel ids that still match."
   ],
   "path": "data/fixtures/market-parcels/counties/12001/tiles",
   "lookup": "data/fixtures/market-parcels/counties/12001/lookup.json",
   "sourceCount": 15563,
   "dropped": 22,
-  "tileCount": 9
+  "tileCount": 9,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://qpublic.schneidercorp.com/Application.aspx?AppID=1081&LayerID=26490&PageTypeID=4&PageID=10770&KeyValue={id}",
+  "gisViewerUrl": "https://mapgenius.alachuacounty.us/"
 }

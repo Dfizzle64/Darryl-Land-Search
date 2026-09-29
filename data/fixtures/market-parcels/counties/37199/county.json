@@ -1,0 +1,32 @@
+{
+  "name": "Yancey",
+  "fips": "37199",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 4517,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-yancey-parcels-37199",
+  "queryUrl": "https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0/query",
+  "gaps": [
+    "Parcels are OperationalLayers2025 TaxParcels (PRIMARY CAMA) (https://gis.yanceycountync.org/server/rest/services/OperationalLayers2025/MapServer/0). Acreage is 5.0\u2013150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 4555 rows; 4517 stayed in the 5.0\u2013150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 152 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Yancey STAMPS is excise tax, not a sale price, and is not stored as last-sale price. The property-appraiser pattern needs a two-digit card suffix the parcel layer does not publish, so parcel rows do not carry a filled appraiser URL.",
+    "This county is not on the rural Opportunity Zone pass-1 table. It fills the batch after Rutherford through Wilkes.",
+    "Non-OZ fill. Usable county parcel card; not on the rural Opportunity Zone pass-1 table.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37199/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37199/lookup.json",
+  "sourceCount": 4555,
+  "dropped": 2,
+  "tileCount": 7,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://yancey.ias-clt.com/parcel.detail.php?id={PIN}{Card}",
+  "gisViewerUrl": "https://gis.yanceycountync.org/maps/"
+}

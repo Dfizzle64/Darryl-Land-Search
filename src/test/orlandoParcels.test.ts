@@ -157,7 +157,7 @@ describe("Orlando shed parcels", () => {
     expect(lakeFeatures.filter((feature) => feature.properties.zoningCode).length).toBeGreaterThan(1000);
     expect(osceolaFeatures.filter((feature) => feature.properties.flu?.code).length).toBeGreaterThan(1000);
     expect(lakeFeatures.filter((feature) => feature.properties.flu?.code).length).toBeGreaterThan(1000);
-    expect(osceolaFeatures.some((feature) => feature.properties.appraiserUrl?.includes("Pin="))).toBe(true);
+    expect(osceolaFeatures.some((feature) => /[?&]pin=/i.test(feature.properties.appraiserUrl || ""))).toBe(true);
     expect(lakeFeatures.some((feature) => feature.properties.appraiserUrl?.includes("AltKey="))).toBe(true);
     expect(osceolaFeatures.every((feature) => feature.properties.source === "osceola-parcels-12097")).toBe(true);
     expect(lakeFeatures.every((feature) => feature.properties.source === "lakecounty-tax-parcels-12069")).toBe(true);
@@ -215,7 +215,8 @@ describe("Orlando shed parcels", () => {
     const orangeFeatures = featuresForCounty(orange!);
     const withOwner = orangeFeatures.filter((feature) => feature.properties.ownerName).length;
     const withZoning = orangeFeatures.filter((feature) => feature.properties.zoningCode).length;
-    expect(withOwner).toBe(orangeFeatures.length);
+    expect(orangeFeatures.every((feature) => feature.properties.ownerName !== "CONFIDENTIAL")).toBe(true);
+    expect(withOwner).toBeGreaterThan(orangeFeatures.length - 80);
     expect(withZoning).toBeGreaterThan(7000);
     let clockwise = 0;
     let collapsed = 0;

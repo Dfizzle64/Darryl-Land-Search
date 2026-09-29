@@ -1,0 +1,31 @@
+{
+  "name": "Swain",
+  "fips": "37173",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 2521,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-swain-parcels-37173",
+  "queryUrl": "https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/4/query",
+  "gaps": [
+    "Parcels are OperationalLayers Tax Parcels (CAMA + polygons) (https://maps.swaincountync.gov/server/rest/services/OperationalLayers/MapServer/4). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale partial). Pass 2 counted 142 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale: No sale fields on OperationalLayers/4. AGOL Swain_County_Parcels/0 Deed_Date non-null = 12,316 of 13,551 (live 2026-09-28); price only on ITSPublicSW AppraisalCard PDF.",
+    "Swain acreage is a string. The filter uses CAST AS FLOAT and LegalLandType='AC'. PIN is empty, so the parcel id is PARCEL_ID.",
+    "PIN is null everywhere, so use PARCEL_ID (the card md/yaml already say so; the JSON layer has no fieldMap). The acreage field is a string and needs CAST. Numeric alternate: AGOL Swain_County_Parcels/0 Acreage (13,551; 5–150 = 2906).",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37173/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37173/lookup.json",
+  "sourceCount": 2521,
+  "dropped": 0,
+  "tileCount": 4,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://www.bttaxpayerportal.com/ITSPublicSW/AppraisalCard.aspx?id={PARCEL_ID}",
+  "gisViewerUrl": "https://maps.swaincountync.gov/gis/"
+}

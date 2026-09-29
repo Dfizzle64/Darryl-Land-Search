@@ -1,0 +1,32 @@
+{
+  "name": "Madison",
+  "fips": "37115",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 6897,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-madison-parcels-37115",
+  "queryUrl": "https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Parcels/FeatureServer/19/query",
+  "gaps": [
+    "Parcels are 2025_Parcels (PRIMARY) (https://services3.arcgis.com/NwIC4HArqo0JlKGT/arcgis/rest/services/2025_Parcels/FeatureServer/19). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 7134 rows; 6897 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax gap, sale gap). Pass 2 counted 205 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Pass 2 tax status is gap. Scrubbed or missing tax values were not copied off the parcel layer.",
+    "Pass 2 sale: No sale price/date on county REST or NC OneMap (saledate null). NCPTS Madison PropertySummary carries Package/Land Sale.",
+    "Pass 2 tax join matched 5604 of 6897 parcel ids. Pass 2 sale join matched 5843 of 6897 parcel ids.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37115/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37115/lookup.json",
+  "sourceCount": 7134,
+  "dropped": 42,
+  "tileCount": 6,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/Madison/PropertySummary.aspx?PIN={PIN}",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/2333843dc4584e648a98fb9542dc75fe"
+}

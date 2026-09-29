@@ -1,0 +1,29 @@
+{
+  "name": "Pitt",
+  "fips": "37147",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 7918,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-pitt-parcels-37147",
+  "queryUrl": "https://gis.pittcountync.gov/gis/rest/services/PittOpenData/CadastralPitt/MapServer/0/query",
+  "gaps": [
+    "Parcels are PittOpenData/CadastralPitt Pitt Parcels (PRIMARY CAMA) (https://gis.pittcountync.gov/gis/rest/services/PittOpenData/CadastralPitt/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 7919 rows; 7918 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 887 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37147/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37147/lookup.json",
+  "sourceCount": 7919,
+  "dropped": 0,
+  "tileCount": 9,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/pitt/parcel-detail/{PARCELNUMBER}",
+  "gisViewerUrl": "https://gis.pittcountync.gov/opis/"
+}

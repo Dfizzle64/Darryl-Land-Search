@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T03:26:29Z",
+  "generatedAt": "2026-09-29T03:46:36Z",
   "market": "Charlotte",
   "tier": "primary",
-  "parcelCount": 118015,
+  "parcelCount": 129191,
   "coreMinAcres": 5.0,
   "coreMaxAcres": 150.0,
   "tile": {
@@ -370,6 +370,50 @@
       "lookup": "data/fixtures/market-parcels/counties/37119/lookup.json",
       "tileCount": 7,
       "sourceCount": 33567
+    },
+    {
+      "name": "Montgomery",
+      "fips": "37123",
+      "state": "North Carolina",
+      "featureCount": 5957,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-montgomery-parcels-37123",
+      "queryUrl": "https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/1/query",
+      "gaps": [
+        "Parcels are NC/Montgomery Parcels (CAMA + polygons) (https://www.webgis.net/arcgis/rest/services/NC/Montgomery/MapServer/1). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 6024 rows; 5957 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 398 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37123/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37123/lookup.json",
+      "tileCount": 8,
+      "sourceCount": 6024
+    },
+    {
+      "name": "Richmond",
+      "fips": "37153",
+      "state": "North Carolina",
+      "featureCount": 5219,
+      "coverage": "complete-gte-5ac",
+      "partition": "tiles",
+      "minAcres": 5.0,
+      "maxAcres": 150.0,
+      "source": "nc-richmond-parcels-37153",
+      "queryUrl": "https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/12/query",
+      "gaps": [
+        "Parcels are GISWebsite/ParcelViewer Parcels (CAMA + polygons) (https://gis.richmondnc.com/server/rest/services/GISWebsite/ParcelViewer/MapServer/12). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+        "Source query returned 5403 rows; 5219 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+        "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 519 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+        "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+      ],
+      "path": "data/fixtures/market-parcels/counties/37153/tiles",
+      "lookup": "data/fixtures/market-parcels/counties/37153/lookup.json",
+      "tileCount": 6,
+      "sourceCount": 5403
     },
     {
       "name": "Rowan",

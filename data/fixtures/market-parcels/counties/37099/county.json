@@ -1,0 +1,31 @@
+{
+  "name": "Jackson",
+  "fips": "37099",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 6732,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-jackson-parcels-37099",
+  "queryUrl": "https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Parcels/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Tax_Admin Parcels (CAMA + polygons) (https://gis.jacksonnc.org/jcgis/rest/services/Tax_Admin/Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 6754 rows; 6732 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 269 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Jackson pages with resultRecordCount. AssessedAcres is a string and the acre filter uses CAST AS FLOAT.",
+    "Acreage is a string field: CAST(AssessedAcres AS FLOAT) 5–150 = 6754. Sample needs resultRecordCount.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37099/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37099/lookup.json",
+  "sourceCount": 6754,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://gis.jacksonnc.org/PRC/PRC/{No_Dash}.pdf",
+  "gisViewerUrl": "https://gis.jacksonnc.org/rpv/"
+}

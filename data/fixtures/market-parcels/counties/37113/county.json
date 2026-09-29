@@ -1,0 +1,29 @@
+{
+  "name": "Macon",
+  "fips": "37113",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 6321,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-macon-parcels-37113",
+  "queryUrl": "https://gis.maconnc.org/arcgis/rest/services/JustParcels/MapServer/0/query",
+  "gaps": [
+    "Parcels are JustParcels Tax Parcels (CAMA + polygons) (https://gis.maconnc.org/arcgis/rest/services/JustParcels/MapServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 6332 rows; 6321 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale ok). Pass 2 counted 338 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37113/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37113/lookup.json",
+  "sourceCount": 6332,
+  "dropped": 0,
+  "tileCount": 7,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "https://gis2.maconnc.org/ITSPublic/AppraisalCard.aspx?id={PIN}",
+  "gisViewerUrl": "https://gis2.maconnc.org/maps/default.htm"
+}

@@ -570,23 +570,35 @@ def fl_spec(fips: str) -> dict:
     }
 
 
-def nc_spec(fips: str) -> dict:
-    # Rural OZ batch 1 writes county GIS tiles. A later market reseed must not
+def nc_shipped(fips: str) -> str | None:
+    # Rural OZ batches write county GIS tiles. A later market reseed must not
     # replace those with the NC OneMap default.
-    manifest = ROOT / "data" / "nc-parcel-cards" / "batch1-result.json"
-    if manifest.exists():
+    for name, source in (
+        ("batch1-result.json", "nc-rural-oz-batch1"),
+        ("batch2-result.json", "nc-rural-oz-batch2"),
+    ):
+        manifest = ROOT / "data" / "nc-parcel-cards" / name
+        if not manifest.exists():
+            continue
         try:
             report = json.loads(manifest.read_text())
         except json.JSONDecodeError:
-            report = {}
+            continue
         pulled = {str(item.get("fips") or "").zfill(5) for item in report.get("pulled") or []}
         if fips in pulled:
-            return {
-                "kind": "shipped",
-                "source": "nc-rural-oz-batch1",
-                "url": None,
-                "coverage": "complete-gte-5ac",
-            }
+            return source
+    return None
+
+
+def nc_spec(fips: str) -> dict:
+    shipped = nc_shipped(fips)
+    if shipped:
+        return {
+            "kind": "shipped",
+            "source": shipped,
+            "url": None,
+            "coverage": "complete-gte-5ac",
+        }
     county3 = fips[2:]
     return {
         "kind": "arcgis",
@@ -1208,6 +1220,8 @@ Alabama rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the fi
 Tennessee parcel batch 4 loads the remaining rural Opportunity Zone counties after Carter (pass1 order 65) that were not already a complete extract, then fills the batch from the rest-of-state list in rest order: Marshall, Perry, Polk, Smith, Stewart, Union, White, Crockett, Fayette, Giles, Houston, Lewis, Lincoln, Loudon, Meigs, Moore, Trousdale, Unicoi, Van Buren, and Washington. Jefferson and Knox were already complete, as were Blount, Cheatham, Davidson, Hamilton, Madison, Montgomery, Rutherford, and Williamson, and those extracts were not replaced. No Tennessee county without a complete extract remains for a later batch. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Meigs is labeled 2025. Unicoi and Washington are labeled 2026. The other seventeen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. Perry GISLINK coverage is flagged below 90 percent, so unmatched parcels use a spatial fallback onto the 2023 layer and are stamped joinMethod spatial-parent-2023. That sale and value are the pre-split parent record, not the parcel's own sale. Marshall zoning is Lewisburg district polygons by centroid. Fayette and Lincoln zoning join on GISLINK. Meigs and Decatur zoning polygons are stamped by centroid, with the later city layer replacing the county code only inside that city. Washington zoning polygons are stamped by centroid. Unicoi keeps a non-blank ZONING value from the sales layer. The other counties leave zoning empty. The TPAD link is stored and not requested. Owner phone and email are not ingested. Counties whose card market was empty were placed on the nearest existing shelf: Stewart, White, and Van Buren on Nashville; Crockett on Jackson; Unicoi and Washington on Knoxville. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
 
 North Carolina rural Opportunity Zone batch 1 loads 5.0–150.0 acre parcels for the first 20 pass-1 counties that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Alexander, Alleghany, Ashe, Avery, Beaufort, Bertie, Bladen, Burke, Caldwell, Carteret, Caswell, Cherokee, Chowan, Craven, Dare, Edgecombe, Graham, Greene, Halifax, and Haywood. Buncombe and Henderson were already complete and were not re-pulled. No endpoint in that stretch was unreachable. Alexander pages with orderByFields because the MapServer has no object id; its returnCountOnly figure repeats PROPERTY 99999 rows, so the stored count is the distinct parcel ids that page. Ashe pages with resultRecordCount. Counties already on a shelf stayed there. The others were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Chowan tax values were scrubbed on the layer and were not copied. Alleghany tax is the NC OneMap fallback join. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
+
+North Carolina rural Opportunity Zone batch 2 loads 5.0–150.0 acre parcels for the next 20 pass-1 counties starting at Hertford that were verified or fixed, were not already a complete extract, and whose card endpoint answered: Hertford, Hoke, Hyde, Jackson, Jones, Lenoir, McDowell, Macon, Madison, Martin, Mitchell, Montgomery, Moore, Northampton, Pamlico, Pasquotank, Pitt, Polk, Richmond, and Robeson. No county in that stretch was already a complete extract, and no endpoint was unreachable. Rutherford was the next verified row and was not loaded because the batch of 20 was already filled. Jackson pages with resultRecordCount, and AssessedAcres is filtered with CAST AS FLOAT. Hoke uses the county AGOL June2025 layer, which has geometry, parcel id, and acreage only. Hoke, Mitchell, and Robeson repeat a parcel id across rows; the extract keeps one geometry per parcel id. Madison tax is the NC OneMap fallback join, and that county has no sale date on the public layer. Hyde has no sale price or date on the public layer. Robeson tax fields are land and improvement assessed values and are not summed into a total. Counties were added to the nearest existing North Carolina shelf: Asheville, Charlotte, Raleigh-Durham, Wilmington, or Winston-Salem. No new market shelf was added. Pass 2 tax, sale, owner, property-appraiser, and county GIS attributes are stored where the card or rural-oz-pass2 result published them. Property-appraiser links are stored from the card or pass-2 pattern and were not requested. A pass-2 sample account id is not copied onto every parcel. Owner phone and email are not ingested. A confidential-owner flag suppresses owner and mailing fields. Sale dates after the pull date are cleared. No Opportunity Zone status was added. NCDOT AADT stays the query-time statewide join. Household income stays ACS B19013_001E. Tract display was not changed.
 
 Tennessee rural Opportunity Zone batch 3 loads the next 20 pass1-order counties that were not already a complete extract: Benton, Carter, Clay, Fentress, Franklin, Hancock, Hawkins, Humphreys, Jackson, Johnson, Lake, Lawrence, Marion, McMinn, Obion, Pickett, Scott, Sullivan, Tipton, and Wayne. Maury, Shelby, and Sumner were already complete and were not replaced. Geometry and owner stay on Tennessee Property Boundaries Public Use, filtered by the card's Comptroller COUNTY_ID. Acreage is geodesic polygon area, 5.0 through 150.0 inclusive. Sale date, sale price, and appraisal are joined on GISLINK from the card's sales-value layer. Lawrence, McMinn, and Marion are labeled 2025. Tipton is labeled 2026. Fentress has no public bulk sale/value layer, so those fields stay empty. The other fifteen use TN_County_Parcel_Map and are labeled 2023. A sale date later than the pull date is left blank. Sullivan zoning is joined on GISLINK. McMinn, Marion, and Tipton zoning polygons are stamped by centroid, with a later city layer replacing the county code only inside that city. The other counties leave zoning empty. The TPAD link is stored and not requested. Owner phone and email are not ingested. No new market shelf was added. No Opportunity Zone designation, school grade, or base flood elevation was added. AADT and tract-income wiring were not changed.
 

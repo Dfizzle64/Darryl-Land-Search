@@ -1,0 +1,30 @@
+{
+  "name": "Polk",
+  "fips": "37149",
+  "state": "North Carolina",
+  "markets": [
+    "Asheville"
+  ],
+  "featureCount": 4683,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-polk-parcels-37149",
+  "queryUrl": "https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Parcels/FeatureServer/0/query",
+  "gaps": [
+    "Parcels are Parcels (CAMA + polygons) (https://services1.arcgis.com/23uf7jKvz6SRPFWJ/arcgis/rest/services/Parcels/FeatureServer/0). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 4702 rows; 4683 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from card pass2 (tax ok, sale partial). Pass 2 counted 237 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Pass 2 sale: DEED_YEAR is year only; price not on REST. Polk PRC PDF has SALES PRICE grid.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37149/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37149/lookup.json",
+  "sourceCount": 4702,
+  "dropped": 0,
+  "tileCount": 6,
+  "paLinkVerified": true,
+  "appraiserSearchUrl": "http://parcels.polknc.org:8080/{TMS}.pdf",
+  "gisViewerUrl": "https://experience.arcgis.com/experience/842578cc98ac4ba8a29d2bbb6044443c"
+}

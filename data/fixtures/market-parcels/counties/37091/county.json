@@ -1,0 +1,29 @@
+{
+  "name": "Hertford",
+  "fips": "37091",
+  "state": "North Carolina",
+  "markets": [
+    "Raleigh-Durham"
+  ],
+  "featureCount": 2701,
+  "coverage": "complete-gte-5ac",
+  "partition": "tiles",
+  "minAcres": 5.0,
+  "maxAcres": 150.0,
+  "source": "nc-hertford-parcels-37091",
+  "queryUrl": "https://gis.hertfordcounty.org/server/rest/services/TaxParcels/MapServer/2/query",
+  "gaps": [
+    "Parcels are TaxParcels Parcels (PRIMARY county ArcGIS CAMA + sale) (https://gis.hertfordcounty.org/server/rest/services/TaxParcels/MapServer/2). Acreage is 5.0–150.0 inclusive. No Opportunity Zone status, school grade, or base flood elevation is stored.",
+    "Source query returned 2711 rows; 2701 stayed in the 5.0–150.0 acre band after the parcel-id and geometry checks.",
+    "Pass 2 enrichment is from rural-oz-pass2 res (tax ok, sale ok). Pass 2 counted 243 NCDOT 2022 AADT stations. NCDOT AADT stays the query-time statewide join.",
+    "Property-appraiser links are stored from the card or pass-2 pattern and were not requested. Owner phone and email are not ingested."
+  ],
+  "path": "data/fixtures/market-parcels/counties/37091/tiles",
+  "lookup": "data/fixtures/market-parcels/counties/37091/lookup.json",
+  "sourceCount": 2711,
+  "dropped": 0,
+  "tileCount": 8,
+  "paLinkVerified": false,
+  "appraiserSearchUrl": "https://lrcpwa.ncptscloud.com/Hertford/PropertySummary.aspx?PIN={REID}",
+  "gisViewerUrl": "https://hertfordcountync.maps.arcgis.com/apps/instant/sidebar/index.html?appid=26b28f8a51164fc89431eedd61072339"
+}

@@ -19,6 +19,7 @@ import {
   bboxContains,
   parcelAtPoint,
   ADDRESS_NOT_FOUND,
+  LOOKUP_UNAVAILABLE,
   coordinateError,
   parseLatLng,
   pointInBounds,
@@ -697,7 +698,7 @@ export function AppShell({
       setFlyTarget({ lng: point.lng, lat: point.lat, key, label: formatJumpPinLabel(query) });
       setPick({ lng: point.lng, lat: point.lat, key, loadStamp: parcelLoadStamp });
     } catch {
-      setJumpError(ADDRESS_NOT_FOUND);
+      setJumpError(LOOKUP_UNAVAILABLE);
     } finally {
       setJumpBusy(false);
     }

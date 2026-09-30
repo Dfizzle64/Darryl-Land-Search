@@ -72,6 +72,9 @@ export function coordinateError(input: string): string | null {
 
 export const ADDRESS_NOT_FOUND = "Couldn't find that address.";
 
+/** Census, Esri, and Nominatim all failed before any of them could say the address is missing. */
+export const LOOKUP_UNAVAILABLE = "Lookup service unavailable, try again.";
+
 export function censusMatchPoint(body: unknown): JumpPoint | null {
   const matches = (body as { result?: { addressMatches?: unknown[] } } | null)?.result?.addressMatches;
   const first = Array.isArray(matches) ? matches[0] : null;

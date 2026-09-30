@@ -18,7 +18,12 @@ export async function GET(request: Request) {
   }
   const result = await geocodeAddress(query);
   const headers = { "Cache-Control": "no-store" };
-  if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status, headers });
+  if (!result.ok) {
+    if (result.suggestions?.length) {
+      return NextResponse.json({ kind: "suggestions", suggestions: result.suggestions }, { status: 200, headers });
+    }
+    return NextResponse.json({ error: result.error }, { status: result.status, headers });
+  }
   return NextResponse.json(
     { lng: result.lng, lat: result.lat, kind: "address", provider: result.provider },
     { headers },

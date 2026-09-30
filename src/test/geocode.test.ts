@@ -9,7 +9,7 @@ import {
 } from "../lib/geocode";
 import { ADDRESS_NOT_FOUND, LOOKUP_UNAVAILABLE } from "../lib/jumpTo";
 
-const FAST = { census: 40, esri: 40, nominatim: 40 };
+const FAST = { census: 40, esri: 40, nominatim: 40, county: 40 };
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -308,6 +308,7 @@ describe("geocode fallback order", () => {
     const result = await geocodeAddress("14500 Whitcomb Way, Winter Garden, FL 34787", {
       fetch: fetchImpl,
       timeouts: FAST,
+      parcelRead: () => "",
     });
     expect(result).toEqual({ ok: false, status: 404, error: ADDRESS_NOT_FOUND });
   });
@@ -348,6 +349,152 @@ describe("geocode fallback order", () => {
     const result = await geocodeAddress("1 CNN Center, Atlanta, GA 30303", { fetch: fetchImpl, timeouts: FAST });
     expect(result).toMatchObject({ ok: true, provider: "esri" });
     expect(censusCalls).toBe(addressVariants("1 CNN Center, Atlanta, GA 30303").length);
+  });
+
+  it("offers a same-state street candidate under the auto threshold and skips postal and unrelated streets", async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const host = requestUrl(input).hostname;
+      if (host.includes("census")) return censusMiss();
+      if (host === "geocode.arcgis.com") {
+        return json({
+          candidates: [
+            {
+              address: "100 Harvest Point Blvd, Spring Hill, Tennessee, 37174",
+              score: 87.03,
+              location: { x: -86.97546, y: 35.73736 },
+              attributes: { Addr_type: "PointAddress", Country: "USA", Region: "Tennessee" },
+            },
+            {
+              address: "37174, Spring Hill, Tennessee",
+              score: 84,
+              location: { x: -86.93, y: 35.75 },
+              attributes: { Addr_type: "Postal", Country: "USA", Region: "Tennessee" },
+            },
+            {
+              address: "Parks Ln, Spring Hill, Tennessee",
+              score: 79.26,
+              location: { x: -86.91, y: 35.72 },
+              attributes: { Addr_type: "StreetName", Country: "USA", Region: "Tennessee" },
+            },
+          ],
+        });
+      }
+      if (host.includes("nominatim")) return json([]);
+      if (host === "tnmap.tn.gov") {
+        return json({
+          candidates: [
+            {
+              address: "100 HARVEST POINT BLVD, SPRING HILL, TN, 37174",
+              score: 88.17,
+              location: { x: -86.975465, y: 35.737368 },
+              attributes: { Score: 88.17 },
+            },
+          ],
+        });
+      }
+      return json({ features: [] });
+    });
+    const result = await geocodeAddress("100 Harvest Park Dr, Spring Hill, TN 37174", {
+      fetch: fetchImpl,
+      timeouts: FAST,
+      parcelRead: () => "",
+    });
+    expect(result).toMatchObject({ ok: false, status: 404, error: ADDRESS_NOT_FOUND });
+    expect(result.ok ? [] : result.suggestions).toEqual([
+      {
+        label: "100 HARVEST POINT BLVD, SPRING HILL, TN, 37174",
+        lng: -86.975465,
+        lat: 35.737368,
+        score: 88.17,
+        provider: "county",
+      },
+    ]);
+  });
+
+  it("does not suggest a ZIP centroid or a street that does not share the name", async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const host = requestUrl(input).hostname;
+      if (host.includes("census")) return censusMiss();
+      if (host === "geocode.arcgis.com") {
+        return json({
+          candidates: [
+            {
+              address: "28079, Indian Trail, North Carolina",
+              score: 84.83,
+              location: { x: -80.67, y: 35.07 },
+              attributes: { Addr_type: "Postal", Country: "USA", Region: "North Carolina" },
+            },
+            {
+              address: "200 Indian Trail Rd, Indian Trail, North Carolina, 28079",
+              score: 78.24,
+              location: { x: -80.67, y: 35.08 },
+              attributes: { Addr_type: "PointAddress", Country: "USA", Region: "North Carolina" },
+            },
+          ],
+        });
+      }
+      if (host.includes("nominatim")) return json([]);
+      if (host === "atlas.unioncountync.gov") {
+        return json({
+          features: [
+            {
+              attributes: { NUM: "911", NAME: "BAILEY", TYPE: "CT", DISPLAY: "911 BAILEY CT" },
+              geometry: { x: -80.8, y: 35.1 },
+            },
+          ],
+        });
+      }
+      return json({ features: [] });
+    });
+    const result = await geocodeAddress("200 Bailey Rd, Indian Trail, NC 28079", {
+      fetch: fetchImpl,
+      timeouts: FAST,
+      parcelRead: () => "",
+    });
+    expect(result).toEqual({ ok: false, status: 404, error: ADDRESS_NOT_FOUND });
+  });
+
+  it("jumps to one parcel situs match and suggests when several remain", async () => {
+    const one = await geocodeAddress("315 N Bumby Avenue, Orlando, FL 32803", {
+      fetch: vi.fn(async (input: RequestInfo | URL) => {
+        const host = requestUrl(input).hostname;
+        if (host.includes("census")) return censusMiss();
+        if (host === "geocode.arcgis.com") return json({ candidates: [] });
+        return json([]);
+      }),
+      timeouts: FAST,
+      parcelRead: () => "315\tN BUMBY AVE\tORLANDO\t32803\t-81.35100\t28.55100\n",
+    });
+    expect(one).toEqual({ ok: true, lng: -81.351, lat: 28.551, provider: "parcels" });
+
+    const many = await geocodeAddress("100 Main Street, FL", {
+      fetch: vi.fn(async (input: RequestInfo | URL) => {
+        const host = requestUrl(input).hostname;
+        if (host.includes("census")) return censusMiss();
+        if (host === "geocode.arcgis.com") return json({ candidates: [] });
+        return json([]);
+      }),
+      timeouts: FAST,
+      parcelRead: () =>
+        ["100\tMAIN ST\tORLANDO\t32801\t-81.30000\t28.50000", "100\tMAIN ST\tAPOPKA\t32703\t-81.50000\t28.60000"].join("\n"),
+    });
+    expect(many.ok ? [] : many.suggestions?.map((item) => item.provider)).toEqual(["parcels", "parcels"]);
+  });
+
+  it("keeps a county outage from turning a clean miss into an unavailable lookup", async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const host = requestUrl(input).hostname;
+      if (host.includes("census")) return censusMiss();
+      if (host === "geocode.arcgis.com") return json({ candidates: [] });
+      if (host.includes("nominatim")) return json([]);
+      return json({ error: "down" }, 429);
+    });
+    const result = await geocodeAddress("100 Harvest Park Dr, Spring Hill, TN 37174", {
+      fetch: fetchImpl,
+      timeouts: FAST,
+      parcelRead: () => "",
+    });
+    expect(result).toEqual({ ok: false, status: 404, error: ADDRESS_NOT_FOUND });
   });
 });
 
@@ -391,5 +538,44 @@ describe("geocode route", () => {
     );
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: LOOKUP_UNAVAILABLE });
+  });
+
+  it("returns did-you-mean choices instead of the not-found error", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const host = requestUrl(input).hostname;
+        if (host.includes("census")) return censusMiss();
+        if (host === "geocode.arcgis.com") {
+          return json({
+            candidates: [
+              {
+                address: "Gardenia Ln, Fort Mill, South Carolina, 29707",
+                score: 89.76,
+                location: { x: -80.84224, y: 34.98276 },
+                attributes: { Addr_type: "StreetName", Country: "USA", Region: "South Carolina" },
+              },
+            ],
+          });
+        }
+        return json([]);
+      }),
+    );
+    const response = await GET(
+      new Request(`http://localhost/api/geocode?q=${encodeURIComponent("4100 Gardenia Dr, Indian Land, SC 29707")}`),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      kind: "suggestions",
+      suggestions: [
+        {
+          label: "Gardenia Ln, Fort Mill, South Carolina, 29707",
+          lng: -80.84224,
+          lat: 34.98276,
+          score: 89.76,
+          provider: "esri",
+        },
+      ],
+    });
   });
 });

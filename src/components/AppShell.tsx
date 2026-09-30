@@ -65,6 +65,7 @@ import { ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcel
 import { rankSites } from "@/lib/score";
 import { DEFAULT_SCREENING_TOGGLES, type ScreeningPoint, type ScreeningToggles } from "@/lib/screening";
 import { filterTractRowsByIncome, incomeByGeoidFromFeatures } from "@/lib/tractIncome";
+import { filterTractRowsByRent, rentByGeoidFromFeatures, tractMetricEmptyMessage, tractRentFilterActive } from "@/lib/tractRent";
 import {
   annotateRuralRows,
   countMfPriority,
@@ -226,18 +227,22 @@ export function AppShell({
     () => incomeByGeoidFromFeatures([ruralTracts, eligibleTracts, oz2Tracts, msTracts]),
     [eligibleTracts, msTracts, oz2Tracts, ruralTracts],
   );
+  const tractRentByGeoid = useMemo(
+    () => rentByGeoidFromFeatures([ruralTracts, eligibleTracts, oz2Tracts, msTracts]),
+    [eligibleTracts, msTracts, oz2Tracts, ruralTracts],
+  );
   const drawnEligibleTracts = useMemo(
     () => mergeMsStatewideTracts(eligibleTracts, ruralTracts, oz2Tracts, msTracts),
     [eligibleTracts, msTracts, oz2Tracts, ruralTracts],
   );
   const msTractRows = useMemo(() => msStatewideTractRows(msTracts), [msTracts]);
   const ruralShown = useMemo(
-    () => filterTractRowsByIncome(ruralSide, tractIncomeByGeoid, filters),
-    [filters, ruralSide, tractIncomeByGeoid],
+    () => filterTractRowsByRent(filterTractRowsByIncome(ruralSide, tractIncomeByGeoid, filters), tractRentByGeoid, filters),
+    [filters, ruralSide, tractIncomeByGeoid, tractRentByGeoid],
   );
   const urbanShown = useMemo(
-    () => filterTractRowsByIncome(urbanSide, tractIncomeByGeoid, filters),
-    [filters, tractIncomeByGeoid, urbanSide],
+    () => filterTractRowsByRent(filterTractRowsByIncome(urbanSide, tractIncomeByGeoid, filters), tractRentByGeoid, filters),
+    [filters, tractIncomeByGeoid, tractRentByGeoid, urbanSide],
   );
   const classRowsShown = useMemo(() => {
     const rows: EligibleTractRow[] = [];
@@ -361,6 +366,7 @@ export function AppShell({
     visibleTracts.find((row) => row.geoid === selectedTractGeoid) ??
     msTractRows.find((row) => row.geoid === selectedTractGeoid) ??
     null;
+  const selectedTractRent = selectedTractGeoid ? (tractRentByGeoid[selectedTractGeoid] ?? null) : null;
   const screeningFocus = selected
     ? { key: `parcel:${selected.properties.id}`, lon: selected.properties.centroid[0], lat: selected.properties.centroid[1] }
     : selectedTract
@@ -754,13 +760,14 @@ export function AppShell({
   };
 
   const showSites = shedParcelsOn && inventoryTab === "sites";
-  const incomeDroppedTracts =
-    filters.incomeGeography === "tract" &&
-    (filters.minIncome > 0 || !filters.includeUnknownIncome) &&
-    classRowsShown.length < classRows.length;
+  const incomeFilterActive =
+    filters.incomeGeography === "tract" && (filters.minIncome > 0 || !filters.includeUnknownIncome);
+  const rentFilterActive = tractRentFilterActive(filters);
+  const metricsDroppedTracts = (incomeFilterActive || rentFilterActive) && classRowsShown.length < classRows.length;
   const tractNoun = overlayMode === "nominated-only" ? "nominated" : "eligible";
-  const tractEmptyMessage = incomeDroppedTracts
-    ? `No ${tractNoun} tracts pass the median-income filter. Only Orange County tracts have a joined ACS median income. Tracts without that attribute stay visible when Include unknown income is on.`
+  const tractEmptyMessage = metricsDroppedTracts
+    ? (tractMetricEmptyMessage(tractNoun, incomeFilterActive, rentFilterActive) ??
+      `No ${tractNoun} tracts in this county filter.`)
     : activeMfView === "all"
       ? tractClass === "urban"
         ? `No urban ${tractNoun} tracts in this county filter.`
@@ -1014,6 +1021,7 @@ export function AppShell({
             minIncome={filters.minIncome}
             includeUnknownIncome={filters.includeUnknownIncome}
             incomeGeography={filters.incomeGeography}
+            rentMinimums={filters}
             highlightTierA={highlightTierA}
             highlightTierB={highlightTierB}
             restrictGeoids={restrictGeoids}
@@ -1158,6 +1166,7 @@ export function AppShell({
               <TractDrawer
                 layout="pane"
                 tract={selectedTract}
+                rent={selectedTractRent}
                 statusHelp={statusHelp}
                 overlayMode={overlayMode}
                 screeningPoint={screeningPoint}
@@ -1181,6 +1190,7 @@ export function AppShell({
           ) : (
             <TractDrawer
               tract={selectedTract}
+              rent={selectedTractRent}
               statusHelp={statusHelp}
               overlayMode={overlayMode}
               screeningPoint={screeningPoint}

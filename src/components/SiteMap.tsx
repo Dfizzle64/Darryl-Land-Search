@@ -89,6 +89,7 @@ import {
 } from "@/lib/jumpPin";
 import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeLayerFilter } from "@/lib/tractIncome";
+import { formatTractRentLines, tractRentLayerFilter, type TractRentFilterInput } from "@/lib/tractRent";
 import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, SC_NOMINATED_RURAL_LEGEND_BLURB, SC_NOMINATED_URBAN_LEGEND_BLURB, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
@@ -129,6 +130,7 @@ type SiteMapProps = {
   minIncome: number;
   includeUnknownIncome: boolean;
   incomeGeography: IncomeGeography;
+  rentMinimums: TractRentFilterInput;
   highlightTierA: string[];
   highlightTierB: string[];
   restrictGeoids: string[] | null;
@@ -630,6 +632,7 @@ function showTractPopup(
   lngLat: maplibregl.LngLatLike,
   details: TractClickDetails,
   incomeLine: string | null = null,
+  rentLines: string[] = [],
 ) {
   const root = document.createElement("div");
   root.style.color = POPUP_TEXT;
@@ -677,10 +680,17 @@ function showTractPopup(
     income.textContent = incomeLine;
     lines.push(income);
   }
+  for (const line of rentLines) {
+    const rent = document.createElement("p");
+    rent.style.margin = "2px 0 0";
+    rent.style.color = POPUP_TEXT;
+    rent.textContent = line;
+    lines.push(rent);
+  }
   root.append(...lines);
   return new maplibregl.Popup({
     closeButton: true,
-    maxWidth: "280px",
+    maxWidth: "320px",
     closeOnClick: false,
     className: "dls-map-popup",
   })
@@ -725,6 +735,7 @@ export function SiteMap({
   minIncome,
   includeUnknownIncome,
   incomeGeography,
+  rentMinimums,
   highlightTierA,
   highlightTierB,
   restrictGeoids,
@@ -929,21 +940,24 @@ export function SiteMap({
             if (!details) return;
             if (details.kind === "eligible" && !showOzTractInScMarkets({ state: details.state, geoid: details.geoid })) return;
             const income = incomeLineFrom(feature?.properties?.medianHouseholdIncome);
+            const rentLines = formatTractRentLines(
+              (feature?.properties ?? null) as Record<string, unknown> | null,
+            );
             const parcelHit = queryRendered(map, event.point, interactive);
             if (parcelHit.length > 0) {
               popupRef.current?.remove();
-              popupRef.current = showTractPopup(map, event.lngLat, details, income);
+              popupRef.current = showTractPopup(map, event.lngLat, details, income, rentLines);
               return;
             }
             if (details.kind === "eligible") {
               callbacksRef.current.onSelectTract(details.geoid);
               popupRef.current?.remove();
-              popupRef.current = details.opensRuralDrawer ? null : showTractPopup(map, event.lngLat, details, income);
+              popupRef.current = details.opensRuralDrawer ? null : showTractPopup(map, event.lngLat, details, income, rentLines);
               return;
             }
             callbacksRef.current.onSelectTract(null);
             popupRef.current?.remove();
-            popupRef.current = showTractPopup(map, event.lngLat, details, income);
+            popupRef.current = showTractPopup(map, event.lngLat, details, income, rentLines);
           });
           map.on("click", "parcel-coverage-fill", (event) => {
             if (drawingRef.current || measuringRef.current) return;
@@ -1278,6 +1292,10 @@ export function SiteMap({
       minIncome,
       includeUnknownIncome,
     ) as maplibregl.FilterSpecification | null;
+    const metricFilter = andFilter(
+      incomeFilter,
+      tractRentLayerFilter(rentMinimums) as maplibregl.FilterSpecification | null,
+    );
     const oz2Filter: maplibregl.FilterSpecification | null =
       classCut === "all"
         ? null
@@ -1285,23 +1303,23 @@ export function SiteMap({
           ? ["==", ["get", "tractGeoid"], "__none__"]
           : ["==", ["get", "rural"], classCut === "rural"];
     const oz2Shown = andFilter(oz2Filter, scNominatedOverlayFilter() as maplibregl.FilterSpecification);
-    setFilterSafe(map, "oz2-fill", andFilter(oz2Shown, incomeFilter));
-    setFilterSafe(map, "oz2-line", andFilter(oz2Shown, incomeFilter));
-    const overviewFilter = eligibleOverviewShownFilter(classCut, incomeFilter) as maplibregl.FilterSpecification | null;
+    setFilterSafe(map, "oz2-fill", andFilter(oz2Shown, metricFilter));
+    setFilterSafe(map, "oz2-line", andFilter(oz2Shown, metricFilter));
+    const overviewFilter = eligibleOverviewShownFilter(classCut, metricFilter) as maplibregl.FilterSpecification | null;
     setFilterSafe(map, "eligible-overview-fill", overviewFilter);
     setFilterSafe(map, "eligible-overview-line", overviewFilter);
     const ruralFilter = tractOverlayFilter(showOrangePilot, restrictGeoids);
-    setFilterSafe(map, "rural-fill", andFilter(ruralFilter, incomeFilter));
-    setFilterSafe(map, "rural-line", andFilter(ruralFilter, incomeFilter));
+    setFilterSafe(map, "rural-fill", andFilter(ruralFilter, metricFilter));
+    setFilterSafe(map, "rural-line", andFilter(ruralFilter, metricFilter));
     const eligibleFilter = tractOverlayFilter(showOrangePilot, null, classCut);
-    setFilterSafe(map, "eligible-fill", andFilter(eligibleFilter, incomeFilter));
-    setFilterSafe(map, "eligible-line", andFilter(eligibleFilter, incomeFilter));
+    setFilterSafe(map, "eligible-fill", andFilter(eligibleFilter, metricFilter));
+    setFilterSafe(map, "eligible-line", andFilter(eligibleFilter, metricFilter));
     const tierAFilter = tractOverlayFilter(showOrangePilot, highlightTierA);
     const tierBFilter = tractOverlayFilter(showOrangePilot, highlightTierB);
-    setFilterSafe(map, "mf-priority-a-fill", andFilter(tierAFilter, incomeFilter));
-    setFilterSafe(map, "mf-priority-a-line", andFilter(tierAFilter, incomeFilter));
-    setFilterSafe(map, "mf-priority-b-fill", andFilter(tierBFilter, incomeFilter));
-    setFilterSafe(map, "mf-priority-b-line", andFilter(tierBFilter, incomeFilter));
+    setFilterSafe(map, "mf-priority-a-fill", andFilter(tierAFilter, metricFilter));
+    setFilterSafe(map, "mf-priority-a-line", andFilter(tierAFilter, metricFilter));
+    setFilterSafe(map, "mf-priority-b-fill", andFilter(tierBFilter, metricFilter));
+    setFilterSafe(map, "mf-priority-b-line", andFilter(tierBFilter, metricFilter));
   }, [
     parcelLayerVisible,
     showExcluded,
@@ -1314,6 +1332,7 @@ export function SiteMap({
     minIncome,
     includeUnknownIncome,
     incomeGeography,
+    rentMinimums,
     tractClass,
     status,
     highlightTierA,

@@ -1,3 +1,5 @@
+import { DEFAULT_RENT_MINIMUMS, type TractRentFields, type TractRentMinimums } from "./tractRent";
+
 export type IncomeGeography = "tract" | "blockGroup";
 
 /** Zoning / FLU search modes. `zoning` is the historical MF-capable default. */
@@ -109,7 +111,7 @@ export type Oz2TractProperties = {
   state?: string | null;
   /** ACS 5-year B19013 median when this 2020 tract GEOID is in the Southeast income table. */
   medianHouseholdIncome?: number;
-};
+} & TractRentFields;
 
 export type OpportunityZoneProperties = {
   id: string;
@@ -120,7 +122,7 @@ export type OpportunityZoneProperties = {
   /** Short county name, without a "County" suffix. */
   county?: string | null;
   state?: string | null;
-};
+} & TractRentFields;
 
 export type OpportunityZoneFeature = GeoJSON.Feature<
   GeoJSON.Polygon | GeoJSON.MultiPolygon,
@@ -378,7 +380,7 @@ export type EligiblePackTractProperties = {
    * Southeast income table. Absent means unknown, not zero.
    */
   medianHouseholdIncome?: number;
-};
+} & TractRentFields;
 
 export type EligiblePackTractFeature = GeoJSON.Feature<
   GeoJSON.Polygon | GeoJSON.MultiPolygon,
@@ -423,7 +425,7 @@ export type RuralMarketTractProperties = {
   source: string;
   /** ACS 5-year B19013 median when this 2020 tract GEOID is in the Southeast income table. */
   medianHouseholdIncome?: number;
-};
+} & TractRentFields;
 
 export type RuralMarketTractFeature = GeoJSON.Feature<
   GeoJSON.Polygon | GeoJSON.MultiPolygon,
@@ -609,7 +611,12 @@ export type FilterState = {
   includeUnknownIncome: boolean;
   minAadt: number;
   includeUnknownAadt: boolean;
-};
+  /**
+   * When false, rent sliders are hidden and no rent minimum is applied on any
+   * tract layer, including the zoom 4–7 overview, even if a slider was raised.
+   */
+  rentFiltersOn: boolean;
+} & TractRentMinimums;
 
 export type ZoningToken = {
   token: string;
@@ -680,6 +687,8 @@ export const DEFAULT_FILTERS: FilterState = {
   includeUnknownIncome: true,
   minAadt: 0,
   includeUnknownAadt: true,
+  rentFiltersOn: false,
+  ...DEFAULT_RENT_MINIMUMS,
 };
 
 export const LAND_USE_FILTERS: LandUseFilter[] = [

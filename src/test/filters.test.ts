@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { describeRezoningCandidate, filterParcels, isRezoningCandidate } from "../lib/filters";
 import { fluAllowsMultifamily } from "../lib/flu";
-import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "../lib/types";
+import { DEFAULT_FILTERS, type FilterState, type FluConfig, type ParcelFeature, type ZoningConfig } from "../lib/types";
 import { parseZoningCode, zoningAllowsMultifamily } from "../lib/zoning";
 
 const config: ZoningConfig = {
@@ -128,19 +128,9 @@ function feature(partial: Partial<ParcelFeature["properties"]>): ParcelFeature {
 }
 
 const baseFilters: FilterState = {
+  ...DEFAULT_FILTERS,
   considerOpportunityZone: true,
   considerZoning: true,
-  landUseFilter: "zoning",
-  includePlannedDevelopment: true,
-  includeConditionalZoning: false,
-  ozFilter: "either",
-  minAcreage: 0,
-  includeUnknownAcreage: true,
-  minIncome: 0,
-  incomeGeography: "tract",
-  includeUnknownIncome: true,
-  minAadt: 0,
-  includeUnknownAadt: true,
 };
 
 describe("parseZoningCode", () => {

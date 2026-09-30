@@ -1,4 +1,5 @@
 import { scNominatedOverlayFilter, showOzTractInScMarkets } from "./scNominatedTracts";
+import type { TractRentFields } from "./tractRent";
 
 /**
  * Eligible tracts draw from a Southeast-wide view. Below this zoom the overlay
@@ -30,7 +31,7 @@ export type TractProps = {
   rural?: boolean | null;
   /** ACS B19013 median when the 2020 GEOID is in the Southeast table. Absent means unknown. */
   medianHouseholdIncome?: number;
-};
+} & TractRentFields;
 
 export type IndexedTractFeature = GeoJSON.Feature<GeoJSON.Geometry, TractProps>;
 
@@ -238,14 +239,15 @@ export function eligibleOverviewFilter(classCut: TractClassCut): unknown[] | nul
 
 /**
  * Far-zoom layer filter. Class, the South Carolina nomination list, and the
- * income slider all apply. Income is null when the slider should not touch tracts.
+ * income and rent sliders all apply. The metric filter is null when those
+ * sliders should not touch tracts.
  */
-export function eligibleOverviewShownFilter(classCut: TractClassCut, incomeFilter: unknown): unknown[] | null {
+export function eligibleOverviewShownFilter(classCut: TractClassCut, metricFilter: unknown): unknown[] | null {
   const parts: unknown[] = [];
   const classFilter = eligibleOverviewFilter(classCut);
   if (classFilter) parts.push(classFilter);
   parts.push(scNominatedOverlayFilter());
-  if (Array.isArray(incomeFilter)) parts.push(incomeFilter);
+  if (Array.isArray(metricFilter)) parts.push(metricFilter);
   if (parts.length === 1) return parts[0] as unknown[];
   return ["all", ...parts];
 }

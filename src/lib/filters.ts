@@ -263,6 +263,7 @@ export function writeParcelFilters(
 export function parcelFiltersFromSearchParams(params: { get(name: string): string | null }): FilterState {
   const geo = params.get("geo");
   return {
+    ...DEFAULT_FILTERS,
     considerOpportunityZone: params.get("ozOn") === "1",
     considerZoning: params.get("zoneOn") === "1",
     landUseFilter: landUseParam(params.get("landUse") ?? params.get("mf")),

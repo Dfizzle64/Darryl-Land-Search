@@ -9,10 +9,13 @@ import { isFull5AcCounty, ORLANDO_FIPS_BY_NAME } from "@/lib/orlandoParcels";
 import { MF_PRIORITY_DISCLAIMER, NOM_WATCH_CAVEAT, tractPlaceLabel } from "@/lib/scMfPriority";
 import { displayTractNotes, isScGovernorNominatedGeoid } from "@/lib/scNominatedTracts";
 import type { TractInfoRow } from "@/lib/msStatewideTracts";
+import { formatTractRentLines } from "@/lib/tractRent";
 import { SC_NOMINATED_NOT_A_QOZ, SHED_CAVEAT } from "@/lib/types";
 
 type TractDrawerProps = {
   tract: TractInfoRow | null;
+  /** Stamped rent numbers for this GEOID. Null when the tract has no joined series. */
+  rent?: Record<string, unknown> | null;
   statusHelp?: string | null;
   overlayMode?: ScOzOverlayMode;
   screeningPoint?: ScreeningPoint | null;
@@ -24,6 +27,7 @@ type TractDrawerProps = {
 
 export function TractDrawer({
   tract,
+  rent = null,
   statusHelp = null,
   overlayMode = "eligible",
   screeningPoint = null,
@@ -107,6 +111,17 @@ export function TractDrawer({
           <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">GEOID</dt>
           <dd className="mt-1 text-ink-100">{tract.geoid}</dd>
         </div>
+        {formatTractRentLines(rent).map((line) => {
+          const splitAt = line.indexOf(": ");
+          const label = splitAt === -1 ? line : line.slice(0, splitAt);
+          const value = splitAt === -1 ? line : line.slice(splitAt + 2);
+          return (
+            <div key={label}>
+              <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">{label}</dt>
+              <dd className="mt-1 text-ink-100">{value}</dd>
+            </div>
+          );
+        })}
         {priority ? (
           <>
             <div>

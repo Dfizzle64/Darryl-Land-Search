@@ -7,6 +7,7 @@ import { ZoningKnowledgePanel } from "./ZoningKnowledgePanel";
 import { southCarolinaOverlayMode } from "@/lib/markets";
 import { screeningLayerNotes } from "@/lib/screeningLayerHelp";
 import type { ScreeningToggles } from "@/lib/screening";
+import { formatRentSliderValue, RENT_SLIDERS, type RentSlider } from "@/lib/tractRent";
 import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MfPriorityView, type OzFilter, type SearchMarketId, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
@@ -122,6 +123,37 @@ function Toggle({
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
       />
+    </label>
+  );
+}
+
+function RentMinimumSlider({
+  slider,
+  value,
+  onValue,
+}: {
+  slider: RentSlider;
+  value: number;
+  onValue: (next: number) => void;
+}) {
+  return (
+    <label className="block text-sm">
+      {slider.label}
+      <input
+        type="range"
+        min={slider.min}
+        max={slider.max}
+        step={slider.step}
+        value={Math.min(Math.max(value, slider.min), slider.max)}
+        onChange={(event) => {
+          const raw = Number(event.target.value);
+          const next = slider.format === "percent" ? Math.round(raw * 10) / 10 : raw;
+          onValue(next);
+        }}
+        className="mt-2 w-full accent-clay-400"
+      />
+      <span className="mt-1 block text-ink-300">{formatRentSliderValue(slider, value)}</span>
+      <span className="mt-1 block text-xs leading-relaxed text-ink-500">{slider.note}</span>
     </label>
   );
 }
@@ -521,6 +553,29 @@ export function FilterSidebar({
               substitutes are not the filter. Charlotte neighborhood income is not used. No income is invented.
             </p>
           </Note>
+        </section>
+
+        <section className="mt-5 space-y-3" id="rent-filters">
+          <YesNo
+            label="Rent filters"
+            value={filters.rentFiltersOn}
+            onChange={(rentFiltersOn) => onChange({ ...filters, rentFiltersOn })}
+          />
+          {filters.rentFiltersOn ? (
+            <>
+              <p className="text-xs leading-relaxed text-ink-400">
+                Each slider starts off. Raising it hides tracts below the minimum and tracts with no value for that source.
+              </p>
+              {RENT_SLIDERS.map((slider) => (
+                <RentMinimumSlider
+                  key={slider.key}
+                  slider={slider}
+                  value={filters[slider.key]}
+                  onValue={(next) => onChange({ ...filters, [slider.key]: next })}
+                />
+              ))}
+            </>
+          ) : null}
         </section>
 
         <section className="mt-5 space-y-3">

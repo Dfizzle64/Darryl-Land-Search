@@ -89,7 +89,7 @@ import {
 } from "@/lib/jumpPin";
 import { tractClickFromFeature, tractPopupRuralLine, type TractClickDetails } from "@/lib/tractCounty";
 import { tractIncomeLayerFilter } from "@/lib/tractIncome";
-import { formatTractRentLines, tractRentLayerFilter, type TractRentMinimums } from "@/lib/tractRent";
+import { formatTractRentLines, tractRentLayerFilter, type TractRentFilterInput } from "@/lib/tractRent";
 import { ORANGE_COUNTY_CENTER, MF_PRIORITY_LEGEND_BLURB, MF_PRIORITY_TIER_A_MEANING, MF_PRIORITY_TIER_B_MEANING, RURAL_ELIGIBLE_LEGEND_BLURB, SC_NOMINATED_RURAL_LEGEND_BLURB, SC_NOMINATED_URBAN_LEGEND_BLURB, URBAN_ELIGIBLE_LEGEND_BLURB, type EligiblePackTractCollection, type IncomeGeography, type OpportunityZoneCollection, type Oz2TractCollection, type OzFilter, type ParcelCollection, type RuralMarketTractCollection, type SearchMarketId, type TractClassView } from "@/lib/types";
 
 type LngLatBounds = [[number, number], [number, number]];
@@ -130,7 +130,7 @@ type SiteMapProps = {
   minIncome: number;
   includeUnknownIncome: boolean;
   incomeGeography: IncomeGeography;
-  rentMinimums: TractRentMinimums;
+  rentMinimums: TractRentFilterInput;
   highlightTierA: string[];
   highlightTierB: string[];
   restrictGeoids: string[] | null;

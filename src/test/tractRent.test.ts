@@ -143,8 +143,12 @@ describe("tract rent filter", () => {
   it("stays off at zero and hides missing values once a minimum is set", () => {
     expect(tractMinimumLayerFilter("safmr2Br", 0)).toBeNull();
     expect(tractMinimumLayerFilter("safmr2Br", Number.NaN)).toBeNull();
-    expect(tractRentLayerFilter(DEFAULT_RENT_MINIMUMS)).toBeNull();
-    expect(tractRentFilterActive(DEFAULT_RENT_MINIMUMS)).toBe(false);
+    const off = { ...DEFAULT_RENT_MINIMUMS, rentFiltersOn: false as const };
+    const idle = { ...DEFAULT_RENT_MINIMUMS, rentFiltersOn: true as const };
+    expect(tractRentLayerFilter(off)).toBeNull();
+    expect(tractRentLayerFilter(idle)).toBeNull();
+    expect(tractRentFilterActive(off)).toBe(false);
+    expect(tractRentFilterActive(idle)).toBe(false);
     const knownOnly = tractMinimumLayerFilter("medianGrossRent", 1500);
     expect(knownOnly).toEqual([
       "all",
@@ -152,11 +156,13 @@ describe("tract rent filter", () => {
       [">=", ["to-number", ["get", "medianGrossRent"]], 1500],
     ]);
     expect(JSON.stringify(knownOnly)).not.toContain('"any"');
-    const combined = tractRentLayerFilter({
+    const raised = {
       ...DEFAULT_RENT_MINIMUMS,
+      rentFiltersOn: true as const,
       minSafmr2Br: 1200,
       minZoriMf5PlusGrowth: 1,
-    });
+    };
+    const combined = tractRentLayerFilter(raised);
     expect(JSON.stringify(combined)).toContain("safmr2Br");
     expect(JSON.stringify(combined)).toContain("zoriMf5PlusGrowth");
     expect(JSON.stringify(combined)).not.toContain('"any"');
@@ -173,13 +179,31 @@ describe("tract rent filter", () => {
       high: { safmr2Br: 1600, zoriMf5PlusGrowth: 2 },
       flat: { safmr2Br: 1600, zoriMf5PlusGrowth: 0 },
     };
-    expect(filterTractRowsByRent(rows, rent, DEFAULT_RENT_MINIMUMS)).toHaveLength(4);
+    const idle = { ...DEFAULT_RENT_MINIMUMS, rentFiltersOn: true as const };
+    expect(filterTractRowsByRent(rows, rent, idle)).toHaveLength(4);
     expect(
-      filterTractRowsByRent(rows, rent, { ...DEFAULT_RENT_MINIMUMS, minSafmr2Br: 1000 }).map((row) => row.geoid),
+      filterTractRowsByRent(rows, rent, { ...idle, minSafmr2Br: 1000 }).map((row) => row.geoid),
     ).toEqual(["high", "flat"]);
     expect(
-      filterTractRowsByRent(rows, rent, { ...DEFAULT_RENT_MINIMUMS, minZoriMf5PlusGrowth: 1 }).map((row) => row.geoid),
+      filterTractRowsByRent(rows, rent, { ...idle, minZoriMf5PlusGrowth: 1 }).map((row) => row.geoid),
     ).toEqual(["low", "high"]);
+  });
+
+  it("ignores nonzero thresholds while rent filters are off and applies them when on", () => {
+    const rows = [{ geoid: "low" }, { geoid: "high" }, { geoid: "missing" }];
+    const rent = {
+      low: { safmr2Br: 900, medianGrossRent: 900 },
+      high: { safmr2Br: 1600, medianGrossRent: 1200 },
+    };
+    const thresholds = { ...DEFAULT_RENT_MINIMUMS, minSafmr2Br: 1200, minMedianGrossRent: 800 };
+    const off = { ...thresholds, rentFiltersOn: false as const };
+    const on = { ...thresholds, rentFiltersOn: true as const };
+    expect(tractRentFilterActive(off)).toBe(false);
+    expect(tractRentLayerFilter(off)).toBeNull();
+    expect(filterTractRowsByRent(rows, rent, off).map((row) => row.geoid)).toEqual(["low", "high", "missing"]);
+    expect(tractRentFilterActive(on)).toBe(true);
+    expect(JSON.stringify(tractRentLayerFilter(on))).toContain("safmr2Br");
+    expect(filterTractRowsByRent(rows, rent, on).map((row) => row.geoid)).toEqual(["high"]);
   });
 });
 

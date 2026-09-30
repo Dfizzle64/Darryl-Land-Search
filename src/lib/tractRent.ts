@@ -271,11 +271,18 @@ export function tractMinimumLayerFilter(property: string, minimum: number): unkn
   return ["all", ["has", property], [">=", ["to-number", ["get", property]], minimum]];
 }
 
-export function tractRentFilterActive(minimums: TractRentMinimums): boolean {
+/** Slider values plus the Yes/No gate. Off ignores every threshold. */
+export type TractRentFilterInput = TractRentMinimums & {
+  rentFiltersOn: boolean;
+};
+
+export function tractRentFilterActive(minimums: TractRentFilterInput): boolean {
+  if (!minimums.rentFiltersOn) return false;
   return RENT_SLIDERS.some((slider) => minimums[slider.key] > 0);
 }
 
-export function tractRentLayerFilter(minimums: TractRentMinimums): unknown[] | null {
+export function tractRentLayerFilter(minimums: TractRentFilterInput): unknown[] | null {
+  if (!minimums.rentFiltersOn) return null;
   const parts: unknown[][] = [];
   for (const slider of RENT_SLIDERS) {
     const part = tractMinimumLayerFilter(slider.property, minimums[slider.key]);
@@ -295,7 +302,7 @@ export function tractRentPasses(value: number | null | undefined, minimum: numbe
 export function filterTractRowsByRent<T extends { geoid: string }>(
   rows: T[],
   rentByGeoid: Readonly<Record<string, Partial<TractRentFields>>>,
-  minimums: TractRentMinimums,
+  minimums: TractRentFilterInput,
 ): T[] {
   if (!tractRentFilterActive(minimums)) return rows;
   return rows.filter((row) => {

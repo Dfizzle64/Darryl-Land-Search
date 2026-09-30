@@ -611,6 +611,11 @@ export type FilterState = {
   includeUnknownIncome: boolean;
   minAadt: number;
   includeUnknownAadt: boolean;
+  /**
+   * When false, rent sliders are hidden and no rent minimum is applied on any
+   * tract layer, including the zoom 4–7 overview, even if a slider was raised.
+   */
+  rentFiltersOn: boolean;
 } & TractRentMinimums;
 
 export type ZoningToken = {
@@ -682,6 +687,7 @@ export const DEFAULT_FILTERS: FilterState = {
   includeUnknownIncome: true,
   minAadt: 0,
   includeUnknownAadt: true,
+  rentFiltersOn: false,
   ...DEFAULT_RENT_MINIMUMS,
 };
 

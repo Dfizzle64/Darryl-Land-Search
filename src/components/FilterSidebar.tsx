@@ -555,21 +555,27 @@ export function FilterSidebar({
           </Note>
         </section>
 
-        <section className="mt-5">
-          <details open className="space-y-3" id="rent-filters">
-            <summary className="cursor-pointer text-xs uppercase tracking-[0.16em] text-ink-500">Rent</summary>
-            <p className="text-xs leading-relaxed text-ink-400">
-              Each slider starts off. Raising it hides tracts below the minimum and tracts with no value for that source.
-            </p>
-            {RENT_SLIDERS.map((slider) => (
-              <RentMinimumSlider
-                key={slider.key}
-                slider={slider}
-                value={filters[slider.key]}
-                onValue={(next) => onChange({ ...filters, [slider.key]: next })}
-              />
-            ))}
-          </details>
+        <section className="mt-5 space-y-3" id="rent-filters">
+          <YesNo
+            label="Rent filters"
+            value={filters.rentFiltersOn}
+            onChange={(rentFiltersOn) => onChange({ ...filters, rentFiltersOn })}
+          />
+          {filters.rentFiltersOn ? (
+            <>
+              <p className="text-xs leading-relaxed text-ink-400">
+                Each slider starts off. Raising it hides tracts below the minimum and tracts with no value for that source.
+              </p>
+              {RENT_SLIDERS.map((slider) => (
+                <RentMinimumSlider
+                  key={slider.key}
+                  slider={slider}
+                  value={filters[slider.key]}
+                  onValue={(next) => onChange({ ...filters, [slider.key]: next })}
+                />
+              ))}
+            </>
+          ) : null}
         </section>
 
         <section className="mt-5 space-y-3">

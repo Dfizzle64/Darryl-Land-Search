@@ -1,13 +1,17 @@
 "use client";
 
+import type { GeocodeSuggestion } from "@/lib/jumpTo";
+
 type JumpToBarProps = {
   busy: boolean;
   note: string | null;
   error: string | null;
+  suggestions?: GeocodeSuggestion[];
   onJump: (query: string) => void;
+  onSuggestion?: (suggestion: GeocodeSuggestion) => void;
 };
 
-export function JumpToBar({ busy, note, error, onJump }: JumpToBarProps) {
+export function JumpToBar({ busy, note, error, suggestions = [], onJump, onSuggestion }: JumpToBarProps) {
   return (
     <form
       className="flex flex-wrap items-center gap-1"
@@ -37,7 +41,22 @@ export function JumpToBar({ busy, note, error, onJump }: JumpToBarProps) {
       >
         {busy ? "Finding…" : "Go"}
       </button>
-      {error ? (
+      {suggestions.length > 0 ? (
+        <div className="flex basis-full flex-wrap items-center gap-1">
+          <span className="text-[11px] text-ink-400">Did you mean</span>
+          {suggestions.map((suggestion) => (
+            <button
+              key={`${suggestion.provider}:${suggestion.lng}:${suggestion.lat}:${suggestion.label}`}
+              type="button"
+              disabled={busy}
+              className="rounded-full border border-white/20 bg-ink-800 px-2.5 py-1 text-left text-[11px] leading-snug text-white disabled:opacity-50"
+              onClick={() => onSuggestion?.(suggestion)}
+            >
+              {suggestion.label}
+            </button>
+          ))}
+        </div>
+      ) : error ? (
         <span id="jump-to-status" role="alert" className="max-w-[18rem] text-[11px] leading-snug text-clay-300">
           {error}
         </span>

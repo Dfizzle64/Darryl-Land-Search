@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   ADDRESS_NOT_FOUND,
   censusMatchPoint,
+  LOOKUP_UNAVAILABLE,
   coordinateError,
   geometryContains,
   parcelAtPoint,
@@ -23,6 +24,7 @@ describe("jump-to address bar", () => {
     expect(coordinateError("26.1224, -80.1373")).toBeNull();
     expect(coordinateError("123 Main St, Fort Lauderdale, FL")).toBeNull();
     expect(ADDRESS_NOT_FOUND).toBe("Couldn't find that address.");
+    expect(LOOKUP_UNAVAILABLE).toBe("Lookup service unavailable, try again.");
   });
 
   it("reads a Census oneline match", () => {

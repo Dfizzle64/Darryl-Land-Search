@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
       "./data/fixtures/screening/dekalb-batch40.json",
     ],
     "/api/screening/schools": ["./data/fixtures/screening/school-ratings.json", "./data/fixtures/screening/cms-spg-2025-26.json"],
+    "/api/geocode": ["./data/address-index/*.tsv"],
   },
 };
 

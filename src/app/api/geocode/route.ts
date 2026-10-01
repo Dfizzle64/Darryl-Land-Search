@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { ADDRESS_NOT_FOUND, censusMatchPoint, coordinateError, parseLatLng } from "@/lib/jumpTo";
+import { geocodeAddress } from "@/lib/geocode";
+import { coordinateError, parseLatLng } from "@/lib/jumpTo";
+
+export const dynamic = "force-dynamic";
+
+/** Headroom for one Census retry plus Esri and Nominatim. Each provider has its own timeout. */
+export const maxDuration = 20;
 
 export async function GET(request: Request) {
   const query = new URL(request.url).searchParams.get("q")?.trim() ?? "";
@@ -10,19 +16,16 @@ export async function GET(request: Request) {
   if (query.length < 5) {
     return NextResponse.json({ error: "Enter a street address or lat, long." }, { status: 400 });
   }
-  const url = new URL("https://geocoding.geo.census.gov/geocoder/locations/onelineaddress");
-  url.searchParams.set("address", query);
-  url.searchParams.set("benchmark", "Public_AR_Current");
-  url.searchParams.set("format", "json");
-  try {
-    const response = await fetch(url.toString(), { headers: { Accept: "application/json" } });
-    if (!response.ok) {
-      return NextResponse.json({ error: "Address lookup failed." }, { status: 502 });
+  const result = await geocodeAddress(query);
+  const headers = { "Cache-Control": "no-store" };
+  if (!result.ok) {
+    if (result.suggestions?.length) {
+      return NextResponse.json({ kind: "suggestions", suggestions: result.suggestions }, { status: 200, headers });
     }
-    const point = censusMatchPoint(await response.json());
-    if (!point) return NextResponse.json({ error: ADDRESS_NOT_FOUND }, { status: 404 });
-    return NextResponse.json({ ...point, kind: "address" });
-  } catch {
-    return NextResponse.json({ error: "Address lookup failed." }, { status: 502 });
+    return NextResponse.json({ error: result.error }, { status: result.status, headers });
   }
+  return NextResponse.json(
+    { lng: result.lng, lat: result.lat, kind: "address", provider: result.provider },
+    { headers },
+  );
 }

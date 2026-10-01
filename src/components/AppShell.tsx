@@ -19,10 +19,12 @@ import {
   bboxContains,
   parcelAtPoint,
   ADDRESS_NOT_FOUND,
+  LOOKUP_UNAVAILABLE,
   coordinateError,
   parseLatLng,
   pointInBounds,
   SOUTH_FLORIDA_BOUNDS,
+  type GeocodeSuggestion,
   type MapFlyTarget,
 } from "@/lib/jumpTo";
 import { appliedParcelFilters, emptyStateHint, filterParcels, parcelFilterKey, stampFilterMatch, writeParcelFilters } from "@/lib/filters";
@@ -194,6 +196,7 @@ export function AppShell({
   const jumpSeq = useRef(0);
   const [jumpNote, setJumpNote] = useState<string | null>(null);
   const [jumpError, setJumpError] = useState<string | null>(null);
+  const [jumpSuggestions, setJumpSuggestions] = useState<GeocodeSuggestion[]>([]);
   const [jumpBusy, setJumpBusy] = useState(false);
   const [parcelLoadStamp, setParcelLoadStamp] = useState(0);
   const [pick, setPick] = useState<{ lng: number; lat: number; key: number; loadStamp: number } | null>(null);
@@ -657,50 +660,73 @@ export function AppShell({
     setFiltersOpen(false);
   };
 
+  const flyToPoint = (point: { lng: number; lat: number }, label: string) => {
+    const pad = 0.03;
+    lastViewport.current = {
+      bbox: [point.lng - pad, point.lat - pad, point.lng + pad, point.lat + pad],
+      zoom: 14,
+    };
+    const inSouthFlorida = pointInBounds(point.lng, point.lat, SOUTH_FLORIDA_BOUNDS);
+    const inCurrent = pointInBounds(point.lng, point.lat, summary.bounds);
+    if (!inCurrent && inSouthFlorida && market !== "South Florida") {
+      changeMarket("South Florida");
+    } else if (county || countyState) {
+      setCounty(null);
+      setCountyState(null);
+      setSelectedId(null);
+      setViewportParcels(null);
+    }
+    const key = jumpSeq.current + 1;
+    jumpSeq.current = key;
+    setFlyTarget({ lng: point.lng, lat: point.lat, key, label: formatJumpPinLabel(label) });
+    setPick({ lng: point.lng, lat: point.lat, key, loadStamp: parcelLoadStamp });
+  };
+
   const jumpToQuery = async (query: string) => {
     setJumpBusy(true);
     setJumpNote(null);
     setJumpError(null);
+    setJumpSuggestions([]);
     try {
       const invalid = coordinateError(query);
       if (invalid) {
         setJumpError(invalid);
         return;
       }
-      let point = parseLatLng(query);
-      if (!point) {
-        const response = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
-        const body = (await response.json()) as { lng?: number; lat?: number; error?: string };
-        if (!response.ok || !Number.isFinite(body.lng) || !Number.isFinite(body.lat)) {
-          setJumpError(body.error || ADDRESS_NOT_FOUND);
-          return;
-        }
-        point = { lng: body.lng as number, lat: body.lat as number };
+      const typed = parseLatLng(query);
+      if (typed) {
+        flyToPoint(typed, query);
+        return;
       }
-      const pad = 0.03;
-      lastViewport.current = {
-        bbox: [point.lng - pad, point.lat - pad, point.lng + pad, point.lat + pad],
-        zoom: 14,
+      const response = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
+      const body = (await response.json()) as {
+        lng?: number;
+        lat?: number;
+        error?: string;
+        kind?: string;
+        suggestions?: GeocodeSuggestion[];
       };
-      const inSouthFlorida = pointInBounds(point.lng, point.lat, SOUTH_FLORIDA_BOUNDS);
-      const inCurrent = pointInBounds(point.lng, point.lat, summary.bounds);
-      if (!inCurrent && inSouthFlorida && market !== "South Florida") {
-        changeMarket("South Florida");
-      } else if (county || countyState) {
-        setCounty(null);
-        setCountyState(null);
-        setSelectedId(null);
-        setViewportParcels(null);
+      if (body.kind === "suggestions" && Array.isArray(body.suggestions) && body.suggestions.length > 0) {
+        setJumpSuggestions(body.suggestions);
+        return;
       }
-      const key = jumpSeq.current + 1;
-      jumpSeq.current = key;
-      setFlyTarget({ lng: point.lng, lat: point.lat, key, label: formatJumpPinLabel(query) });
-      setPick({ lng: point.lng, lat: point.lat, key, loadStamp: parcelLoadStamp });
+      if (!response.ok || !Number.isFinite(body.lng) || !Number.isFinite(body.lat)) {
+        setJumpError(body.error || ADDRESS_NOT_FOUND);
+        return;
+      }
+      flyToPoint({ lng: body.lng as number, lat: body.lat as number }, query);
     } catch {
-      setJumpError(ADDRESS_NOT_FOUND);
+      setJumpError(LOOKUP_UNAVAILABLE);
     } finally {
       setJumpBusy(false);
     }
+  };
+
+  const jumpToSuggestion = (suggestion: GeocodeSuggestion) => {
+    setJumpSuggestions([]);
+    setJumpError(null);
+    setJumpNote(null);
+    flyToPoint(suggestion, suggestion.label);
   };
 
   useEffect(() => {
@@ -823,7 +849,14 @@ export function AppShell({
           >
             How OZ 2.0 works
           </button>
-          <JumpToBar busy={jumpBusy} note={jumpNote} error={jumpError} onJump={(query) => void jumpToQuery(query)} />
+          <JumpToBar
+            busy={jumpBusy}
+            note={jumpNote}
+            error={jumpError}
+            suggestions={jumpSuggestions}
+            onJump={(query) => void jumpToQuery(query)}
+            onSuggestion={jumpToSuggestion}
+          />
           <div className="flex items-center gap-1 text-[11px] text-ink-500">
             <span>Market</span>
             <MarketMenu value={market} groups={marketGroups} onChange={changeMarket} />

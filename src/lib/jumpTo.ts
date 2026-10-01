@@ -70,7 +70,19 @@ export function coordinateError(input: string): string | null {
   return "Those coordinates are not valid.";
 }
 
+/** A near match the user can click. The map jumps to lng/lat and does not geocode the label again. */
+export type GeocodeSuggestion = {
+  label: string;
+  lng: number;
+  lat: number;
+  score: number;
+  provider: "esri" | "nominatim" | "parcels" | "county";
+};
+
 export const ADDRESS_NOT_FOUND = "Couldn't find that address.";
+
+/** Census, Esri, and Nominatim all failed before any of them could say the address is missing. */
+export const LOOKUP_UNAVAILABLE = "Lookup service unavailable, try again.";
 
 export function censusMatchPoint(body: unknown): JumpPoint | null {
   const matches = (body as { result?: { addressMatches?: unknown[] } } | null)?.result?.addressMatches;

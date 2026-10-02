@@ -321,7 +321,7 @@ describe("site PDF assembly", () => {
       state: "FL",
       level: "Elementary",
       rating: null,
-      ratingKind: null as const,
+      ratingKind: null,
       year: null,
       summary: "No letter grade in this public extract.",
       source: "NCES",

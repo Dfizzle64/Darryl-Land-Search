@@ -67,6 +67,7 @@ import { ORLANDO_FIPS_BY_NAME, ORLANDO_SHED_COUNTIES } from "@/lib/orlandoParcel
 import { rankSites } from "@/lib/score";
 import { DEFAULT_SCREENING_TOGGLES, type ScreeningPoint, type ScreeningToggles } from "@/lib/screening";
 import { filterTractRowsByIncome, incomeByGeoidFromFeatures } from "@/lib/tractIncome";
+import { indexTractGeometries, tractGeoidForParcel } from "@/lib/sitePdf";
 import { filterTractRowsByRent, rentByGeoidFromFeatures, tractMetricEmptyMessage, tractRentFilterActive } from "@/lib/tractRent";
 import {
   annotateRuralRows,
@@ -234,6 +235,10 @@ export function AppShell({
     () => rentByGeoidFromFeatures([ruralTracts, eligibleTracts, oz2Tracts, msTracts]),
     [eligibleTracts, msTracts, oz2Tracts, ruralTracts],
   );
+  const tractGeometryByGeoid = useMemo(
+    () => indexTractGeometries([oz2Tracts, eligibleTracts, ruralTracts, msTracts]),
+    [eligibleTracts, msTracts, oz2Tracts, ruralTracts],
+  );
   const drawnEligibleTracts = useMemo(
     () => mergeMsStatewideTracts(eligibleTracts, ruralTracts, oz2Tracts, msTracts),
     [eligibleTracts, msTracts, oz2Tracts, ruralTracts],
@@ -370,6 +375,9 @@ export function AppShell({
     msTractRows.find((row) => row.geoid === selectedTractGeoid) ??
     null;
   const selectedTractRent = selectedTractGeoid ? (tractRentByGeoid[selectedTractGeoid] ?? null) : null;
+  const selectedPdfGeoid = selected ? tractGeoidForParcel(selected.properties) : null;
+  const selectedPdfTract = selectedPdfGeoid ? (tractGeometryByGeoid.get(selectedPdfGeoid) ?? null) : null;
+  const selectedPdfRent = selectedPdfGeoid ? (tractRentByGeoid[selectedPdfGeoid] ?? null) : null;
   const screeningFocus = selected
     ? { key: `parcel:${selected.properties.id}`, lon: selected.properties.centroid[0], lat: selected.properties.centroid[1] }
     : selectedTract
@@ -1193,6 +1201,10 @@ export function AppShell({
                 filters={appliedFilters}
                 screeningPoint={screeningPoint}
                 screeningStatus={screeningStatus}
+                pdfTract={selectedPdfTract}
+                pdfRent={selectedPdfRent}
+                showTracts={showOz2}
+                tractClass={tractClass}
                 onClose={() => setSelectedId(null)}
               />
             ) : (
@@ -1218,6 +1230,10 @@ export function AppShell({
               filters={appliedFilters}
               screeningPoint={screeningPoint}
               screeningStatus={screeningStatus}
+              pdfTract={selectedPdfTract}
+              pdfRent={selectedPdfRent}
+              showTracts={showOz2}
+              tractClass={tractClass}
               onClose={() => setSelectedId(null)}
             />
           ) : (

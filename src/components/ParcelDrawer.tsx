@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
   comptrollerRecordsUrl,
   entitySearchLink,
@@ -27,7 +28,9 @@ import { ScreeningDetails } from "./ScreeningDetails";
 import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility, oz2ParcelFieldValue } from "@/lib/opportunityZone";
-import type { FilterState, FluConfig, ParcelFeature, ZoningConfig } from "@/lib/types";
+import type { FilterState, FluConfig, ParcelFeature, TractClassView, ZoningConfig } from "@/lib/types";
+import { OZ2_NOT_JOINED, SitePdfError, type TractGeometryRecord } from "@/lib/sitePdf";
+import type { TractRentFields } from "@/lib/tractRent";
 import { fluEmptyForPolk, zoningEmptyForPolk } from "@/lib/polkMunicipal";
 import { fluEmptyForSeminole, zoningEmptyForSeminole } from "@/lib/seminoleMunicipal";
 import { fluEmptyForMartinIrc, zoningEmptyForMartinIrc } from "@/lib/martinIrcMunicipal";
@@ -47,6 +50,13 @@ type ParcelDrawerProps = {
   filters: FilterState;
   screeningPoint?: ScreeningPoint | null;
   screeningStatus?: "idle" | "loading" | "error";
+  /** Tract polygon for this parcel's 2020 GEOID, when the app has one. */
+  pdfTract?: TractGeometryRecord | null;
+  /** Rent-layer values for that GEOID. Missing series stay dashes in the PDF. */
+  pdfRent?: Partial<TractRentFields> | null;
+  /** Eligible-tract overlay. Off keeps the tract tint off the PDF map. */
+  showTracts?: boolean;
+  tractClass?: TractClassView;
   onClose: () => void;
   /** `pane` fills the desktop details rail. `page` is the standalone column / mobile sheet. */
   layout?: "page" | "pane";
@@ -79,10 +89,21 @@ export function ParcelDrawer({
   filters,
   screeningPoint = null,
   screeningStatus = "idle",
+  pdfTract = null,
+  pdfRent = null,
+  showTracts = true,
+  tractClass = "both",
   onClose,
   layout = "page",
 }: ParcelDrawerProps) {
   const pane = layout === "pane";
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const exportToken = useRef(0);
+  const parcelKey = parcel?.properties.id ?? null;
+  useEffect(() => {
+    setExportError(null);
+  }, [parcelKey]);
   if (!parcel) {
     return (
       <aside className={pane ? "h-full overflow-y-auto bg-ink-900/80 p-5" : "hidden"}>
@@ -207,6 +228,49 @@ export function ParcelDrawer({
               ) : null}
             </>
           ) : null}
+          <button
+            type="button"
+            data-export-pdf
+            onClick={() => {
+              const token = exportToken.current + 1;
+              exportToken.current = token;
+              setExporting(true);
+              setExportError(null);
+              void import("@/lib/sitePdfExport")
+                .then(({ downloadSitePdf }) =>
+                  downloadSitePdf({
+                    parcel,
+                    zoningLine,
+                    fluLine,
+                    screeningPoint,
+                    screeningStatus,
+                    rent: pdfRent,
+                    eligibleTract: pdfTract,
+                    showTracts,
+                    tractClass,
+                    filters,
+                  }),
+                )
+                .catch((error: unknown) => {
+                  if (exportToken.current !== token) return;
+                  setExportError(
+                    error instanceof SitePdfError ? error.message : "Could not export the PDF. Try again.",
+                  );
+                })
+                .finally(() => {
+                  if (exportToken.current === token) setExporting(false);
+                });
+            }}
+            disabled={exporting}
+            className="mt-3 inline-flex rounded-full border border-white/15 bg-ink-800 px-3 py-1 text-sm text-white hover:bg-ink-700 disabled:opacity-60"
+          >
+            {exporting ? "Exporting PDF…" : "Export PDF"}
+          </button>
+          {exportError ? (
+            <p role="alert" className="mt-1 max-w-[16rem] text-xs leading-snug text-clay-300">
+              {exportError}
+            </p>
+          ) : null}
         </div>
         <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-3 py-1 text-sm">
           Close
@@ -264,7 +328,7 @@ export function ParcelDrawer({
         <Field
           label="OZ 2.0"
           value={oz2ParcelFieldValue(oz2, properties.oz2Eligibility?.tractGeoid)}
-          empty="OZ 2.0 eligibility is not joined for this parcel. That is not a designation."
+          empty={OZ2_NOT_JOINED}
         />
         <Field
           label={vintageFieldLabel("Last sale", properties.lastSale.vintage, formatSale(properties.lastSale) != null)}

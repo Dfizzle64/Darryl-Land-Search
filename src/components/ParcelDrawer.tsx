@@ -29,7 +29,8 @@ import { describeFluMatch } from "@/lib/flu";
 import { describeRezoningCandidate } from "@/lib/filters";
 import { describeOpportunityZone, describeOz2Eligibility, oz2ParcelFieldValue } from "@/lib/opportunityZone";
 import type { FilterState, FluConfig, ParcelFeature, TractClassView, ZoningConfig } from "@/lib/types";
-import { OZ2_NOT_JOINED, SitePdfError, type TractGeometryRecord } from "@/lib/sitePdf";
+import { googleMapsUrl, OZ2_NOT_JOINED, SitePdfError, type TractGeometryRecord } from "@/lib/sitePdf";
+import { useSheetExpanded } from "./useSheetExpanded";
 import type { TractRentFields } from "@/lib/tractRent";
 import { fluEmptyForPolk, zoningEmptyForPolk } from "@/lib/polkMunicipal";
 import { fluEmptyForSeminole, zoningEmptyForSeminole } from "@/lib/seminoleMunicipal";
@@ -97,6 +98,7 @@ export function ParcelDrawer({
   layout = "page",
 }: ParcelDrawerProps) {
   const pane = layout === "pane";
+  const { expanded, handleProps } = useSheetExpanded(parcel?.properties.id ?? null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const exportToken = useRef(0);
@@ -194,23 +196,47 @@ export function ParcelDrawer({
   });
   const gaps = properties.dataGaps?.length ? properties.dataGaps : null;
 
+  const [lon, lat] = properties.centroid;
+  const mapsHref = Number.isFinite(lat) && Number.isFinite(lon) ? googleMapsUrl(lat, lon) : null;
+  const ozPeek =
+    oz.inZone == null ? "Designated QOZ unknown" : oz.inZone ? "Designated QOZ" : "Not a designated QOZ";
+  const oz2Peek = oz2.statusChip ?? oz2.label;
+
   return (
-    <aside className={pane ? "drawer-scroll h-full overflow-y-auto bg-ink-900 p-5" : "drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl"}>
+    <aside
+      data-detail-sheet={pane ? "pane" : expanded ? "expanded" : "peek"}
+      className={pane ? "drawer-scroll h-full overflow-y-auto bg-ink-900 p-5" : `drawer-scroll sheet-page absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl${expanded ? " sheet-expanded" : ""}`}
+    >
+      {pane ? null : (
+        <button
+          type="button"
+          className="sheet-handle mx-auto mb-2 h-11 w-full items-center justify-center"
+          aria-expanded={expanded}
+          aria-label={expanded ? "Show less" : "Expand details"}
+          {...handleProps}
+        >
+          <span className="flex flex-col items-center gap-1 text-[11px] uppercase tracking-[0.14em] text-ink-300">
+            <span className="h-1.5 w-10 rounded-full bg-white/40" />
+            {expanded ? "Show less" : "Details"}
+          </span>
+        </button>
+      )}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500">{parcelIdLabel(properties.countyFips)}</p>
-          <p className="mt-0.5 break-all font-mono text-sm text-clay-300">{properties.parcelId}</p>
+          <p className="text-[11px] uppercase tracking-[0.14em] text-ink-500 max-[767px]:hidden">{parcelIdLabel(properties.countyFips)}</p>
+          <p className="mt-0.5 break-all font-mono text-sm text-clay-300 max-[767px]:hidden">{properties.parcelId}</p>
           {properties.countyFips === "12069" && lakeAltKey(properties.appraiserUrl) ? (
             <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-ink-500">
               Alt Key <span className="font-mono normal-case tracking-normal text-clay-300">{lakeAltKey(properties.appraiserUrl)}</span>
             </p>
           ) : null}
-          <h2 className="mt-1 font-display text-2xl leading-tight text-white">
+          <h2 className="mt-1 font-display text-2xl leading-tight text-white max-[767px]:line-clamp-2 max-[767px]:text-xl">
             {properties.situsAddress || missingPublicParcelValue("situs")}
           </h2>
           <p className="text-sm text-ink-300">{placeLine}</p>
+          <div data-sheet-actions className="max-[767px]:mt-3 max-[767px]:grid max-[767px]:grid-cols-2 max-[767px]:gap-2">
           {appraiser.href ? (
-            <a className="mt-2 inline-block text-sm text-moss-400 underline-offset-2 hover:underline" href={appraiser.href} target="_blank" rel="noreferrer">
+            <a className="dls-hit mt-2 inline-block text-sm text-moss-400 underline-offset-2 hover:underline max-[767px]:mt-0 max-[767px]:flex max-[767px]:items-center max-[767px]:justify-center max-[767px]:rounded-xl max-[767px]:border max-[767px]:border-white/15 max-[767px]:bg-ink-800 max-[767px]:px-2 max-[767px]:text-center max-[767px]:text-xs max-[767px]:font-semibold max-[767px]:text-white max-[767px]:no-underline" href={appraiser.href} target="_blank" rel="noreferrer">
               {appraiser.label}
             </a>
           ) : (
@@ -218,15 +244,20 @@ export function ParcelDrawer({
           )}
           {gisViewers ? (
             <>
-              <a className="mt-1 block text-sm text-moss-400 underline-offset-2 hover:underline" href={gisViewers.primary.href} target="_blank" rel="noreferrer">
+              <a className="dls-hit mt-1 block text-sm text-moss-400 underline-offset-2 hover:underline max-[767px]:mt-0 max-[767px]:flex max-[767px]:items-center max-[767px]:justify-center max-[767px]:rounded-xl max-[767px]:border max-[767px]:border-white/15 max-[767px]:bg-ink-800 max-[767px]:px-2 max-[767px]:text-center max-[767px]:text-xs max-[767px]:font-semibold max-[767px]:text-white max-[767px]:no-underline" href={gisViewers.primary.href} target="_blank" rel="noreferrer">
                 {gisViewers.primary.label}
               </a>
               {gisViewers.alt ? (
-                <a className="mt-1 block text-sm text-moss-400 underline-offset-2 hover:underline" href={gisViewers.alt.href} target="_blank" rel="noreferrer">
+                <a className="dls-hit mt-1 block text-sm text-moss-400 underline-offset-2 hover:underline max-[767px]:mt-0 max-[767px]:flex max-[767px]:items-center max-[767px]:justify-center max-[767px]:rounded-xl max-[767px]:border max-[767px]:border-white/15 max-[767px]:bg-ink-800 max-[767px]:px-2 max-[767px]:text-center max-[767px]:text-xs max-[767px]:font-semibold max-[767px]:text-white max-[767px]:no-underline" href={gisViewers.alt.href} target="_blank" rel="noreferrer">
                   {gisViewers.alt.label}
                 </a>
               ) : null}
             </>
+          ) : null}
+          {mapsHref ? (
+            <a className="dls-narrow dls-hit items-center justify-center rounded-xl border border-white/15 bg-ink-800 px-2 text-center text-xs font-semibold text-white" href={mapsHref} target="_blank" rel="noreferrer">
+              Google Maps
+            </a>
           ) : null}
           <button
             type="button"
@@ -262,21 +293,31 @@ export function ParcelDrawer({
                 });
             }}
             disabled={exporting}
-            className="mt-3 inline-flex rounded-full border border-white/15 bg-ink-800 px-3 py-1 text-sm text-white hover:bg-ink-700 disabled:opacity-60"
+            className="dls-hit mt-3 inline-flex rounded-full border border-white/15 bg-ink-800 px-3 py-1 text-sm text-white hover:bg-ink-700 disabled:opacity-60 max-[767px]:mt-0 max-[767px]:items-center max-[767px]:justify-center max-[767px]:rounded-xl max-[767px]:text-xs max-[767px]:font-semibold"
           >
             {exporting ? "Exporting PDF…" : "Export PDF"}
           </button>
           {exportError ? (
-            <p role="alert" className="mt-1 max-w-[16rem] text-xs leading-snug text-clay-300">
+            <p role="alert" className="mt-1 max-w-[16rem] text-xs leading-snug text-clay-300 max-[767px]:col-span-2 max-[767px]:text-sm">
               {exportError}
             </p>
           ) : null}
+          </div>
         </div>
-        <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-3 py-1 text-sm">
+        <button type="button" onClick={onClose} className="dls-hit shrink-0 rounded-full border border-white/15 px-3 py-1 text-sm">
           Close
         </button>
       </div>
 
+      <dl data-sheet-peek className="sheet-peek-facts mt-4 grid grid-cols-2 gap-3 md:hidden">
+        <Field label="Acreage" value={formatAcres(properties.acreage)} />
+        <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
+        <div className="col-span-2">
+          <Field label="Opportunity Zone" value={`${ozPeek} · ${oz2Peek}`} />
+        </div>
+      </dl>
+
+      <div className="sheet-rest">
       <dl className="mt-5 grid grid-cols-2 gap-4">
         <Field label="Owner" value={[properties.ownerName, properties.ownerName2].filter(Boolean).join("\n")} />
         <Field label="Property name" value={properties.propertyName} empty={missingPublicParcelValue("propertyName")} />
@@ -472,6 +513,7 @@ export function ParcelDrawer({
         </p>
       </div>
       <ScreeningDetails point={screeningPoint} status={screeningStatus} />
+      </div>
     </aside>
   );
 }

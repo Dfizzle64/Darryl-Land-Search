@@ -10,6 +10,7 @@ import { applyMapGestures } from "@/lib/mapGestures";
 import { BasemapToggle } from "./BasemapToggle";
 import { AoiControls } from "./AoiControls";
 import { MeasureControl } from "./MeasureControl";
+import { MobileMapTools } from "./MobileMapTools";
 import { ParcelLayerToggle } from "./ParcelLayerToggle";
 import {
   STREET_STYLE_CANDIDATES,
@@ -764,6 +765,7 @@ export function SiteMap({
   const [drawing, setDrawing] = useState(false);
   const [measuring, setMeasuring] = useState(false);
   const [measurePoints, setMeasurePoints] = useState<LngLat[]>([]);
+  const [legendOpen, setLegendOpen] = useState(false);
   const callbacksRef = useRef({ onSelect, onHover, onSelectTract, onViewportIdle, onZoom, onAoiChange });
   callbacksRef.current = { onSelect, onHover, onSelectTract, onViewportIdle, onZoom, onAoiChange };
   const drawingRef = useRef(drawing);
@@ -995,10 +997,11 @@ export function SiteMap({
           const paintZoomAttr = () => {
             const zoomNow = map.getZoom();
             containerRef.current?.setAttribute("data-map-zoom", zoomNow.toFixed(2));
-            const label = zoomReadoutRef.current;
-            if (!label) return;
             const text = formatMapZoom(zoomNow);
-            if (label.textContent !== text) label.textContent = text;
+            const labels = [zoomReadoutRef.current, shellRef.current?.querySelector<HTMLElement>("[data-mobile-zoom]")];
+            labels.forEach((label) => {
+              if (label && label.textContent !== text) label.textContent = text;
+            });
           };
           const emitViewport = () => {
             paintZoomAttr();
@@ -1686,10 +1689,21 @@ export function SiteMap({
     const map = mapRef.current;
     const slot = cornerClusterRef.current;
     if (!map || !slot) return;
-    const scaleEl = map.getContainer().querySelector<HTMLElement>(".maplibregl-ctrl-scale");
-    if (scaleEl && scaleEl.parentElement !== slot) slot.appendChild(scaleEl);
-    const label = zoomReadoutRef.current;
-    if (label) label.textContent = formatMapZoom(map.getZoom());
+    const placeScale = () => {
+      const scaleEl = shellRef.current?.querySelector<HTMLElement>(".maplibregl-ctrl-scale");
+      if (!scaleEl) return;
+      const narrow = window.matchMedia("(max-width: 767px)").matches;
+      const home = narrow ? map.getContainer() : slot;
+      if (scaleEl.parentElement !== home) home.appendChild(scaleEl);
+    };
+    placeScale();
+    const text = formatMapZoom(map.getZoom());
+    if (zoomReadoutRef.current) zoomReadoutRef.current.textContent = text;
+    const mobileZoom = shellRef.current?.querySelector<HTMLElement>("[data-mobile-zoom]");
+    if (mobileZoom) mobileZoom.textContent = text;
+    const media = window.matchMedia("(max-width: 767px)");
+    media.addEventListener("change", placeScale);
+    return () => media.removeEventListener("change", placeScale);
   }, [status]);
 
   const overlayMode = southCarolinaOverlayMode(market, countyState);
@@ -1702,9 +1716,61 @@ export function SiteMap({
     <div ref={shellRef} className="dls-map relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
       {status === "ready" ? (
+        <MobileMapTools
+          basemap={basemap}
+          onBasemap={setBasemap}
+          showParcels={showParcels}
+          parcelLayerVisible={layerOn}
+          parcelHint={parcelVisibilityHint ?? ""}
+          onToggleParcelLayer={onToggleParcelLayer}
+          showOz2={showOz2}
+          tractToggleName={tractToggleName}
+          onToggleTractOverlay={onToggleTractOverlay}
+          showCoverage={showCoverage}
+          onToggleCoverage={() => setShowCoverage((current) => !current)}
+          measuring={measuring}
+          measurePoints={measurePoints}
+          onStartMeasure={() => {
+            setDrawing(false);
+            setMeasuring(true);
+          }}
+          onClearMeasure={() => setMeasurePoints([])}
+          onCancelMeasure={() => {
+            setMeasuring(false);
+            setMeasurePoints([]);
+          }}
+          legendOpen={legendOpen}
+          onToggleLegend={() => setLegendOpen((current) => !current)}
+          tractClass={tractClass}
+          onTractClass={onTractClass}
+          showAoi={showParcels}
+          drawing={drawing}
+          aoi={aoi ?? null}
+          onDraw={() => {
+            setMeasuring(false);
+            setMeasurePoints([]);
+            setDrawing(true);
+          }}
+          onCancelDraw={() => setDrawing(false)}
+          onLockView={() => {
+            const map = mapRef.current;
+            if (!map) return;
+            const camera = map.getBounds();
+            const bbox = normalizeBbox(camera.getWest(), camera.getSouth(), camera.getEast(), camera.getNorth());
+            if (!bbox) return;
+            setDrawing(false);
+            onAoiChange?.({ bbox, source: "bounds" });
+          }}
+          onClearAoi={() => {
+            setDrawing(false);
+            onAoiChange?.(null);
+          }}
+        />
+      ) : null}
+      {status === "ready" ? (
         <div
           data-map-corner
-          className="map-chrome absolute left-3 top-3 z-30 flex flex-col items-start gap-2 sm:left-4 sm:top-4"
+          className="dls-wide map-chrome absolute left-3 top-3 z-30 flex flex-col items-start gap-2 sm:left-4 sm:top-4"
         >
           <BasemapToggle value={basemap} onChange={setBasemap} />
           {showParcels && onToggleParcelLayer ? (
@@ -1753,7 +1819,7 @@ export function SiteMap({
       {status === "ready" ? (
         <div
           ref={cornerClusterRef}
-          className="map-chrome absolute bottom-4 right-[3.25rem] z-20 flex flex-col items-end gap-1 sm:flex-row sm:gap-2"
+          className="dls-wide map-chrome absolute bottom-4 right-[3.25rem] z-20 flex flex-col items-end gap-1 sm:flex-row sm:gap-2"
         >
           <MeasureControl
             active={measuring}
@@ -1806,8 +1872,18 @@ export function SiteMap({
         />
       ) : null}
       {status === "ready" && (showOz || showOz2 || showParcels || showCoverage || screening.flood || screening.wetlands || screening.schools || screening.water || screening.sewer || screening.power) ? (
-        <div className="map-chrome map-scrim absolute bottom-4 left-3 z-10 max-h-[calc(100%-17.5rem)] max-w-[min(17rem,calc(100%-9.5rem))] rounded-xl border sm:left-4 sm:max-h-[42vh] sm:max-w-[min(22rem,calc(100%-18.5rem))]">
+        <div
+          data-open={legendOpen ? "true" : "false"}
+          className="map-legend map-chrome map-scrim absolute bottom-4 left-3 z-10 max-h-[calc(100%-17.5rem)] max-w-[min(17rem,calc(100%-9.5rem))] rounded-xl border sm:left-4 sm:max-h-[42vh] sm:max-w-[min(22rem,calc(100%-18.5rem))]"
+        >
           <div className="legend-scroll max-h-[inherit] space-y-1.5 overflow-y-auto break-words px-3 py-2.5 text-sm leading-snug">
+          <button
+            type="button"
+            className="dls-narrow dls-hit mb-2 w-full items-center justify-center rounded-full border border-white/20 text-sm text-white"
+            onClick={() => setLegendOpen(false)}
+          >
+            Close legend
+          </button>
           {aoi ? (
             <p>
               <span className="mr-2 inline-block h-3.5 w-5 border border-dashed border-clay-400 align-middle" />

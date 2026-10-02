@@ -11,6 +11,7 @@ import { displayTractNotes, isScGovernorNominatedGeoid } from "@/lib/scNominated
 import type { TractInfoRow } from "@/lib/msStatewideTracts";
 import { formatTractRentLines } from "@/lib/tractRent";
 import { SC_NOMINATED_NOT_A_QOZ, SHED_CAVEAT } from "@/lib/types";
+import { useSheetExpanded } from "./useSheetExpanded";
 
 type TractDrawerProps = {
   tract: TractInfoRow | null;
@@ -36,6 +37,7 @@ export function TractDrawer({
   layout = "page",
 }: TractDrawerProps) {
   const pane = layout === "pane";
+  const { expanded, handleProps } = useSheetExpanded(tract?.geoid ?? null);
   if (!tract) {
     return (
       <aside className={pane ? "h-full overflow-y-auto bg-ink-900/80 p-5" : "hidden"}>
@@ -59,7 +61,24 @@ export function TractDrawer({
   const statusChip = displayStatusChip(tract);
 
   return (
-    <aside className={pane ? "drawer-scroll h-full overflow-y-auto bg-ink-900 p-5" : "drawer-scroll absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl"}>
+    <aside
+      data-detail-sheet={pane ? "pane" : expanded ? "expanded" : "peek"}
+      className={pane ? "drawer-scroll h-full overflow-y-auto bg-ink-900 p-5" : `drawer-scroll sheet-page absolute inset-x-0 bottom-0 z-20 max-h-[70vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-5 shadow-2xl${expanded ? " sheet-expanded" : ""}`}
+    >
+      {pane ? null : (
+        <button
+          type="button"
+          className="sheet-handle mx-auto mb-2 h-11 w-full items-center justify-center"
+          aria-expanded={expanded}
+          aria-label={expanded ? "Show less" : "Expand details"}
+          {...handleProps}
+        >
+          <span className="flex flex-col items-center gap-1 text-[11px] uppercase tracking-[0.14em] text-ink-300">
+            <span className="h-1.5 w-10 rounded-full bg-white/40" />
+            {expanded ? "Show less" : "Details"}
+          </span>
+        </button>
+      )}
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-clay-400">{tract.geoid}</p>
@@ -71,7 +90,7 @@ export function TractDrawer({
             <p className="mt-1 text-xs text-ink-500">Pack label: {tract.placeOrCorridor}</p>
           ) : null}
         </div>
-        <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-3 py-1 text-sm">
+        <button type="button" onClick={onClose} className="dls-hit shrink-0 rounded-full border border-white/15 px-3 py-1 text-sm">
           Close
         </button>
       </div>
@@ -98,6 +117,7 @@ export function TractDrawer({
         </p>
       ) : null}
 
+      <div className="sheet-rest">
       <dl className="mt-4 space-y-3 text-sm">
         <div>
           <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-500">County</dt>
@@ -205,6 +225,7 @@ export function TractDrawer({
             ? ` ${tract.county} County still uses a thinner public-GIS sample in this build, not every parcel of 5 acres and up.`
             : " This county has no parcel extract in the app — the map shows the tract polygon."}
       </p>
+      </div>
     </aside>
   );
 }

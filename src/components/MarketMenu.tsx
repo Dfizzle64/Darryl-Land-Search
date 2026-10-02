@@ -8,9 +8,10 @@ type MarketMenuProps = {
   value: SearchMarketId;
   groups: MarketStateGroup[];
   onChange: (market: SearchMarketId) => void;
+  buttonClassName?: string;
 };
 
-export function MarketMenu({ value, groups, onChange }: MarketMenuProps) {
+export function MarketMenu({ value, groups, onChange, buttonClassName = "" }: MarketMenuProps) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [flyoutTop, setFlyoutTop] = useState(0);
@@ -70,7 +71,7 @@ export function MarketMenu({ value, groups, onChange }: MarketMenuProps) {
         aria-label="Market"
         aria-haspopup="menu"
         aria-expanded={open}
-        className="rounded-full border border-white/30 bg-ink-800 px-3 py-1.5 text-sm text-white"
+        className={`rounded-full border border-white/30 bg-ink-800 px-3 py-1.5 text-sm text-white ${buttonClassName}`}
         onClick={() => {
           setOpen((current) => {
             if (current) setExpanded(null);

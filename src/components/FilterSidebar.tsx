@@ -8,6 +8,7 @@ import { southCarolinaOverlayMode } from "@/lib/markets";
 import { screeningLayerNotes } from "@/lib/screeningLayerHelp";
 import type { ScreeningToggles } from "@/lib/screening";
 import { formatRentSliderValue, RENT_SLIDERS, type RentSlider } from "@/lib/tractRent";
+import { activeFiltersLabel, countActiveFilters } from "@/lib/activeFilters";
 import { ACREAGE_SLIDER, DEFAULT_FILTERS, SHED_CAVEAT, type FilterState, type FluConfig, type LandUseFilter, type MfPriorityView, type OzFilter, type SearchMarketId, type ZoningConfig } from "@/lib/types";
 
 type FilterSidebarProps = {
@@ -77,7 +78,7 @@ function YesNo({
               key={text}
               type="button"
               aria-pressed={selected}
-              className={`rounded-lg px-3 py-1.5 text-sm ${
+              className={`dls-hit rounded-lg px-3 py-1.5 text-sm ${
                 selected ? "bg-white text-ink-950" : "text-ink-200 hover:bg-white/10"
               }`}
               onClick={() => onChange(next)}
@@ -88,6 +89,20 @@ function YesNo({
         })}
       </div>
     </div>
+  );
+}
+
+function Fold({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <details className="filter-fold mt-5">
+      <summary className="dls-hit flex cursor-pointer list-none items-center justify-between gap-2 text-sm uppercase tracking-[0.16em] text-ink-300 [&::-webkit-details-marker]:hidden">
+        <span>{title}</span>
+        <span aria-hidden="true" className="text-base text-ink-500">
+          +
+        </span>
+      </summary>
+      <div className="filter-fold-body max-[767px]:mt-3">{children}</div>
+    </details>
   );
 }
 
@@ -112,7 +127,7 @@ function Toggle({
   hint?: string;
 }) {
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-3">
+    <label className="dls-hit flex cursor-pointer items-start justify-between gap-3">
       <span>
         <span className="block text-sm text-white">{label}</span>
         {hint ? <span className="mt-0.5 block text-xs text-ink-500">{hint}</span> : null}
@@ -150,7 +165,7 @@ function RentMinimumSlider({
           const next = slider.format === "percent" ? Math.round(raw * 10) / 10 : raw;
           onValue(next);
         }}
-        className="mt-2 w-full accent-clay-400"
+        className="dls-range mt-2 w-full accent-clay-400"
       />
       <span className="mt-1 block text-ink-300">{formatRentSliderValue(slider, value)}</span>
       <span className="mt-1 block text-xs leading-relaxed text-ink-500">{slider.note}</span>
@@ -291,18 +306,35 @@ export function FilterSidebar({
   const tractToggleLabel =
     overlayMode === "nominated-only" ? "Nominated tracts" : overlayMode === "mixed" ? "OZ tracts" : "Eligible tracts";
 
+  const activeCount = countActiveFilters({
+    filters,
+    resetLandUse: orlandoParcels ? "off" : DEFAULT_FILTERS.landUseFilter,
+    showExcluded,
+    showTraffic,
+    showOz,
+    showOz2,
+    screening,
+  });
+
   return (
     <>
       {open ? <button type="button" className="fixed inset-0 z-20 bg-black/50 md:hidden" onClick={onClose} aria-label="Close filters" /> : null}
       <aside
-        className={`sidebar-scroll fixed inset-y-0 left-0 z-30 w-[min(100%,22rem)] overflow-y-auto border-r border-white/10 bg-ink-900 px-4 py-4 transition-transform md:static md:z-0 md:block md:w-[22rem] md:translate-x-0 ${
+        data-filter-drawer
+        data-open={open ? "true" : "false"}
+        className={`sidebar-scroll filter-drawer fixed inset-y-0 left-0 z-30 w-[min(100%,22rem)] overflow-y-auto border-r border-white/10 bg-ink-900 px-4 py-4 transition-transform md:static md:z-0 md:block md:w-[22rem] md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        <div className="mb-4 flex items-center justify-between md:hidden">
-          <h2 className="text-lg text-white">Filters</h2>
-          <button type="button" className="text-sm text-ink-300" onClick={onClose}>
-            Done
+        <div className="mb-4 flex items-center justify-between gap-3 md:hidden">
+          <div className="min-w-0">
+            <h2 className="text-lg text-white">Filters</h2>
+            <p className="mt-1 inline-flex rounded-full bg-clay-500 px-2 py-0.5 text-xs font-semibold text-ink-950" data-filters-active>
+              {activeFiltersLabel(activeCount)}
+            </p>
+          </div>
+          <button type="button" className="dls-hit shrink-0 rounded-full border border-white/20 px-4 text-sm text-white" onClick={onClose} aria-label="Close filters">
+            Close
           </button>
         </div>
 
@@ -314,15 +346,16 @@ export function FilterSidebar({
           </p>
           <button
             type="button"
-            className="mt-3 text-xs text-clay-400 underline-offset-2 hover:underline"
+            className="dls-hit mt-3 inline-flex items-center text-xs text-clay-400 underline-offset-2 hover:underline"
             onClick={() => onChange({ ...DEFAULT_FILTERS, landUseFilter: orlandoParcels ? "off" : DEFAULT_FILTERS.landUseFilter })}
           >
             Reset filters
           </button>
         </section>
 
-        <section className="mt-5 space-y-2 rounded-2xl border border-white/10 bg-ink-800/70 p-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">{tractHeading}</h2>
+        <Fold title={tractHeading}>
+        <section className="space-y-2 rounded-2xl border border-white/10 bg-ink-800/70 p-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500 max-[767px]:hidden">{tractHeading}</h2>
           <p className="text-sm text-white">
             {market}: {tractCount.toLocaleString()} {`${tractCountLabel ? `${tractCountLabel} ` : ""}${tractCount === 1 ? "tract" : "tracts"}`}
           </p>
@@ -360,9 +393,11 @@ export function FilterSidebar({
             ) : null}
           </Note>
         </section>
+        </Fold>
 
-        <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Opportunity Zones</h2>
+        <Fold title="Opportunity Zones">
+        <section className="space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500 max-[767px]:hidden">Opportunity Zones</h2>
           <YesNo
             label="Opportunity Zone"
             value={filters.considerOpportunityZone}
@@ -372,7 +407,7 @@ export function FilterSidebar({
             <fieldset className="space-y-2">
               <legend className="sr-only">Opportunity Zone filter</legend>
               {ozOptions.map((option) => (
-                <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
+                <label key={option.value} className="dls-hit flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
                   <input
                     type="radio"
                     className="mt-1 accent-moss-400"
@@ -399,9 +434,11 @@ export function FilterSidebar({
             <p>{layerNotes.designatedOz}</p>
           </Note>
         </section>
+        </Fold>
 
-        <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Map layers</h2>
+        <Fold title="Map layers">
+        <section className="space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500 max-[767px]:hidden">Map layers</h2>
           <Toggle label="Flood" checked={screening.flood} onChange={(value) => onScreening("flood", value)} />
           <Toggle label="Wetlands" checked={screening.wetlands} onChange={(value) => onScreening("wetlands", value)} />
           <Toggle label="Schools" checked={screening.schools} onChange={(value) => onScreening("schools", value)} />
@@ -418,9 +455,11 @@ export function FilterSidebar({
             <p>{layerNotes.power}</p>
           </Note>
         </section>
+        </Fold>
 
-        <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Zoning</h2>
+        <Fold title="Zoning">
+        <section className="space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500 max-[767px]:hidden">Zoning</h2>
           <YesNo
             label="Zoning"
             value={filters.considerZoning}
@@ -431,7 +470,7 @@ export function FilterSidebar({
               <fieldset className="space-y-2">
                 <legend className="sr-only">Zoning and Future Land Use mode</legend>
                 {LAND_USE_OPTIONS.map((option) => (
-                  <label key={option.value} className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
+                  <label key={option.value} className="dls-hit flex cursor-pointer items-start gap-2 rounded-xl border border-white/5 bg-ink-950/30 px-2 py-2">
                     <input
                       type="radio"
                       className="mt-1 accent-moss-400"
@@ -464,9 +503,11 @@ export function FilterSidebar({
             </>
           ) : null}
         </section>
+        </Fold>
 
-        <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Minimum acreage</h2>
+        <Fold title="Minimum acreage">
+        <section className="space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500 max-[767px]:hidden">Minimum acreage</h2>
           <label className="block text-sm">
             Parcel acreage
             <input
@@ -476,7 +517,7 @@ export function FilterSidebar({
               step={ACREAGE_SLIDER.step}
               value={Math.min(filters.minAcreage, ACREAGE_SLIDER.max)}
               onChange={(event) => onChange({ ...filters, minAcreage: Number(event.target.value) })}
-              className="mt-2 w-full accent-clay-400"
+              className="dls-range mt-2 w-full accent-clay-400"
             />
             <span className="mt-1 block text-ink-300">
               {filters.minAcreage === 0
@@ -498,13 +539,15 @@ export function FilterSidebar({
             onChange={(includeUnknownAcreage) => onChange({ ...filters, includeUnknownAcreage })}
           />
         </section>
+        </Fold>
 
-        <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Area income</h2>
+        <Fold title="Area income">
+        <section className="space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500 max-[767px]:hidden">Area income</h2>
           <label className="block text-sm">
             Census geography
             <select
-              className="mt-1 w-full rounded-lg border border-white/10 bg-ink-950 px-3 py-2 text-sm"
+              className="dls-hit mt-1 w-full rounded-lg border border-white/10 bg-ink-950 px-3 py-2 text-sm max-[767px]:text-base"
               value={filters.incomeGeography}
               onChange={(event) =>
                 onChange({ ...filters, incomeGeography: event.target.value as FilterState["incomeGeography"] })
@@ -533,7 +576,7 @@ export function FilterSidebar({
                   includeUnknownIncome: engaging ? false : clearing ? true : filters.includeUnknownIncome,
                 });
               }}
-              className="mt-2 w-full accent-clay-400"
+              className="dls-range mt-2 w-full accent-clay-400"
             />
             <span className="mt-1 block text-ink-300">
               {filters.minIncome === 0 ? "No minimum" : `$${filters.minIncome.toLocaleString()}+`}
@@ -554,8 +597,10 @@ export function FilterSidebar({
             </p>
           </Note>
         </section>
+        </Fold>
 
-        <section className="mt-5 space-y-3" id="rent-filters">
+        <Fold title="Rent">
+        <section className="space-y-3" id="rent-filters">
           <YesNo
             label="Rent filters"
             value={filters.rentFiltersOn}
@@ -577,9 +622,11 @@ export function FilterSidebar({
             </>
           ) : null}
         </section>
+        </Fold>
 
-        <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Nearby traffic</h2>
+        <Fold title="Nearby traffic">
+        <section className="space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500 max-[767px]:hidden">Nearby traffic</h2>
           <label className="block text-sm">
             Minimum AADT on the nearest count segment
             <input
@@ -589,7 +636,7 @@ export function FilterSidebar({
               step={1000}
               value={filters.minAadt}
               onChange={(event) => onChange({ ...filters, minAadt: Number(event.target.value) })}
-              className="mt-2 w-full accent-clay-400"
+              className="dls-range mt-2 w-full accent-clay-400"
             />
             <span className="mt-1 block text-ink-300">
               {filters.minAadt === 0 ? "No minimum" : `${filters.minAadt.toLocaleString()}+ vehicles/day`}
@@ -610,12 +657,16 @@ export function FilterSidebar({
             </p>
           </Note>
         </section>
+        </Fold>
 
-        <section className="mt-5 space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500">Map</h2>
+        <Fold title="Map">
+        <section className="space-y-3">
+          <h2 className="text-xs uppercase tracking-[0.16em] text-ink-500 max-[767px]:hidden">Map</h2>
           <Toggle label="Parcels that fail filters" checked={showExcluded} onChange={onShowExcluded} />
         </section>
+        </Fold>
 
+        <div className="dls-wide">
         <Note label="Zoning reference">
           <ZoningKnowledgePanel
             zoningConfig={zoningConfig}
@@ -630,6 +681,7 @@ export function FilterSidebar({
             HUD layer, not a 2027 designation. Income and traffic joins stay unknown where the public source has no row.
           </p>
         </Note>
+        </div>
       </aside>
     </>
   );

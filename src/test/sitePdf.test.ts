@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { DEFAULT_FILTERS, RURAL_ELIGIBLE_STATUS_CHIP, type FilterState, type ParcelFeature } from "../lib/types";
-import { describeOz2Eligibility, oz2ParcelFieldValue } from "../lib/opportunityZone";
+import { describeOz2Eligibility } from "../lib/opportunityZone";
 import {
   OZ2_NOT_JOINED,
   SITE_PDF_DISCLAIMER,
@@ -10,10 +10,12 @@ import {
   contextBbox,
   eligibleTractIsVisible,
   googleMapsUrl,
+  ozPdfStatus,
+  pdfScreeningLine,
   sitePdfFileName,
   type TractGeometryRecord,
 } from "../lib/sitePdf";
-import { buildSitePdfBytes } from "../lib/sitePdfDocument";
+import { buildSitePdfBytes, factRowHeight } from "../lib/sitePdfDocument";
 import type { ScreeningPoint } from "../lib/screening";
 
 const SQUARE: GeoJSON.Polygon = {
@@ -113,8 +115,9 @@ describe("site PDF assembly", () => {
     });
     const described = describeOz2Eligibility(feature.properties.oz2Eligibility);
     const oz = model.tractFacts.find((fact) => fact.label === "OZ 2.0");
-    expect(oz?.value).toBe(oz2ParcelFieldValue(described, "12095016702"));
-    expect(oz?.value).toContain("Eligible, not rural");
+    expect(oz?.value).toBe(ozPdfStatus(described));
+    expect(oz?.value).toBe("Eligible, not rural");
+    expect(oz?.value).not.toContain("12095016702");
     expect(oz?.value).not.toContain("designated QOZ");
     expect(model.tractFacts.find((fact) => fact.label === "Rural")?.value).toBe("Non-rural");
     expect(model.tractFacts.find((fact) => fact.label === "2020 GEOID")?.value).toBe("12095016702");
@@ -146,9 +149,8 @@ describe("site PDF assembly", () => {
       generatedAt: new Date("2026-10-02T15:00:00Z"),
       timeZone: "UTC",
     });
-    expect(model.tractFacts.find((fact) => fact.label === "OZ 2.0")?.value).toBe(
-      `${RURAL_ELIGIBLE_STATUS_CHIP} · census tract GEOID 01001020100`,
-    );
+    expect(model.tractFacts.find((fact) => fact.label === "OZ 2.0")?.value).toBe(RURAL_ELIGIBLE_STATUS_CHIP);
+    expect(model.tractFacts.find((fact) => fact.label === "OZ 2.0")?.value).not.toContain("01001020100");
     expect(model.tractFacts.find((fact) => fact.label === "Rural")?.value).toBe("Rural");
     expect(model.tractFacts.find((fact) => fact.label === "Zoning")).toBeUndefined();
     expect(model.tractFacts.find((fact) => fact.label === "Future land use")).toBeUndefined();
@@ -294,6 +296,113 @@ describe("site PDF assembly", () => {
     expect(model.screeningFacts.find((fact) => fact.label === "Nearest FDOT AADT")?.value).toContain("18,500");
     expect(model.sources).toContain("FEMA NFHL");
     expect(model.disclaimer).toBe("Public data; verify before relying on it.");
+  });
+
+  it("shortens screening to a finished clause and caps schools at three", () => {
+    const flood = pdfScreeningLine(
+      "flood",
+      "FEMA zone X at the parcel centroid. AREA OF MINIMAL FLOOD HAZARD. Not flagged as SFHA on this polygon. No published static base flood elevation on this polygon.",
+    );
+    expect(flood).toBe("FEMA zone X at the parcel centroid (minimal flood hazard).");
+    expect(flood).not.toMatch(/\.\.\.|BFE|base flood/i);
+    expect(pdfScreeningLine("wetland", "No NWI wetland polygon within about 70 feet of this point. Nearby wetlands can still exist.")).toBe(
+      "No NWI wetland polygon within ~70 ft.",
+    );
+    const water = pdfScreeningLine(
+      "utility",
+      "Water service area: Orange County. Service-area provider from county open data — not a connection or will-serve letter.",
+    );
+    expect(water).toBe("Orange County service area. Not a will-serve.");
+    expect(water).not.toContain("...");
+    const schools = Array.from({ length: 8 }, (_, index) => ({
+      id: `s${index}`,
+      name: `School ${index + 1}`,
+      city: null,
+      state: "FL",
+      level: "Elementary",
+      rating: null,
+      ratingKind: null as const,
+      year: null,
+      summary: "No letter grade in this public extract.",
+      source: "NCES",
+      sourceUrl: "https://nces.ed.gov/",
+      reportCardUrl: null,
+      distanceMiles: index + 1,
+      lon: -81.37,
+      lat: 28.54,
+    }));
+    const model = assembleSiteSummary({
+      parcel: parcel(),
+      zoningLine: "R-3",
+      fluLine: "Multifamily",
+      screeningPoint: {
+        flood: {
+          status: "ok",
+          zone: "X",
+          subtype: null,
+          sfha: false,
+          floodway: false,
+          staticBfe: null,
+          depth: null,
+          datum: null,
+          community: null,
+          cid: null,
+          summary:
+            "FEMA zone X at the parcel centroid. AREA OF MINIMAL FLOOD HAZARD. Not flagged as SFHA on this polygon. No published static base flood elevation on this polygon.",
+          source: "FEMA",
+          sourceUrl: "https://www.fema.gov/flood-maps",
+        },
+        wetland: {
+          status: "none",
+          code: null,
+          wetlandType: null,
+          summary: "No NWI wetland polygon within about 70 feet of this point. Nearby wetlands can still exist.",
+          source: "NWI",
+          sourceUrl: "https://www.fws.gov/",
+        },
+        utilities: [
+          {
+            kind: "water",
+            status: "ok",
+            providers: ["Orange County"],
+            summary:
+              "Water service area: Orange County. Service-area provider from county open data — not a connection or will-serve letter.",
+            source: "Orange County open data",
+            sourceUrl: "https://www.ocfl.net/",
+          },
+        ],
+        schools,
+        schoolsNote: "Grades are only shown when the extract has them.",
+        tract: null,
+      },
+      screeningStatus: "idle",
+      filters: filters(),
+      generatedAt: new Date("2026-10-02T12:00:00Z"),
+      timeZone: "UTC",
+    });
+    const schoolFact = model.screeningFacts.find((fact) => fact.label === "Schools")?.value ?? "";
+    expect(schoolFact).toContain("School 1");
+    expect(schoolFact).toContain("School 3");
+    expect(schoolFact).not.toContain("School 4");
+    expect(schoolFact).toContain("+5 more");
+    expect(model.screeningFacts.find((fact) => fact.label === "Flood zone")?.value).toBe(flood);
+    const bytes = buildSitePdfBytes(model, {
+      main: TINY_PNG,
+      locator: TINY_PNG,
+      scaleLabel: "0.5 mi",
+      logo: TINY_PNG,
+    });
+    const text = new TextDecoder().decode(bytes);
+    expect(text).not.toContain("/Count 2");
+    expect(text).toContain("Eligible, not rural");
+    expect(text).toContain("+5 more");
+    expect(text).toContain(SITE_PDF_DISCLAIMER);
+    expect(text).not.toContain("School 4");
+  });
+
+  it("gives a wrapped value a taller row than a single line", () => {
+    expect(factRowHeight(3, 1)).toBeGreaterThan(factRowHeight(1, 1) + 8 * 1.15);
+    expect(factRowHeight(1, 2)).toBeGreaterThan(factRowHeight(1, 1));
   });
 
   it("hides AADT outside Florida when no count was joined and hides screening when idle", () => {

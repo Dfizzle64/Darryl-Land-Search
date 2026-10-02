@@ -1,8 +1,5 @@
 import { eligibleClassCut } from "./markets";
-import {
-  describeOz2Eligibility,
-  oz2ParcelFieldValue,
-} from "./opportunityZone";
+import { describeOz2Eligibility } from "./opportunityZone";
 import type { ScreeningPoint, SchoolRating } from "./screening";
 import { tractIncomeFilterActive, tractIncomePasses } from "./tractIncome";
 import {
@@ -270,6 +267,58 @@ function schoolLine(school: SchoolRating): string {
   return where ? `${zoned}${grade} · ${school.name} (${where})` : `${zoned}${grade} · ${school.name}`;
 }
 
+/** Status chip only. The 2020 GEOID is its own row, so the panel's GEOID suffix is not repeated. */
+export function ozPdfStatus(oz: {
+  eligible: boolean | null;
+  rural: boolean | null;
+  label: string;
+  statusChip: string | null;
+  shown: boolean;
+}): string {
+  if (oz.eligible == null) return OZ2_NOT_JOINED;
+  if (!oz.shown) return oz.label;
+  if (!oz.eligible) return "Not eligible";
+  return oz.statusChip ?? (oz.rural === false ? "Eligible, not rural" : "Eligible");
+}
+
+function firstSentence(text: string): string {
+  const match = text.match(/^[\s\S]{1,220}?[.!?](?=\s|$)/);
+  return (match?.[0] ?? text).trim();
+}
+
+/** One clean clause for the PDF. Does not add a hazard, a grade, or a provider the summary does not already state. */
+export function pdfScreeningLine(kind: "flood" | "wetland" | "utility" | "note", summary: string): string {
+  const text = summary.replace(/\s+/g, " ").trim();
+  if (!text) return text;
+  if (kind === "flood") {
+    const zone = text.match(/^FEMA zone ([A-Z0-9]+) at the parcel centroid\b/i);
+    if (zone) {
+      if (/AREA OF MINIMAL FLOOD HAZARD/i.test(text)) {
+        return `FEMA zone ${zone[1].toUpperCase()} at the parcel centroid (minimal flood hazard).`;
+      }
+      if (/Special Flood Hazard Area/i.test(text)) {
+        return `FEMA zone ${zone[1].toUpperCase()} at the parcel centroid (Special Flood Hazard Area).`;
+      }
+      return `FEMA zone ${zone[1].toUpperCase()} at the parcel centroid.`;
+    }
+  }
+  if (kind === "wetland") {
+    if (/^No NWI wetland polygon within about 70 feet/i.test(text)) {
+      return "No NWI wetland polygon within ~70 ft.";
+    }
+    const hit = text.match(/^NWI (.+?) within about 70 feet/i);
+    if (hit) return `NWI ${hit[1]} within ~70 ft.`;
+  }
+  if (kind === "utility") {
+    const area = text.match(/^(?:Water|Sewer|Electric) service area: ([^.]+)\./i);
+    if (area && /will-serve/i.test(text)) return `${area[1].trim()} service area. Not a will-serve.`;
+    const retail = text.match(/^Electric retail territory: ([^.]+)\./i);
+    if (retail && /will-serve/i.test(text)) return `${retail[1].trim()}. Not a will-serve.`;
+  }
+  if (text.length <= 110) return text;
+  return firstSentence(text);
+}
+
 function utilityLabel(kind: ScreeningPoint["utilities"][number]["kind"]): string {
   if (kind === "power") return "Electric";
   if (kind === "gas") return "Gas";
@@ -317,16 +366,16 @@ function screeningFacts(
     return facts;
   }
   if (!point) return facts;
-  facts.push({ label: "Flood zone", value: clipText(point.flood.summary) });
-  if (point.tract?.summary) facts.push({ label: "Census tract", value: clipText(point.tract.summary) });
-  facts.push({ label: "Wetlands", value: clipText(point.wetland.summary) });
+  facts.push({ label: "Flood zone", value: pdfScreeningLine("flood", point.flood.summary) });
+  if (point.tract?.summary) facts.push({ label: "Census tract", value: pdfScreeningLine("note", point.tract.summary) });
+  facts.push({ label: "Wetlands", value: pdfScreeningLine("wetland", point.wetland.summary) });
   for (const utility of point.utilities) {
     if (!utility.summary?.trim()) continue;
-    facts.push({ label: utilityLabel(utility.kind), value: clipText(utility.summary) });
+    facts.push({ label: utilityLabel(utility.kind), value: pdfScreeningLine("utility", utility.summary) });
   }
   if (point.schools.length) {
     const lines = point.schools.slice(0, 3).map(schoolLine);
-    if (point.schools.length > 3) lines.push(`+${point.schools.length - 3} more in the panel`);
+    if (point.schools.length > 3) lines.push(`+${point.schools.length - 3} more`);
     facts.push({ label: "Schools", value: lines.join("\n") });
   } else {
     facts.push({ label: "Schools", value: "No public school in this extract within 3 miles." });
@@ -393,8 +442,7 @@ export function assembleSiteSummary(input: SitePdfInput): SitePdfModel {
   const geoid = tractGeoidForParcel(properties);
   const tractFacts: SitePdfFact[] = [];
   if (geoid) tractFacts.push({ label: "2020 GEOID", value: geoid });
-  const ozValue = oz2ParcelFieldValue(oz, properties.oz2Eligibility?.tractGeoid) ?? OZ2_NOT_JOINED;
-  tractFacts.push({ label: "OZ 2.0", value: ozValue });
+  tractFacts.push({ label: "OZ 2.0", value: ozPdfStatus(oz) });
   if (oz.rural === true) tractFacts.push({ label: "Rural", value: "Rural" });
   else if (oz.rural === false) tractFacts.push({ label: "Rural", value: "Non-rural" });
   const income = properties.incomeTract;

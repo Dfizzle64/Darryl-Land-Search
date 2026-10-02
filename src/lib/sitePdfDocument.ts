@@ -26,15 +26,30 @@ function imageFormat(dataUrl: string): "PNG" | "JPEG" {
   return dataUrl.startsWith("data:image/jpeg") || dataUrl.startsWith("data:image/jpg") ? "JPEG" : "PNG";
 }
 
-function wrapFact(doc: jsPDF, value: string, valueW: number, maxLines: number): string[] {
+const LABEL_SIZE = 6.5;
+const VALUE_SIZE = 8;
+const ROW_PAD = 5;
+/** jsPDF's default. Row height uses the same leading the text operator paints. */
+const LEADING = 1.15;
+
+function wrapLines(doc: jsPDF, value: string, width: number, fontSize: number, maxLines: number): string[] {
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(fontSize);
   const paragraphs = pdfSafe(value).split("\n");
-  const all = paragraphs.flatMap((paragraph) => doc.splitTextToSize(paragraph || " ", valueW) as string[]);
+  const all = paragraphs.flatMap((paragraph) => doc.splitTextToSize(paragraph || " ", width) as string[]);
+  if (all.length <= maxLines) return all.length ? all : ["-"];
   const kept = all.slice(0, maxLines);
-  if (all.length > maxLines && kept.length) {
-    const trimmed = kept[kept.length - 1].replace(/[.,;:\s]+$/g, "").trimEnd();
-    kept[kept.length - 1] = `${trimmed || kept[kept.length - 1]}...`;
-  }
-  return kept.length ? kept : ["-"];
+  const last = kept[kept.length - 1] ?? "";
+  const sentence = last.match(/^(.*[.!?])(?:\s+\S|$)/);
+  const trimmed = (sentence?.[1] ?? last.replace(/\s+\S*$/, "")).trimEnd();
+  kept[kept.length - 1] = trimmed || last;
+  return kept;
+}
+
+/** Height of one fact row: the taller of the wrapped label and value, plus padding. */
+export function factRowHeight(valueLines: number, labelLines: number): number {
+  const lines = (count: number, size: number) => (Math.max(1, count) - 1) * size * LEADING + size;
+  return Math.max(lines(valueLines, VALUE_SIZE), lines(labelLines, LABEL_SIZE)) + ROW_PAD;
 }
 
 function drawFacts(
@@ -58,21 +73,21 @@ function drawFacts(
   } else if (title.length) {
     cursor = y + 12;
   }
-  const labelW = 96;
-  const valueX = x + labelW;
-  const valueW = Math.max(40, width - labelW);
+  const labelW = 90;
+  const valueX = x + labelW + 6;
+  const valueW = Math.max(40, width - (valueX - x));
   for (const fact of facts) {
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    const lines = wrapFact(doc, fact.value, valueW, maxLines);
-    const rowH = Math.max(11, lines.length * 8.6);
+    const valueLines = wrapLines(doc, fact.value, valueW, VALUE_SIZE, maxLines);
+    const labelLines = wrapLines(doc, fact.label, labelW, LABEL_SIZE, 3);
+    const rowH = factRowHeight(valueLines.length, labelLines.length);
     if (cursor + rowH > maxY) break;
-    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(LABEL_SIZE);
     doc.setTextColor(...MUTED);
-    doc.text(pdfSafe(fact.label), x, cursor);
-    doc.setFontSize(8);
+    doc.text(labelLines, x, cursor);
+    doc.setFontSize(VALUE_SIZE);
     doc.setTextColor(...INK);
-    doc.text(lines, valueX, cursor);
+    doc.text(valueLines, valueX, cursor);
     cursor += rowH;
   }
   return cursor;
@@ -132,6 +147,7 @@ function drawFooter(doc: jsPDF, model: SitePdfModel) {
  */
 export function buildSitePdfBytes(model: SitePdfModel, images: SitePdfImages): Uint8Array {
   const doc = new jsPDF({ unit: "pt", format: "letter", orientation: "portrait", compress: false });
+  doc.setLineHeightFactor(LEADING);
   doc.setProperties({
     title: `${model.title} — ${model.headline}`,
     creator: "Catalyst Development Partners",
@@ -222,7 +238,7 @@ export function buildSitePdfBytes(model: SitePdfModel, images: SitePdfImages): U
   const columnW = (mapW - 16) / 2;
   const schools = model.screeningFacts.filter((fact) => fact.label === "Schools");
   const screening = model.screeningFacts.filter((fact) => fact.label !== "Schools");
-  const schoolReserve = schools.length ? 52 : 0;
+  const schoolReserve = schools.length ? factRowHeight(4, 1) + 6 : 0;
   const leftBottom = drawFacts(doc, "PARCEL", model.parcelFacts, mapX, columnsTop, columnW, contentMax - schoolReserve);
   const rightBottom = drawFacts(doc, "TRACT", model.tractFacts, mapX + columnW + 16, columnsTop, columnW, contentMax - schoolReserve);
   let cursor = Math.max(leftBottom, rightBottom) + 8;

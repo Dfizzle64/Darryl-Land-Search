@@ -8,12 +8,14 @@ type MeasureControlProps = {
   onStart: () => void;
   onClear: () => void;
   onCancel: () => void;
+  /** Icon button for the narrow-screen toolbar. Desktop keeps the worded control. */
+  compact?: boolean;
 };
 
-export function MeasureControl({ active, points, onStart, onClear, onCancel }: MeasureControlProps) {
+export function MeasureControl({ active, points, onStart, onClear, onCancel, compact = false }: MeasureControlProps) {
   const summary = summarizeMeasure(points);
   return (
-    <div className="pointer-events-auto flex max-w-[18rem] flex-col-reverse items-end gap-1.5">
+    <div className={`pointer-events-auto flex flex-col-reverse items-end gap-1.5 ${compact ? "max-w-[12rem]" : "max-w-[18rem]"}`}>
       <button
         type="button"
         aria-pressed={active}
@@ -24,11 +26,17 @@ export function MeasureControl({ active, points, onStart, onClear, onCancel }: M
           if (active) onCancel();
           else onStart();
         }}
-        className={`rounded-full border px-3 py-1.5 text-xs font-semibold sm:text-sm ${
-          active ? "map-scrim-active border-white" : "map-scrim text-white hover:bg-white/10"
-        }`}
+        className={
+          compact
+            ? `dls-hit inline-flex h-11 w-11 items-center justify-center rounded-full border text-xs font-semibold ${
+                active ? "map-scrim-active border-white" : "map-scrim text-white"
+              }`
+            : `rounded-full border px-3 py-1.5 text-xs font-semibold sm:text-sm ${
+                active ? "map-scrim-active border-white" : "map-scrim text-white hover:bg-white/10"
+              }`
+        }
       >
-        Measure
+        {compact ? "Mi" : "Measure"}
       </button>
       {active ? (
         <div className="map-scrim rounded-xl border px-3 py-2 text-xs leading-snug text-ink-100">
@@ -48,7 +56,7 @@ export function MeasureControl({ active, points, onStart, onClear, onCancel }: M
           <div className="mt-2 flex gap-1.5">
             <button
               type="button"
-              className="rounded-full border border-white/20 px-2 py-0.5 text-[11px] text-white hover:border-white/40"
+              className={`rounded-full border border-white/20 text-white hover:border-white/40 ${compact ? "dls-hit px-3 text-xs" : "px-2 py-0.5 text-[11px]"}`}
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -59,7 +67,7 @@ export function MeasureControl({ active, points, onStart, onClear, onCancel }: M
             </button>
             <button
               type="button"
-              className="rounded-full border border-white/20 px-2 py-0.5 text-[11px] text-white hover:border-white/40"
+              className={`rounded-full border border-white/20 text-white hover:border-white/40 ${compact ? "dls-hit px-3 text-xs" : "px-2 py-0.5 text-[11px]"}`}
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { countActiveFilters } from "@/lib/activeFilters";
 import { CompanyLogo } from "./CompanyLogo";
+import { MobileHeaderActions, MobileMoreSheet, MobileSearchBar } from "./MobileChrome";
 import { FilterSidebar } from "./FilterSidebar";
 import { JumpToBar } from "./JumpToBar";
 import { OzExplainer } from "./OzExplainer";
@@ -174,6 +176,8 @@ export function AppShell({
   const [screeningPoint, setScreeningPoint] = useState<ScreeningPoint | null>(null);
   const [screeningStatus, setScreeningStatus] = useState<"idle" | "loading" | "error">("idle");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [sitesOpen, setSitesOpen] = useState(false);
   const [rankingExpanded, setRankingExpanded] = useState(false);
   const [ozHelpOpen, setOzHelpOpen] = useState(false);
@@ -829,6 +833,15 @@ export function AppShell({
     return Array.from(byKey.values()).sort((a, b) => a.county.localeCompare(b.county) || a.state.localeCompare(b.state));
   }, [classRowsShown, market, marketParcelIndex.markets]);
 
+  const activeFilterCount = countActiveFilters({
+    filters,
+    resetLandUse: shedParcelsOn ? "off" : DEFAULT_FILTERS.landUseFilter,
+    showExcluded,
+    showTraffic,
+    showOz,
+    showOz2,
+    screening,
+  });
   const marketCoverage = market === "Orlando" ? null : marketParcelIndex.markets[market];
   const headerPlace =
     shedParcelsOn && county
@@ -839,17 +852,34 @@ export function AppShell({
 
   return (
     <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-ink-950 text-ink-100">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-3 py-2.5 sm:px-4 sm:py-3 md:px-5">
-        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+      <header className="dls-app-header flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-3 py-2.5 sm:px-4 sm:py-3 md:px-5">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
           <CompanyLogo />
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-clay-400">{headerPlace}</p>
-            <h1 className="font-display text-xl tracking-tight text-white md:text-2xl">
-              {shedParcelsOn ? "Multifamily site search" : overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}
+            <p className="dls-wide text-[11px] uppercase tracking-[0.22em] text-clay-400">{headerPlace}</p>
+            <h1 className="truncate font-display text-xl tracking-tight text-white md:text-2xl max-[767px]:text-base">
+              <span className="max-[767px]:hidden">
+                {shedParcelsOn ? "Multifamily site search" : overlayMode === "nominated-only" ? "Nominated tracts" : "Eligible tracts"}
+              </span>
+              <span className="hidden max-[767px]:inline">Land search</span>
             </h1>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <MobileHeaderActions
+          searchOpen={searchOpen}
+          onToggleSearch={() => setSearchOpen((current) => !current)}
+          activeCount={activeFilterCount}
+          onOpenFilters={() => {
+            setMoreOpen(false);
+            setFiltersOpen(true);
+          }}
+          moreOpen={moreOpen}
+          onToggleMore={() => {
+            setSearchOpen(false);
+            setMoreOpen((current) => !current);
+          }}
+        />
+        <div className="dls-wide flex flex-wrap items-center gap-2">
           <button
             type="button"
             className="rounded-full border border-white/20 bg-ink-800 px-3 py-1.5 text-sm text-white"
@@ -886,7 +916,7 @@ export function AppShell({
               ))}
             </select>
           </label>
-          <p className="hidden text-right text-xs text-ink-500 sm:block">
+          <p className="dls-wide hidden text-right text-xs text-ink-500 sm:block">
             {visibleTracts.length.toLocaleString()}{" "}
             {activeMfView === "all" ? "eligible" : "SC MF priority"}{" "}
             {visibleTracts.length === 1 ? "tract" : "tracts"}
@@ -934,7 +964,7 @@ export function AppShell({
           {shedParcelsOn ? (
             <button
               type="button"
-              className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm lg:hidden"
+              className="dls-wide rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm lg:hidden"
               onClick={() => {
                 setInventoryTab("sites");
                 setSitesOpen(true);
@@ -945,7 +975,7 @@ export function AppShell({
           ) : null}
           <button
             type="button"
-            className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm lg:hidden"
+            className="dls-wide rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm lg:hidden"
             onClick={() => {
               setInventoryTab("tracts");
               setSitesOpen(true);
@@ -953,20 +983,22 @@ export function AppShell({
           >
             Tracts ({visibleTracts.length.toLocaleString()})
           </button>
-          <button
-            type="button"
-            className="rounded-full border border-white/15 bg-ink-800 px-3 py-1.5 text-sm md:hidden"
-            onClick={() => setFiltersOpen(true)}
-          >
-            Filters
-          </button>
         </div>
       </header>
-      <p className="border-b border-white/10 px-4 py-2 text-[11px] leading-relaxed text-ink-500 md:px-5">{SHED_CAVEAT}</p>
+      <MobileSearchBar
+        open={searchOpen}
+        busy={jumpBusy}
+        note={jumpNote}
+        error={jumpError}
+        suggestions={jumpSuggestions}
+        onJump={(query) => void jumpToQuery(query)}
+        onSuggestion={jumpToSuggestion}
+      />
+      <p className="dls-wide border-b border-white/10 px-4 py-2 text-[11px] leading-relaxed text-ink-500 md:px-5">{SHED_CAVEAT}</p>
       {statusHelp ? (
         <SouthCarolinaStatusNote
           note={statusHelp}
-          className="border-b border-white/10 px-4 py-2 text-[11px] leading-relaxed text-ink-300 md:px-5"
+          className="dls-wide border-b border-white/10 px-4 py-2 text-[11px] leading-relaxed text-ink-300 md:px-5"
         />
       ) : null}
 
@@ -1079,7 +1111,7 @@ export function AppShell({
             onAoiChange={setAoi}
           />
           {emptyCopy && (showSites || queryingParcels) ? (
-            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center px-4">
+            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center px-4 max-[767px]:top-16">
               <div className="pointer-events-none max-w-md rounded-2xl border border-white/10 bg-ink-900/95 px-4 py-3 text-sm shadow-2xl">
                 <p className="font-medium text-white">{emptyCopy.title}</p>
                 <p className="mt-1 text-ink-300">{emptyCopy.detail}</p>
@@ -1091,7 +1123,7 @@ export function AppShell({
             data-ranking-toggle
             aria-expanded={sitesOpen}
             aria-label="Show ranked sites"
-            className="absolute right-0 top-1/2 z-30 flex h-14 w-7 -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-white/20 bg-ink-900 text-lg text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-ink-800 lg:hidden"
+            className="dls-wide absolute right-0 top-1/2 z-30 flex h-14 w-7 -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-white/20 bg-ink-900 text-lg text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-ink-800 lg:hidden"
             onClick={() => {
               setInventoryTab(shedParcelsOn ? "sites" : "tracts");
               setSitesOpen(true);
@@ -1253,7 +1285,7 @@ export function AppShell({
       {sitesOpen ? (
         <div className="fixed inset-0 z-40 lg:hidden">
           <button type="button" className="absolute inset-0 bg-black/50" aria-label="Close list" onClick={() => setSitesOpen(false)} />
-          <div className="absolute inset-x-0 bottom-0 flex h-[75vh] flex-col rounded-t-3xl border border-white/10 bg-ink-900 shadow-2xl">
+          <div className="absolute inset-x-0 bottom-0 flex h-[75vh] flex-col rounded-t-3xl border border-white/10 bg-ink-900 pb-[env(safe-area-inset-bottom)] shadow-2xl">
             {showSites ? (
               <SitesPanel
                 variant="sheet"
@@ -1285,6 +1317,41 @@ export function AppShell({
           </div>
         </div>
       ) : null}
+      <MobileMoreSheet
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+        market={market}
+        marketGroups={marketGroups}
+        onMarket={changeMarket}
+        county={county}
+        countyState={countyState}
+        countyOptions={countyOptions}
+        countyTotal={classRowsShown.length}
+        onCounty={changeCounty}
+        showSites={shedParcelsOn}
+        siteCount={filterMatchTotal}
+        tractCount={visibleTracts.length}
+        onOpenSites={() => {
+          setInventoryTab("sites");
+          setMoreOpen(false);
+          setSitesOpen(true);
+        }}
+        onOpenTracts={() => {
+          setInventoryTab("tracts");
+          setMoreOpen(false);
+          setSitesOpen(true);
+        }}
+        onOpenOzHelp={() => {
+          setMoreOpen(false);
+          setOzHelpOpen(true);
+        }}
+        caveat={SHED_CAVEAT}
+        statusHelp={statusHelp}
+        zoningConfig={zoningConfig}
+        fluConfig={fluConfig}
+        fluJoinedCount={fluJoinedCount}
+        parcelCount={parcelsInView}
+      />
       <OzExplainer open={ozHelpOpen} onClose={() => setOzHelpOpen(false)} />
     </div>
   );

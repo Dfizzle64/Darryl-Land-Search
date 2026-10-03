@@ -166,3 +166,138 @@ body {
   background: rgba(197, 208, 218, 0.2);
   border-radius: 999px;
 }
+
+/* Phone layout. These classes do nothing from 768px up, so the desktop rails stay put. */
+.dls-narrow,
+.dls-narrow-block {
+  display: none !important;
+}
+
+.sheet-handle {
+  display: none;
+  touch-action: none;
+}
+
+@media (min-width: 768px) {
+  details.filter-fold > summary {
+    display: none;
+  }
+
+  details.filter-fold:not([open]) > .filter-fold-body {
+    display: block !important;
+  }
+}
+
+@media (max-width: 767px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .dls-wide {
+    display: none !important;
+  }
+
+  .dls-narrow {
+    display: flex !important;
+  }
+
+  .dls-narrow-block {
+    display: block !important;
+  }
+
+  .dls-hit {
+    min-height: 44px;
+  }
+
+  .dls-range {
+    height: 44px;
+  }
+
+  .dls-app-header {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .filter-drawer {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 50;
+    width: 100%;
+    max-width: 100%;
+    height: min(92dvh, 100%);
+    transform: translate3d(0, 110%, 0);
+    border-right-width: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem 1.5rem 0 0;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .filter-drawer[data-open="true"] {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .sheet-handle {
+    display: flex;
+  }
+
+  .sheet-page {
+    z-index: 35;
+    max-height: min(52dvh, 26rem);
+    overflow: hidden;
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  }
+
+  .sheet-page.sheet-expanded {
+    max-height: calc(100dvh - env(safe-area-inset-top) - 4.5rem);
+    overflow-y: auto;
+  }
+
+  .sheet-page:not(.sheet-expanded) .sheet-rest {
+    display: none;
+  }
+
+  .map-legend[data-open="false"] {
+    display: none !important;
+  }
+
+  .map-legend[data-open="true"] {
+    position: fixed !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 45;
+    width: 100%;
+    max-width: none !important;
+    max-height: min(70dvh, 100%);
+    border-radius: 1.5rem 1.5rem 0 0;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .dls-map .maplibregl-ctrl-bottom-right .maplibregl-ctrl-group {
+    right: max(0.5rem, env(safe-area-inset-right));
+    bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .dls-map .maplibregl-ctrl-group button {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .dls-map .dls-map-scale {
+    position: absolute;
+    right: auto;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    left: max(0.5rem, env(safe-area-inset-left));
+    z-index: 2;
+    max-width: 42vw;
+  }
+
+  .dls-map .maplibregl-ctrl-bottom-right > .maplibregl-ctrl-attrib {
+    bottom: env(safe-area-inset-bottom);
+  }
+}
